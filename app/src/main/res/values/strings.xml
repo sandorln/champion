@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Champion</string>
+    <string name="not_find_data">Not Find Data</string>
+    <string name="unknown">UNKNOWN</string>
 </resources>
