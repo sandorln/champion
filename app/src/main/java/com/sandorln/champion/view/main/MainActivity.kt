@@ -2,14 +2,17 @@ package com.sandorln.champion.view.main
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.appbar.AppBarLayout
 import com.sandorln.champion.R
 import com.sandorln.champion.data.CharacterData
 import com.sandorln.champion.databinding.AMainBinding
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
     lateinit var aMainBinding: AMainBinding
@@ -28,9 +31,10 @@ class MainActivity : AppCompatActivity() {
         aMainBinding.rvChampions.layoutManager = GridLayoutManager(this, 6)
         aMainBinding.rvChampions.adapter = champAdapter
 
+        setSupportActionBar(aMainBinding.toolbar)
 
         mainViewModel.characterDefaultList.observe(this,
-            Observer<List<CharacterData>> { characterList->
+            Observer<List<CharacterData>> { characterList ->
                 champAdapter.championList = characterList
                 champAdapter.notifyDataSetChanged()
             })
@@ -45,6 +49,17 @@ class MainActivity : AppCompatActivity() {
                     champAdapter.championList = mainViewModel.characterDefaultList.value!!
 
                 champAdapter.notifyDataSetChanged()
+            })
+
+        aMainBinding.appbar.addOnOffsetChangedListener(
+            AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+                if (appBarLayout.totalScrollRange == 0 || verticalOffset == 0) {
+                    aMainBinding.txlayoutInAppbar.visibility = View.VISIBLE
+                    aMainBinding.txlayoutInToolbar.visibility = View.INVISIBLE
+                } else if (abs(verticalOffset) >= appBarLayout.totalScrollRange) {
+                    aMainBinding.txlayoutInAppbar.visibility = View.INVISIBLE
+                    aMainBinding.txlayoutInToolbar.visibility = View.VISIBLE
+                }
             })
     }
 
