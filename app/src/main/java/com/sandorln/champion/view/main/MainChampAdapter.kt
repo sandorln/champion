@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.item_champion_icon.view.*
 class MainChampAdapter : RecyclerView.Adapter<MainChampAdapter.MainChampionViewHolder>() {
 
     private var _selectChampion = MutableLiveData<Int>().apply { value = -1 }
-    val selectChampion: LiveData<Int> get() = _selectChampion
 
     var championList: List<CharacterData> = mutableListOf()
 

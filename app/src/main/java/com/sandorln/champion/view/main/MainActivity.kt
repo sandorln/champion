@@ -2,14 +2,11 @@ package com.sandorln.champion.view.main
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.R
 import com.sandorln.champion.data.CharacterData
 import com.sandorln.champion.databinding.AMainBinding
@@ -31,9 +28,22 @@ class MainActivity : AppCompatActivity() {
         aMainBinding.rvChampions.layoutManager = GridLayoutManager(this, 6)
         aMainBinding.rvChampions.adapter = champAdapter
 
-        mainViewModel.characterList.observe(this,
-            Observer<List<CharacterData>> { champList ->
-                champAdapter.championList = champList
+
+        mainViewModel.characterDefaultList.observe(this,
+            Observer<List<CharacterData>> { characterList->
+                champAdapter.championList = characterList
+                champAdapter.notifyDataSetChanged()
+            })
+
+        mainViewModel.searchChamp.observe(this,
+            Observer<String> { searchChampName ->
+                if (searchChampName.trim().isNotEmpty())
+                    champAdapter.championList = mainViewModel.characterDefaultList.value!!.filter { champ ->
+                        champ.cName.startsWith(searchChampName)
+                    }
+                else
+                    champAdapter.championList = mainViewModel.characterDefaultList.value!!
+
                 champAdapter.notifyDataSetChanged()
             })
     }
