@@ -3,6 +3,7 @@ package com.sandorln.champion.view.main
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -38,6 +39,14 @@ class MainActivity : AppCompatActivity() {
             return false
 
         }
+    }
+
+    private val backBtnKeyEvent = View.OnKeyListener { view, i, keyEvent ->
+        if (i == KeyEvent.KEYCODE_BACK) {
+            view.clearFocus()
+            true
+        } else
+            false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,17 +114,42 @@ class MainActivity : AppCompatActivity() {
                 champAdapter.notifyDataSetChanged()
             })
 
+
+        aMainBinding.editAppbar.isFocusableInTouchMode = true
+        aMainBinding.editToolbar.isFocusableInTouchMode = true
+
         /* 스크롤에 따른 이벤트 저장 */
         aMainBinding.appbar.addOnOffsetChangedListener(
             AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
                 if (appBarLayout.totalScrollRange == 0 || verticalOffset == 0) {
                     aMainBinding.txlayoutInAppbar.visibility = View.VISIBLE
+                    if (aMainBinding.editToolbar.isFocused) {
+                        aMainBinding.editAppbar.requestFocus()
+                        aMainBinding.editAppbar.setSelection(mainViewModel.searchChamp.value!!.length)
+                    }
                     aMainBinding.txlayoutInToolbar.visibility = View.INVISIBLE
+
+
                 } else if (abs(verticalOffset) >= (appBarLayout.totalScrollRange - aMainBinding.toolbar.height)) {
-                    aMainBinding.txlayoutInAppbar.visibility = View.INVISIBLE
                     aMainBinding.txlayoutInToolbar.visibility = View.VISIBLE
+                    if (aMainBinding.editAppbar.isFocused) {
+                        aMainBinding.editToolbar.requestFocus()
+                        aMainBinding.editToolbar.setSelection(mainViewModel.searchChamp.value!!.length)
+                    }
+                    aMainBinding.txlayoutInAppbar.visibility = View.INVISIBLE
                 }
             })
+
+        /* back button 시 focus 삭제 */
+        aMainBinding.editToolbar.setOnKeyListener(backBtnKeyEvent)
+        aMainBinding.editAppbar.setOnKeyListener(backBtnKeyEvent)
+    }
+
+    override fun onBackPressed() {
+        if (currentFocus != null)
+            currentFocus?.clearFocus()
+        else
+            finish()
     }
 
     override fun onResume() {
