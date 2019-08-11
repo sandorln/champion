@@ -19,16 +19,35 @@
                     android:layout_height="wrap_content">
                 <com.google.android.material.appbar.CollapsingToolbarLayout
                         android:background="#000000"
+                        app:contentScrim="#000000"
+                        app:statusBarScrim="#000000"
                         app:layout_scrollFlags="scroll|exitUntilCollapsed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
+
                     <ImageView
                             app:layout_collapseMode="parallax"
                             android:src="@drawable/lol_log"
                             android:id="@+id/img_logo"
-                            app:layout_constraintTop_toTopOf="parent"
                             android:layout_width="match_parent"
                             android:layout_height="150dp"/>
+
+                    <androidx.appcompat.widget.Toolbar
+                            app:layout_collapseMode="pin"
+                            android:layout_width="match_parent"
+                            android:layout_height="?attr/actionBarSize">
+                        <com.google.android.material.textfield.TextInputLayout
+                                android:hint="챔피언 이름 검색"
+                                android:textColorHint="#ffffff"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                            <com.google.android.material.textfield.TextInputEditText
+                                    android:textColor="#ffffff"
+                                    android:imeOptions="actionSearch"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </androidx.appcompat.widget.Toolbar>
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -41,7 +60,7 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toTopOf="@+id/layout_small_champ_info"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         android:id="@+id/rv_champions"
@@ -52,15 +71,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"/>
 
-                <include
-                        android:layout_height="200dp"
-                        android:layout_width="match_parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/rv_champions"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        android:id="@+id/layout_small_champ_info"
-                        layout="@layout/include_small_champ_info"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

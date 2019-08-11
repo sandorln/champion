@@ -36,15 +36,6 @@ class MainActivity : AppCompatActivity() {
                 champAdapter.championList = champList
                 champAdapter.notifyDataSetChanged()
             })
-
-        champAdapter.selectChampion.observe(this,
-            Observer<Int> { selectPosition ->
-                if (selectPosition >= 0) {
-                    
-                    aMainBinding.layoutSmallChampInfo.visibility = View.VISIBLE
-                } else
-                    aMainBinding.layoutSmallChampInfo.visibility = View.GONE
-            })
     }
 
     override fun onResume() {
