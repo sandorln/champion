@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
         if (event!!.action == MotionEvent.ACTION_UP) {
             if (event.rawX >= (aMainBinding.editxMain.right - aMainBinding.editxMain.compoundDrawables[DRAWABLE_RIGHT].bounds.width())){
                 mainViewModel.searchChamp.value = ""
-                return@OnTouchListener true
             }
         }
         return@OnTouchListener false
