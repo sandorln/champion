@@ -28,12 +28,13 @@ class LolDataServiceResponse {
 
         return if (rData != null) {
             val gson = Gson()
-            for ((key, value) in rData!!.entrySet()) {
+            for ((_, value) in rData!!.entrySet()) {
                 rCharacterList.add(gson.fromJson(value, CharacterData::class.java))
             }
             true
         } else
             false
+
     }
 
     override fun toString(): String {

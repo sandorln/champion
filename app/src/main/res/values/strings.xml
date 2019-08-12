@@ -2,4 +2,5 @@
     <string name="app_name">Champion</string>
     <string name="not_find_data">Not Find Data</string>
     <string name="unknown">UNKNOWN</string>
+    <string name="champion_info_title">&lt; %s &gt;</string>
 </resources>

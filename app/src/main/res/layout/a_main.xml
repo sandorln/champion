@@ -8,7 +8,6 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:background="#000000"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -19,95 +18,72 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                 <com.google.android.material.appbar.CollapsingToolbarLayout
-                        app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
                         android:background="#000000"
                         app:contentScrim="#000000"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                            app:layout_collapseMode="none"
+                    <ImageView
+                            app:layout_collapseMode="parallax"
+                            android:src="@drawable/lol_log"
+                            android:id="@+id/img_logo"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-                        <ImageView
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toTopOf="@+id/txlayout_in_appbar"
-                                app:layout_collapseMode="parallax"
-                                android:src="@drawable/lol_log"
-                                android:id="@+id/img_logo"
-                                android:layout_width="match_parent"
-                                android:layout_height="150dp"/>
-                        <com.google.android.material.textfield.TextInputLayout
-                                android:layout_marginStart="15dp"
-                                android:layout_marginEnd="15dp"
-                                android:id="@+id/txlayout_in_appbar"
-                                app:layout_constraintTop_toBottomOf="@id/img_logo"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                android:hint="챔피언 이름 검색"
-                                android:textColorHint="#ffffff"
-                                android:layout_width="match_parent"
-                                android:layout_height="?attr/actionBarSize">
-                            <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/edit_appbar"
-                                    android:textColor="#ffffff"
-                                    android:text="@={vm.searchChamp}"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    android:inputType="text"
-                                    android:imeOptions="actionSearch"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.appcompat.widget.Toolbar
-                            app:layout_collapseMode="pin"
-                            android:id="@+id/toolbar"
-                            android:layout_width="match_parent"
-                            android:layout_height="?attr/actionBarSize">
-                        <com.google.android.material.textfield.TextInputLayout
-                                android:id="@+id/txlayout_in_toolbar"
-                                android:hint="챔피언 이름 검색"
-                                android:textColorHint="#ffffff"
-                                android:layout_width="match_parent"
-                                android:layout_height="?attr/actionBarSize">
-                            <com.google.android.material.textfield.TextInputEditText
-                                    android:layout_marginEnd="15dp"
-                                    android:id="@+id/edit_toolbar"
-                                    android:textColor="#ffffff"
-                                    android:text="@={vm.searchChamp}"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    android:inputType="text"
-                                    android:imeOptions="actionSearch"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </androidx.appcompat.widget.Toolbar>
+                            android:layout_height="150dp"/>
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
-
             <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_champ_info"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:background="#000000"
+                    android:id="@+id/layout_champs"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                <androidx.recyclerview.widget.RecyclerView
+                <com.google.android.material.textfield.TextInputLayout
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:id="@+id/txlayout_main"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/rv_champions"
+                        android:hint="챔피언 이름 검색"
+                        android:textColorHint="#ffffff"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize">
+                    <com.sandorln.champion.custom.ClearFocusEditText
+                            android:id="@+id/editx_main"
+                            android:textColor="#ffffff"
+                            android:text="@={vm.searchChamp}"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:inputType="text"
+                            android:imeOptions="actionSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                        app:layout_constraintTop_toBottomOf="@id/txlayout_main"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
                         android:id="@+id/rv_champions"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:layout_marginBottom="20dp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="20dp"
                         bind:listitem="@layout/item_champion_icon"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <include
+                    android:id="@+id/include_bottom"
+                    bind:champion = "@{act.champAdapter.selectChampion}"
+                    layout="@layout/include_small_champ_info"/>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
         <include
                 bind:isLoading="@{vm.isLoading}"

@@ -18,11 +18,17 @@ class MainViewModel : ViewModel() {
 
     val searchChamp = MutableLiveData<String>().apply { value = "" }
 
-    val isLoading: LiveData<Boolean> get() = lolDataModel.isLoading
     private val responseData: LiveData<LolDataServiceResponse> get() = lolDataModel.successResult
+    val isLoading: LiveData<Boolean> get() = lolDataModel.isLoading
     val errorMsg: LiveData<String> get() = lolDataModel.errorResult
 
     fun getAllChampion() {
         lolDataModel.getAllChampion()
+    }
+
+    fun getChampionInfo(characterData: CharacterData, onComplete : (loadingData:CharacterData)-> Unit)  {
+        lolDataModel.getChampionInfo(characterData.cId) { loadingData ->
+            onComplete(loadingData)
+        }
     }
 }
