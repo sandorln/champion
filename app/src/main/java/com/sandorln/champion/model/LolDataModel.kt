@@ -3,6 +3,7 @@ package com.sandorln.champion.model
 import androidx.lifecycle.MutableLiveData
 import com.sandorln.champion.api.LolDataService
 import com.sandorln.champion.api.LolDataServiceResponse
+import com.sandorln.champion.data.CharacterData
 
 class LolDataModel {
 
@@ -19,6 +20,18 @@ class LolDataModel {
         }, { errorMsg ->
             errorResult.postValue(errorMsg)
             isLoading.postValue(false)
+        })
+    }
+
+    fun getChampionInfo(champName: String, onComplete : (championData : CharacterData) -> Unit) {
+        LolDataService.getChampionInfo(champName, { successData ->
+            successResult.value!!.rCharacterList.forEachIndexed { index, champ ->
+                if(successData.cKey == champ.cKey)
+                    successResult.value!!.rCharacterList[index] = successData
+            }
+            onComplete(successData)
+        }, { errorMsg ->
+            errorResult.postValue(errorMsg)
         })
     }
 }

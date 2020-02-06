@@ -14,7 +14,7 @@ class CharacterData {
     @SerializedName("title")
     var cTitle: String = ""
     @SerializedName("blurb")
-    var cblurb: String = ""
+    var cBlurb: String = ""
     @SerializedName("info")
     var cInfo: CharacterInfo = CharacterInfo()
     @SerializedName("image")
@@ -25,9 +25,16 @@ class CharacterData {
     var cPartType: String = ""
     @SerializedName("stats")
     var cStats: CharacterStats = CharacterStats()
+    @SerializedName("skins")
+
+    var cSkins: List<CharacterSkin> = mutableListOf()
+    @SerializedName("allytips")
+    var cAllytips : List<String> = mutableListOf()
+    @SerializedName("enemytips")
+    var cEnemytips : List<String> = mutableListOf()
 
     override fun toString(): String {
-        return "CharacterData(cVersion='$cVersion', cId='$cId', cKey=$cKey, cName='$cName', cTitle='$cTitle', cblurb='$cblurb', cInfo=$cInfo, cImage=$cImage, cTags=$cTags, cPartType='$cPartType', cStats=$cStats)"
+        return "CharacterData(cVersion='$cVersion', cId='$cId', cKey=$cKey, cName='$cName', cTitle='$cTitle', cBlurb='$cBlurb', cInfo=$cInfo, cImage=$cImage, cTags=$cTags, cPartType='$cPartType', cStats=$cStats)"
     }
 
 
