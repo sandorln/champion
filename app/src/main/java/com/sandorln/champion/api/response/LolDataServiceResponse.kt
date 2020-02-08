@@ -1,24 +1,25 @@
-package com.sandorln.champion.api
+package com.sandorln.champion.api.response
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
-import com.sandorln.champion.data.CharacterData
+import com.sandorln.champion.api.data.CharacterData
 
-class LolDataServiceResponse {
+data class LolDataServiceResponse(
     @SerializedName("type")
-    var rType: String = ""
+    var rType: String = "",
     @SerializedName("format")
-    var rFormat: String = ""
+    var rFormat: String = "",
     @SerializedName("version")
-    var rVersion: String = ""
+    var rVersion: String = "",
 
     /* 해당 Data 를 받아와서 별도의 Parsing 을 해줌 */
     @SerializedName("data")
-    var rData: JsonObject? = JsonObject()
+    var rData: JsonObject? = JsonObject(),
 
     /* 위의 rData 를 Parsing 하여 생성 될 캐릭터 정보 리스트 */
     var rCharacterList: MutableList<CharacterData> = mutableListOf()
+) {
 
     /**
      * 캐릭터 정보 값 Parsing
@@ -35,9 +36,5 @@ class LolDataServiceResponse {
         } else
             false
 
-    }
-
-    override fun toString(): String {
-        return "LolDataServiceResponse(rType='$rType', rFormat='$rFormat', rVersion='$rVersion', rData=$rData)"
     }
 }

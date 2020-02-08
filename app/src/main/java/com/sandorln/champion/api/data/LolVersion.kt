@@ -1,4 +1,4 @@
-package com.sandorln.champion.api
+package com.sandorln.champion.api.data
 
 import com.google.gson.annotations.SerializedName
 
