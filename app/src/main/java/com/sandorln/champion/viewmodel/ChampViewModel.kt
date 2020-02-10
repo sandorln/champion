@@ -18,15 +18,12 @@ class ChampViewModel(application: Application) : AndroidViewModel(application) {
     val isLoading: LiveData<Boolean> = lolRepository.isLoading
     val errorMsg: LiveData<String> = lolRepository.errorResult
 
-
-
-    fun getChampionInfo(characterData: CharacterData) {
+    /**
+     * 특정한 챔피언의 정보를 가져올 시
+     */
+    fun getChampionDetailInfo(characterData: CharacterData) {
         lolRepository.getChampionInfo(characterData.cId) {
             selectCharacter.postValue(it)
         }
-    }
-
-    fun getVersion(onComplete: () -> Unit) {
-        lolRepository.getVersion(onComplete)
     }
 }

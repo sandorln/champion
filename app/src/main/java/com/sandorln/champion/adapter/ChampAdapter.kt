@@ -23,19 +23,18 @@ class ChampAdapter(var championList: List<CharacterData>, var onClickItem: (sele
 
     override fun onBindViewHolder(holder: MainChampionViewHolder, position: Int) {
         holder.itemView.setOnClickListener { onClickItem(championList[position]) }
+        holder.binding.character = championList[position]
 
         /* 챔피언 버전에 맞게 URL 수정 후 이미지 불러오기 */
         val champVersion = LolApiClient.lolVersion!!.lvCategory.cvChampion
 
         Glide.with(holder.itemView.context)
             .load("http://ddragon.leagueoflegends.com/cdn/$champVersion/img/champion/${championList[position].cId}.png")
-            .thumbnail(0.1f)
             .placeholder(R.drawable.ic_launcher_foreground)
+            .fitCenter()
             .into(holder.binding.imgChampionIcon)
 
-        holder.binding.txChampionName.text = championList[position].cName
-
-        holder.itemView.refreshDrawableState()
+        holder.itemView.requestLayout()
     }
 
     class MainChampionViewHolder(val binding: ItemChampionIconBinding) : RecyclerView.ViewHolder(binding.root)

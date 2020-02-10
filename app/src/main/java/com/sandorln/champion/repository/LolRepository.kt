@@ -29,13 +29,13 @@ class LolRepository {
                     if (response.body()!!.parsingData())
                         characterList.postValue(response.body()!!.rCharacterList)
                     else
-                        errorResult.postValue("데이터를 찾을 수 없습니다")
+                        errorResult.postValue("Error : Not Find Data !!")
 
                     isLoading.postValue(false)
                 }
 
                 override fun onFailure(call: Call<LolDataServiceResponse>, t: Throwable) {
-                    errorResult.postValue(t.message.toString())
+                    errorResult.postValue("Error : Network Not Connection")
                     isLoading.postValue(false)
                 }
             })
@@ -47,19 +47,24 @@ class LolRepository {
      * 특정 캐릭터 정보값 가져오기
      */
     fun getChampionInfo(champID: String, onComplete: (selectCharacter: CharacterData) -> Unit) {
+        isLoading.postValue(true)
+
         LolApiClient
             .getService()
-            .apiGetChampionInfo(LolApiClient.lolVersion!!.lvCategory.cvChampion, champID)
+            .getChampionDetailInfo(LolApiClient.lolVersion!!.lvCategory.cvChampion, champID)
             .enqueue(object : Callback<LolDataServiceResponse> {
                 override fun onResponse(call: Call<LolDataServiceResponse>, response: Response<LolDataServiceResponse>) {
                     if (response.body()!!.parsingData())
                         onComplete(response.body()!!.rCharacterList.first())
                     else
                         errorResult.postValue("Error : Not Find Data !!")
+
+                    isLoading.postValue(false)
                 }
 
                 override fun onFailure(call: Call<LolDataServiceResponse>, t: Throwable) {
-                    errorResult.postValue(t.message.toString())
+                    errorResult.postValue("Error : Network Not Connection")
+                    isLoading.postValue(false)
                 }
             })
     }
@@ -73,7 +78,7 @@ class LolRepository {
             .getVersion()
             .enqueue(object : Callback<LolVersion> {
                 override fun onFailure(call: Call<LolVersion>, t: Throwable) {
-                    errorResult.postValue(t.message.toString())
+                    errorResult.postValue("Error : Network Not Connection")
                 }
 
                 override fun onResponse(call: Call<LolVersion>, response: Response<LolVersion>) {
