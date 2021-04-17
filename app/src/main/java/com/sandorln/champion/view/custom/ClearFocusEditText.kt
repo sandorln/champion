@@ -1,4 +1,4 @@
-package com.sandorln.champion.custom
+package com.sandorln.champion.view.custom
 
 import android.content.Context
 import android.util.AttributeSet

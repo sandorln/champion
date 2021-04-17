@@ -69,7 +69,7 @@
                         app:layout_constraintBottom_toTopOf="@id/rv_champions"
                         app:layout_constraintTop_toTopOf="parent">
 
-                    <com.sandorln.champion.custom.ClearFocusEditText
+                    <com.sandorln.champion.view.custom.ClearFocusEditText
                             android:id="@+id/edit_search_champ"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

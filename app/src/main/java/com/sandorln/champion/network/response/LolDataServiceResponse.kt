@@ -1,5 +1,6 @@
 package com.sandorln.champion.network.response
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
@@ -20,21 +21,27 @@ data class LolDataServiceResponse(
     /* 위의 rData 를 Parsing 하여 생성 될 캐릭터 정보 리스트 */
     var rCharacterList: MutableList<CharacterData> = mutableListOf()
 ) {
+    init {
+        try {
+            parsingData()
+        } catch (e: Exception) {
+            Log.d("LOGD", "파싱 에러 : $e")
+        }
+    }
 
     /**
      * 캐릭터 정보 값 Parsing
      */
-    fun parsingData(): Boolean {
+    @Throws
+    private fun parsingData() {
         rCharacterList.clear()
 
-        return if (rData != null) {
+        if (rData != null) {
             val gson = Gson()
             for ((_, value) in rData!!.entrySet()) {
                 rCharacterList.add(gson.fromJson(value, CharacterData::class.java))
             }
-            true
         } else
-            false
-
+            throw Exception("값을 찾을 수 없습니다")
     }
 }

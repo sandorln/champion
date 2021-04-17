@@ -4,28 +4,33 @@ import android.content.Context
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.sandorln.champion.R
+import com.sandorln.champion.databinding.ActivityMainBinding
+import com.sandorln.champion.databinding.BottomSheetChampInfoBinding
+import com.sandorln.champion.model.CharacterData
+import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampAdapter
 import com.sandorln.champion.view.adapter.ChampSkinAdapter
-import com.sandorln.champion.databinding.ActivityMainBinding
-import com.sandorln.champion.model.CharacterData
-import com.sandorln.champion.databinding.BottomSheetChampInfoBinding
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampViewModel
-import com.sandorln.champion.viewmodel.factory.ViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     private lateinit var champInfoBinding: BottomSheetChampInfoBinding
 
-    private val champViewModel: ChampViewModel by lazy { ViewModelProvider(this, ViewModelFactory(application))[ChampViewModel::class.java] }
+    private val champViewModel: ChampViewModel by viewModels()
     private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     /* Bottom Sheet */
@@ -60,7 +65,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         bottomSheet = BottomSheetBehavior.from(champInfoBinding.bottomSheet)
 
         champAdapter = ChampAdapter(mutableListOf()) {
-            champViewModel.getChampionDetailInfo(it)
+            lifecycleScope.launchWhenResumed {
+                champViewModel.getChampionDetailInfo(it.cId)
+            }
         }
 
         champSkinAdapter = ChampSkinAdapter()
@@ -82,22 +89,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override suspend fun initObserverSetting() {
-        champViewModel.errorMsg.observe(this, Observer { errorMsg ->
-            if (errorMsg.isNotEmpty()) {
-                AlertDialog
-                    .Builder(this)
-                    .setTitle("Error")
-                    .setMessage(errorMsg)
-                    .setPositiveButton("Okay") { _, _ -> }
-                    .create()
-                    .show()
-            }
-        })
-        
+        champViewModel.characterAllList.observe(this, Observer { resultCharacterList ->
+            when(resultCharacterList){
+                is ResultData.Success->{
+                    champAdapter.championList = resultCharacterList.data ?: mutableListOf()
+                    champAdapter.notifyDataSetChanged()
+                }
+                is ResultData.Failed->{
 
-        champViewModel.characterAllList.observe(this, Observer { characterList ->
-            champAdapter.championList = characterList
-            champAdapter.notifyDataSetChanged()
+                }
+            }
         })
 
         champViewModel.searchChampName.observe(this, Observer { searchChampName ->

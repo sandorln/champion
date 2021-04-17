@@ -1,88 +1,77 @@
 package com.sandorln.champion.repository
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.sandorln.champion.model.CharacterData
+import com.sandorln.champion.model.LolVersion
+import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.network.LolApiClient
-import com.sandorln.champion.network.response.LolDataServiceResponse
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class LolRepository {
-    val isLoading = MutableLiveData<Boolean>().apply { value = false }
-    val errorResult = MutableLiveData<String>().apply { value = "" }
 
     /**
      * 모든 챔피언 정보 가져오기
      */
-    fun getAllChampion(): LiveData<List<CharacterData>> {
-        isLoading.postValue(true)
-        val characterList = MutableLiveData<List<CharacterData>>()
+    private val inMemoryAllChampionList = mutableListOf<CharacterData>()
+    private var isLoadingAllChampion = false
+    private val resultAllChampionList = ConflatedBroadcastChannel<ResultData<List<CharacterData>>>()
+    suspend fun getResultAllChampionList(): Flow<ResultData<List<CharacterData>>> {
+        inMemoryAllChampionList.clear()
+        isLoadingAllChampion = false
+        requestAllChampion()
+        return resultAllChampionList.asFlow()
+    }
 
-        LolApiClient
-            .getService()
-            .getAllChampion(LolApiClient.lolVersion!!.lvCategory.cvChampion)
-            .enqueue(object : Callback<LolDataServiceResponse> {
-                override fun onResponse(call: Call<LolDataServiceResponse>, response: Response<LolDataServiceResponse>) {
-                    if (response.body()!!.parsingData())
-                        characterList.postValue(response.body()!!.rCharacterList)
-                    else
-                        errorResult.postValue("Error : Not Find Data !!")
-
-                    isLoading.postValue(false)
-                }
-
-                override fun onFailure(call: Call<LolDataServiceResponse>, t: Throwable) {
-                    errorResult.postValue("Error : Network Not Connection")
-                    isLoading.postValue(false)
-                }
-            })
-
-        return characterList
+    suspend fun requestAllChampion() {
+        if (!isLoadingAllChampion) {
+            try {
+                isLoadingAllChampion = true
+                val response = LolApiClient.getService().getAllChampion(LolApiClient.lolVersion!!.lvCategory.cvChampion)
+                inMemoryAllChampionList.addAll(response.rCharacterList)
+                resultAllChampionList.offer(ResultData.Success(inMemoryAllChampionList.toList()))
+            } catch (e: Exception) {
+                resultAllChampionList.offer(ResultData.Failed(e))
+            } finally {
+                isLoadingAllChampion = false
+            }
+        }
     }
 
     /**
      * 특정 캐릭터 정보값 가져오기
      */
-    fun getChampionInfo(champID: String, onComplete: (selectCharacter: CharacterData) -> Unit) {
-        isLoading.postValue(true)
-
-        LolApiClient
-            .getService()
-            .getChampionDetailInfo(LolApiClient.lolVersion!!.lvCategory.cvChampion, champID)
-            .enqueue(object : Callback<LolDataServiceResponse> {
-                override fun onResponse(call: Call<LolDataServiceResponse>, response: Response<LolDataServiceResponse>) {
-                    if (response.body()!!.parsingData())
-                        onComplete(response.body()!!.rCharacterList.first())
-                    else
-                        errorResult.postValue("Error : Not Find Data !!")
-
-                    isLoading.postValue(false)
+    private var isLoadingGetChampion = false
+    suspend fun getChampionInfo(champID: String): ResultData<CharacterData> =
+        if (!isLoadingGetChampion) {
+            try {
+                withContext(Dispatchers.IO) {
+                    isLoadingGetChampion = true
+                    val response = LolApiClient.getService().getChampionDetailInfo(LolApiClient.lolVersion!!.lvCategory.cvChampion, champID)
+                    ResultData.Success(response.rCharacterList.first())
                 }
-
-                override fun onFailure(call: Call<LolDataServiceResponse>, t: Throwable) {
-                    errorResult.postValue("Error : Network Not Connection")
-                    isLoading.postValue(false)
-                }
-            })
-    }
+            } catch (e: Exception) {
+                ResultData.Failed(e)
+            } finally {
+                isLoadingGetChampion = false
+            }
+        } else
+            ResultData.Failed(Exception("이미 로딩중 입니다"))
 
     /**
      * 버전 값 가져오기
      */
-    suspend fun getVersion(onComplete: () -> Unit) {
+    suspend fun getVersion(): ResultData<LolVersion> =
         try {
             LolApiClient.lolVersion = LolApiClient.getService().getVersion()
-            withContext(Dispatchers.Main) {
-                onComplete()
-            }
+            ResultData.Success(LolApiClient.lolVersion)
         } catch (e: Exception) {
-            Log.d("TAG", "getVersion: $e")
-            errorResult.postValue("Error : Network Not Connection")
+            ResultData.Failed(e)
         }
-    }
 }
