@@ -1,6 +1,6 @@
-package com.sandorln.champion.api
+package com.sandorln.champion.network
 
-import com.sandorln.champion.api.data.LolVersion
+import com.sandorln.champion.model.LolVersion
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

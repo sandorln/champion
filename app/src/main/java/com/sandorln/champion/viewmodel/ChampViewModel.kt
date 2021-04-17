@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.sandorln.champion.api.data.CharacterData
+import com.sandorln.champion.model.CharacterData
 import com.sandorln.champion.repository.LolRepository
 
 class ChampViewModel(application: Application) : AndroidViewModel(application) {
@@ -22,8 +22,8 @@ class ChampViewModel(application: Application) : AndroidViewModel(application) {
      * 특정한 챔피언의 정보를 가져올 시
      */
     fun getChampionDetailInfo(characterData: CharacterData) {
-        lolRepository.getChampionInfo(characterData.cId) {
-            selectCharacter.postValue(it)
+        lolRepository.getChampionInfo(characterData.cId) { value->
+            selectCharacter.postValue(value)
         }
     }
 }

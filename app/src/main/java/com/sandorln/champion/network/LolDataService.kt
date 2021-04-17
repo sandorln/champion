@@ -1,7 +1,7 @@
-package com.sandorln.champion.api
+package com.sandorln.champion.network
 
-import com.sandorln.champion.api.data.LolVersion
-import com.sandorln.champion.api.response.LolDataServiceResponse
+import com.sandorln.champion.network.response.LolDataServiceResponse
+import com.sandorln.champion.model.LolVersion
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -17,6 +17,6 @@ interface LolDataService {
     fun getChampionDetailInfo(@Path("champion_version") champVersion: String, @Path("champion_name") champName: String): Call<LolDataServiceResponse>
 
     @GET("/realms/na.json")
-    fun getVersion(): Call<LolVersion>
+    suspend fun getVersion(): LolVersion
 
 }

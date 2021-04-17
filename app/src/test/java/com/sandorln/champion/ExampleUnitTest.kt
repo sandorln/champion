@@ -1,8 +1,8 @@
 package com.sandorln.champion
 
-import com.sandorln.champion.api.LolApiClient
-import com.sandorln.champion.api.data.LolVersion
-import com.sandorln.champion.api.response.LolDataServiceResponse
+import com.sandorln.champion.network.LolApiClient
+import com.sandorln.champion.model.LolVersion
+import com.sandorln.champion.network.response.LolDataServiceResponse
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import retrofit2.Call

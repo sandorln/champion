@@ -1,4 +1,4 @@
-package com.sandorln.champion.view.main
+package com.sandorln.champion.view.activity
 
 import android.content.Context
 import android.view.MotionEvent
@@ -10,17 +10,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.sandorln.champion.R
-import com.sandorln.champion.adapter.ChampAdapter
-import com.sandorln.champion.adapter.ChampSkinAdapter
-import com.sandorln.champion.api.data.CharacterData
-import com.sandorln.champion.databinding.AMainBinding
+import com.sandorln.champion.view.adapter.ChampAdapter
+import com.sandorln.champion.view.adapter.ChampSkinAdapter
+import com.sandorln.champion.databinding.ActivityMainBinding
+import com.sandorln.champion.model.CharacterData
 import com.sandorln.champion.databinding.BottomSheetChampInfoBinding
-import com.sandorln.champion.view.BaseActivity
+import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampViewModel
 import com.sandorln.champion.viewmodel.factory.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : BaseActivity<AMainBinding>() {
-    override fun getLayout(): Int = R.layout.a_main
+@AndroidEntryPoint
+class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     private lateinit var champInfoBinding: BottomSheetChampInfoBinding
 
@@ -46,7 +47,7 @@ class MainActivity : BaseActivity<AMainBinding>() {
         return@OnTouchListener false
     }
 
-    override fun initBindingSetting() {
+    override suspend fun initViewModelSetting() {
         binding.act = this
         binding.vm = champViewModel
         champInfoBinding = DataBindingUtil.findBinding(binding.includeBottom.root)!!
@@ -55,7 +56,7 @@ class MainActivity : BaseActivity<AMainBinding>() {
         champInfoBinding.champViewModel = champViewModel
     }
 
-    override fun initObjectSetting() {
+    override suspend fun initObjectSetting() {
         bottomSheet = BottomSheetBehavior.from(champInfoBinding.bottomSheet)
 
         champAdapter = ChampAdapter(mutableListOf()) {
@@ -65,7 +66,7 @@ class MainActivity : BaseActivity<AMainBinding>() {
         champSkinAdapter = ChampSkinAdapter()
     }
 
-    override fun initViewSetting() {
+    override suspend fun initViewSetting() {
         /* 챔피언 리스트 어뎁터 */
         binding.rvChampions.adapter = champAdapter
 
@@ -80,7 +81,7 @@ class MainActivity : BaseActivity<AMainBinding>() {
         bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
-    override fun initObserverSetting() {
+    override suspend fun initObserverSetting() {
         champViewModel.errorMsg.observe(this, Observer { errorMsg ->
             if (errorMsg.isNotEmpty()) {
                 AlertDialog
@@ -92,6 +93,7 @@ class MainActivity : BaseActivity<AMainBinding>() {
                     .show()
             }
         })
+        
 
         champViewModel.characterAllList.observe(this, Observer { characterList ->
             champAdapter.championList = characterList

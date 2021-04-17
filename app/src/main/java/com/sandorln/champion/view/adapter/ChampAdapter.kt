@@ -1,12 +1,12 @@
-package com.sandorln.champion.adapter
+package com.sandorln.champion.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sandorln.champion.R
-import com.sandorln.champion.api.LolApiClient
-import com.sandorln.champion.api.data.CharacterData
+import com.sandorln.champion.network.LolApiClient
+import com.sandorln.champion.model.CharacterData
 import com.sandorln.champion.databinding.ItemChampionIconBinding
 
 class ChampAdapter(var championList: List<CharacterData>, var onClickItem: (selectChampion: CharacterData) -> Unit) :

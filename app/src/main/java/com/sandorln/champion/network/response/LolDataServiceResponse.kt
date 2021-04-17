@@ -1,9 +1,9 @@
-package com.sandorln.champion.api.response
+package com.sandorln.champion.network.response
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
-import com.sandorln.champion.api.data.CharacterData
+import com.sandorln.champion.model.CharacterData
 
 data class LolDataServiceResponse(
     @SerializedName("type")

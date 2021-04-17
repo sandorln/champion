@@ -1,11 +1,13 @@
 package com.sandorln.champion.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.sandorln.champion.api.LolApiClient
-import com.sandorln.champion.api.data.CharacterData
-import com.sandorln.champion.api.data.LolVersion
-import com.sandorln.champion.api.response.LolDataServiceResponse
+import com.sandorln.champion.model.CharacterData
+import com.sandorln.champion.network.LolApiClient
+import com.sandorln.champion.network.response.LolDataServiceResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -72,22 +74,15 @@ class LolRepository {
     /**
      * 버전 값 가져오기
      */
-    fun getVersion(onComplete: () -> Unit) {
-        LolApiClient
-            .getService()
-            .getVersion()
-            .enqueue(object : Callback<LolVersion> {
-                override fun onFailure(call: Call<LolVersion>, t: Throwable) {
-                    errorResult.postValue("Error : Network Not Connection")
-                }
-
-                override fun onResponse(call: Call<LolVersion>, response: Response<LolVersion>) {
-                    if (response.isSuccessful) {
-                        LolApiClient.lolVersion = response.body()!!
-                        onComplete()
-                    } else
-                        errorResult.postValue("Error : Not Find Data !!")
-                }
-            })
+    suspend fun getVersion(onComplete: () -> Unit) {
+        try {
+            LolApiClient.lolVersion = LolApiClient.getService().getVersion()
+            withContext(Dispatchers.Main) {
+                onComplete()
+            }
+        } catch (e: Exception) {
+            Log.d("TAG", "getVersion: $e")
+            errorResult.postValue("Error : Network Not Connection")
+        }
     }
 }
