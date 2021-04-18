@@ -21,26 +21,16 @@ data class LolDataServiceResponse(
     /* 위의 rData 를 Parsing 하여 생성 될 캐릭터 정보 리스트 */
     var rCharacterList: MutableList<CharacterData> = mutableListOf()
 ) {
-    init {
-        try {
-            parsingData()
-        } catch (e: Exception) {
-            Log.d("LOGD", "파싱 에러 : $e")
-        }
-    }
-
     /**
      * 캐릭터 정보 값 Parsing
      */
-    @Throws
-    private fun parsingData() {
+    fun parsingData() {
         rCharacterList.clear()
 
         if (rData != null) {
             val gson = Gson()
-            for ((_, value) in rData!!.entrySet()) {
+            for ((_, value) in rData!!.entrySet())
                 rCharacterList.add(gson.fromJson(value, CharacterData::class.java))
-            }
         } else
             throw Exception("값을 찾을 수 없습니다")
     }

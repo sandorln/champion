@@ -1,7 +1,6 @@
 package com.sandorln.champion
 
-import com.sandorln.champion.network.LolApiClient
-import com.sandorln.champion.model.LolVersion
+import com.sandorln.champion.model.VersionLol
 import com.sandorln.champion.network.response.LolDataServiceResponse
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -30,8 +29,8 @@ class ExampleUnitTest {
         LolApiClient
             .getService()
             .getVersion()
-            .enqueue(object : Callback<LolVersion> {
-                override fun onResponse(call: Call<LolVersion>, response: Response<LolVersion>) {
+            .enqueue(object : Callback<VersionLol> {
+                override fun onResponse(call: Call<VersionLol>, response: Response<VersionLol>) {
                     LolApiClient
                         .getService()
                         .getAllChampion(response.body()!!.lvCategory.cvChampion)
@@ -46,7 +45,7 @@ class ExampleUnitTest {
                         })
                 }
 
-                override fun onFailure(call: Call<LolVersion>, t: Throwable) {
+                override fun onFailure(call: Call<VersionLol>, t: Throwable) {
                     countDownLatch.countDown()
                 }
             })

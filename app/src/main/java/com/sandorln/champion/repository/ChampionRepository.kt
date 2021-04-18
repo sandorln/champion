@@ -1,9 +1,9 @@
 package com.sandorln.champion.repository
 
+import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.CharacterData
-import com.sandorln.champion.model.LolVersion
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.network.LolApiClient
+import com.sandorln.champion.network.ChampionService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -14,7 +14,10 @@ import kotlinx.coroutines.withContext
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class LolRepository {
+class ChampionRepository(
+    private val championService: ChampionService,
+    private val versionManager: VersionManager
+) {
 
     /**
      * 모든 챔피언 정보 가져오기
@@ -29,12 +32,13 @@ class LolRepository {
         return resultAllChampionList.asFlow()
     }
 
-    suspend fun requestAllChampion() {
+    private suspend fun requestAllChampion() {
         if (!isLoadingAllChampion) {
             try {
                 isLoadingAllChampion = true
-                val response = LolApiClient.getService().getAllChampion(LolApiClient.lolVersion!!.lvCategory.cvChampion)
-                inMemoryAllChampionList.addAll(response.rCharacterList)
+                val response = championService.getAllChampion(versionManager.getVersion().lvCategory.cvChampion)
+                response.parsingData()
+                inMemoryAllChampionList.addAll(response.rCharacterList.sortedBy { it.cName })
                 resultAllChampionList.offer(ResultData.Success(inMemoryAllChampionList.toList()))
             } catch (e: Exception) {
                 resultAllChampionList.offer(ResultData.Failed(e))
@@ -43,6 +47,7 @@ class LolRepository {
             }
         }
     }
+
 
     /**
      * 특정 캐릭터 정보값 가져오기
@@ -53,7 +58,8 @@ class LolRepository {
             try {
                 withContext(Dispatchers.IO) {
                     isLoadingGetChampion = true
-                    val response = LolApiClient.getService().getChampionDetailInfo(LolApiClient.lolVersion!!.lvCategory.cvChampion, champID)
+                    val response = championService.getChampionDetailInfo(versionManager.getVersion().lvCategory.cvChampion, champID)
+                    response.parsingData()
                     ResultData.Success(response.rCharacterList.first())
                 }
             } catch (e: Exception) {
@@ -63,15 +69,4 @@ class LolRepository {
             }
         } else
             ResultData.Failed(Exception("이미 로딩중 입니다"))
-
-    /**
-     * 버전 값 가져오기
-     */
-    suspend fun getVersion(): ResultData<LolVersion> =
-        try {
-            LolApiClient.lolVersion = LolApiClient.getService().getVersion()
-            ResultData.Success(LolApiClient.lolVersion)
-        } catch (e: Exception) {
-            ResultData.Failed(e)
-        }
 }

@@ -101,10 +101,5 @@
                     android:id="@+id/include_bottom"
                     layout="@layout/bottom_sheet_champ_info" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-        <include
-                layout="@layout/a_loading"
-                bind:isLoading="@{vm.isLoading}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

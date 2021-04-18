@@ -10,18 +10,19 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId: Int) : AppCompatActivity(), LifecycleObserver {
+abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId: Int) : AppCompatActivity() {
     lateinit var binding: T
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, layoutId)
         binding.lifecycleOwner = this
-        lifecycle.addObserver(this)
+
 
         lifecycleScope.launchWhenCreated {
+            initViewModelSetting()
+
             withContext(Dispatchers.Default) {
-                initViewModelSetting()
                 initObjectSetting()
             }
 

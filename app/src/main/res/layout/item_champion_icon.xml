@@ -2,13 +2,6 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-                name="character"
-                type="com.sandorln.champion.model.CharacterData" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,13 +16,12 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-                android:id="@+id/tx_champion_name"
+                android:id="@+id/tv_champion_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#99000000"
                 android:gravity="center"
                 android:hint="@string/unknown"
-                android:text="@{character.cName}"
                 android:textColor="#FFFFFFFF"
                 android:textSize="7.5sp"
                 app:layout_constraintBottom_toBottomOf="parent"
