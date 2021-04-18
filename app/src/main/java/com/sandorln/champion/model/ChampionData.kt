@@ -2,7 +2,7 @@ package com.sandorln.champion.model
 
 import com.google.gson.annotations.SerializedName
 
-data class CharacterData(
+data class ChampionData(
     @SerializedName("version")
     var cVersion: String = "",
     @SerializedName("id")

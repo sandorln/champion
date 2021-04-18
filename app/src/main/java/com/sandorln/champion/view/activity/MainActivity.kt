@@ -1,22 +1,19 @@
 package com.sandorln.champion.view.activity
 
 import android.content.Context
+import android.content.Intent
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityMainBinding
-import com.sandorln.champion.databinding.BottomSheetChampInfoBinding
 import com.sandorln.champion.manager.VersionManager
-import com.sandorln.champion.model.CharacterData
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.view.adapter.ChampAdapter
 import com.sandorln.champion.view.adapter.ChampSkinAdapter
+import com.sandorln.champion.view.adapter.ThumbnailChampionAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,41 +28,35 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     @Inject
     lateinit var versionManager: VersionManager
 
-    private lateinit var champInfoBinding: BottomSheetChampInfoBinding
     private val champViewModel: ChampViewModel by viewModels()
     private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-    /* Bottom Sheet */
-    private lateinit var bottomSheet: BottomSheetBehavior<View>
-
     /* Champion List Adapter */
-    private lateinit var champAdapter: ChampAdapter
+    private lateinit var thumbnailChampionAdapter: ThumbnailChampionAdapter
     private lateinit var champSkinAdapter: ChampSkinAdapter
 
     /* 검색 창 오른쪽 X 버튼 */
     private val cleanBtnClick = View.OnTouchListener { v, event ->
         val DRAWABLE_RIGHT = 2
 
-        if (event!!.action == MotionEvent.ACTION_UP) {
-            if (event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())) {
-                champViewModel.searchChampName.value = ""
-            }
-        }
+        if (event!!.action == MotionEvent.ACTION_UP &&
+            event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
+        )
+            champViewModel.searchChampName.postValue("")
+
         return@OnTouchListener false
     }
 
     override suspend fun initViewModelSetting() {
         binding.act = this
         binding.vm = champViewModel
-        champInfoBinding = DataBindingUtil.findBinding(binding.includeBottom.root)!!
-        champInfoBinding.clickListener = View.OnClickListener { }
     }
 
     override suspend fun initObjectSetting() {
-        bottomSheet = BottomSheetBehavior.from(champInfoBinding.bottomSheet)
-
         champSkinAdapter = ChampSkinAdapter()
-        champAdapter = ChampAdapter(mutableListOf(), versionManager.getVersion().lvCategory.cvChampion) {
+        thumbnailChampionAdapter = ThumbnailChampionAdapter(versionManager.getVersion().lvCategory.cvChampion) {
+            // 사용자가 챔피언을 선택했을 경우
+            // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
                 when (val result = champViewModel.getChampionDetailInfo(it.cId)) {
                     is ResultData.Success -> result.data?.let { champion ->
@@ -76,15 +67,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                                 inputMethodManager.hideSoftInputFromWindow(binding.editSearchChamp.windowToken, 0)
                             }
 
-                            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-
                             /* 해당 챔피언의 상세 정보가 없을 시 다시 불러옴 */
-                            champSkinAdapter.characterData = champion
-                            champInfoBinding.champViewModel
-                            champInfoBinding.vpChampSkin.setCurrentItem(0, true)
+                            champSkinAdapter.championData = champion
                             champSkinAdapter.notifyDataSetChanged()
-                        } else
-                            bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+                        }
+
+                        startActivity(Intent(this@MainActivity, ChampionDetailActivity::class.java))
                     }
                 }
             }
@@ -93,42 +81,29 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     override suspend fun initViewSetting() {
         /* 챔피언 리스트 어뎁터 */
-        binding.rvChampions.adapter = champAdapter
+        binding.rvChampions.adapter = thumbnailChampionAdapter
 
         /* 챔피언 스킨 어뎁터 */
-        champInfoBinding.vpChampSkin.adapter = champSkinAdapter
 
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { view, isFocus ->
-            if (isFocus)
-                bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
         }
 
-        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     override suspend fun initObserverSetting() {
-        champViewModel.characterAllList.observe(this, Observer { resultCharacterList ->
+        champViewModel.championAllList.observe(this, Observer { resultCharacterList ->
             when (resultCharacterList) {
-                is ResultData.Success -> {
-                    champAdapter.championList = resultCharacterList.data ?: mutableListOf()
-                    champAdapter.notifyDataSetChanged()
-                }
+                is ResultData.Success -> thumbnailChampionAdapter.submitList(resultCharacterList.data ?: mutableListOf())
                 is ResultData.Failed -> {
-
                 }
             }
         })
 
-        champViewModel.searchChampName.observe(this, Observer { searchChampName ->
-            /* 검색어가 비어있지 않을 경우 */
-            if (searchChampName.trim().isNotEmpty()) {
-//                champAdapter.championList =
-//                    champViewModel.characterAllList.value!!.filter { champ ->
-//                        /* 검색어 / 검색 대상 공백 제거 */
-//                        champ.cName.replace(" ", "")
-//                            .startsWith(searchChampName.replace(" ", ""))
-//                    }
+        champViewModel.searchChampName.observe(this, Observer { searchChampionName ->
+            champViewModel.searchChampion(searchChampionName)
 
+            /* 검색어가 비어있지 않을 경우 */
+            if (searchChampionName.isNotEmpty()) {
                 /* 검색어를 모두 지우는 아이콘 생성 */
                 with(binding.editSearchChamp) {
                     setCompoundDrawablesWithIntrinsicBounds(
@@ -138,30 +113,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                 }
 
             } else {
-                /* 검색어가 존재하지 않을 시 기본 챔피언 리스트 출력 */
-//                champAdapter.championList = champViewModel.characterAllList.value ?: mutableListOf()
                 /* 검색어가 존재하지 않을 시 검색어를 모두 지우는 아이콘 삭제 */
                 with(binding.editSearchChamp) {
                     setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
                     setOnTouchListener(null)
                 }
             }
-
-            champAdapter.notifyDataSetChanged()
-        })
-
-        // 사용자가 챔피언을 선택했을 경우
-        // 해당 챔피언의 상세 내용을 가져옴
-        champViewModel.selectCharacter.observe(this, Observer<CharacterData> { champion ->
-
         })
     }
 
     override fun onBackPressed() {
         when {
-            bottomSheet.state == BottomSheetBehavior.STATE_COLLAPSED || bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED -> {
-                bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-            }
             currentFocus != null -> currentFocus?.clearFocus()
             champViewModel.searchChampName.value!!.isNotEmpty() -> champViewModel.searchChampName.postValue("")
             else -> finish()

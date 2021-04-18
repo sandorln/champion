@@ -2,24 +2,12 @@
 
 <layout>
 
-    <data>
-
-        <variable
-                name="clickListener"
-                type="android.view.View.OnClickListener" />
-
-        <variable
-                name="champViewModel"
-                type="com.sandorln.champion.viewmodel.ChampViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="240dp"
             android:background="#000000"
-            android:onClick="@{clickListener}"
             android:orientation="vertical"
             android:padding="20dp"
             app:behavior_hideable="true"
@@ -51,20 +39,17 @@
             <TextView
                     style="@style/champion_info_tx_style"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@{@string/champion_info_title(champViewModel.selectCharacter.cTitle)}" />
+                    android:layout_height="wrap_content" />
 
             <TextView
                     style="@style/champion_info_tx_style"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@{champViewModel.selectCharacter.cName}" />
+                    android:layout_height="wrap_content" />
 
             <TextView
                     style="@style/champion_info_tx_style"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text='@{"TAG " + champViewModel.selectCharacter.cTags}' />
+                    android:layout_height="wrap_content" />
 
             <ScrollView
                     android:layout_width="match_parent"
@@ -73,8 +58,7 @@
                 <TextView
                         style="@style/champion_info_tx_style"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@{champViewModel.selectCharacter.cBlurb}" />
+                        android:layout_height="wrap_content" />
             </ScrollView>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

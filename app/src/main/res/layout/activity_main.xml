@@ -97,9 +97,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <include
-                    android:id="@+id/include_bottom"
-                    layout="@layout/bottom_sheet_champ_info" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

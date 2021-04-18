@@ -1,6 +1,8 @@
 package com.sandorln.champion.view.activity
 
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import androidx.core.app.ActivityOptionsCompat
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivitySplashBinding
@@ -21,8 +23,10 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
 
     override fun onResume() {
         super.onResume()
-        val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this, binding.imgLogo, "logo").toBundle()
-        startActivity(Intent(this, MainActivity::class.java), option)
-        finish()
+        Handler(Looper.getMainLooper()).postDelayed({
+            val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this, binding.imgLogo, "logo").toBundle()
+            startActivity(Intent(this, MainActivity::class.java), option)
+            finish()
+        }, 750)
     }
 }
