@@ -1,20 +1,18 @@
 package com.sandorln.champion.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
-class CharacterInfo {
+@Parcelize
+data class CharacterInfo(
     @SerializedName("attack")
-    var iAtk: Int = 0
+    var iAtk: Int = 0,
     @SerializedName("defense")
-    var iDef: Int = 0
+    var iDef: Int = 0,
     @SerializedName("magic")
-    var iMagic: Int = 0
+    var iMagic: Int = 0,
     @SerializedName("difficulty")
     var idifficult: Int = 0
-
-    override fun toString(): String {
-        return "CharacterInfo(iAtk=$iAtk, iDef=$iDef, iMagic=$iMagic, idifficult=$idifficult)"
-    }
-
-
-}
+) : Serializable, Parcelable

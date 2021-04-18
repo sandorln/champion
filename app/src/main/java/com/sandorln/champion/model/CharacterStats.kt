@@ -1,52 +1,50 @@
 package com.sandorln.champion.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
-class CharacterStats {
+@Parcelize
+data class CharacterStats(
     @SerializedName("hp")
-    var sHp: Double = 0.0
+    var sHp: Double = 0.0,
     @SerializedName("hpperlevel")
-    var sHpLv: Double = 0.0
+    var sHpLv: Double = 0.0,
     @SerializedName("mp")
-    var sMp: Double = 0.0
+    var sMp: Double = 0.0,
     @SerializedName("mpperlevel")
-    var sMpLv: Double = 0.0
+    var sMpLv: Double = 0.0,
     @SerializedName("movespeed")
-    var sMoveSpeed: Double = 0.0
+    var sMoveSpeed: Double = 0.0,
     @SerializedName("armor")
-    var sArmor: Double = 0.0
+    var sArmor: Double = 0.0,
     @SerializedName("armorperlevel")
-    var sArmorLv: Double = 0.0
+    var sArmorLv: Double = 0.0,
     @SerializedName("spellblock")
-    var sSpellBlock: Double = 0.0
+    var sSpellBlock: Double = 0.0,
     @SerializedName("spellblockperlevel")
-    var sSpellBlockLv: Double = 0.0
+    var sSpellBlockLv: Double = 0.0,
     @SerializedName("attackrange")
-    var sAttackRange: Double = 0.0
+    var sAttackRange: Double = 0.0,
     @SerializedName("hpregen")
-    var sHpRegen: Double = 0.0
+    var sHpRegen: Double = 0.0,
     @SerializedName("hpregenperlevel")
-    var sHpRegenLv: Double = 0.0
+    var sHpRegenLv: Double = 0.0,
     @SerializedName("mpregen")
-    var sMpRegen: Double = 0.0
+    var sMpRegen: Double = 0.0,
     @SerializedName("mpregenperlevel")
-    var sMpRegenLv: Double = 0.0
+    var sMpRegenLv: Double = 0.0,
     @SerializedName("crit")
-    var sCrit: Double = 0.0
+    var sCrit: Double = 0.0,
     @SerializedName("critperlevel")
-    var sCritLv: Double = 0.0
+    var sCritLv: Double = 0.0,
     @SerializedName("attackdamage")
-    var sAttk: Double = 0.0
+    var sAttk: Double = 0.0,
     @SerializedName("attackdamageperlevel")
-    var sAttkLv: Double = 0.0
+    var sAttkLv: Double = 0.0,
     @SerializedName("attackspeedoffset")
-    var sAttkSpeed: Double = 0.0
+    var sAttkSpeed: Double = 0.0,
     @SerializedName("attackspeedperlevel")
     var sAttkSpeedLv: Double = 0.0
-
-    override fun toString(): String {
-        return "CharacterStats(sHp=$sHp, sHpLv=$sHpLv, sMp=$sMp, sMpLv=$sMpLv, sMoveSpeed=$sMoveSpeed, sArmor=$sArmor, sArmorLv=$sArmorLv, sSpellBlock=$sSpellBlock, sSpellBlockLv=$sSpellBlockLv, sAttackRange=$sAttackRange, sHpRegen=$sHpRegen, sHpRegenLv=$sHpRegenLv, sMpRegen=$sMpRegen, sMpRegenLv=$sMpRegenLv, sCrit=$sCrit, sCritLv=$sCritLv, sAttk=$sAttk, sAttkLv=$sAttkLv, sAttkSpeed=$sAttkSpeed, sAttkSpeedLv=$sAttkSpeedLv)"
-    }
-
-
-}
+) : Serializable, Parcelable

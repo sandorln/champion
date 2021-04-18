@@ -11,7 +11,7 @@
 
         <variable
                 name="vm"
-                type="com.sandorln.champion.viewmodel.ChampViewModel" />
+                type="com.sandorln.champion.viewmodel.ChampionViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

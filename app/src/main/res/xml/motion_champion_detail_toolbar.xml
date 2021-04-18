@@ -2,35 +2,100 @@
 <MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <Transition
-            app:constraintSetEnd="@id/end"
-            app:constraintSetStart="@id/start"
-            app:duration="1000"
-            app:motionInterpolator="linear">
+            app:constraintSetEnd="@id/champion_detail_toolbar_end"
+            app:constraintSetStart="@id/champion_detail_toolbar_start"
+            app:duration="1000">
         <OnSwipe
                 app:dragDirection="dragDown"
                 app:touchAnchorId="@id/img_champion_splash"
                 app:touchAnchorSide="bottom" />
     </Transition>
 
-    <ConstraintSet android:id="@+id/start">
+    <ConstraintSet android:id="@+id/champion_detail_toolbar_start">
         <Constraint
-                android:id="@+id/img_champion_splash"
+                android:id="@+id/img_back"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                app:layout_constraintEnd_toStartOf="@id/card_champion"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+                android:id="@+id/card_champion"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="h,16:9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute
+                    app:attributeName="radius"
+                    app:customDimension="0dp" />
+        </Constraint>
+
+        <Constraint
+                android:id="@+id/tv_champion_name"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="0dp"
+                android:textColor="@color/base"
+                app:layout_constraintBottom_toBottomOf="parent">
+            <CustomAttribute
+                    app:attributeName="textColor"
+                    app:customColorValue="@color/base" />
+            <CustomAttribute
+                    app:attributeName="textSize"
+                    app:customDimension="13dp" />
+        </Constraint>
+
+        <Constraint android:id="@+id/tv_champion_blurb">
+            <PropertySet android:visibility="invisible" />
+        </Constraint>
+
     </ConstraintSet>
 
-    <ConstraintSet android:id="@+id/end">
+    <ConstraintSet android:id="@+id/champion_detail_toolbar_end">
         <Constraint
-                android:id="@+id/img_champion_splash"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:id="@+id/img_back"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
+
+        <Constraint
+                android:id="@+id/card_champion"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/img_back">
+            <CustomAttribute
+                    app:attributeName="radius"
+                    app:customDimension="20dp" />
+        </Constraint>
+
+        <Constraint
+                android:id="@+id/tv_champion_name"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/card_champion">
+            <CustomAttribute
+                    app:attributeName="textColor"
+                    app:customColorValue="@android:color/white" />
+            <CustomAttribute
+                    app:attributeName="textSize"
+                    app:customDimension="8dp" />
+        </Constraint>
+
+        <Constraint android:id="@+id/tv_champion_blurb">
+            <PropertySet android:visibility="visible" />
+        </Constraint>
+
     </ConstraintSet>
 </MotionScene>

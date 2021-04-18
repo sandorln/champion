@@ -1,7 +1,6 @@
 package com.sandorln.champion.view.activity
 
 import android.content.Context
-import android.content.Intent
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -15,7 +14,7 @@ import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampSkinAdapter
 import com.sandorln.champion.view.adapter.ThumbnailChampionAdapter
 import com.sandorln.champion.view.base.BaseActivity
-import com.sandorln.champion.viewmodel.ChampViewModel
+import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -28,7 +27,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     @Inject
     lateinit var versionManager: VersionManager
 
-    private val champViewModel: ChampViewModel by viewModels()
+    private val championViewModel: ChampionViewModel by viewModels()
     private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     /* Champion List Adapter */
@@ -42,14 +41,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         if (event!!.action == MotionEvent.ACTION_UP &&
             event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
         )
-            champViewModel.searchChampName.postValue("")
+            championViewModel.searchChampName.postValue("")
 
         return@OnTouchListener false
     }
 
     override suspend fun initViewModelSetting() {
         binding.act = this
-        binding.vm = champViewModel
+        binding.vm = championViewModel
     }
 
     override suspend fun initObjectSetting() {
@@ -58,7 +57,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             // 사용자가 챔피언을 선택했을 경우
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
-                when (val result = champViewModel.getChampionDetailInfo(it.cId)) {
+                when (val result = championViewModel.getChampionDetailInfo(it.cId)) {
                     is ResultData.Success -> result.data?.let { champion ->
                         if (champion.cName.isNotEmpty()) {
                             /* 검색 중 챔피언을 눌렀을 시 _ 키보드 및 검색창 닫기 */
@@ -72,7 +71,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                             champSkinAdapter.notifyDataSetChanged()
                         }
 
-                        startActivity(Intent(this@MainActivity, ChampionDetailActivity::class.java))
+                        startActivity(ChampionDetailActivity.newIntent(champion, this@MainActivity))
                     }
                 }
             }
@@ -91,7 +90,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override suspend fun initObserverSetting() {
-        champViewModel.championAllList.observe(this, Observer { resultCharacterList ->
+        championViewModel.championAllList.observe(this, Observer { resultCharacterList ->
             when (resultCharacterList) {
                 is ResultData.Success -> thumbnailChampionAdapter.submitList(resultCharacterList.data ?: mutableListOf())
                 is ResultData.Failed -> {
@@ -99,8 +98,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             }
         })
 
-        champViewModel.searchChampName.observe(this, Observer { searchChampionName ->
-            champViewModel.searchChampion(searchChampionName)
+        championViewModel.searchChampName.observe(this, Observer { searchChampionName ->
+            championViewModel.searchChampion(searchChampionName)
 
             /* 검색어가 비어있지 않을 경우 */
             if (searchChampionName.isNotEmpty()) {
@@ -125,7 +124,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     override fun onBackPressed() {
         when {
             currentFocus != null -> currentFocus?.clearFocus()
-            champViewModel.searchChampName.value!!.isNotEmpty() -> champViewModel.searchChampName.postValue("")
+            championViewModel.searchChampName.value!!.isNotEmpty() -> championViewModel.searchChampName.postValue("")
             else -> finish()
         }
     }

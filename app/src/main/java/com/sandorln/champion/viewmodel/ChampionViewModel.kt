@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.*
 import com.sandorln.champion.model.ChampionData
+import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.repository.ChampionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +18,9 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @FlowPreview
 @HiltViewModel
-class ChampViewModel @Inject constructor(
+class ChampionViewModel @Inject constructor(
     @ApplicationContext context: Context,
+    private val savedStateHandle: SavedStateHandle,
     private val championRepository: ChampionRepository
 ) : AndroidViewModel(context as Application) {
 
@@ -35,9 +37,10 @@ class ChampViewModel @Inject constructor(
         championRepository.searchChampion(searchChampionName)
     }
 
-
     /**
      * 특정한 챔피언의 정보를 가져올 시
      */
     suspend fun getChampionDetailInfo(characterId: String): ResultData<ChampionData> = championRepository.getChampionInfo(characterId)
+
+    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA)
 }

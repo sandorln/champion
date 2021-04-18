@@ -1,14 +1,18 @@
 package com.sandorln.champion.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
-class CharacterSkin {
+@Parcelize
+data class CharacterSkin(
     @SerializedName("id")
-    var skId : String = ""
+    var skId: String = "",
     @SerializedName("num")
-    var skNum : String = ""
+    var skNum: String = "",
     @SerializedName("name")
-    var skName : String = ""
+    var skName: String = "",
     @SerializedName("chromas")
-    var skChromas : Boolean = false
-}
+    var skChromas: Boolean = false
+) : Serializable, Parcelable

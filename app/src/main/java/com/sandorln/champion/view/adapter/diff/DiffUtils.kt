@@ -1,4 +1,4 @@
-package com.sandorln.champion.view.adapter
+package com.sandorln.champion.view.adapter.diff
 
 import androidx.recyclerview.widget.DiffUtil
 import com.sandorln.champion.model.ChampionData

@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemChampionIconBinding
 import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.view.binding.setCharacterThumbnail
+import com.sandorln.champion.view.adapter.diff.DiffUtils
+import com.sandorln.champion.view.binding.setChampionThumbnail
 
 class ThumbnailChampionAdapter(
     var championVersion: String = "",
@@ -22,7 +23,7 @@ class ThumbnailChampionAdapter(
 
         with(holder.binding) {
             tvChampionName.text = championData.cName
-            imgChampionIcon.setCharacterThumbnail(championVersion, championData.cId)
+            imgChampionIcon.setChampionThumbnail(championVersion, championData.cId)
         }
     }
 

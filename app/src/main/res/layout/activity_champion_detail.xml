@@ -8,19 +8,64 @@
         <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/appbar"
                 android:layout_width="match_parent"
-                android:layout_height="300dp">
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent">
 
             <com.sandorln.champion.view.custom.CollapsibleToolbar
+                    android:id="@+id/collapsing_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:clipToPadding="false"
                     android:minHeight="50dp"
                     app:layoutDescription="@xml/motion_champion_detail_toolbar"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
-                <androidx.constraintlayout.utils.widget.ImageFilterView
-                        android:id="@+id/img_champion_splash"
+                <androidx.cardview.widget.CardView
+                        android:id="@+id/card_champion"
                         android:layout_width="match_parent"
-                        android:layout_height="0dp" />
+                        android:layout_height="0dp"
+                        app:cardBackgroundColor="@android:color/transparent">
+
+                    <ImageView
+                            android:id="@+id/img_champion_splash"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop" />
+                </androidx.cardview.widget.CardView>
+
+                <ImageView
+                        android:id="@+id/img_back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:elevation="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_arrow_back"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                        android:id="@+id/tv_champion_name"
+                        style="@style/shadowEffect"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="15dp"
+                        android:textColor="@color/base"
+                        android:textSize="30dp"
+                        android:textStyle="italic|bold"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                <TextView
+                        android:id="@+id/tv_champion_blurb"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:paddingBottom="5dp"
+                        android:singleLine="true"
+                        android:textColor="@color/gray"
+                        android:textSize="11dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tv_champion_name" />
 
             </com.sandorln.champion.view.custom.CollapsibleToolbar>
 

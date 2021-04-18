@@ -1,7 +1,11 @@
 package com.sandorln.champion.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
+@Parcelize
 data class ChampionData(
     @SerializedName("version")
     var cVersion: String = "",
@@ -31,4 +35,4 @@ data class ChampionData(
     var cAllytips: List<String> = mutableListOf(),
     @SerializedName("enemytips")
     var cEnemytips: List<String> = mutableListOf()
-)
+) : Serializable, Parcelable
