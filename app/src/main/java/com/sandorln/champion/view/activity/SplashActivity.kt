@@ -16,7 +16,6 @@ import kotlinx.coroutines.FlowPreview
 @AndroidEntryPoint
 class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_splash) {
 
-    override suspend fun initViewModelSetting() {}
     override suspend fun initObjectSetting() {}
     override suspend fun initViewSetting() {}
     override suspend fun initObserverSetting() {}

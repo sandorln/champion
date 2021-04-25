@@ -30,7 +30,7 @@ data class ChampionData(
     @SerializedName("stats")
     var cStats: CharacterStats = CharacterStats(),
     @SerializedName("skins")
-    var cSkins: List<CharacterSkin> = mutableListOf(),
+    var cSkins: List<ChampionSkin> = mutableListOf(),
     @SerializedName("allytips")
     var cAllytips: List<String> = mutableListOf(),
     @SerializedName("enemytips")

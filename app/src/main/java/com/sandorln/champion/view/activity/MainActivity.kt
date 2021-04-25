@@ -11,8 +11,7 @@ import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityMainBinding
 import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.view.adapter.ChampSkinAdapter
-import com.sandorln.champion.view.adapter.ThumbnailChampionAdapter
+import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,8 +30,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     /* Champion List Adapter */
-    private lateinit var thumbnailChampionAdapter: ThumbnailChampionAdapter
-    private lateinit var champSkinAdapter: ChampSkinAdapter
+    private lateinit var championThumbnailAdapter: ChampionThumbnailAdapter
 
     /* 검색 창 오른쪽 X 버튼 */
     private val cleanBtnClick = View.OnTouchListener { v, event ->
@@ -46,14 +44,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         return@OnTouchListener false
     }
 
-    override suspend fun initViewModelSetting() {
-        binding.act = this
-        binding.vm = championViewModel
-    }
-
     override suspend fun initObjectSetting() {
-        champSkinAdapter = ChampSkinAdapter()
-        thumbnailChampionAdapter = ThumbnailChampionAdapter(versionManager.getVersion().lvCategory.cvChampion) {
+        championThumbnailAdapter = ChampionThumbnailAdapter(versionManager.getVersion().lvCategory.cvChampion) {
             // 사용자가 챔피언을 선택했을 경우
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
@@ -65,10 +57,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                                 binding.editSearchChamp.clearFocus()
                                 inputMethodManager.hideSoftInputFromWindow(binding.editSearchChamp.windowToken, 0)
                             }
-
-                            /* 해당 챔피언의 상세 정보가 없을 시 다시 불러옴 */
-                            champSkinAdapter.championData = champion
-                            champSkinAdapter.notifyDataSetChanged()
                         }
 
                         startActivity(ChampionDetailActivity.newIntent(champion, this@MainActivity))
@@ -80,7 +68,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     override suspend fun initViewSetting() {
         /* 챔피언 리스트 어뎁터 */
-        binding.rvChampions.adapter = thumbnailChampionAdapter
+        binding.rvChampions.adapter = championThumbnailAdapter
 
         /* 챔피언 스킨 어뎁터 */
 
@@ -90,9 +78,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override suspend fun initObserverSetting() {
+        binding.act = this
+        binding.vm = championViewModel
+
         championViewModel.championAllList.observe(this, Observer { resultCharacterList ->
             when (resultCharacterList) {
-                is ResultData.Success -> thumbnailChampionAdapter.submitList(resultCharacterList.data ?: mutableListOf())
+                is ResultData.Success -> championThumbnailAdapter.submitList(resultCharacterList.data ?: mutableListOf())
                 is ResultData.Failed -> {
                 }
             }
@@ -110,7 +101,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     )
                     setOnTouchListener(cleanBtnClick)
                 }
-
             } else {
                 /* 검색어가 존재하지 않을 시 검색어를 모두 지우는 아이콘 삭제 */
                 with(binding.editSearchChamp) {

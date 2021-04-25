@@ -16,13 +16,29 @@
                 android:id="@+id/img_back"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                app:layout_constraintEnd_toStartOf="@id/card_champion"
+                app:layout_constraintEnd_toStartOf="@id/card_splash_champion"
                 app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-                android:id="@+id/card_champion"
+                android:id="@+id/card_splash_champion"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:alpha="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="h,16:9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute
+                    app:attributeName="radius"
+                    app:customDimension="0dp" />
+        </Constraint>
+
+        <Constraint
+                android:id="@+id/card_thumbnail_champion"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:alpha="0"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="h,16:9"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -48,8 +64,18 @@
                     app:customDimension="13dp" />
         </Constraint>
 
-        <Constraint android:id="@+id/tv_champion_blurb">
-            <PropertySet android:visibility="invisible" />
+        <Constraint
+                android:id="@+id/tv_champion_title"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                app:layout_constraintBottom_toTopOf="@id/tv_champion_name"
+                app:layout_constraintStart_toStartOf="@id/tv_champion_name">
+            <CustomAttribute
+                    app:attributeName="textColor"
+                    app:customColorValue="@android:color/white" />
+            <CustomAttribute
+                    app:attributeName="textSize"
+                    app:customDimension="8dp" />
         </Constraint>
 
     </ConstraintSet>
@@ -63,13 +89,30 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
         <Constraint
-                android:id="@+id/card_champion"
+                android:id="@+id/card_splash_champion"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="5dp"
+                android:alpha="0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/img_back">
+            <CustomAttribute
+                    app:attributeName="radius"
+                    app:customDimension="20dp" />
+        </Constraint>
+
+        <Constraint
+                android:id="@+id/card_thumbnail_champion"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:alpha="1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/img_back">
             <CustomAttribute
@@ -84,7 +127,7 @@
                 android:layout_marginStart="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/card_champion">
+                app:layout_constraintStart_toEndOf="@id/card_splash_champion">
             <CustomAttribute
                     app:attributeName="textColor"
                     app:customColorValue="@android:color/white" />
@@ -93,8 +136,19 @@
                     app:customDimension="8dp" />
         </Constraint>
 
-        <Constraint android:id="@+id/tv_champion_blurb">
-            <PropertySet android:visibility="visible" />
+        <Constraint
+                android:id="@+id/tv_champion_title"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tv_champion_name">
+            <CustomAttribute
+                    app:attributeName="textColor"
+                    app:customColorValue="@color/gray" />
+            <CustomAttribute
+                    app:attributeName="textSize"
+                    app:customDimension="5.5dp" />
         </Constraint>
 
     </ConstraintSet>

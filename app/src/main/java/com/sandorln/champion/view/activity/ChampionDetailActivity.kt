@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Parcelable
 import androidx.activity.viewModels
-import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.sandorln.champion.R
@@ -12,6 +11,7 @@ import com.sandorln.champion.databinding.ActivityChampionDetailBinding
 import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.keys.BundleKeys
+import com.sandorln.champion.view.adapter.ChampionStatusAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.view.binding.setChampionSplash
 import com.sandorln.champion.view.binding.setToolbarChampionThumbnail
@@ -28,6 +28,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     @Inject
     lateinit var versionManager: VersionManager
     private val championViewModel: ChampionViewModel by viewModels()
+    lateinit var championStatusAdapter: ChampionStatusAdapter
 
     companion object {
         fun newIntent(championData: ChampionData, context: Context): Intent = Intent(context, ChampionDetailActivity::class.java).apply {
@@ -35,36 +36,26 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
         }
     }
 
-    override suspend fun initViewModelSetting() {
-    }
-
     override suspend fun initObjectSetting() {
+        championStatusAdapter = ChampionStatusAdapter()
     }
 
     override suspend fun initViewSetting() {
         initAppbarHeight()
+        binding.rvChampionsStatus.adapter = championStatusAdapter
     }
 
     override suspend fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
-            binding.tvChampionName.text = "\" ${champion.cName} \""
-            binding.tvChampionBlurb.text = champion.cBlurb
+            championStatusAdapter.championData = champion
+
+            binding.tvChampionName.text = champion.cName
+            binding.tvChampionTitle.text = champion.cTitle
             binding.imgChampionSplash.setChampionSplash(champion)
 
-            binding.collapsingLayout.setTransitionListener(object : MotionLayout.TransitionListener {
-                override fun onTransitionStarted(p0: MotionLayout?, p1: Int, p2: Int) {}
-                override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {}
-                override fun onTransitionCompleted(p0: MotionLayout?, p1: Int) {}
-
-                override fun onTransitionChange(p0: MotionLayout?, p1: Int, p2: Int, progress: Float) {
-                    lifecycleScope.launchWhenResumed {
-                        when {
-                            progress < 0.3 -> binding.imgChampionSplash.setChampionSplash(champion)
-                            else -> binding.imgChampionSplash.setToolbarChampionThumbnail(versionManager.getVersion().lvCategory.cvChampion, champion.cId)
-                        }
-                    }
-                }
-            })
+            lifecycleScope.launchWhenResumed {
+                binding.imgChampionThumbnail.setToolbarChampionThumbnail(versionManager.getVersion().lvCategory.cvChampion, champion.cId)
+            }
         })
     }
 

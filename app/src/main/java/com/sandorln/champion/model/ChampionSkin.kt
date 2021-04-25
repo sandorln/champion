@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
 @Parcelize
-data class CharacterSkin(
+data class ChampionSkin(
     @SerializedName("id")
     var skId: String = "",
     @SerializedName("num")

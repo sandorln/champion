@@ -21,13 +21,26 @@
                     app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
                 <androidx.cardview.widget.CardView
-                        android:id="@+id/card_champion"
+                        android:id="@+id/card_splash_champion"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         app:cardBackgroundColor="@android:color/transparent">
 
                     <ImageView
                             android:id="@+id/img_champion_splash"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                        android:id="@+id/card_thumbnail_champion"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:cardBackgroundColor="@android:color/transparent">
+
+                    <ImageView
+                            android:id="@+id/img_champion_thumbnail"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop" />
@@ -55,42 +68,30 @@
                         app:layout_constraintBottom_toBottomOf="parent" />
 
                 <TextView
-                        android:id="@+id/tv_champion_blurb"
+                        android:id="@+id/tv_champion_title"
+                        style="@style/shadowEffect"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
+                        android:elevation="3dp"
+                        android:gravity="bottom"
                         android:paddingBottom="5dp"
                         android:singleLine="true"
                         android:textColor="@color/gray"
                         android:textSize="11dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/tv_champion_name" />
+                        android:textStyle="italic|bold" />
 
             </com.sandorln.champion.view.custom.CollapsibleToolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_champions_status"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="800dp"
-                        android:text="qwnfoqwnfpqwnofpnqpofnqwopf"
-                        android:textColor="@android:color/white"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

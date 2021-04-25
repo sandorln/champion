@@ -30,3 +30,11 @@ fun ImageView.setChampionSplash(championData: ChampionData) {
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(this)
 }
+
+fun ImageView.setChampionSkin(championId: String, skinNumber: String = "0") {
+    Glide.with(context)
+        .load("http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_${skinNumber}.jpg")
+        .thumbnail(0.1f)
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+        .into(this)
+}

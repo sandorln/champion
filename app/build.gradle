@@ -54,7 +54,6 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$test_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
 
-
     // retrofit
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
@@ -65,7 +64,7 @@ dependencies {
 
     // ViewPager2
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
-
+    implementation "androidx.recyclerview:recyclerview:1.2.0"
     // Glide
     implementation "com.github.bumptech.glide:glide:$glide_version"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"

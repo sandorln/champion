@@ -9,11 +9,11 @@ import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 import com.sandorln.champion.view.binding.setChampionThumbnail
 
-class ThumbnailChampionAdapter(
+class ChampionThumbnailAdapter(
     var championVersion: String = "",
     var onClickItem: (selectChampion: ChampionData) -> Unit
 ) :
-    ListAdapter<ChampionData, ThumbnailChampionAdapter.ThumbnailChampionViewHolder>(DiffUtils.DIFF_CHAMPION_DATA) {
+    ListAdapter<ChampionData, ChampionThumbnailAdapter.ThumbnailChampionViewHolder>(DiffUtils.DIFF_CHAMPION_DATA) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThumbnailChampionViewHolder =
         ThumbnailChampionViewHolder(ItemChampionIconBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 

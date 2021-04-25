@@ -20,8 +20,6 @@ abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId
 
 
         lifecycleScope.launchWhenCreated {
-            initViewModelSetting()
-
             withContext(Dispatchers.Default) {
                 initObjectSetting()
             }
@@ -33,7 +31,6 @@ abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId
         }
     }
 
-    abstract suspend fun initViewModelSetting()
     abstract suspend fun initObjectSetting()
     abstract suspend fun initViewSetting()
     abstract suspend fun initObserverSetting()
