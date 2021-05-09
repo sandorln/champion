@@ -20,9 +20,10 @@
                 android:id="@+id/rv_thumbnail_skin"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_marginBottom="5dp"
                 android:nestedScrollingEnabled="false"
                 android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toTopOf="@id/rv_full_skin"
                 app:layout_constraintDimensionRatio="64:9"
                 app:layout_constraintTop_toTopOf="parent" />

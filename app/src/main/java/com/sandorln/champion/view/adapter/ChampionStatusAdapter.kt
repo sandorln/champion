@@ -45,10 +45,6 @@ class ChampionStatusAdapter(var championData: ChampionData = ChampionData()) : R
             fullAdapterFull = ChampionFullSkinAdapter(championId)
             fullAdapterFull.submitList(skinList)
 
-            val thumbnailSnapHelper = PagerSnapHelper().apply {
-                attachToRecyclerView(binding.rvThumbnailSkin)
-            }
-
             val fullSnapHelper = PagerSnapHelper().apply {
                 attachToRecyclerView(binding.rvFullSkin)
             }
