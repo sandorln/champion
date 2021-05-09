@@ -14,7 +14,9 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true">
 
-        <activity android:name="com.sandorln.champion.view.activity.SplashActivity">
+        <activity
+                android:noHistory="true"
+                android:name="com.sandorln.champion.view.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -6,7 +6,7 @@
             android:layout_height="wrap_content">
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/vp_full_skin"
+                android:id="@+id/rv_full_skin"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:nestedScrollingEnabled="false"
@@ -14,16 +14,16 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="16:9"
-                app:layout_constraintTop_toBottomOf="@id/vp_thumbnail_skin" />
+                app:layout_constraintTop_toBottomOf="@id/rv_thumbnail_skin" />
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/vp_thumbnail_skin"
+                android:id="@+id/rv_thumbnail_skin"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:nestedScrollingEnabled="false"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toTopOf="@id/vp_full_skin"
+                app:layout_constraintBottom_toTopOf="@id/rv_full_skin"
                 app:layout_constraintDimensionRatio="64:9"
                 app:layout_constraintTop_toTopOf="parent" />
 

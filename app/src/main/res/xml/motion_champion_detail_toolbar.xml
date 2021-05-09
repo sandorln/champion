@@ -133,7 +133,7 @@
                     app:customColorValue="@android:color/white" />
             <CustomAttribute
                     app:attributeName="textSize"
-                    app:customDimension="8dp" />
+                    app:customDimension="7dp" />
         </Constraint>
 
         <Constraint
@@ -148,7 +148,7 @@
                     app:customColorValue="@color/gray" />
             <CustomAttribute
                     app:attributeName="textSize"
-                    app:customDimension="5.5dp" />
+                    app:customDimension="4.5dp" />
         </Constraint>
 
     </ConstraintSet>

@@ -25,7 +25,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
         Handler(Looper.getMainLooper()).postDelayed({
             val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this, binding.imgLogo, "logo").toBundle()
             startActivity(Intent(this, MainActivity::class.java), option)
-            finish()
         }, 750)
     }
 }

@@ -27,8 +27,10 @@ import javax.inject.Inject
 class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.layout.activity_champion_detail) {
     @Inject
     lateinit var versionManager: VersionManager
-    private val championViewModel: ChampionViewModel by viewModels()
     lateinit var championStatusAdapter: ChampionStatusAdapter
+
+    private val championViewModel: ChampionViewModel by viewModels()
+
 
     companion object {
         fun newIntent(championData: ChampionData, context: Context): Intent = Intent(context, ChampionDetailActivity::class.java).apply {
@@ -43,6 +45,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     override suspend fun initViewSetting() {
         initAppbarHeight()
         binding.rvChampionsStatus.adapter = championStatusAdapter
+        binding.imgBack.setOnClickListener { finish() }
     }
 
     override suspend fun initObserverSetting() {
