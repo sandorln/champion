@@ -27,16 +27,11 @@
 
         <TextView
                 android:id="@+id/tv_champion_blurb"
-                style="@style/shadowEffect"
+                style="@style/Base.Widget.AppCompat.TextView.DescriptionStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_small"
                 android:layout_marginBottom="@dimen/padding_small"
-                android:gravity="center"
-                android:padding="@dimen/padding_middle"
-                android:textColor="@android:color/white"
-                android:textSize="12.5dp"
-                android:textStyle="italic|bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

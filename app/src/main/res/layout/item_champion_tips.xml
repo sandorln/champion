@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <TextView
+                android:id="@+id/tv_title"
+                style="@style/Base.Widget.AppCompat.TextView.DescriptionStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_small"
+                android:textColor="@color/base"
+                android:visibility="gone" />
+
+        <TextView
+                android:id="@+id/tv_tips"
+                style="@style/Base.Widget.AppCompat.TextView.TipStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="팁입니다" />
+    </LinearLayout>
+</layout>
