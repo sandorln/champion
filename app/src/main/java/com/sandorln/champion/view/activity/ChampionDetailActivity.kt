@@ -31,7 +31,6 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
     private val championViewModel: ChampionViewModel by viewModels()
 
-
     companion object {
         fun newIntent(championData: ChampionData, context: Context): Intent = Intent(context, ChampionDetailActivity::class.java).apply {
             putExtra(BundleKeys.CHAMPION_DATA, championData as Parcelable)
@@ -74,5 +73,17 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
         val layoutParams = binding.appbar.layoutParams
         layoutParams.height = width / 16 * 9
         binding.appbar.layoutParams = layoutParams
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (::championStatusAdapter.isInitialized)
+            championStatusAdapter.stopSkillExoPlayer()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::championStatusAdapter.isInitialized)
+            championStatusAdapter.startSkillExoPlayer()
     }
 }

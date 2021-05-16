@@ -19,7 +19,7 @@
         <View
                 android:id="@+id/v_select"
                 android:layout_width="0dp"
-                android:layout_height="3dp"
+                android:layout_height="5dp"
                 android:background="@color/base"
                 app:layout_constraintBottom_toBottomOf="@id/img_champion_skin"
                 app:layout_constraintEnd_toEndOf="@id/img_champion_skin"

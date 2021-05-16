@@ -20,17 +20,23 @@ data class ChampionData(
     @SerializedName("blurb")
     var cBlurb: String = "",
     @SerializedName("info")
-    var cInfo: CharacterInfo = CharacterInfo(),
+    var cInfo: ChampionInfo = ChampionInfo(),
     @SerializedName("image")
-    var cImage: CharacterImage = CharacterImage(),
+    var cImage: LOLImage = LOLImage(),
     @SerializedName("tags")
     var cTags: List<String> = mutableListOf(),
     @SerializedName("partype")
     var cPartType: String = "",
     @SerializedName("stats")
-    var cStats: CharacterStats = CharacterStats(),
+    var cStats: ChampionStats = ChampionStats(),
     @SerializedName("skins")
     var cSkins: List<ChampionSkin> = mutableListOf(),
+
+    @SerializedName("spells")
+    var cSpellList: List<ChampionSpell> = mutableListOf(),
+    @SerializedName("passive")
+    var cPassive: ChampionSpell = ChampionSpell(),
+
     @SerializedName("allytips")
     var cAllytips: List<String> = mutableListOf(),
     @SerializedName("enemytips")

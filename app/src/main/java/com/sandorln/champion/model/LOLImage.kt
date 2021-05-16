@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
 @Parcelize
-data class CharacterImage(
+data class LOLImage(
     @SerializedName("full")
     var imgFull: String = "",
     @SerializedName("sprite")

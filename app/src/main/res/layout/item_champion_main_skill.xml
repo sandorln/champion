@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/padding_middle"
+            android:paddingBottom="@dimen/padding_middle">
+
+        <com.sandorln.champion.view.custom.AdapterTitleTextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_thumbnail_skill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/padding_xxlarge"
+                android:layout_marginTop="@dimen/padding_small"
+                android:layout_marginEnd="@dimen/padding_xxlarge"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/tv_title"
+                app:spanCount="5"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_champion_thumbnail_skill" />
+
+        <TextView
+                android:id="@+id/tv_spell_name"
+                style="@style/Base.Widget.AppCompat.TextView.SkillStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_xsmall"
+                android:padding="0dp"
+                android:text="스킬 제목"
+                android:textColor="@color/base"
+                android:textSize="12.5dp"
+                app:layout_constraintTop_toBottomOf="@id/rv_thumbnail_skill" />
+
+        <TextView
+                android:id="@+id/tv_description"
+                style="@style/Base.Widget.AppCompat.TextView.SkillStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="75dp"
+                android:paddingStart="@dimen/padding_xlarge"
+                android:paddingEnd="@dimen/padding_xlarge"
+                android:text="스킬 정보"
+                app:layout_constraintTop_toBottomOf="@id/tv_spell_name" />
+
+        <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/exo_player"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/padding_small"
+                app:layout_constraintDimensionRatio="16:9"
+                app:layout_constraintTop_toBottomOf="@id/tv_description"
+                app:resize_mode="fill"
+                app:use_controller="false" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

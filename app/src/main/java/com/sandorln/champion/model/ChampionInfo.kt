@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
 @Parcelize
-data class CharacterInfo(
+data class ChampionInfo(
     @SerializedName("attack")
     var iAtk: Int = 0,
     @SerializedName("defense")

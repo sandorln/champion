@@ -3,6 +3,7 @@ package com.sandorln.champion.view.binding
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionData
 
 
@@ -34,6 +35,18 @@ fun ImageView.setChampionSplash(championData: ChampionData) {
 fun ImageView.setChampionSkin(championId: String, skinNumber: String = "0") {
     Glide.with(context)
         .load("http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_${skinNumber}.jpg")
+        .thumbnail(0.5f)
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+        .into(this)
+}
+
+fun ImageView.setSkillIcon(skillImageName: String, isPassive: Boolean) {
+    val path = if (isPassive) "passive" else "spell"
+    val version = VersionManager.versionLol.lvCategory.cvChampion
+    val url = "http://ddragon.leagueoflegends.com/cdn/$version/img/$path/${skillImageName}"
+
+    Glide.with(context)
+        .load(url)
         .thumbnail(0.5f)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(this)

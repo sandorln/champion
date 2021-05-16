@@ -6,14 +6,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <TextView
+        <com.sandorln.champion.view.custom.AdapterTitleTextView
                 android:id="@+id/tv_title"
-                style="@style/Base.Widget.AppCompat.TextView.DescriptionStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/padding_small"
-                android:textColor="@color/base"
-                android:visibility="gone" />
+                android:layout_height="wrap_content"/>
 
         <TextView
                 android:id="@+id/tv_tips"

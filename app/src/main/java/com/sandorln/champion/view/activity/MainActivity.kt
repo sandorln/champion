@@ -113,7 +113,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     override fun onBackPressed() {
         when {
-            currentFocus != null -> currentFocus?.clearFocus()
             championViewModel.searchChampName.value!!.isNotEmpty() -> championViewModel.searchChampName.postValue("")
             else -> finish()
         }
