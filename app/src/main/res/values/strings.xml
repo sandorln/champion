@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Champion</string>
+    <string name="app_name">챔피언 정보</string>
     <string name="not_find_data">Not Find Data</string>
     <string name="unknown">UNKNOWN</string>
     <string name="champion_info_title">&lt; %s &gt;</string>

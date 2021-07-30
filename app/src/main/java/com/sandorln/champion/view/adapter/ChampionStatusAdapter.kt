@@ -147,6 +147,9 @@ class ChampionStatusAdapter(var championData: ChampionData = ChampionData()) : R
     }
 
     fun startSkillExoPlayer() {
-        ChampionSkillViewHolder.skillExoPlayer?.prepare()
+        if (ChampionSkillViewHolder.skillExoPlayer == null)
+            notifyItemChanged(1)
+        else
+            ChampionSkillViewHolder.skillExoPlayer?.prepare()
     }
 }
