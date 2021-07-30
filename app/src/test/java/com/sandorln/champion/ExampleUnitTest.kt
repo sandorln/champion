@@ -25,31 +25,5 @@ class ExampleUnitTest {
 
     @Test
     fun retrofit2Connection() {
-
-        LolApiClient
-            .getService()
-            .getVersion()
-            .enqueue(object : Callback<VersionLol> {
-                override fun onResponse(call: Call<VersionLol>, response: Response<VersionLol>) {
-                    LolApiClient
-                        .getService()
-                        .getAllChampion(response.body()!!.lvCategory.cvChampion)
-                        .enqueue(object : Callback<LolDataServiceResponse> {
-                            override fun onResponse(call: Call<LolDataServiceResponse>, response: Response<LolDataServiceResponse>) {
-                                println(response.body()!!)
-                            }
-
-                            override fun onFailure(call: Call<LolDataServiceResponse>, t: Throwable) {
-                                countDownLatch.countDown()
-                            }
-                        })
-                }
-
-                override fun onFailure(call: Call<VersionLol>, t: Throwable) {
-                    countDownLatch.countDown()
-                }
-            })
-
-        countDownLatch.await()
     }
 }
