@@ -10,7 +10,7 @@ class AdapterTitleTextView : FrameLayout {
     private var binding: CustomAdapterTitleBinding = CustomAdapterTitleBinding.inflate(LayoutInflater.from(context), null, false)
     var text: String = ""
         set(value) {
-            field = value 
+            field = value  
             binding.tvTitle.text = value
             requestLayout()
         }
