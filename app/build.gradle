@@ -20,15 +20,6 @@ android {
         buildConfigField "String", "BASE_URL", "\"http://ddragon.leagueoflegends.com\""
     }
 
-    signingConfigs {
-        release {
-            keyAlias System.getenv("BITRISEIO_ANDROID_KEYSTORE_ALIAS")
-            keyPassword System.getenv("BITRISEIO_ANDROID_KEYSTORE_PASSWORD")
-            storeFile file(System.getenv("HOME") + "/keystores/champion.jks")
-            storePassword System.getenv("BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD")
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
