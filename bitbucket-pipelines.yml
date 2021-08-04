@@ -20,33 +20,11 @@ pipelines:
           artifacts:
             - keys/**
       - parallel:           # running a set of steps at the same time https://support.atlassian.com/bitbucket-cloud/docs/set-up-or-run-parallel-steps/
-          - step:
-              name: Run unit tests
-              caches:
-                - gradle
-              script:
-                - export GRADLE_OPTS='-XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=1024m -XX:ReservedCodeCacheSize=440m -XX:+UseCompressedOops -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" -Dorg.gradle.parallel=false -Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true'
-                - "./gradlew -PKEYSTORE_FILE=../keys/$KEYSTORE_FILE
-                             -PKEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
-                             -PKEY_ALIAS=$KEY_ALIAS
-                             -PKEY_PASSWORD=$KEY_PASSWORD
-                             -PGOOGLE_PLAY_API_KEY=../keys/$GOOGLE_PLAY_API_KEY
-                             test"
-              artifacts:
-                - app/build/outputs/**
-                - app/build/reports/**      
-          - step:
-              name: Build & deploy
-              caches:
-                - gradle
-              script:
-                # publish the aab file to the internal testing channel
-                - export GRADLE_OPTS='-XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxPermSize=1024m -XX:ReservedCodeCacheSize=440m -XX:+UseCompressedOops -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" -Dorg.gradle.parallel=false -Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true'
-                - "./gradlew -PKEYSTORE_FILE=../keys/$KEYSTORE_FILE
-                             -PKEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
-                             -PKEY_ALIAS=$KEY_ALIAS
-                             -PKEY_PASSWORD=$KEY_PASSWORD
-                             -PGOOGLE_PLAY_API_KEY=../keys/$GOOGLE_PLAY_API_KEY
-                             -PBUILD_NUMBER=$BITBUCKET_BUILD_NUMBER"
-              artifacts:
-                - app/build/outputs/
+        - step:
+            name: Publish Internal
+            image: bitbucketpipelines/android-ci-image
+            deployment: Internal
+            script:
+            - echo $GOOGLE_PLAY_API_KEY > google_play_api_key.json
+            - echo "$KEYSTORE_FILE" | base64 -d > android-signing-keystore.jks
+            - ./gradlew publishReleaseApk
