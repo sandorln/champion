@@ -48,6 +48,5 @@ pipelines:
                              -PKEY_PASSWORD=$KEY_PASSWORD
                              -PGOOGLE_PLAY_API_KEY=../keys/$GOOGLE_PLAY_API_KEY
                              -PBUILD_NUMBER=$BITBUCKET_BUILD_NUMBER
-                             clean :app:publishFreeReleaseBundle :app:publishProReleaseBundle"
               artifacts:
                 - app/build/outputs/
