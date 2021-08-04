@@ -21,10 +21,12 @@ pipelines:
             - keys/**
       - parallel:           # running a set of steps at the same time https://support.atlassian.com/bitbucket-cloud/docs/set-up-or-run-parallel-steps/
         - step:
-            name: Publish Internal
+            name: Build
             image: bitbucketpipelines/android-ci-image
-            deployment: Internal
+            caches:
+            - gradle
             script:
-            - echo $GOOGLE_PLAY_API_KEY > google_play_api_key.json
-            - echo "$KEYSTORE_FILE" | base64 -d > android-signing-keystore.jks
-            - ./gradlew publishReleaseApk
+            - echo keys/$KEYSTORE_FILE | base64 -d > android-signing-keystore.jks
+            - ./gradlew assembleRelease
+            artifacts:
+            - app/build/outputs/**
