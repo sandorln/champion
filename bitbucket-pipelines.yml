@@ -10,15 +10,6 @@ image: androidsdk/android-30
 pipelines:
   branches:
     master:
-      - step:
-          name: Create Keystore and API key
-          script:
-            # create the keystore file and the google play api key file
-            - mkdir keys
-            - echo $GOOGLE_PLAY_API_KEY_BASE64 | base64 --decode > keys/$GOOGLE_PLAY_API_KEY
-            - echo $KEYSTORE_FILE_BASE64 | base64 --decode > keys/$KEYSTORE_FILE
-          artifacts:
-            - keys/**
       - parallel:           # running a set of steps at the same time https://support.atlassian.com/bitbucket-cloud/docs/set-up-or-run-parallel-steps/
         - step:
             name: Build
@@ -26,7 +17,7 @@ pipelines:
             caches:
             - gradle
             script:
-            - echo keys/$KEYSTORE_FILE | base64 -d > android-signing-keystore.jks
+            - echo $KEYSTORE_FILE_BASE64 | base64 -d > android-signing-keystore.jks
             - ./gradlew assembleRelease
             artifacts:
             - app/build/outputs/**
