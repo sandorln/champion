@@ -16,7 +16,6 @@ pipelines:
             caches:
             - gradle
             script:
-            - echo $KEYSTORE_FILE_BASE64 | base64 -d > android-signing-keystore.jks
             - ./gradlew clean :app:publishReleaseBundle 
             artifacts:
             - app/build/outputs/**
