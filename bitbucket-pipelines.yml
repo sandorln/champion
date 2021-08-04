@@ -13,7 +13,6 @@ pipelines:
       - parallel:           # running a set of steps at the same time https://support.atlassian.com/bitbucket-cloud/docs/set-up-or-run-parallel-steps/
         - step:
             name: Build
-            image: bitbucketpipelines/android-ci-image
             caches:
             - gradle
             script:
