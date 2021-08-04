@@ -47,6 +47,6 @@ pipelines:
                              -PKEY_ALIAS=$KEY_ALIAS
                              -PKEY_PASSWORD=$KEY_PASSWORD
                              -PGOOGLE_PLAY_API_KEY=../keys/$GOOGLE_PLAY_API_KEY
-                             -PBUILD_NUMBER=$BITBUCKET_BUILD_NUMBER
+                             -PBUILD_NUMBER=$BITBUCKET_BUILD_NUMBER"
               artifacts:
                 - app/build/outputs/
