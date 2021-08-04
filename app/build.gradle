@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.github.triplet.play'
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'kotlin-android-extensions'
@@ -7,23 +8,37 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file("champion.jks")
+            storePassword STORE_PASSWORD
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PASSWORD
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
+
     defaultConfig {
         applicationId "com.sandorln.Champion"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 31
+        versionName "1.0.00"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "BASE_URL", "\"http://ddragon.leagueoflegends.com\""
     }
 
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug{
+
         }
     }
 
@@ -67,7 +82,7 @@ dependencies {
 
     // Glide
     implementation "com.github.bumptech.glide:glide:$glide_version"
-    annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
 
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
@@ -83,4 +98,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.14.0'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.14.0'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.0'
+}
+
+play {
+    track = 'internal'
+    serviceAccountCredentials = file("pc-api-6364978287569636907-207-66c2e41a7f8c.json")
 }
