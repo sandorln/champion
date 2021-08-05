@@ -56,14 +56,6 @@ jobs:
         id: createServiceAccount
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' | base64 --decode > service_account.json
 
-      - name: Firebase App Distribution (Release)
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          serviceCredentialsFile: service_account.json
-          groups: tester
-          file: app/build/outputs/apk/release/app-release-unsigned.apk
-
       - uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: service_account.json
