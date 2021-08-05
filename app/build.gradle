@@ -1,10 +1,14 @@
 plugins {
     id 'com.android.application'
-    id 'com.github.triplet.play'
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'kotlin-android-extensions'
     id 'dagger.hilt.android.plugin'
+
+    /* CI / CD */
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.appdistribution'
+    id 'com.github.triplet.play'
 }
 
 android {
@@ -23,8 +27,8 @@ android {
         applicationId "com.sandorln.Champion"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 32
-        versionName "1.0.001"
+        versionCode 33
+        versionName "1.0.002"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "BASE_URL", "\"http://ddragon.leagueoflegends.com\""
@@ -98,6 +102,8 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.14.0'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.14.0'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.0'
+
+    implementation platform('com.google.firebase:firebase-bom:28.3.0')
 }
 
 play {
