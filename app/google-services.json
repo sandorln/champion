@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:832986250143:android:083be4df03011f3adc1baa",
+        "mobilesdk_app_id": "1:832986250143:android:5e47d61a58bebefcdc1baa",
         "android_client_info": {
-          "package_name": "com.sandorln.champion"
+          "package_name": "com.sandorln.Champion"
         }
       },
       "oauth_client": [
