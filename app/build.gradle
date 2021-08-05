@@ -8,18 +8,9 @@ plugins {
     /* CI / CD */
     id 'com.google.gms.google-services'
     id 'com.google.firebase.appdistribution'
-    id 'com.github.triplet.play'
 }
 
 android {
-    signingConfigs {
-        release {
-            storeFile file("champion.jks")
-            storePassword STORE_PASSWORD
-            keyAlias KEY_ALIAS
-            keyPassword KEY_PASSWORD
-        }
-    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
@@ -39,7 +30,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
         debug{
 
@@ -104,9 +94,4 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.0'
 
     implementation platform('com.google.firebase:firebase-bom:28.3.0')
-}
-
-play {
-    track = 'internal'
-    serviceAccountCredentials = file("pc-api-6364978287569636907-207-66c2e41a7f8c.json")
 }
