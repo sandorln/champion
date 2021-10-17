@@ -15,8 +15,9 @@
             android:usesCleartextTraffic="true">
 
         <activity
-                android:noHistory="true"
-                android:name="com.sandorln.champion.view.activity.SplashActivity">
+                android:name="com.sandorln.champion.view.activity.SplashActivity"
+                android:exported="true"
+                android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -25,13 +26,16 @@
 
         <activity
                 android:name="com.sandorln.champion.view.activity.MainActivity"
+                android:exported="true"
                 android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".view.activity.ChampionDetailActivity" />
+        <activity
+                android:name=".view.activity.ChampionDetailActivity"
+                android:exported="true" />
     </application>
 
 </manifest>

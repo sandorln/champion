@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'kotlin-android-extensions'
     id 'dagger.hilt.android.plugin'
 
     /* CI / CD */
@@ -11,13 +10,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.sandorln.Champion"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 39
         versionName "1.0.009"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -65,6 +64,7 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout_version"
+    implementation 'com.google.firebase:firebase-auth:19.2.0'
 
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$test_junit_version"
@@ -75,7 +75,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.okhttp3:logging-interceptor:4.6.0"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
 
     // ViewPager2
