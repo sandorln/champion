@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
 class BoardRepository {
-    fun getChampionBoardPagingFlow(championId: String): Flow<PagingData<ChampionBoard>> = Pager(
+    fun getChampionBoardPagingFlow(championId: String): Pager<QuerySnapshot, ChampionBoard> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
         initialKey = null,
         pagingSourceFactory = { ChampionBoardPagingSource(championId) }
-    ).flow
+    )
 
     class ChampionBoardPagingSource(private val championId: String) : PagingSource<QuerySnapshot, ChampionBoard>() {
         private val db = FirebaseFirestore.getInstance()

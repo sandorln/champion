@@ -22,9 +22,9 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
     @Inject
     lateinit var versionManager: VersionManager
 
-    override suspend fun initObjectSetting() {}
-    override suspend fun initViewSetting() {}
-    override suspend fun initObserverSetting() {}
+    override fun initObjectSetting() {}
+    override fun initViewSetting() {}
+    override fun initObserverSetting() {}
 
     override fun onResume() {
         super.onResume()

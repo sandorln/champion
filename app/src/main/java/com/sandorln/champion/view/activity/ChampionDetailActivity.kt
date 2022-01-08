@@ -37,17 +37,17 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
         }
     }
 
-    override suspend fun initObjectSetting() {
+    override fun initObjectSetting() {
         championStatusAdapter = ChampionStatusAdapter()
     }
 
-    override suspend fun initViewSetting() {
+    override fun initViewSetting() {
         initAppbarHeight()
         binding.rvChampionsStatus.adapter = championStatusAdapter
         binding.imgBack.setOnClickListener { finish() }
     }
 
-    override suspend fun initObserverSetting() {
+    override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
             championStatusAdapter.championData = champion
 
@@ -59,6 +59,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                 binding.imgChampionThumbnail.setToolbarChampionThumbnail(versionManager.getVersion().lvCategory.cvChampion, champion.cId)
             }
         })
+
     }
 
     /**

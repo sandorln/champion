@@ -1,6 +1,7 @@
 package com.sandorln.champion.view.adapter.diff
 
 import androidx.recyclerview.widget.DiffUtil
+import com.sandorln.champion.model.ChampionBoard
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.ChampionSkin
 import com.sandorln.champion.model.ChampionSpell
@@ -23,4 +24,9 @@ object DiffUtils {
         override fun areItemsTheSame(oldItem: ChampionSpell, newItem: ChampionSpell): Boolean = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: ChampionSpell, newItem: ChampionSpell): Boolean = oldItem == newItem
     }
+
+//    val DIFF_ = object : DiffUtil.ItemCallback<ChampionBoard>() {
+//        override fun areItemsTheSame(oldItem: ChampionSpell, newItem: ChampionSpell): Boolean = oldItem.id == newItem.id
+//        override fun areContentsTheSame(oldItem: ChampionSpell, newItem: ChampionSpell): Boolean = oldItem == newItem
+//    }
 }

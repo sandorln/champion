@@ -18,20 +18,12 @@ abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId
         binding = DataBindingUtil.setContentView(this, layoutId)
         binding.lifecycleOwner = this
 
-
-        lifecycleScope.launchWhenCreated {
-            withContext(Dispatchers.Default) {
-                initObjectSetting()
-            }
-
-            withContext(Dispatchers.Main) {
-                initViewSetting()
-                initObserverSetting()
-            }
-        }
+        initObjectSetting()
+        initViewSetting()
+        initObserverSetting()
     }
 
-    abstract suspend fun initObjectSetting()
-    abstract suspend fun initViewSetting()
-    abstract suspend fun initObserverSetting()
+    abstract fun initObjectSetting()
+    abstract fun initViewSetting()
+    abstract fun initObserverSetting()
 }

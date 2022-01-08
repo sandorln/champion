@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityMainBinding
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseActivity
@@ -18,14 +17,12 @@ import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import javax.inject.Inject
+import kotlinx.coroutines.flow.collect
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
-    @Inject
-    lateinit var versionManager: VersionManager
 
     private val championViewModel: ChampionViewModel by viewModels()
     private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
@@ -38,18 +35,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         val DRAWABLE_RIGHT = 2
 
         if (event!!.action == MotionEvent.ACTION_UP &&
-                event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
+            event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
         )
             championViewModel.searchChampName.postValue("")
 
         return@OnTouchListener false
     }
 
-    override suspend fun initObjectSetting() {
+    override fun initObjectSetting() {
         binding.act = this
         binding.vm = championViewModel
 
-        championThumbnailAdapter = ChampionThumbnailAdapter(versionManager.getVersion().lvCategory.cvChampion) {
+        championThumbnailAdapter = ChampionThumbnailAdapter("") {
             // 사용자가 챔피언을 선택했을 경우
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
@@ -70,16 +67,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         }
     }
 
-    override suspend fun initViewSetting() {
+    override fun initViewSetting() {
         /* 챔피언 리스트 어뎁터 */
         binding.rvChampions.adapter = championThumbnailAdapter
 
         /* 챔피언 스킨 어뎁터 */
-        binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { view, isFocus ->
-        }
+        binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
     }
 
-    override suspend fun initObserverSetting() {
+    override fun initObserverSetting() {
+        lifecycleScope.launchWhenResumed {
+            championViewModel.versionLol.collect {
+                championThumbnailAdapter.championVersion = it.lvCategory.cvChampion
+                championThumbnailAdapter.notifyDataSetChanged()
+            }
+        }
+
         championViewModel.championAllList.observe(this, Observer { resultCharacterList ->
             when (resultCharacterList) {
                 is ResultData.Success -> championThumbnailAdapter.submitList(resultCharacterList.data ?: mutableListOf())
