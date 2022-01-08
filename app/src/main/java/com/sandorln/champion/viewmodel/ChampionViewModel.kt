@@ -41,6 +41,6 @@ class ChampionViewModel @Inject constructor(
      * 특정한 챔피언의 정보를 가져올 시
      */
     suspend fun getChampionDetailInfo(characterId: String): ResultData<ChampionData> = championRepository.getChampionInfo(characterId)
-
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA)
+
 }

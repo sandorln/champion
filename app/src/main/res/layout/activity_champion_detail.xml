@@ -20,6 +20,7 @@
                     app:layoutDescription="@xml/motion_champion_detail_toolbar"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
+                <!-- Champion Image / Thumbnail -->
                 <androidx.cardview.widget.CardView
                         android:id="@+id/card_splash_champion"
                         android:layout_width="match_parent"
@@ -46,6 +47,7 @@
                             android:scaleType="centerCrop" />
                 </androidx.cardview.widget.CardView>
 
+                <!-- Back Button -->
                 <ImageView
                         android:id="@+id/img_back"
                         android:layout_width="wrap_content"
@@ -56,6 +58,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+                <!-- Champion Title / Nick Name -->
                 <TextView
                         android:id="@+id/tv_champion_name"
                         style="@style/shadowEffect"
@@ -81,6 +84,7 @@
                         android:textSize="11dp"
                         android:textStyle="italic|bold" />
 
+                <!-- 평점 및 댓글 입력 아이콘 -->
             </com.sandorln.champion.view.custom.CollapsibleToolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -92,6 +96,8 @@
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+
+        <!-- Bottom Sheet / Board 관련 처리 -->
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

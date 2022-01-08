@@ -11,7 +11,7 @@ plugins {
 
 android {
     compileSdkVersion 31
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.sandorln.Champion"
@@ -31,14 +31,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [
-                    appName     : "@string/app_name"
+                    appName: "@string/app_name"
             ]
         }
-        debug{
+        debug {
             applicationIdSuffix ".dev"
 
             manifestPlaceholders = [
-                    appName     : "@string/app_name_dev"
+                    appName: "@string/app_name_dev"
             ]
         }
     }
@@ -64,7 +64,6 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout_version"
-    implementation 'com.google.firebase:firebase-auth:19.2.0'
 
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$test_junit_version"
@@ -100,5 +99,15 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-core:2.14.0'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.0'
 
+    // Firebase
     implementation platform('com.google.firebase:firebase-bom:28.3.0')
+    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-firestore'
+
+    // Paging
+    implementation "androidx.paging:paging-runtime-ktx:3.0.0"
+    implementation "androidx.paging:paging-rxjava2-ktx:3.0.0"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.2.1'
 }

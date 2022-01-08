@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "881019636229",
+    "project_id": "lol-champion-a5911",
+    "storage_bucket": "lol-champion-a5911.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881019636229:android:54781c2d5346e04001ea6c",
+        "android_client_info": {
+          "package_name": "com.sandorln.Champion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881019636229-7gg9uc8vctr5fbbu7q6gcv4ab4uko2re.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sandorln.Champion",
+            "certificate_hash": "18f3e7d0163d1b97f3277168c20cc59975898a11"
+          }
+        },
+        {
+          "client_id": "881019636229-epmin8196u0qadv1cunv8ndqc5nud9nk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLEQQSfJh4TU0ICHZJeQWgH8YwmR0_iu8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881019636229-epmin8196u0qadv1cunv8ndqc5nud9nk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

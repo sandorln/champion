@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.sandorln.champion.R
@@ -37,7 +38,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         val DRAWABLE_RIGHT = 2
 
         if (event!!.action == MotionEvent.ACTION_UP &&
-            event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
+                event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
         )
             championViewModel.searchChampName.postValue("")
 
@@ -45,6 +46,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override suspend fun initObjectSetting() {
+        binding.act = this
+        binding.vm = championViewModel
+
         championThumbnailAdapter = ChampionThumbnailAdapter(versionManager.getVersion().lvCategory.cvChampion) {
             // 사용자가 챔피언을 선택했을 경우
             // 해당 챔피언의 상세 내용을 가져옴
@@ -71,16 +75,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         binding.rvChampions.adapter = championThumbnailAdapter
 
         /* 챔피언 스킨 어뎁터 */
-
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { view, isFocus ->
         }
-
     }
 
     override suspend fun initObserverSetting() {
-        binding.act = this
-        binding.vm = championViewModel
-
         championViewModel.championAllList.observe(this, Observer { resultCharacterList ->
             when (resultCharacterList) {
                 is ResultData.Success -> championThumbnailAdapter.submitList(resultCharacterList.data ?: mutableListOf())
@@ -93,17 +92,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             championViewModel.searchChampion(searchChampionName)
 
             /* 검색어가 비어있지 않을 경우 */
-            if (searchChampionName.isNotEmpty()) {
-                /* 검색어를 모두 지우는 아이콘 생성 */
-                with(binding.editSearchChamp) {
-                    setCompoundDrawablesWithIntrinsicBounds(
-                        null, null, getDrawable(R.drawable.round_clear_white_18), null
-                    )
+            with(binding.editSearchChamp) {
+                if (searchChampionName.isNotEmpty()) {
+                    /* 검색어를 모두 지우는 아이콘 생성 */
+                    setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this@MainActivity, R.drawable.round_clear_white_18), null)
                     setOnTouchListener(cleanBtnClick)
-                }
-            } else {
-                /* 검색어가 존재하지 않을 시 검색어를 모두 지우는 아이콘 삭제 */
-                with(binding.editSearchChamp) {
+                } else {
+                    /* 검색어가 존재하지 않을 시 검색어를 모두 지우는 아이콘 삭제 */
                     setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
                     setOnTouchListener(null)
                 }
