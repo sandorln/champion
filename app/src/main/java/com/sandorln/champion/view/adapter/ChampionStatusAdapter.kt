@@ -33,7 +33,7 @@ class ChampionStatusAdapter(var championData: ChampionData = ChampionData()) : R
         with(holder) {
             when (this) {
                 is ChampionBlurbViewHolder -> {
-                    binding.tvTitle.text = "STORY"
+                    binding.tvTitle.titleName = "STORY"
                     binding.tvChampionBlurb.text = championData.cBlurb
                 }
                 is ChampionSkillViewHolder -> bind(championData)
@@ -51,7 +51,7 @@ class ChampionStatusAdapter(var championData: ChampionData = ChampionData()) : R
         lateinit var fullAdapterFull: ChampionFullSkinAdapter
 
         fun bind(championId: String, defaultName: String, skinList: List<ChampionSkin>) {
-            binding.tvTitle.text = "SKIN"
+            binding.tvTitle.titleName = "SKIN"
 
             thumbnailAdapterFull = ChampionThumbnailSkinAdapter(championId)
             thumbnailAdapterFull.submitList(skinList)
@@ -105,7 +105,7 @@ class ChampionStatusAdapter(var championData: ChampionData = ChampionData()) : R
         lateinit var championId: String
         lateinit var championThumbnailSkillAdapter: ChampionThumbnailSkillAdapter
         fun bind(championData: ChampionData) {
-            binding.tvTitle.text = "SKILL"
+            binding.tvTitle.titleName = "SKILL"
 
             championId = String.format("%04d", championData.cKey)
 

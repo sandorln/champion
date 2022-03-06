@@ -2,6 +2,7 @@ package com.sandorln.champion.di
 
 import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.network.ChampionService
+import com.sandorln.champion.repository.BoardRepository
 import com.sandorln.champion.repository.ChampionRepository
 import dagger.Module
 import dagger.Provides
@@ -18,4 +19,7 @@ object RepositoryModule {
     @Provides
     fun providesChampionRepository(championService: ChampionService, versionManager: VersionManager): ChampionRepository =
         ChampionRepository(championService, versionManager)
+
+    @Provides
+    fun providesBoardRepository(): BoardRepository = BoardRepository()
 }

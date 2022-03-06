@@ -16,7 +16,7 @@ class ChampionTipsAdapter(var tips: List<String>, val tipsType: TipsType) : Recy
 
     override fun onBindViewHolder(holder: ChampionTipsViewHolder, position: Int) {
         holder.binding.tvTitle.visibility = if (position == 0) {
-            holder.binding.tvTitle.text = tipsType.value
+            holder.binding.tvTitle.titleName = tipsType.value
             View.VISIBLE
         } else
             View.GONE

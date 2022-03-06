@@ -2,7 +2,7 @@ package com.sandorln.champion.model
 
 import android.os.Parcelable
 import com.sandorln.champion.model.type.SpellType
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
