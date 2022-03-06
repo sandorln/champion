@@ -3,17 +3,6 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:bind="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-                name="act"
-                type="com.sandorln.champion.view.activity.MainActivity" />
-
-        <variable
-                name="vm"
-                type="com.sandorln.champion.viewmodel.ChampionViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -76,7 +65,6 @@
                             android:backgroundTint="@android:color/black"
                             android:imeOptions="actionSearch"
                             android:inputType="text"
-                            android:text="@={vm.searchChampName}"
                             android:textColor="@android:color/white"
                             android:textCursorDrawable="@android:color/white" />
                 </com.google.android.material.textfield.TextInputLayout>

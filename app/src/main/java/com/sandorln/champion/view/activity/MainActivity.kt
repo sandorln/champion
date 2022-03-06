@@ -17,18 +17,18 @@ import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
-
+    /* viewModels */
     private val championViewModel: ChampionViewModel by viewModels()
-    private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-    /* Champion List Adapter */
+    /* Adapters */
     private lateinit var championThumbnailAdapter: ChampionThumbnailAdapter
+
+    private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     /* 검색 창 오른쪽 X 버튼 */
     private val cleanBtnClick = View.OnTouchListener { v, event ->
@@ -43,10 +43,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override fun initObjectSetting() {
-        binding.act = this
-        binding.vm = championViewModel
-
-        championThumbnailAdapter = ChampionThumbnailAdapter("") {
+        championThumbnailAdapter = ChampionThumbnailAdapter {
             // 사용자가 챔피언을 선택했을 경우
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
@@ -68,21 +65,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override fun initViewSetting() {
-        /* 챔피언 리스트 어뎁터 */
         binding.rvChampions.adapter = championThumbnailAdapter
-
-        /* 챔피언 스킨 어뎁터 */
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
     }
 
     override fun initObserverSetting() {
-        lifecycleScope.launchWhenResumed {
-            championViewModel.versionLol.collect {
-                championThumbnailAdapter.championVersion = it.lvCategory.cvChampion
-                championThumbnailAdapter.notifyDataSetChanged()
-            }
-        }
-
         championViewModel.championAllList.observe(this, Observer { resultCharacterList ->
             when (resultCharacterList) {
                 is ResultData.Success -> championThumbnailAdapter.submitList(resultCharacterList.data ?: mutableListOf())

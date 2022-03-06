@@ -27,21 +27,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ChampionViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val versionManager: VersionManager,
     private val savedStateHandle: SavedStateHandle,
     private val championRepository: ChampionRepository,
     private val boardRepository: BoardRepository
 ) : AndroidViewModel(context as Application) {
-    val versionLol = MutableStateFlow(VersionLol())
-
-    init {
-        /* 버전 값 초기화 */
-        viewModelScope.launch(Dispatchers.IO) {
-            versionLol.emit(versionManager.getVersion())
-        }
-    }
-
-
     val championAllList: LiveData<ResultData<List<ChampionData>>> = liveData {
         emitSource(championRepository.getResultAllChampionList().asLiveData(Dispatchers.IO))
     }

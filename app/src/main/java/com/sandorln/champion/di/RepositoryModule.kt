@@ -1,6 +1,5 @@
 package com.sandorln.champion.di
 
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.network.ChampionService
 import com.sandorln.champion.repository.BoardRepository
 import com.sandorln.champion.repository.ChampionRepository
@@ -17,8 +16,7 @@ import kotlinx.coroutines.FlowPreview
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
     @Provides
-    fun providesChampionRepository(championService: ChampionService, versionManager: VersionManager): ChampionRepository =
-        ChampionRepository(championService, versionManager)
+    fun providesChampionRepository(championService: ChampionService): ChampionRepository = ChampionRepository(championService)
 
     @Provides
     fun providesBoardRepository(): BoardRepository = BoardRepository()

@@ -8,7 +8,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionData
 
-fun ImageView.setChampionThumbnail(version: String, championId: String) {
+fun ImageView.setChampionThumbnail(championId: String) {
+    val version = VersionManager.getVersion(this.context).lvCategory.cvChampion
     Glide.with(context)
         .load("http://ddragon.leagueoflegends.com/cdn/$version/img/champion/${championId}.png")
         .thumbnail(0.5f)
@@ -17,7 +18,8 @@ fun ImageView.setChampionThumbnail(version: String, championId: String) {
         .into(this)
 }
 
-fun ImageView.setToolbarChampionThumbnail(version: String, championId: String) {
+fun ImageView.setToolbarChampionThumbnail(championId: String) {
+    val version = VersionManager.getVersion(this.context).lvCategory.cvChampion
     Glide.with(context)
         .load("http://ddragon.leagueoflegends.com/cdn/$version/img/champion/${championId}.png")
         .thumbnail(0.5f)
@@ -43,7 +45,7 @@ fun ImageView.setChampionSkin(championId: String, skinNumber: String = "0") {
 
 fun ImageView.setSkillIcon(skillImageName: String, isPassive: Boolean) {
     val path = if (isPassive) "passive" else "spell"
-    val version = VersionManager.versionLol.lvCategory.cvChampion
+    val version = VersionManager.getVersion(this.context).lvCategory.cvChampion
     val url = "http://ddragon.leagueoflegends.com/cdn/$version/img/$path/${skillImageName}"
 
     Glide.with(context)

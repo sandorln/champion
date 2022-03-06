@@ -108,7 +108,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
             lifecycleScope.launchWhenResumed {
-                binding.imgChampionThumbnail.setToolbarChampionThumbnail(versionManager.getVersion().lvCategory.cvChampion, champion.cId)
+                binding.imgChampionThumbnail.setToolbarChampionThumbnail(champion.cId)
             }
 
             val championId = String.format("%04d", champion.cKey)

@@ -17,8 +17,7 @@ import kotlinx.coroutines.withContext
 @FlowPreview
 @ExperimentalCoroutinesApi
 class ChampionRepository(
-    private val championService: ChampionService,
-    private val versionManager: VersionManager
+    private val championService: ChampionService
 ) {
 
     /**
@@ -38,7 +37,7 @@ class ChampionRepository(
         if (!isLoadingAllChampion) {
             try {
                 isLoadingAllChampion = true
-                val response = championService.getAllChampion(versionManager.getVersion().lvCategory.cvChampion)
+                val response = championService.getAllChampion(VersionManager.getVersion().lvCategory.cvChampion)
                 response.parsingData()
                 inMemoryAllChampionList.addAll(response.rChampionList.sortedBy { it.cName })
                 resultAllChampionList.offer(ResultData.Success(inMemoryAllChampionList.toList()))
@@ -60,7 +59,7 @@ class ChampionRepository(
             try {
                 withContext(Dispatchers.IO) {
                     isLoadingGetChampion = true
-                    val response = championService.getChampionDetailInfo(versionManager.getVersion().lvCategory.cvChampion, champID)
+                    val response = championService.getChampionDetailInfo(VersionManager.getVersion().lvCategory.cvChampion, champID)
                     response.parsingData()
                     ResultData.Success(response.rChampionList.first())
                 }

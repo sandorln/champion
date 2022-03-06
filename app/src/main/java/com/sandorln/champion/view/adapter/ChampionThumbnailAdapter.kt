@@ -10,7 +10,6 @@ import com.sandorln.champion.util.setChampionThumbnail
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 
 class ChampionThumbnailAdapter(
-    var championVersion: String = "",
     var onClickItem: (selectChampion: ChampionData) -> Unit
 ) :
     ListAdapter<ChampionData, ChampionThumbnailAdapter.ThumbnailChampionViewHolder>(DiffUtils.DIFF_CHAMPION_DATA) {
@@ -23,7 +22,7 @@ class ChampionThumbnailAdapter(
 
         with(holder.binding) {
             tvChampionName.text = championData.cName
-            imgChampionIcon.setChampionThumbnail(championVersion, championData.cId)
+            imgChampionIcon.setChampionThumbnail( championData.cId)
         }
     }
 
