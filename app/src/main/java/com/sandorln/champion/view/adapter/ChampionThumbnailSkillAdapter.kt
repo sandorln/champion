@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemChampionThumbnailSkillBinding
 import com.sandorln.champion.model.ChampionSpell
 import com.sandorln.champion.model.type.SpellType
+import com.sandorln.champion.util.setSkillIcon
 import com.sandorln.champion.view.adapter.diff.DiffUtils
-import com.sandorln.champion.view.binding.setSkillIcon
 
 class ChampionThumbnailSkillAdapter(var onChangeSkillType: (championSpell: ChampionSpell, spellType: SpellType) -> Unit = { _, _ -> }) :
     ListAdapter<ChampionSpell, ChampionThumbnailSkillAdapter.ChampionThumbnailSkillViewHolder>(DiffUtils.DIFF_CHAMPION_SKILL) {

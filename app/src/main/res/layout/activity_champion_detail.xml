@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -89,15 +90,209 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_champions_status"
+        <!-- 챔피언 설명 -->
+        <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+                android:overScrollMode="never"
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <!-- Bottom Sheet / Board 관련 처리 -->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="30dp">
 
+                <!-- Story -->
+                <com.sandorln.champion.view.custom.AdapterTitleTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/padding_middle"
+                        app:layout_constraintTop_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:titleName="story" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_story"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/padding_small"
+                            android:text="\u02DD"
+                            android:textColor="@color/base"
+                            android:textSize="35dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/padding_small"
+                            android:text="\u02F6"
+                            android:textColor="@color/base"
+                            android:textSize="35dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                    <TextView
+                            android:id="@+id/tv_champion_story"
+                            style="@style/Base.Widget.AppCompat.TextView.DescriptionStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/padding_small"
+                            android:layout_marginBottom="@dimen/padding_small"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Skill -->
+                <com.sandorln.champion.view.custom.AdapterTitleTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/padding_xlarge"
+                        app:titleName="skill" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <com.google.android.exoplayer2.ui.PlayerView
+                            android:id="@+id/exo_player_skill"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_marginTop="@dimen/padding_small"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintDimensionRatio="16:9"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:resize_mode="fill"
+                            app:use_controller="false" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_thumbnail_skill"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/padding_xxlarge"
+                        android:layout_marginTop="@dimen/padding_small"
+                        android:layout_marginEnd="@dimen/padding_xxlarge"
+                        android:nestedScrollingEnabled="false"
+                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                        app:layout_constraintTop_toBottomOf="@id/tv_title"
+                        app:spanCount="5"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/item_champion_thumbnail_skill" />
+
+                <TextView
+                        android:id="@+id/tv_spell_name"
+                        style="@style/Base.Widget.AppCompat.TextView.SkillStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/padding_xsmall"
+                        android:padding="0dp"
+                        android:text="스킬 제목"
+                        android:textColor="@color/base"
+                        android:textSize="12.5dp" />
+
+                <TextView
+                        android:id="@+id/tv_skill_description"
+                        style="@style/Base.Widget.AppCompat.TextView.SkillStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="75dp"
+                        android:paddingStart="@dimen/padding_xlarge"
+                        android:paddingEnd="@dimen/padding_xlarge"
+                        android:text="스킬 정보" />
+
+                <!-- Skin -->
+                <com.sandorln.champion.view.custom.AdapterTitleTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/padding_xlarge"
+                        app:titleName="skin" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/padding_small">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                            android:id="@+id/vp_full_skin"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:clipChildren="false"
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="horizontal"
+                            android:overScrollMode="never"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintDimensionRatio="16:9"
+                            app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/layout_tips"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="@dimen/padding_middle"
+                        android:paddingEnd="@dimen/padding_middle"
+                        android:visibility="gone">
+
+                    <com.sandorln.champion.view.custom.AdapterTitleTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/padding_middle"
+                            app:titleName="tips" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_ally_tips"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/padding_small"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="vertical"
+                            android:overScrollMode="never"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="3"
+                            tools:listitem="@layout/item_champion_tip" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/layout_enemy_tips"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="@dimen/padding_middle"
+                        android:paddingEnd="@dimen/padding_middle"
+                        android:visibility="gone">
+
+                    <com.sandorln.champion.view.custom.AdapterTitleTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/padding_middle"
+                            app:titleName="enemy tips" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_enemy_tips"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/padding_small"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="vertical"
+                            android:overScrollMode="never"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="3"
+                            tools:listitem="@layout/item_champion_tip" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.core.widget.NestedScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

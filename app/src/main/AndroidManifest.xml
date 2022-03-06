@@ -41,7 +41,7 @@
                 android:screenOrientation="fullSensor" />
 
         <activity
-                android:name=".view.activity.ChampionDetailUpdateActivity"
+                android:name=".view.activity.ChampionDetailActivity"
                 android:exported="true"
                 android:screenOrientation="fullSensor" />
     </application>

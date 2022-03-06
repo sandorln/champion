@@ -21,12 +21,12 @@
                 android:nestedScrollingEnabled="false"
                 android:orientation="horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toTopOf="@id/rv_full_skin"
+                app:layout_constraintBottom_toTopOf="@id/vp_full_skin"
                 app:layout_constraintDimensionRatio="64:9"
                 app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_full_skin"
+                android:id="@+id/vp_full_skin"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:nestedScrollingEnabled="false"

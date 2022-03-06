@@ -1,11 +1,12 @@
-package com.sandorln.champion.view.binding
+package com.sandorln.champion.util
 
 import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionData
-
 
 fun ImageView.setChampionThumbnail(version: String, championId: String) {
     Glide.with(context)

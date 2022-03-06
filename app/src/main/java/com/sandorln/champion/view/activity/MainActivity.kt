@@ -60,7 +60,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                             }
                         }
 
-                        startActivity(ChampionDetailUpdateActivity.newIntent(champion, this@MainActivity))
+                        startActivity(ChampionDetailActivity.newIntent(champion, this@MainActivity))
                     }
                 }
             }
