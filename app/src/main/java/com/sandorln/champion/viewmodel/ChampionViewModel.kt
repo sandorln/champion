@@ -5,21 +5,19 @@ import android.content.Context
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionBoard
 import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.VersionLol
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.repository.BoardRepository
 import com.sandorln.champion.repository.ChampionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -31,17 +29,39 @@ class ChampionViewModel @Inject constructor(
     private val championRepository: ChampionRepository,
     private val boardRepository: BoardRepository
 ) : AndroidViewModel(context as Application) {
-    val championAllList: LiveData<ResultData<List<ChampionData>>> = liveData {
-        emitSource(championRepository.getResultAllChampionList().asLiveData(Dispatchers.IO))
-    }
+    private val championAllList: Flow<ResultData<List<ChampionData>>> = championRepository.championList
+    private val searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
+    val showChampionList: MutableStateFlow<ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
 
-    /**
-     * 현재 가져온 값에서 검색 기능
-     */
-    val searchChampName = MutableLiveData<String>().apply { value = "" }
+    fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { searchChampionName.emit(searchName) }
 
-    fun searchChampion(searchChampionName: String) = viewModelScope.launch(Dispatchers.IO) {
-        championRepository.searchChampion(searchChampionName)
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            delay(500)
+            championRepository.refreshAllChampionList()
+
+            championAllList.combine(searchChampionName) { championAllList, searchChampionName ->
+                val searchResult = when {
+                    /* 로딩 중일 시 */
+                    championAllList is ResultData.Loading -> ResultData.Loading
+
+                    /* 검색어가 없을 시 모든 챔피언 보여주기 */
+                    championAllList is ResultData.Success && searchChampionName.isEmpty() -> ResultData.Success(championAllList.data)
+
+                    /* 검색어가 있을 시 해당 챔피언 보여주기 */
+                    championAllList is ResultData.Success && searchChampionName.isNotEmpty() -> {
+                        val searchChampionList = championAllList.data?.filter { champion ->
+                            /* 검색어 / 검색 대상 공백 제거 */
+                            champion.cName.replace(" ", "").startsWith(searchChampionName.replace(" ", ""))
+                        }?.toList()
+                        ResultData.Success(searchChampionList)
+                    }
+
+                    else -> ResultData.Failed(Exception())
+                }
+                showChampionList.emit(searchResult)
+            }.collect()
+        }
     }
 
     /**

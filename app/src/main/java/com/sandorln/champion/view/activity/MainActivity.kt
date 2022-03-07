@@ -6,10 +6,14 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityMainBinding
+import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseActivity
@@ -17,6 +21,8 @@ import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -28,19 +34,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     /* Adapters */
     private lateinit var championThumbnailAdapter: ChampionThumbnailAdapter
 
-    private val inputMethodManager: InputMethodManager by lazy { getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
-
-    /* 검색 창 오른쪽 X 버튼 */
-    private val cleanBtnClick = View.OnTouchListener { v, event ->
-        val DRAWABLE_RIGHT = 2
-
-        if (event!!.action == MotionEvent.ACTION_UP &&
-            event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
-        )
-            championViewModel.searchChampName.postValue("")
-
-        return@OnTouchListener false
-    }
+    private lateinit var inputMethodManager: InputMethodManager
+    private lateinit var cleanBtnClick: View.OnTouchListener                    /* 검색 창 오른쪽 X 버튼 */
 
     override fun initObjectSetting() {
         championThumbnailAdapter = ChampionThumbnailAdapter {
@@ -62,28 +57,29 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                 }
             }
         }
+
+        inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        cleanBtnClick = View.OnTouchListener { v, event ->
+            val DRAWABLE_RIGHT = 2
+
+            if (event!!.action == MotionEvent.ACTION_UP &&
+                event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
+            ) {
+                binding.editSearchChamp.setText("")
+                binding.editSearchChamp.clearFocus()
+                inputMethodManager.hideSoftInputFromWindow(binding.editSearchChamp.windowToken, 0)
+            }
+            return@OnTouchListener false
+        }
     }
 
     override fun initViewSetting() {
         binding.rvChampions.adapter = championThumbnailAdapter
-        binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
-    }
+        binding.editSearchChamp.doOnTextChanged { text, _, _, _ ->
+            championViewModel.changeSearchChampionName(text.toString())
 
-    override fun initObserverSetting() {
-        championViewModel.championAllList.observe(this, Observer { resultCharacterList ->
-            when (resultCharacterList) {
-                is ResultData.Success -> championThumbnailAdapter.submitList(resultCharacterList.data ?: mutableListOf())
-                is ResultData.Failed -> {
-                }
-            }
-        })
-
-        championViewModel.searchChampName.observe(this, Observer { searchChampionName ->
-            championViewModel.searchChampion(searchChampionName)
-
-            /* 검색어가 비어있지 않을 경우 */
             with(binding.editSearchChamp) {
-                if (searchChampionName.isNotEmpty()) {
+                if (text?.isNotEmpty() == true) {
                     /* 검색어를 모두 지우는 아이콘 생성 */
                     setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this@MainActivity, R.drawable.round_clear_white_18), null)
                     setOnTouchListener(cleanBtnClick)
@@ -93,13 +89,37 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     setOnTouchListener(null)
                 }
             }
-        })
+        }
+        binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
+        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).lvTotalVersion}"
+    }
+
+    override fun initObserverSetting() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                championViewModel.showChampionList.collect { result ->
+                    when (result) {
+                        is ResultData.Success -> {
+                            binding.pbContent.isVisible = false
+                            championThumbnailAdapter.submitList(result.data)
+                        }
+                        is ResultData.Loading -> {
+                            binding.pbContent.isVisible = true
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {
         when {
-            championViewModel.searchChampName.value!!.isNotEmpty() -> championViewModel.searchChampName.postValue("")
-            else -> finish()
+            binding.editSearchChamp.text?.toString()?.isNotEmpty() == true -> binding.editSearchChamp.setText("")
+            else -> {
+                moveTaskToBack(true)
+                finishAndRemoveTask()
+                android.os.Process.killProcess(android.os.Process.myPid())
+            }
         }
     }
 }

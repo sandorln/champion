@@ -27,18 +27,11 @@ fun ImageView.setToolbarChampionThumbnail(championId: String) {
         .into(this)
 }
 
-fun ImageView.setChampionSplash(championData: ChampionData) {
+fun ImageView.setChampionSplash(championId: String, skinNum: String) {
     Glide.with(context)
-        .load("http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championData.cId}_${championData.cSkins.first().skNum}.jpg")
+        .load("http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_${skinNum}.jpg")
         .thumbnail(0.5f)
-        .diskCacheStrategy(DiskCacheStrategy.ALL)
-        .into(this)
-}
-
-fun ImageView.setChampionSkin(championId: String, skinNumber: String = "0") {
-    Glide.with(context)
-        .load("http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_${skinNumber}.jpg")
-        .thumbnail(0.5f)
+        .fitCenter()
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(this)
 }

@@ -1,5 +1,6 @@
 package com.sandorln.champion.manager
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -16,13 +17,20 @@ class VersionManager(private val versionService: VersionService) {
                     .Builder(context)
                     .setTitle("알림")
                     .setMessage("롤 버전을 가져올 수 없습니다")
-                    .setPositiveButton("확인") { _, _ ->
+                    .setPositiveButton("다시 접속") { _, _ ->
                         val intent = Intent(context, SplashActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         context.startActivity(intent)
                         VersionLol()
+                    }
+                    .setNegativeButton("종료") { _, _ ->
+                        (context as? Activity)?.apply {
+                            moveTaskToBack(true)
+                            finishAndRemoveTask()
+                            android.os.Process.killProcess(android.os.Process.myPid())
+                        }
                     }
                     .show()
 

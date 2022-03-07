@@ -30,6 +30,14 @@
                             android:src="@drawable/lol_log"
                             android:transitionName="logo"
                             app:layout_collapseMode="parallax" />
+                    <TextView
+                            android:id="@+id/tv_version"
+                            style="@style/Base.Widget.AppCompat.TextView.TipStyle"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_gravity="bottom|end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -37,6 +45,7 @@
                     android:id="@+id/layout_champs"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:animateLayoutChanges="true"
                     android:background="@android:color/black"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -74,6 +83,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:orientation="vertical"
+                        android:overScrollMode="never"
                         android:paddingStart="@dimen/padding_large"
                         android:paddingEnd="@dimen/padding_large"
                         android:paddingBottom="@dimen/padding_large"
@@ -83,8 +93,17 @@
                         app:spanCount="6"
                         bind:listitem="@layout/item_champion_icon" />
 
+                <androidx.core.widget.ContentLoadingProgressBar
+                        android:id="@+id/pb_content"
+                        style="@style/Widget.AppCompat.ProgressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

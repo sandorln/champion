@@ -6,10 +6,11 @@ import android.graphics.Rect
 import android.os.Parcelable
 import android.view.View
 import androidx.activity.viewModels
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
@@ -107,16 +108,14 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
     override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
-            lifecycleScope.launchWhenResumed {
-                binding.imgChampionThumbnail.setToolbarChampionThumbnail(champion.cId)
-            }
+            binding.imgChampionThumbnail.setToolbarChampionThumbnail(champion.cId)
+            binding.imgChampionSplash.setChampionSplash(champion.cId, champion.cSkins.first().skNum)
 
             val championId = String.format("%04d", champion.cKey)
 
             /* 스토리 관련 */
             binding.tvChampionName.text = champion.cName
             binding.tvChampionTitle.text = champion.cTitle
-            binding.imgChampionSplash.setChampionSplash(champion)
             binding.tvChampionStory.text = champion.cBlurb
 
             /* 스킬 관련 */
@@ -134,6 +133,20 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             binding.vpFullSkin.offscreenPageLimit = champion.cSkins.size
             championFullSkinAdapter.championId = champion.cId
             championFullSkinAdapter.submitList(champion.cSkins)
+            /* 스킨 변경에 따른 상단 이름 및 썸네일 변경 */
+            binding.vpFullSkin.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    try {
+                        val viewHolder = (binding.vpFullSkin[0] as RecyclerView).findViewHolderForAdapterPosition(position) as ChampionFullSkinAdapter.ChampionFullSkinViewHolder
+                        binding.imgChampionSplash.setImageDrawable(viewHolder.binding.imgChampionSkin.drawable)
+                        binding.tvChampionName.text = if (position == 0) champion.cName else champion.cSkins[position].skName
+                    } catch (e: Exception) {
+                        binding.imgChampionSplash.setChampionSplash(champion.cId, champion.cSkins.first().skNum)
+                        binding.tvChampionName.text = champion.cName
+                    }
+                }
+            })
 
             /* 팁 관련 */
             if (champion.cAllytips.isNotEmpty()) {
