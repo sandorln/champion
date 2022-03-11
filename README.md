@@ -4,7 +4,7 @@
 현재는 각 챔피언마다 리뷰를 작성하는 댓글 기능 개발 중에 있습니다.
 
 ## 개발 환경
-- Kotlin, MVVM, DataBinding, Hilt, Coroutine, Retrofit2, Glide, Motion Layout
+- Kotlin, MVVM, DataBinding, Hilt, Coroutine, Retrofit2, Glide, Exoplayer, Motion Layout
 - Min SDK 21
 
 ## 스크린 샷
