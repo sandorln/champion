@@ -8,7 +8,4 @@
 - Min SDK 21
 
 ## 스크린 샷
-<img src="https://user-images.githubusercontent.com/25873584/157794741-a70863a3-b443-4b9a-b714-6fd4f2deb6a5.jpg" width="200" height="335">
-<img src="https://user-images.githubusercontent.com/25873584/157794771-c70819a6-7875-4e23-a875-b2a8f4540371.jpg" width="200" height="335">
-<img src="https://user-images.githubusercontent.com/25873584/157794779-12f8048a-fa17-447c-bd40-4e4eebc80521.jpg" width="200" height="335">
-<img src="https://user-images.githubusercontent.com/25873584/157794786-d62d392b-a6e0-4d58-b41e-292e7ca1a10d.jpg" width="200" height="335">
+<img src="https://user-images.githubusercontent.com/25873584/157794741-a70863a3-b443-4b9a-b714-6fd4f2deb6a5.jpg" width="200" height="335"><img src="https://user-images.githubusercontent.com/25873584/157794771-c70819a6-7875-4e23-a875-b2a8f4540371.jpg" width="200" height="335"><img src="https://user-images.githubusercontent.com/25873584/157794779-12f8048a-fa17-447c-bd40-4e4eebc80521.jpg" width="200" height="335"><img src="https://user-images.githubusercontent.com/25873584/157794786-d62d392b-a6e0-4d58-b41e-292e7ca1a10d.jpg" width="200" height="335">
