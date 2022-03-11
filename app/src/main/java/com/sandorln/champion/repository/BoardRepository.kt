@@ -4,7 +4,6 @@ import androidx.paging.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.sandorln.champion.model.ChampionBoard
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
 class BoardRepository {

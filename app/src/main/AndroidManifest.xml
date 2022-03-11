@@ -15,7 +15,7 @@
             android:usesCleartextTraffic="true">
 
         <activity
-                android:name="com.sandorln.champion.view.activity.SplashActivity"
+                android:name="com.sandorln.champion.view.activity.SplashLoadingActivity"
                 android:exported="true"
                 android:noHistory="true"
                 android:screenOrientation="fullSensor">
@@ -34,11 +34,6 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-
-        <activity
-                android:name=".view.activity.ChampionDetailActivity"
-                android:exported="true"
-                android:screenOrientation="fullSensor" />
 
         <activity
                 android:name=".view.activity.ChampionDetailActivity"

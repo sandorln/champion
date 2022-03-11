@@ -219,7 +219,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/padding_small">
+                        android:layout_marginTop="@dimen/padding_xsmall">
 
                     <androidx.viewpager2.widget.ViewPager2
                             android:id="@+id/vp_full_skin"
@@ -233,6 +233,22 @@
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintDimensionRatio="16:9"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                            android:id="@+id/v_vp_full_skin_pre"
+                            android:layout_width="@dimen/padding_xlarge"
+                            android:layout_height="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                            android:id="@+id/v_vp_full_skin_next"
+                            android:layout_width="@dimen/padding_xlarge"
+                            android:layout_height="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

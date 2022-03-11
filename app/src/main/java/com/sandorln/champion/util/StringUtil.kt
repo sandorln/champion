@@ -3,7 +3,7 @@ package com.sandorln.champion.util
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 
-fun String.fromHtml(): Spanned {
+fun String.removeBrFromHtml(): Spanned {
     var tempString = this.replace("<br>", "")
     tempString = tempString.replace("</br>", "")
 

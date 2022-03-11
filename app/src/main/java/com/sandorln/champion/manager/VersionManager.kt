@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import com.sandorln.champion.model.VersionLol
 import com.sandorln.champion.network.VersionService
-import com.sandorln.champion.view.activity.SplashActivity
+import com.sandorln.champion.view.activity.SplashLoadingActivity
 
 class VersionManager(private val versionService: VersionService) {
     companion object {
@@ -18,7 +18,7 @@ class VersionManager(private val versionService: VersionService) {
                     .setTitle("알림")
                     .setMessage("롤 버전을 가져올 수 없습니다")
                     .setPositiveButton("다시 접속") { _, _ ->
-                        val intent = Intent(context, SplashActivity::class.java)
+                        val intent = Intent(context, SplashLoadingActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)

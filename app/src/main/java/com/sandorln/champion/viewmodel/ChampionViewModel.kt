@@ -20,8 +20,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 @HiltViewModel
 class ChampionViewModel @Inject constructor(
     @ApplicationContext context: Context,

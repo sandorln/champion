@@ -18,15 +18,6 @@ fun ImageView.setChampionThumbnail(championId: String) {
         .into(this)
 }
 
-fun ImageView.setToolbarChampionThumbnail(championId: String) {
-    val version = VersionManager.getVersion(this.context).lvCategory.cvChampion
-    Glide.with(context)
-        .load("http://ddragon.leagueoflegends.com/cdn/$version/img/champion/${championId}.png")
-        .thumbnail(0.5f)
-        .diskCacheStrategy(DiskCacheStrategy.ALL)
-        .into(this)
-}
-
 fun ImageView.setChampionSplash(championId: String, skinNum: String) {
     Glide.with(context)
         .load("http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_${skinNum}.jpg")

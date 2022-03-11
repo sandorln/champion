@@ -22,10 +22,10 @@ import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.ChampionSpell
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.type.SpellType
-import com.sandorln.champion.util.fromHtml
 import com.sandorln.champion.util.playChampionSkill
+import com.sandorln.champion.util.removeBrFromHtml
 import com.sandorln.champion.util.setChampionSplash
-import com.sandorln.champion.util.setToolbarChampionThumbnail
+import com.sandorln.champion.util.setChampionThumbnail
 import com.sandorln.champion.view.adapter.ChampionFullSkinAdapter
 import com.sandorln.champion.view.adapter.ChampionThumbnailSkillAdapter
 import com.sandorln.champion.view.adapter.ChampionTipAdapter
@@ -37,13 +37,8 @@ import kotlinx.coroutines.FlowPreview
 import javax.inject.Inject
 import kotlin.math.abs
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.layout.activity_champion_detail) {
-    @Inject
-    lateinit var versionManager: VersionManager
-
     /* ViewModels */
     private val championViewModel: ChampionViewModel by viewModels()
 
@@ -102,13 +97,31 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                 }
             })
         }
+        binding.vVpFullSkinPre.setOnClickListener {
+            try {
+                val index = binding.vpFullSkin.currentItem
+                if (index > 0)
+                    binding.vpFullSkin.setCurrentItem(index - 1, true)
+            } catch (e: Exception) {
+
+            }
+        }
+        binding.vVpFullSkinNext.setOnClickListener {
+            try {
+                val index = binding.vpFullSkin.currentItem
+                if (index < championFullSkinAdapter.currentList.size - 1)
+                    binding.vpFullSkin.setCurrentItem(index + 1, true)
+            } catch (e: Exception) {
+
+            }
+        }
         binding.rvAllyTips.adapter = championTipAdapter
         binding.rvEnemyTips.adapter = championEnemyTipAdapter
     }
 
     override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
-            binding.imgChampionThumbnail.setToolbarChampionThumbnail(champion.cId)
+            binding.imgChampionThumbnail.setChampionThumbnail(champion.cId)
             binding.imgChampionSplash.setChampionSplash(champion.cId, champion.cSkins.first().skNum)
 
             val championId = String.format("%04d", champion.cKey)
@@ -198,7 +211,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
      */
     private fun selectChampionSkill(championId: String, spellType: SpellType, championSpell: ChampionSpell) {
         skillExoPlayer?.playChampionSkill(championId, spellType)
-        binding.tvSkillDescription.text = championSpell.description.fromHtml()
+        binding.tvSkillDescription.text = championSpell.description.removeBrFromHtml()
         binding.tvSpellName.text = championSpell.name
     }
 }
