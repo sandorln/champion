@@ -13,11 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityChampionDetailBinding
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.ChampionSpell
 import com.sandorln.champion.model.keys.BundleKeys
@@ -32,9 +33,6 @@ import com.sandorln.champion.view.adapter.ChampionTipAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import javax.inject.Inject
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -67,16 +65,39 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             .setMediaSourceFactory(DefaultMediaSourceFactory(this))
             .setTrackSelector(DefaultTrackSelector(this))
             .build()
-        skillExoPlayer?.playWhenReady = true
-        skillExoPlayer?.repeatMode = ExoPlayer.REPEAT_MODE_ONE
+            .apply {
+                playWhenReady = true
+                repeatMode = ExoPlayer.REPEAT_MODE_ONE
+                addListener(object : Player.Listener {
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        super.onPlaybackStateChanged(playbackState)
+                        binding.pbLoadingSkill.isVisible = playbackState == Player.STATE_BUFFERING
+                        binding.layoutNoSkill.isVisible = playbackState == Player.STATE_IDLE
+                    }
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        super.onIsPlayingChanged(isPlaying)
+                        binding.layoutNoSkill.isVisible = false
+                    }
+
+                    override fun onPlayerError(error: PlaybackException) {
+                        super.onPlayerError(error)
+                        binding.layoutNoSkill.isVisible = true
+                    }
+                })
+            }
     }
 
     override fun initViewSetting() {
         initAppbarHeight()
 
         binding.imgBack.setOnClickListener { finish() }
+
+        /* 스킬 관련 */
         binding.exoPlayerSkill.player = skillExoPlayer
         binding.rvThumbnailSkill.adapter = championThumbnailSkillAdapter
+
+        /* 스킨 관련 */
         binding.vpFullSkin.apply {
             adapter = championFullSkinAdapter
 
@@ -115,6 +136,8 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
             }
         }
+
+        /* 팁 관련 */
         binding.rvAllyTips.adapter = championTipAdapter
         binding.rvEnemyTips.adapter = championEnemyTipAdapter
     }
