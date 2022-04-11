@@ -9,12 +9,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Singleton
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+class RepositoryModule {
     @Provides
     fun providesChampionRepository(championService: ChampionService): ChampionRepository = ChampionRepository(championService)
 

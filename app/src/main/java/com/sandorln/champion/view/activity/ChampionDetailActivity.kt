@@ -118,6 +118,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                 }
             })
         }
+
         binding.vVpFullSkinPre.setOnClickListener {
             try {
                 val index = binding.vpFullSkin.currentItem
@@ -127,6 +128,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
             }
         }
+
         binding.vVpFullSkinNext.setOnClickListener {
             try {
                 val index = binding.vpFullSkin.currentItem

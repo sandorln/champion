@@ -15,7 +15,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.sandorln.Champion"
+        applicationId "com.sandorln.champion"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 39

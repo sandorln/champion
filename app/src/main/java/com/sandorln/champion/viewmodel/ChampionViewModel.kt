@@ -13,11 +13,9 @@ import com.sandorln.champion.repository.BoardRepository
 import com.sandorln.champion.repository.ChampionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,40 +25,29 @@ class ChampionViewModel @Inject constructor(
     private val championRepository: ChampionRepository,
     private val boardRepository: BoardRepository
 ) : AndroidViewModel(context as Application) {
-    private val championAllList: Flow<ResultData<List<ChampionData>>> = championRepository.championList
-    private val searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
-    val showChampionList: MutableStateFlow<ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
+    private val _championAllList: Flow<ResultData<List<ChampionData>>> = championRepository.championList
+    private val _searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
+    val searchChampionData: StateFlow<String> = _searchChampionName.asStateFlow()
 
-    fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { searchChampionName.emit(searchName) }
+    fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(500)
-            championRepository.refreshAllChampionList()
+    val showChampionList: StateFlow<ResultData<List<ChampionData>>> = _searchChampionName
+        .debounce(250)
+        .combineTransform(_championAllList) { search, resultAllChampions ->
+            when (resultAllChampions) {
+                is ResultData.Success -> {
+                    val searchChampionList = resultAllChampions.data?.filter { champion ->
+                        /* 검색어 / 검색 대상 공백 제거 */
+                        champion.cName.replace(" ", "").startsWith(search.replace(" ", ""))
+                    }?.toList()
 
-            championAllList.combine(searchChampionName) { championAllList, searchChampionName ->
-                val searchResult = when {
-                    /* 로딩 중일 시 */
-                    championAllList is ResultData.Loading -> ResultData.Loading
-
-                    /* 검색어가 없을 시 모든 챔피언 보여주기 */
-                    championAllList is ResultData.Success && searchChampionName.isEmpty() -> ResultData.Success(championAllList.data)
-
-                    /* 검색어가 있을 시 해당 챔피언 보여주기 */
-                    championAllList is ResultData.Success && searchChampionName.isNotEmpty() -> {
-                        val searchChampionList = championAllList.data?.filter { champion ->
-                            /* 검색어 / 검색 대상 공백 제거 */
-                            champion.cName.replace(" ", "").startsWith(searchChampionName.replace(" ", ""))
-                        }?.toList()
-                        ResultData.Success(searchChampionList)
-                    }
-
-                    else -> ResultData.Failed(Exception())
+                    emit(ResultData.Success(searchChampionList))
                 }
-                showChampionList.emit(searchResult)
-            }.collect()
-        }
-    }
+                else -> emit(resultAllChampions)
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
+
+    fun refreshAllChampionList() = viewModelScope.launch { championRepository.refreshAllChampionList() }
 
     /**
      * 특정한 챔피언의 정보를 가져올 시

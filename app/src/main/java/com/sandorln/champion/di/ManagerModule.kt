@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ManagerModule {
+class ManagerModule {
     @Provides
     fun providesVersionManager(versionService: VersionService): VersionManager = VersionManager(versionService)
 }

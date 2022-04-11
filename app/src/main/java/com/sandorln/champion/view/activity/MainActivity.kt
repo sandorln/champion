@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -19,7 +20,10 @@ import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -69,39 +73,69 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override fun initViewSetting() {
+        binding.rvChampions.setHasFixedSize(true)
         binding.rvChampions.adapter = championThumbnailAdapter
+
         binding.editSearchChamp.doOnTextChanged { text, _, _, _ ->
             championViewModel.changeSearchChampionName(text.toString())
-
-            with(binding.editSearchChamp) {
-                if (text?.isNotEmpty() == true) {
-                    /* 검색어를 모두 지우는 아이콘 생성 */
-                    setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this@MainActivity, R.drawable.round_clear_white_18), null)
-                    setOnTouchListener(cleanBtnClick)
-                } else {
-                    /* 검색어가 존재하지 않을 시 검색어를 모두 지우는 아이콘 삭제 */
-                    setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-                    setOnTouchListener(null)
-                }
-            }
         }
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
         binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).lvTotalVersion}"
+
+        championViewModel.refreshAllChampionList()
     }
 
     override fun initObserverSetting() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                championViewModel.showChampionList.collect { result ->
-                    when (result) {
-                        is ResultData.Success -> {
-                            binding.pbContent.isVisible = false
-                            championThumbnailAdapter.submitList(result.data)
+                launch {
+                    championViewModel
+                        .showChampionList
+                        .onStart {
+                            delay(250)
                         }
-                        is ResultData.Loading -> {
-                            binding.pbContent.isVisible = true
+                        .collect { result ->
+                            when (result) {
+                                is ResultData.Success -> {
+                                    binding.pbContent.isVisible = false
+                                    championThumbnailAdapter.submitList(result.data) {
+                                        binding.rvChampions.scrollToPosition(0)
+                                    }
+                                }
+                                is ResultData.Loading -> {
+                                    binding.pbContent.isVisible = true
+                                }
+                                is ResultData.Failed -> {
+                                    AlertDialog
+                                        .Builder(this@MainActivity)
+                                        .setTitle("오류")
+                                        .setMessage("오류가 발생하였습니다.\n다시 시도해주세요")
+                                        .setPositiveButton("다시 시도") { _, _ ->
+                                            championViewModel.refreshAllChampionList()
+                                        }
+                                        .setNegativeButton("취소") { _, _ -> finish() }
+                                        .show()
+                                }
+                            }
                         }
-                    }
+                }
+
+                launch {
+                    championViewModel
+                        .searchChampionData
+                        .collectLatest { search ->
+                            with(binding.editSearchChamp) {
+                                if (search.isNotEmpty()) {
+                                    /* 검색어를 모두 지우는 아이콘 생성 */
+                                    setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this@MainActivity, R.drawable.round_clear_white_18), null)
+                                    setOnTouchListener(cleanBtnClick)
+                                } else {
+                                    /* 검색어가 존재하지 않을 시 검색어를 모두 지우는 아이콘 삭제 */
+                                    setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
+                                    setOnTouchListener(null)
+                                }
+                            }
+                        }
                 }
             }
         }

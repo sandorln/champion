@@ -12,10 +12,11 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+class NetworkModule {
     @Provides
     fun providesHttpLoggingInterceptor(): Interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BASIC
@@ -29,6 +30,7 @@ object NetworkModule {
         }.build()
 
     @Provides
+    @Singleton
     fun providesRetrofit(client: OkHttpClient): Retrofit =
         Retrofit
             .Builder()
@@ -38,7 +40,10 @@ object NetworkModule {
             .build()
 
     @Provides
+    @Singleton
     fun providesChampionService(retrofit: Retrofit): ChampionService = retrofit.create(ChampionService::class.java)
+
     @Provides
+    @Singleton
     fun providesVersionService(retrofit: Retrofit): VersionService = retrofit.create(VersionService::class.java)
 }

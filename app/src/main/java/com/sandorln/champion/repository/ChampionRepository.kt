@@ -20,7 +20,8 @@ class ChampionRepository(
             championList.emit(ResultData.Loading)
             val response = championService.getAllChampion(VersionManager.getVersion().lvCategory.cvChampion)
             response.parsingData()
-            championList.emit(ResultData.Success(response.rChampionList.sortedBy { it.cName }))
+            val allChampions = ResultData.Success(response.rChampionList.sortedBy { it.cName })
+            championList.emit(allChampions)
         } catch (e: Exception) {
             championList.emit(ResultData.Failed(e))
         }
