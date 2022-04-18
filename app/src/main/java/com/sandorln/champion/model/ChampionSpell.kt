@@ -1,11 +1,13 @@
 package com.sandorln.champion.model
 
 import android.os.Parcelable
+import androidx.room.Entity
 import com.sandorln.champion.model.type.SpellType
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
+@Entity
 data class ChampionSpell(
     var id: String = "P",
     var name: String = "",

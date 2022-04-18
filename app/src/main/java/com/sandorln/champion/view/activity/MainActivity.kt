@@ -5,25 +5,19 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityMainBinding
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -41,9 +35,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         championThumbnailAdapter = ChampionThumbnailAdapter {
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
-                when (val result = championViewModel.getChampionDetailInfo(it.cId)) {
+                when (val result = championViewModel.getChampionDetailInfo(it.id)) {
                     is ResultData.Success -> result.data?.let { champion ->
-                        if (champion.cName.isNotEmpty()) {
+                        if (champion.name.isNotEmpty()) {
                             /* 검색 중 챔피언을 눌렀을 시 _ 키보드 및 검색창 닫기 */
                             if (binding.editSearchChamp.hasFocus()) {
                                 binding.editSearchChamp.clearFocus()
@@ -80,42 +74,26 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             championViewModel.changeSearchChampionName(text.toString())
         }
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
-        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).lvTotalVersion}"
-
-        championViewModel.refreshAllChampionList()
+//        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).totalVersion}"
     }
 
     override fun initObserverSetting() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     championViewModel
-                        .showChampionList
-                        .onStart {
-                            delay(250)
+                        .championVersion
+                        .collectLatest { version ->
+                            binding.tvVersion.text = "VERSION $version"
                         }
-                        .collect { result ->
-                            when (result) {
-                                is ResultData.Success -> {
-                                    binding.pbContent.isVisible = false
-                                    championThumbnailAdapter.submitList(result.data) {
-                                        binding.rvChampions.scrollToPosition(0)
-                                    }
-                                }
-                                is ResultData.Loading -> {
-                                    binding.pbContent.isVisible = true
-                                }
-                                is ResultData.Failed -> {
-                                    AlertDialog
-                                        .Builder(this@MainActivity)
-                                        .setTitle("오류")
-                                        .setMessage("오류가 발생하였습니다.\n다시 시도해주세요")
-                                        .setPositiveButton("다시 시도") { _, _ ->
-                                            championViewModel.refreshAllChampionList()
-                                        }
-                                        .setNegativeButton("취소") { _, _ -> finish() }
-                                        .show()
-                                }
+                }
+
+                launch {
+                    championViewModel
+                        .championList
+                        .collect { champions ->
+                            championThumbnailAdapter.submitList(champions) {
+                                binding.rvChampions.scrollToPosition(0)
                             }
                         }
                 }

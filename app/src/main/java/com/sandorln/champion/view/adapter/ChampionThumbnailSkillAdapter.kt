@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemChampionThumbnailSkillBinding
 import com.sandorln.champion.model.ChampionSpell
 import com.sandorln.champion.model.type.SpellType
-import com.sandorln.champion.util.setSkillIcon
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 
 class ChampionThumbnailSkillAdapter(var onChangeSkillType: (championSpell: ChampionSpell, spellType: SpellType) -> Unit = { _, _ -> }) :
@@ -24,7 +23,7 @@ class ChampionThumbnailSkillAdapter(var onChangeSkillType: (championSpell: Champ
             val spellType = spell.getSpellType(position)
 
             with(holder.binding) {
-                imgChampionSkill.setSkillIcon(spell.image.imgFull, spellType == SpellType.P)
+                imgChampionSkill.setSkillIcon(spell.image.full, spellType == SpellType.P)
                 tvSkillType.text = spellType.name
                 vSelect.isVisible = selectSpellType == spellType
             }

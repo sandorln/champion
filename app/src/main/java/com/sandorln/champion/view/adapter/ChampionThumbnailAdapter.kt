@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemChampionIconBinding
 import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.util.setChampionThumbnail
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 
 class ChampionThumbnailAdapter(
@@ -21,8 +20,8 @@ class ChampionThumbnailAdapter(
         holder.itemView.setOnClickListener { onClickItem(championData) }
 
         with(holder.binding) {
-            tvChampionName.text = championData.cName
-            imgChampionIcon.setChampionThumbnail( championData.cId)
+            tvChampionName.text = championData.name
+            imgChampionIcon.setChampionThumbnail(championData.id)
         }
     }
 

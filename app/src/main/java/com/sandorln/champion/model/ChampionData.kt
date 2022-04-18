@@ -1,44 +1,31 @@
 package com.sandorln.champion.model
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
+@Entity(primaryKeys = ["version", "id"])
 data class ChampionData(
-    @SerializedName("version")
-    var cVersion: String = "",
-    @SerializedName("id")
-    var cId: String = "",
-    @SerializedName("key")
-    var cKey: Int = 0,
-    @SerializedName("name")
-    var cName: String = "",
-    @SerializedName("title")
-    var cTitle: String = "",
-    @SerializedName("blurb")
-    var cBlurb: String = "",
-    @SerializedName("info")
-    var cInfo: ChampionInfo = ChampionInfo(),
-    @SerializedName("image")
-    var cImage: LOLImage = LOLImage(),
-    @SerializedName("tags")
-    var cTags: List<String> = mutableListOf(),
-    @SerializedName("partype")
-    var cPartType: String = "",
-    @SerializedName("stats")
-    var cStats: ChampionStats = ChampionStats(),
-    @SerializedName("skins")
-    var cSkins: List<ChampionSkin> = mutableListOf(),
+    var version: String = "",
+    var id: String = "",
+    var key: Int = 0,
+    var name: String = "",
+    var title: String = "",
+    var blurb: String = "",
+    var info: ChampionInfo = ChampionInfo(),
+    var image: LOLImage = LOLImage(),
+    var tags: List<String> = mutableListOf(),
+    var partype: String = "",
+    var stats: ChampionStats = ChampionStats(),
+    var skins: List<ChampionSkin> = mutableListOf(),
 
-    @SerializedName("spells")
-    var cSpellList: List<ChampionSpell> = mutableListOf(),
-    @SerializedName("passive")
-    var cPassive: ChampionSpell = ChampionSpell(),
+    var spells: List<ChampionSpell> = mutableListOf(),
+    var passive: ChampionSpell = ChampionSpell(),
 
-    @SerializedName("allytips")
-    var cAllytips: List<String> = mutableListOf(),
-    @SerializedName("enemytips")
-    var cEnemytips: List<String> = mutableListOf()
+    var allytips: List<String> = mutableListOf(),
+    var enemytips: List<String> = mutableListOf()
 ) : Serializable, Parcelable
