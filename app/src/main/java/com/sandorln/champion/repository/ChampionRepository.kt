@@ -1,5 +1,6 @@
 package com.sandorln.champion.repository
 
+import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.result.ResultData
@@ -9,7 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
 class ChampionRepository(
-    private val championService: ChampionService
+    private val championService: ChampionService,
+    private val championDao: ChampionDao
 ) {
     /**
      * 모든 챔피언 정보 가져오기
@@ -20,6 +22,8 @@ class ChampionRepository(
             championList.emit(ResultData.Loading)
             val response = championService.getAllChampion(VersionManager.getVersion().category.champion)
             response.parsingData()
+            championDao.insertChampionList(response.rChampionList)
+
             val allChampions = ResultData.Success(response.rChampionList.sortedBy { it.name })
             championList.emit(allChampions)
         } catch (e: Exception) {
