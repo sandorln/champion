@@ -9,44 +9,24 @@ import java.io.Serializable
 @Parcelize
 @Entity
 data class ChampionStats(
-    @SerializedName("hp")
-    var sHp: Double = 0.0,
-    @SerializedName("hpperlevel")
-    var sHpLv: Double = 0.0,
-    @SerializedName("mp")
-    var sMp: Double = 0.0,
-    @SerializedName("mpperlevel")
-    var sMpLv: Double = 0.0,
-    @SerializedName("movespeed")
-    var sMoveSpeed: Double = 0.0,
-    @SerializedName("armor")
-    var sArmor: Double = 0.0,
-    @SerializedName("armorperlevel")
-    var sArmorLv: Double = 0.0,
-    @SerializedName("spellblock")
-    var sSpellBlock: Double = 0.0,
-    @SerializedName("spellblockperlevel")
-    var sSpellBlockLv: Double = 0.0,
-    @SerializedName("attackrange")
-    var sAttackRange: Double = 0.0,
-    @SerializedName("hpregen")
-    var sHpRegen: Double = 0.0,
-    @SerializedName("hpregenperlevel")
-    var sHpRegenLv: Double = 0.0,
-    @SerializedName("mpregen")
-    var sMpRegen: Double = 0.0,
-    @SerializedName("mpregenperlevel")
-    var sMpRegenLv: Double = 0.0,
-    @SerializedName("crit")
-    var sCrit: Double = 0.0,
-    @SerializedName("critperlevel")
-    var sCritLv: Double = 0.0,
-    @SerializedName("attackdamage")
-    var sAttk: Double = 0.0,
-    @SerializedName("attackdamageperlevel")
-    var sAttkLv: Double = 0.0,
-    @SerializedName("attackspeedoffset")
-    var sAttkSpeed: Double = 0.0,
-    @SerializedName("attackspeedperlevel")
-    var sAttkSpeedLv: Double = 0.0
+    var hp: Double = 0.0,
+    var hpperlevel: Double = 0.0,
+    var mp: Double = 0.0,
+    var mpperlevel: Double = 0.0,
+    var movespeed: Double = 0.0,
+    var armor: Double = 0.0,
+    var armorperlevel: Double = 0.0,
+    var spellblock: Double = 0.0,
+    var spellblockperlevel: Double = 0.0,
+    var attackrange: Double = 0.0,
+    var hpregen: Double = 0.0,
+    var hpregenperlevel: Double = 0.0,
+    var mpregen: Double = 0.0,
+    var mpregenperlevel: Double = 0.0,
+    var crit: Double = 0.0,
+    var critperlevel: Double = 0.0,
+    var attackdamage: Double = 0.0,
+    var attackdamageperlevel: Double = 0.0,
+    var attackspeedoffset: Double = 0.0,
+    var attackspeedperlevel: Double = 0.0
 ) : Serializable, Parcelable

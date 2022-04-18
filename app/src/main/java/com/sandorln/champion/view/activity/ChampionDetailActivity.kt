@@ -146,19 +146,19 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
     override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
-            binding.imgChampionThumbnail.setChampionThumbnail(champion.cId)
-            binding.imgChampionSplash.setChampionSplash(champion.cId, champion.cSkins.first().skNum)
+            binding.imgChampionThumbnail.setChampionThumbnail(champion.id)
+            binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num)
 
-            val championId = String.format("%04d", champion.cKey)
+            val championId = String.format("%04d", champion.key)
 
             /* 스토리 관련 */
-            binding.tvChampionName.text = champion.cName
-            binding.tvChampionTitle.text = champion.cTitle
-            binding.tvChampionStory.text = champion.cBlurb
+            binding.tvChampionName.text = champion.name
+            binding.tvChampionTitle.text = champion.title
+            binding.tvChampionStory.text = champion.blurb
 
             /* 스킬 관련 */
-            val skillList = champion.cSpellList.toMutableList()
-            skillList.add(0, champion.cPassive)
+            val skillList = champion.spells.toMutableList()
+            skillList.add(0, champion.passive)
             championThumbnailSkillAdapter.submitList(skillList)
             championThumbnailSkillAdapter.onChangeSkillType = { championSpell, spellType ->
                 selectChampionSkill(championId, spellType, championSpell)
@@ -168,9 +168,9 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             selectChampionSkill(championId, SpellType.P, skillList.first())
 
             /* 스킨 관련 */
-            binding.vpFullSkin.offscreenPageLimit = champion.cSkins.size
-            championFullSkinAdapter.championId = champion.cId
-            championFullSkinAdapter.submitList(champion.cSkins)
+            binding.vpFullSkin.offscreenPageLimit = champion.skins.size
+            championFullSkinAdapter.championId = champion.id
+            championFullSkinAdapter.submitList(champion.skins)
             /* 스킨 변경에 따른 상단 이름 및 썸네일 변경 */
             binding.vpFullSkin.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -178,23 +178,23 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                     try {
                         val viewHolder = (binding.vpFullSkin[0] as RecyclerView).findViewHolderForAdapterPosition(position) as ChampionFullSkinAdapter.ChampionFullSkinViewHolder
                         binding.imgChampionSplash.setImageDrawable(viewHolder.binding.imgChampionSkin.drawable)
-                        binding.tvChampionName.text = if (position == 0) champion.cName else champion.cSkins[position].skName
+                        binding.tvChampionName.text = if (position == 0) champion.name else champion.skins[position].name
                     } catch (e: Exception) {
-                        binding.imgChampionSplash.setChampionSplash(champion.cId, champion.cSkins.first().skNum)
-                        binding.tvChampionName.text = champion.cName
+                        binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num)
+                        binding.tvChampionName.text = champion.name
                     }
                 }
             })
 
             /* 팁 관련 */
-            if (champion.cAllytips.isNotEmpty()) {
+            if (champion.allytips.isNotEmpty()) {
                 binding.layoutTips.isVisible = true
-                championTipAdapter.tips = champion.cAllytips
+                championTipAdapter.tips = champion.allytips
                 championTipAdapter.notifyDataSetChanged()
             }
-            if (champion.cEnemytips.isNotEmpty()) {
+            if (champion.enemytips.isNotEmpty()) {
                 binding.layoutEnemyTips.isVisible = true
-                championEnemyTipAdapter.tips = champion.cEnemytips
+                championEnemyTipAdapter.tips = champion.enemytips
                 championEnemyTipAdapter.notifyDataSetChanged()
             }
         })

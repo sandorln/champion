@@ -20,8 +20,8 @@ class ChampionFullSkinAdapter(var championId: String = "0") :
 
     override fun onBindViewHolder(holder: ChampionFullSkinViewHolder, position: Int) {
         val skin = getItem(position)
-        holder.binding.imgChampionSkin.setChampionSplash(championId, skin.skNum)
-        holder.binding.tvSkinName.text = if (position == 0) "기본 스킨" else skin.skName
+        holder.binding.imgChampionSkin.setChampionSplash(championId, skin.num)
+        holder.binding.tvSkinName.text = if (position == 0) "기본 스킨" else skin.name
     }
 
     class ChampionFullSkinViewHolder(val binding: ItemChampionFullSkinBinding) : RecyclerView.ViewHolder(binding.root)

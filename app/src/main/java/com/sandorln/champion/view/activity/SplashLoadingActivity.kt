@@ -30,7 +30,7 @@ class SplashLoadingActivity : BaseActivity<ActivitySplashLoadingBinding>(R.layou
             try {
                 versionManager.initData()
 
-                val checkVersionData = VersionManager.getVersion(this@SplashLoadingActivity).lvTotalVersion.isNotEmpty()
+                val checkVersionData = VersionManager.getVersion(this@SplashLoadingActivity).totalVersion.isNotEmpty()
                 if (checkVersionData) {
                     val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this@SplashLoadingActivity, binding.imgLogo, "logo").toBundle()
                     startActivity(Intent(this@SplashLoadingActivity, MainActivity::class.java), option)

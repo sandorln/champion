@@ -9,18 +9,12 @@ import java.io.Serializable
 @Parcelize
 @Entity
 data class LOLImage(
-    @SerializedName("full")
-    var imgFull: String = "",
-    @SerializedName("sprite")
-    var imgSprite: String = "",
-    @SerializedName("group")
-    var imgGroup: String = "",
-    @SerializedName("x")
-    var imgX: Int = 0,
-    @SerializedName("y")
-    var imgY: Int = 0,
-    @SerializedName("w")
-    var imgW: Int = 0,
-    @SerializedName("h")
-    var imgH: Int = 0
+    var full: String = "",
+    var sprite: String = "",
+    var group: String = "",
+    /* 이미지 좌표 */
+    var x: Int = 0,
+    var y: Int = 0,
+    var w: Int = 0,
+    var h: Int = 0
 ) : Serializable, Parcelable

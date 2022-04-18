@@ -21,7 +21,6 @@ import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -41,9 +40,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         championThumbnailAdapter = ChampionThumbnailAdapter {
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
-                when (val result = championViewModel.getChampionDetailInfo(it.cId)) {
+                when (val result = championViewModel.getChampionDetailInfo(it.id)) {
                     is ResultData.Success -> result.data?.let { champion ->
-                        if (champion.cName.isNotEmpty()) {
+                        if (champion.name.isNotEmpty()) {
                             /* 검색 중 챔피언을 눌렀을 시 _ 키보드 및 검색창 닫기 */
                             if (binding.editSearchChamp.hasFocus()) {
                                 binding.editSearchChamp.clearFocus()
@@ -80,7 +79,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             championViewModel.changeSearchChampionName(text.toString())
         }
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
-        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).lvTotalVersion}"
+        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).totalVersion}"
 
         championViewModel.refreshAllChampionList()
     }

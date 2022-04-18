@@ -24,7 +24,7 @@ class ChampionThumbnailSkillAdapter(var onChangeSkillType: (championSpell: Champ
             val spellType = spell.getSpellType(position)
 
             with(holder.binding) {
-                imgChampionSkill.setSkillIcon(spell.image.imgFull, spellType == SpellType.P)
+                imgChampionSkill.setSkillIcon(spell.image.full, spellType == SpellType.P)
                 tvSkillType.text = spellType.name
                 vSelect.isVisible = selectSpellType == spellType
             }

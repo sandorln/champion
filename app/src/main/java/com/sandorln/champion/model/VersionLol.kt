@@ -4,29 +4,15 @@ import com.google.gson.annotations.SerializedName
 
 data class VersionLol(
     @SerializedName("n")
-    var lvCategory: VersionCategory = VersionCategory(),
-
+    var category: VersionCategory = VersionCategory(),
     @SerializedName("v")
-    var lvTotalVersion: String = "",
+    var totalVersion: String = "",
 
-    @SerializedName("l")
-    var lvLanguage: String = "",
-
-    @SerializedName("cdn")
-    var lvCdn: String = "",
-
-    @SerializedName("dd")
-    var lvDd: String = "",
-
-    @SerializedName("lg")
-    var lvLg: String = "",
-
-    @SerializedName("css")
-    var lvCss: String = "",
-
-    @SerializedName("profileiconmax")
-    var lvProfileiconMax: String = "",
-
-    @SerializedName("store")
-    var lvStore: String = "",
+    var language: String = "",
+    var cdn: String = "",
+    var dd: String = "",
+    var lg: String = "",
+    var css: String = "",
+    var profileiconmax: String = "",
+    var store: String = "",
 )

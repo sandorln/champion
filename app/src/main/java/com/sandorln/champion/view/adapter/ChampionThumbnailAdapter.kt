@@ -21,8 +21,8 @@ class ChampionThumbnailAdapter(
         holder.itemView.setOnClickListener { onClickItem(championData) }
 
         with(holder.binding) {
-            tvChampionName.text = championData.cName
-            imgChampionIcon.setChampionThumbnail( championData.cId)
+            tvChampionName.text = championData.name
+            imgChampionIcon.setChampionThumbnail( championData.id)
         }
     }
 
