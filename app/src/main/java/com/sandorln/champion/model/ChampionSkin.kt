@@ -7,12 +7,8 @@ import java.io.Serializable
 
 @Parcelize
 data class ChampionSkin(
-    @SerializedName("id")
-    var skId: String = "",
-    @SerializedName("num")
-    var skNum: String = "",
-    @SerializedName("name")
-    var skName: String = "",
-    @SerializedName("chromas")
-    var skChromas: Boolean = false
+    var id: String = "",
+    var num: String = "",
+    var name: String = "",
+    var chromas: Boolean = false
 ) : Serializable, Parcelable

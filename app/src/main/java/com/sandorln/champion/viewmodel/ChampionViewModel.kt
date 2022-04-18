@@ -38,7 +38,7 @@ class ChampionViewModel @Inject constructor(
                 is ResultData.Success -> {
                     val searchChampionList = resultAllChampions.data?.filter { champion ->
                         /* 검색어 / 검색 대상 공백 제거 */
-                        champion.cName.replace(" ", "").startsWith(search.replace(" ", ""))
+                        champion.name.replace(" ", "").startsWith(search.replace(" ", ""))
                     }?.toList()
 
                     emit(ResultData.Success(searchChampionList))
@@ -56,7 +56,7 @@ class ChampionViewModel @Inject constructor(
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA)
     val championBoardList: LiveData<PagingData<ChampionBoard>> = championData.switchMap {
         liveData {
-            emitSource(boardRepository.getChampionBoardPagingFlow(it.cId).flow.cachedIn(viewModelScope).asLiveData(Dispatchers.IO))
+            emitSource(boardRepository.getChampionBoardPagingFlow(it.id).flow.cachedIn(viewModelScope).asLiveData(Dispatchers.IO))
         }
     }
 }

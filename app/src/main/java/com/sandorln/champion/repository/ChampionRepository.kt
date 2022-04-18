@@ -18,9 +18,9 @@ class ChampionRepository(
     suspend fun refreshAllChampionList() {
         try {
             championList.emit(ResultData.Loading)
-            val response = championService.getAllChampion(VersionManager.getVersion().lvCategory.cvChampion)
+            val response = championService.getAllChampion(VersionManager.getVersion().category.champion)
             response.parsingData()
-            val allChampions = ResultData.Success(response.rChampionList.sortedBy { it.cName })
+            val allChampions = ResultData.Success(response.rChampionList.sortedBy { it.name })
             championList.emit(allChampions)
         } catch (e: Exception) {
             championList.emit(ResultData.Failed(e))
@@ -36,7 +36,7 @@ class ChampionRepository(
             try {
                 withContext(Dispatchers.IO) {
                     isLoadingGetChampion = true
-                    val response = championService.getChampionDetailInfo(VersionManager.getVersion().lvCategory.cvChampion, champID)
+                    val response = championService.getChampionDetailInfo(VersionManager.getVersion().category.champion, champID)
                     response.parsingData()
                     ResultData.Success(response.rChampionList.first())
                 }
