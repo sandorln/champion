@@ -5,9 +5,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,9 +18,7 @@ import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -80,41 +76,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         }
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
         binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).totalVersion}"
-
-        championViewModel.refreshAllChampionList()
     }
 
     override fun initObserverSetting() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     championViewModel
-                        .showChampionList
-                        .onStart {
-                            delay(250)
-                        }
-                        .collect { result ->
-                            when (result) {
-                                is ResultData.Success -> {
-                                    binding.pbContent.isVisible = false
-                                    championThumbnailAdapter.submitList(result.data) {
-                                        binding.rvChampions.scrollToPosition(0)
-                                    }
-                                }
-                                is ResultData.Loading -> {
-                                    binding.pbContent.isVisible = true
-                                }
-                                is ResultData.Failed -> {
-                                    AlertDialog
-                                        .Builder(this@MainActivity)
-                                        .setTitle("오류")
-                                        .setMessage("오류가 발생하였습니다.\n다시 시도해주세요")
-                                        .setPositiveButton("다시 시도") { _, _ ->
-                                            championViewModel.refreshAllChampionList()
-                                        }
-                                        .setNegativeButton("취소") { _, _ -> finish() }
-                                        .show()
-                                }
+                        .championList
+                        .collect { champions ->
+                            championThumbnailAdapter.submitList(champions) {
+                                binding.rvChampions.scrollToPosition(0)
                             }
                         }
                 }
