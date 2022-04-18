@@ -3,6 +3,7 @@ package com.sandorln.champion.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
+import com.google.gson.Gson
 import com.sandorln.champion.database.AppDatabase
 import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.database.shareddao.VersionDao
@@ -38,5 +39,9 @@ class LocalDbModule {
 
     @Singleton
     @Provides
-    fun providesSharedDao(sharedPreferences: SharedPreferences): VersionDao = VersionDaoImpl(sharedPreferences)
+    fun providesSharedDao(sharedPreferences: SharedPreferences,gson: Gson): VersionDao = VersionDaoImpl(sharedPreferences,gson)
+
+    @Singleton
+    @Provides
+    fun providesGson(): Gson = Gson()
 }

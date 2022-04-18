@@ -12,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityMainBinding
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseActivity
@@ -75,12 +74,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             championViewModel.changeSearchChampionName(text.toString())
         }
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
-        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).totalVersion}"
+//        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).totalVersion}"
     }
 
     override fun initObserverSetting() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
+                launch {
+                    championViewModel
+                        .championVersion
+                        .collectLatest { version ->
+                            binding.tvVersion.text = "VERSION $version"
+                        }
+                }
+
                 launch {
                     championViewModel
                         .championList

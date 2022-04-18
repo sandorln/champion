@@ -6,7 +6,7 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true">
 
-        <ImageView
+        <com.sandorln.champion.view.custom.VersionImage
                 android:id="@+id/img_champion_skill"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

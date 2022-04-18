@@ -1,7 +1,6 @@
 package com.sandorln.champion.repository
 
 import com.sandorln.champion.database.roomdao.ChampionDao
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.network.ChampionService
@@ -30,12 +29,12 @@ class ChampionRepository(
      * 특정 캐릭터 정보값 가져오기
      */
     private var isLoadingGetChampion = false
-    suspend fun getChampionInfo(champID: String): ResultData<ChampionData> =
+    suspend fun getChampionInfo(champID: String, version: String): ResultData<ChampionData> =
         if (!isLoadingGetChampion) {
             try {
                 withContext(Dispatchers.IO) {
                     isLoadingGetChampion = true
-                    val response = championService.getChampionDetailInfo(VersionManager.getVersion().category.champion, champID)
+                    val response = championService.getChampionDetailInfo(version, champID)
                     response.parsingData()
                     ResultData.Success(response.rChampionList.first())
                 }

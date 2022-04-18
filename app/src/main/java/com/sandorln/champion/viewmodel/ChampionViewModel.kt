@@ -5,13 +5,13 @@ import android.content.Context
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.sandorln.champion.manager.VersionManager
 import com.sandorln.champion.model.ChampionBoard
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.repository.BoardRepository
 import com.sandorln.champion.repository.ChampionRepository
+import com.sandorln.champion.repository.VersionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ChampionViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val versionManager: VersionManager,
     private val savedStateHandle: SavedStateHandle,
+    private val versionRepository: VersionRepository,
     private val championRepository: ChampionRepository,
     private val boardRepository: BoardRepository
 ) : AndroidViewModel(context as Application) {
@@ -32,15 +32,14 @@ class ChampionViewModel @Inject constructor(
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
     val searchChampionData: StateFlow<String> get() = _searchChampionName
 
-    val championVersion = flow {
-        emit(VersionManager.getVersion().category.champion)
-    }
+    val championVersion = flow { emit(versionRepository.getLolVersionCategory().champion) }
 
     /* 챔피언 모든 정보 */
     private val _championList = championVersion.flatMapLatest { version ->
         championRepository.getAllChampionListFlow(version)
     }
 
+    /* 챔피언 검색 결과 정보 */
     val championList = _searchChampionName
         .debounce(250)
         .combineTransform(_championList) { search, champions ->
@@ -54,7 +53,9 @@ class ChampionViewModel @Inject constructor(
     /**
      * 특정한 챔피언의 정보를 가져올 시
      */
-    suspend fun getChampionDetailInfo(characterId: String): ResultData<ChampionData> = championRepository.getChampionInfo(characterId)
+    suspend fun getChampionDetailInfo(characterId: String): ResultData<ChampionData> =
+        championRepository.getChampionInfo(characterId, versionRepository.getLolVersionCategory().champion)
+
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA)
     val championBoardList: LiveData<PagingData<ChampionBoard>> = championData.switchMap {
         liveData {

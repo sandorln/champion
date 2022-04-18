@@ -26,7 +26,6 @@ import com.sandorln.champion.model.type.SpellType
 import com.sandorln.champion.util.playChampionSkill
 import com.sandorln.champion.util.removeBrFromHtml
 import com.sandorln.champion.util.setChampionSplash
-import com.sandorln.champion.util.setChampionThumbnail
 import com.sandorln.champion.view.adapter.ChampionFullSkinAdapter
 import com.sandorln.champion.view.adapter.ChampionThumbnailSkillAdapter
 import com.sandorln.champion.view.adapter.ChampionTipAdapter
