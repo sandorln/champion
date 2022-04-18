@@ -1,11 +1,14 @@
 package com.sandorln.champion.model
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
+@Entity(primaryKeys = ["cVersion", "cId"])
 data class ChampionData(
     @SerializedName("version")
     var cVersion: String = "",

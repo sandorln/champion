@@ -1,11 +1,13 @@
 package com.sandorln.champion.model
 
 import android.os.Parcelable
+import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
+@Entity
 data class LOLImage(
     @SerializedName("full")
     var imgFull: String = "",
