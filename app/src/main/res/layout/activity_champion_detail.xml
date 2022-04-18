@@ -41,7 +41,7 @@
                     android:layout_height="0dp"
                     app:cardBackgroundColor="@android:color/transparent">
 
-                    <ImageView
+                    <com.sandorln.champion.view.custom.VersionImage
                         android:id="@+id/img_champion_thumbnail"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
