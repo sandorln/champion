@@ -3,9 +3,9 @@ package com.sandorln.champion.view.custom
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.sandorln.champion.database.shareddao.VersionDao
+import com.sandorln.champion.di.GlideApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ class VersionImage : AppCompatImageView {
 
     fun setChampionThumbnail(championId: String) {
         val version = versionDao.getVersionCategory().champion
-        Glide.with(context)
+        GlideApp.with(this)
             .load("http://ddragon.leagueoflegends.com/cdn/$version/img/champion/${championId}.png")
             .thumbnail(0.5f)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -33,7 +33,7 @@ class VersionImage : AppCompatImageView {
         val version = versionDao.getVersionCategory().champion
         val url = "http://ddragon.leagueoflegends.com/cdn/$version/img/$path/${skillImageName}"
 
-        Glide.with(context)
+        GlideApp.with(this)
             .load(url)
             .thumbnail(0.5f)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
