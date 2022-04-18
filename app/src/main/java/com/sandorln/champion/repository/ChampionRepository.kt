@@ -6,30 +6,25 @@ import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.network.ChampionService
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 class ChampionRepository(
     private val championService: ChampionService,
     private val championDao: ChampionDao
 ) {
-    /**
-     * 모든 챔피언 정보 가져오기
-     */
-    val championList: MutableStateFlow<ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
-    suspend fun refreshAllChampionList() {
-        try {
-            championList.emit(ResultData.Loading)
-            val response = championService.getAllChampion(VersionManager.getVersion().category.champion)
+    suspend fun refreshAllChampionList(championVersion: String) {
+        /* DB에 해당 Champion Version 정보가 없을 시 값 갱신 */
+        val isEmptyLocalDB = championDao.getChampionList(championVersion).first().isEmpty()
+        if (isEmptyLocalDB) {
+            val response = championService.getAllChampion(championVersion)
             response.parsingData()
             championDao.insertChampionList(response.rChampionList)
-
-            val allChampions = ResultData.Success(response.rChampionList.sortedBy { it.name })
-            championList.emit(allChampions)
-        } catch (e: Exception) {
-            championList.emit(ResultData.Failed(e))
         }
     }
+
+    fun getAllChampionListFlow(championVersion: String): Flow<List<ChampionData>> = championDao.getChampionList(championVersion)
 
     /**
      * 특정 캐릭터 정보값 가져오기
