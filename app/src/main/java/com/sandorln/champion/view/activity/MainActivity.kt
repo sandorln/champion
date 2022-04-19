@@ -4,8 +4,10 @@ import android.content.Context
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -83,16 +85,26 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                 launch {
                     championViewModel
                         .championVersion
-                        .collectLatest { version ->
-                            binding.tvVersion.text = "VERSION $version"
+                        .collectLatest { championVersion ->
+                            binding.tvVersion.text = "CHAMPION VERSION $championVersion"
                         }
                 }
-
                 launch {
                     championViewModel
-                        .championList
-                        .collect { champions ->
-                            championThumbnailAdapter.submitList(champions) {
+                        .showChampionList
+                        .collectLatest { result ->
+                            binding.pbContent.isVisible = result is ResultData.Loading
+
+                            val championList = when (result) {
+                                is ResultData.Success -> result.data ?: mutableListOf()
+                                is ResultData.Failed -> {
+                                    Toast.makeText(this@MainActivity, result.exception.message, Toast.LENGTH_SHORT).show()
+                                    result.data ?: mutableListOf()
+                                }
+                                else -> mutableListOf()
+                            }
+
+                            championThumbnailAdapter.submitList(championList) {
                                 binding.rvChampions.scrollToPosition(0)
                             }
                         }

@@ -10,15 +10,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-    @Singleton
     @Binds
-    abstract fun providesChampionRepository(championRepositoryImpl: ChampionRepositoryImpl): ChampionRepository
+    @Singleton
+    abstract fun providesChampionRepository(champRepoImpl: ChampionRepositoryImpl): ChampionRepository
 
-    @Singleton
     @Binds
-    abstract fun providesBoardRepository(boardRepositoryImpl: BoardRepositoryImpl): BoardRepository
+    @Singleton
+    abstract fun providesBoardRepository(boardRepoImpl: BoardRepositoryImpl): BoardRepository
 
-    @Singleton
     @Binds
-    abstract fun providesVersionRepository(versionRepositoryImpl: VersionRepositoryImpl): VersionRepository
+    @Singleton
+    abstract fun providesVersionRepository(versionRepoImpl: VersionRepositoryImpl): VersionRepository
 }

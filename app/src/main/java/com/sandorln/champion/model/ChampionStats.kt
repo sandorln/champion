@@ -7,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
-@Entity
 data class ChampionStats(
     var hp: Double = 0.0,
     var hpperlevel: Double = 0.0,

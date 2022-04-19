@@ -5,8 +5,6 @@ import com.sandorln.champion.model.result.ResultData
 import kotlinx.coroutines.flow.Flow
 
 interface ChampionRepository {
-    suspend fun refreshAllChampionList(championVersion: String)
-    fun getAllChampionListFlow(championVersion: String): Flow<List<ChampionData>>
-
-    suspend fun getChampionInfo(champID: String, version: String): ResultData<ChampionData>
+    fun getChampionList(championVersion: String, search: String): Flow<ResultData<List<ChampionData>>>
+    fun getChampionInfo(championVersion: String,championId : String) : Flow<ResultData<ChampionData>>
 }

@@ -7,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
-@Entity
 data class ChampionSpell(
     var id: String = "P",
     var name: String = "",
