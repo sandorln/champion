@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/main_navi"
+        app:startDestination="@id/frg_champion_list">
+    <fragment
+            android:id="@+id/frg_champion_list"
+            android:name="com.sandorln.champion.view.fragment.ChampionListFragment" />
+    <fragment
+            android:id="@+id/frg_item_list"
+            android:name="com.sandorln.champion.view.fragment.ItemListFragment" />
+    <fragment
+            android:id="@+id/frg_rune_frg"
+            android:name="com.sandorln.champion.view.fragment.RuneListFragment" />
+    <fragment
+            android:id="@+id/frg_app_setting"
+            android:name="com.sandorln.champion.view.fragment.AppSettingFragment" />
+</navigation>
