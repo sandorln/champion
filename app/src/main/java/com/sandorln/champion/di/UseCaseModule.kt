@@ -14,10 +14,10 @@ import dagger.hilt.android.components.ViewModelComponent
 @Module
 class UseCaseModule {
     @Provides
-    fun providesGetChampionList(versionRepo: VersionRepository, champRepo: ChampionRepository): GetChampionList = GetChampionList(versionRepo, champRepo)
+    fun providesGetChampionList(getVersionCategory: GetVersionCategory, champRepo: ChampionRepository): GetChampionList = GetChampionList(getVersionCategory, champRepo)
 
     @Provides
-    fun providesGetChampionInfo(versionRepo: VersionRepository, champRepo: ChampionRepository): GetChampionInfo = GetChampionInfo(versionRepo, champRepo)
+    fun providesGetChampionInfo(getVersionCategory: GetVersionCategory, champRepo: ChampionRepository): GetChampionInfo = GetChampionInfo(getVersionCategory, champRepo)
 
     @Provides
     fun providesGetVersionCategory(versionRepo: VersionRepository): GetVersionCategory = GetVersionCategory(versionRepo)

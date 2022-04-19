@@ -3,16 +3,17 @@ package com.sandorln.champion.use_case
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.repository.ChampionRepository
-import com.sandorln.champion.repository.VersionRepository
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapLatest
 
 class GetChampionList(
-    private val versionRepository: VersionRepository,
+    private val getVersionCategory: GetVersionCategory,
     private val championRepository: ChampionRepository
 ) {
     operator fun invoke(search: String): Flow<ResultData<List<ChampionData>>> =
-        versionRepository
-            .getLolVersionCategory()
+        getVersionCategory()
             .mapLatest { it.champion }
             .flatMapLatest { championVersion ->
                 if (championVersion.isEmpty())

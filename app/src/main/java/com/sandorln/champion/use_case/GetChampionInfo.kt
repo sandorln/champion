@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 
 class GetChampionInfo(
-    private val versionRepository: VersionRepository,
+    private val getVersionCategory: GetVersionCategory,
     private val championRepository: ChampionRepository
 ) {
     operator fun invoke(championId: String): Flow<ResultData<ChampionData>> =
-        versionRepository.getLolVersionCategory()
+        getVersionCategory()
             .mapLatest { it.champion }
             .flatMapLatest { championVersion ->
                 if (championVersion.isEmpty())

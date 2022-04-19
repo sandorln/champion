@@ -32,13 +32,13 @@ class ChampionViewModel @Inject constructor(
     val searchChampionData: StateFlow<String> get() = _searchChampionName
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
 
-    val championVersion = getVersionCategory.invoke().mapLatest { it.champion }
+    val championVersion = getVersionCategory().mapLatest { it.champion }
     val showChampionList = _searchChampionName
         .debounce(250)
-        .flatMapLatest { search -> getChampionList.invoke(search) }
+        .flatMapLatest { search -> getChampionList(search) }
         .onStart { delay(250) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
-    suspend fun getChampionDetailInfo(championId: String) = getChampionInfo.invoke(championId).firstOrNull()
+    suspend fun getChampionDetailInfo(championId: String) = getChampionInfo(championId).firstOrNull()
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA)
 }
