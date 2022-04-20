@@ -3,10 +3,7 @@ package com.sandorln.champion.di
 import com.sandorln.champion.repository.ChampionRepository
 import com.sandorln.champion.repository.ItemRepository
 import com.sandorln.champion.repository.VersionRepository
-import com.sandorln.champion.use_case.GetChampionInfo
-import com.sandorln.champion.use_case.GetChampionList
-import com.sandorln.champion.use_case.GetItemList
-import com.sandorln.champion.use_case.GetVersionCategory
+import com.sandorln.champion.use_case.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,4 +24,7 @@ class UseCaseModule {
 
     @Provides
     fun providesGetItemList(getVersion: GetVersionCategory, itemRepo: ItemRepository) = GetItemList(getVersion, itemRepo)
+
+    @Provides
+    fun providesFindItemById(getVersion: GetVersionCategory, itemRepo: ItemRepository) = FindItemById(getVersion, itemRepo)
 }

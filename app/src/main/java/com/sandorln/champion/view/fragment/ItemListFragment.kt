@@ -11,6 +11,7 @@ import com.sandorln.champion.databinding.FragmentItemListBinding
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.view.adapter.ItemThumbnailAdapter
 import com.sandorln.champion.view.base.BaseFragment
+import com.sandorln.champion.view.dialog.ItemDataInfoDialog
 import com.sandorln.champion.viewmodel.ItemViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -25,7 +26,9 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
     private lateinit var itemThumbnailAdapter: ItemThumbnailAdapter
 
     override fun initObjectSetting() {
-        itemThumbnailAdapter = ItemThumbnailAdapter()
+        itemThumbnailAdapter = ItemThumbnailAdapter { itemId ->
+            ItemDataInfoDialog.newInstance(itemId).show(childFragmentManager, ItemDataInfoDialog::class.java.name)
+        }
     }
 
     override fun initViewSetting() {
@@ -43,7 +46,12 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
                 launch {
                     itemViewModel
                         .itemVersion
-                        .collectLatest { itemVersion -> binding.tvVersion.text = "ITEM VERSION $itemVersion" }
+                        .collectLatest { itemVersion ->
+                            itemThumbnailAdapter.itemVersion = itemVersion
+                            if (itemThumbnailAdapter.itemCount > 0)
+                                itemThumbnailAdapter.notifyItemRangeChanged(0, itemThumbnailAdapter.itemCount)
+                            binding.tvVersion.text = "ITEM VERSION $itemVersion"
+                        }
                 }
 
                 launch {

@@ -16,35 +16,37 @@ class ItemRepositoryImpl @Inject constructor(
     private val itemService: ItemService,
     private val itemDao: ItemDao,
 ) : ItemRepository {
-    lateinit var initAllItemList: List<ItemData>
+    lateinit var allItemList: List<ItemData>
     private val itemMutex = Mutex()
-
-    override fun getItemList(version: String, search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>> = flow {
+    private suspend fun initAllItemList(version: String) {
         itemMutex.withLock {
+            // 초기화 작업 (Local DB 에서 먼저 가져오기 및 버전 비교하기)
+            if (!::allItemList.isInitialized || version != allItemList.firstOrNull()?.version ?: "") {
+                allItemList = itemDao.getAllItemData(version) ?: mutableListOf()
+            }
+
+            // 비어 있을 시 서버에서 값 가져오기
+            if (allItemList.isEmpty()) {
+                val response = itemService.getAllItem(version)
+                response.parsingData(version)
+                itemDao.insertItemDataList(response.itemList)
+
+                allItemList = itemDao.getAllItemData(version) ?: mutableListOf()
+            }
+        }
+    }
+
+    override fun getItemList(version: String, search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>> =
+        flow {
             try {
                 emit(ResultData.Loading)
-
-                // 초기화 작업 (Local DB 에서 먼저 가져오기)
-                if (!::initAllItemList.isInitialized) {
-                    initAllItemList = itemDao.getAllItemData(version) ?: mutableListOf()
-                }
-
-                // 비어 있을 시 서버에서 값 가져오기
-                if (initAllItemList.isEmpty()) {
-                    val response = itemService.getAllItem(version)
-                    response.parsingData(version)
-                    itemDao.insertItemDataList(response.itemList)
-
-                    initAllItemList = itemDao.getAllItemData(version) ?: mutableListOf()
-                }
-
-                itemDao.insertItemDataList(initAllItemList)
+                initAllItemList(version)
 
                 /* 검색어 / 검색 대상 공백 제거 */
                 val itemSearch = search.replace(" ", "").uppercase()
 
                 /* 검색어에 맞는 아이템 필터 */
-                val searchItemList = initAllItemList.filter { item ->
+                val searchItemList = allItemList.filter { item ->
                     val isSearchName = item
                         .name
                         .uppercase()
@@ -62,6 +64,19 @@ class ItemRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 emit(ResultData.Failed(e, itemDao.getAllItemData(version)))
             }
-        }
-    }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO)
+
+
+    override fun findItemById(version: String, itemId: String): Flow<ResultData<ItemData>> =
+        flow {
+            try {
+                emit(ResultData.Loading)
+                initAllItemList(version)
+
+                val findItem = allItemList.firstOrNull { it.id == itemId } ?: throw Exception("해당 아이템은 존재하지 않습니다")
+                emit(ResultData.Success(findItem))
+            } catch (e: Exception) {
+                emit(ResultData.Failed(e))
+            }
+        }.flowOn(Dispatchers.IO)
 }

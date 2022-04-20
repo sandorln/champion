@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <com.sandorln.champion.view.custom.VersionImage
+            android:id="@+id/img_item_thumbnail"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_item_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@id/img_item_thumbnail"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.sandorln.champion.view.custom.AdapterTitleTextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                app:titleName="이름" />
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="이름" />
+
+            <com.sandorln.champion.view.custom.AdapterTitleTextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                app:titleName="설명" />
+
+            <TextView
+                android:id="@+id/tv_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="설명" />
+
+            <com.sandorln.champion.view.custom.AdapterTitleTextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                app:titleName="판매가" />
+
+            <TextView
+                android:id="@+id/tv_gold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="가격" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_top"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="layout_item_info,img_item_thumbnail" />
+
+        <com.sandorln.champion.view.custom.AdapterTitleTextView
+            android:id="@+id/tv_next_depth_items"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="@id/layout_item_info"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier_top"
+            app:titleName="다음 아이템" />
+
+
+        <HorizontalScrollView
+            android:id="@+id/scroll_next_depth_items"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_next_depth_items">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_next_depth_items"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </HorizontalScrollView>
+
+        <com.sandorln.champion.view.custom.AdapterTitleTextView
+            android:id="@+id/tv_pre_depth_items"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="@id/layout_item_info"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scroll_next_depth_items"
+            app:titleName="이전 아이템" />
+
+        <HorizontalScrollView
+            android:id="@+id/scroll_pre_depth_items"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_pre_depth_items">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_pre_depth_items"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </HorizontalScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

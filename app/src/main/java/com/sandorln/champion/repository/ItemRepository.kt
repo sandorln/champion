@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ItemRepository {
     fun getItemList(version: String, search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>>
+    fun findItemById(version: String, itemId: String): Flow<ResultData<ItemData>>
 }

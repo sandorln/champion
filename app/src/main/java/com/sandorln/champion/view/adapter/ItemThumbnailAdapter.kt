@@ -9,7 +9,10 @@ import com.sandorln.champion.model.ItemData
 import com.sandorln.champion.util.removeBrFromHtml
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 
-class ItemThumbnailAdapter : ListAdapter<ItemData, ItemThumbnailAdapter.ItemThumbnailViewHolder>(DiffUtils.DIFF_ITEM_DATA) {
+class ItemThumbnailAdapter(private val onClickItemListener: (itemId: String) -> Unit) :
+    ListAdapter<ItemData, ItemThumbnailAdapter.ItemThumbnailViewHolder>(DiffUtils.DIFF_ITEM_DATA) {
+    var itemVersion: String = ""
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemThumbnailViewHolder =
         ItemThumbnailViewHolder(ItemItemThumbnailBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
@@ -17,7 +20,8 @@ class ItemThumbnailAdapter : ListAdapter<ItemData, ItemThumbnailAdapter.ItemThum
         with(holder.binding) {
             try {
                 val itemData = getItem(position)
-                imgItemThumbnail.setItemThumbnail(itemData.id)
+                root.setOnClickListener { onClickItemListener(itemData.id) }
+                imgItemThumbnail.setItemThumbnail(itemVersion, itemData.id)
                 tvItemName.text = itemData.name.removeBrFromHtml()
             } catch (e: Exception) {
 

@@ -40,10 +40,9 @@ class VersionImage : AppCompatImageView {
             .into(this)
     }
 
-    fun setItemThumbnail(itemId: String) {
-        val version = versionDao.getVersionCategory().item
+    fun setItemThumbnail(itemVersion: String, itemId: String) {
         GlideApp.with(this)
-            .load("http://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png")
+            .load("http://ddragon.leagueoflegends.com/cdn/${itemVersion}/img/item/${itemId}.png")
             .thumbnail(0.5f)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .fitCenter()
