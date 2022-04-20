@@ -2,7 +2,6 @@ package com.sandorln.champion.model.response
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.ItemData
 
 data class LolItemResponse(
@@ -13,13 +12,13 @@ data class LolItemResponse(
     val data: JsonObject? = JsonObject(),
 
     /* 위의 data 를 Parsing 하여 생성 될 아이템 정보 리스트 */
-    var itemList : MutableList<ItemData> = mutableListOf()
-){
+    var itemList: MutableList<ItemData> = mutableListOf()
+) {
     /**
      * 캐릭터 정보 값 Parsing
      */
     fun parsingData() {
-        itemList.clear()
+        itemList = mutableListOf()
 
         if (data != null) {
             val gson = Gson()
