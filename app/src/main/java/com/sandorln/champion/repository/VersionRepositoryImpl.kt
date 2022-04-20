@@ -1,7 +1,7 @@
 package com.sandorln.champion.repository
 
 import com.sandorln.champion.database.shareddao.VersionDao
-import com.sandorln.champion.model.VersionCategory
+import com.sandorln.champion.model.VersionLol.VersionCategory
 import com.sandorln.champion.network.VersionService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

@@ -20,7 +20,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityChampionDetailBinding
 import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.ChampionSpell
+import com.sandorln.champion.model.ChampionData.ChampionSpell
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.type.SpellType
 import com.sandorln.champion.util.playChampionSkill

@@ -12,7 +12,7 @@ data class LolChampionResponse(
     /* 해당 Data 를 받아와서 별도의 Parsing 을 해줌 */
     var data: JsonObject? = JsonObject(),
 
-    /* 위의 rData 를 Parsing 하여 생성 될 캐릭터 정보 리스트 */
+    /* 위의 data 를 Parsing 하여 생성 될 캐릭터 정보 리스트 */
     var championList: MutableList<ChampionData> = mutableListOf()
 ) {
     /**
