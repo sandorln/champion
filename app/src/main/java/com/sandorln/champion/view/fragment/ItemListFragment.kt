@@ -1,12 +1,15 @@
 package com.sandorln.champion.view.fragment
 
-import android.util.Log
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentItemListBinding
+import com.sandorln.champion.model.result.ResultData
+import com.sandorln.champion.view.adapter.ItemThumbnailAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ItemViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,10 +21,18 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
     /* ViewModels */
     private val itemViewModel: ItemViewModel by viewModels()
 
+    /* Adapters */
+    private lateinit var itemThumbnailAdapter: ItemThumbnailAdapter
+
     override fun initObjectSetting() {
+        itemThumbnailAdapter = ItemThumbnailAdapter()
     }
 
     override fun initViewSetting() {
+        binding.editSearchItem.doOnTextChanged { text, _, _, _ ->
+            itemViewModel.changeSearchItemName(text.toString())
+        }
+        binding.rvItemList.adapter = itemThumbnailAdapter
     }
 
     override fun initObserverSetting() {
@@ -29,9 +40,24 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     itemViewModel
-                        .itemList
+                        .isEmptySearchItemName
                         .collectLatest {
-                            Log.d("LOGD", "item List = $it")
+                        }
+                }
+
+                launch {
+                    itemViewModel
+                        .itemList
+                        .collectLatest { result ->
+                            binding.pbContent.isVisible = result is ResultData.Loading
+
+                            val itemList = when (result) {
+                                is ResultData.Success -> result.data ?: mutableListOf()
+                                is ResultData.Failed -> result.data ?: mutableListOf()
+                                else -> mutableListOf()
+                            }
+
+                            itemThumbnailAdapter.submitList(itemList)
                         }
                 }
             }

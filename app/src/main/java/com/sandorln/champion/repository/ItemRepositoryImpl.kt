@@ -19,7 +19,7 @@ class ItemRepositoryImpl @Inject constructor(
     lateinit var initAllItemList: List<ItemData>
     private val itemMutex = Mutex()
 
-    override fun getItemList(version: String): Flow<ResultData<List<ItemData>>> = flow {
+    override fun getItemList(version: String, search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>> = flow {
         itemMutex.withLock {
             try {
                 emit(ResultData.Loading)
@@ -39,7 +39,22 @@ class ItemRepositoryImpl @Inject constructor(
                 }
 
                 itemDao.insertItemDataList(initAllItemList)
-                emit(ResultData.Success(itemDao.getAllItemData(version)))
+
+                /* 검색어 / 검색 대상 공백 제거 */
+                val itemSearch = search.replace(" ", "").uppercase()
+
+                /* 검색어에 맞는 아이템 필터 */
+                val searchChampionList = initAllItemList.filter { item ->
+                    val isSearchName = item
+                        .name
+                        .uppercase()
+                        .replace(" ", "")
+                        .contains(itemSearch)
+
+                    isSearchName && item.inStore == inStore
+                }
+
+                emit(ResultData.Success(searchChampionList))
             } catch (e: Exception) {
                 emit(ResultData.Failed(e, itemDao.getAllItemData(version)))
             }

@@ -12,13 +12,13 @@ class GetItemList(
     private val getVersionCategory: GetVersionCategory,
     private val itemRepository: ItemRepository
 ) {
-    operator fun invoke(): Flow<ResultData<List<ItemData>>> =
+    operator fun invoke(search: String): Flow<ResultData<List<ItemData>>> =
         getVersionCategory()
             .mapLatest { it.item }
             .flatMapLatest { itemVersion ->
                 if (itemVersion.isEmpty())
                     flow { emit(ResultData.Failed(Exception("버전 정보를 알 수 없습니다"))) }
                 else
-                    itemRepository.getItemList(itemVersion)
+                    itemRepository.getItemList(itemVersion, search, true)
             }
 }

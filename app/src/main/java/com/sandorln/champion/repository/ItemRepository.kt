@@ -5,5 +5,5 @@ import com.sandorln.champion.model.result.ResultData
 import kotlinx.coroutines.flow.Flow
 
 interface ItemRepository {
-    fun getItemList(version: String): Flow<ResultData<List<ItemData>>>
+    fun getItemList(version: String, search: String, isStore: Boolean): Flow<ResultData<List<ItemData>>>
 }
