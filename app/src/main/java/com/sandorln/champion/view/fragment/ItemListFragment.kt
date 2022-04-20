@@ -29,10 +29,12 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
     }
 
     override fun initViewSetting() {
-        binding.editSearchItem.doOnTextChanged { text, _, _, _ ->
-            itemViewModel.changeSearchItemName(text.toString())
-        }
+        binding.editSearchItem.doOnTextChanged { text, _, _, _ -> itemViewModel.changeSearchItemName(text.toString()) }
+        binding.rvItemList.setHasFixedSize(true)
         binding.rvItemList.adapter = itemThumbnailAdapter
+
+        binding.cbInStore.isChecked = itemViewModel.inStoreItem.value
+        binding.cbInStore.setOnCheckedChangeListener { _, inStore -> itemViewModel.changeInStoreItem(inStore) }
     }
 
     override fun initObserverSetting() {
@@ -40,9 +42,8 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     itemViewModel
-                        .isEmptySearchItemName
-                        .collectLatest {
-                        }
+                        .itemVersion
+                        .collectLatest { itemVersion -> binding.tvVersion.text = "ITEM VERSION $itemVersion" }
                 }
 
                 launch {

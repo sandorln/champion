@@ -12,17 +12,18 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toTopOf="parent" />
 
+
         <TextView
             android:id="@+id/tv_item_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/img_item_thumbnail" />
-
-        <TextView
-            android:id="@+id/tv_item_gold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tv_item_name" />
+            android:background="#99000000"
+            android:gravity="center"
+            android:hint="@string/unknown"
+            android:singleLine="true"
+            android:textColor="#FFFFFFFF"
+            android:textSize="7.5dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

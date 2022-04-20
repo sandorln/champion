@@ -18,7 +18,6 @@ class ItemThumbnailAdapter : ListAdapter<ItemData, ItemThumbnailAdapter.ItemThum
             try {
                 val itemData = getItem(position)
                 imgItemThumbnail.setItemThumbnail(itemData.id)
-                tvItemGold.text = itemData.gold.total.toString()
                 tvItemName.text = itemData.name.removeBrFromHtml()
             } catch (e: Exception) {
 

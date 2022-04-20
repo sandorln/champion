@@ -8,7 +8,7 @@ import com.sandorln.champion.model.ItemData
 
 @Dao
 interface ItemDao {
-    @Query("SELECT * FROM ItemData WHERE version == :version ORDER BY depth, name")
+    @Query("SELECT * FROM ItemData WHERE version == :version")
     fun getAllItemData(version: String): List<ItemData>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

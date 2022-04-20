@@ -44,17 +44,21 @@ class ItemRepositoryImpl @Inject constructor(
                 val itemSearch = search.replace(" ", "").uppercase()
 
                 /* 검색어에 맞는 아이템 필터 */
-                val searchChampionList = initAllItemList.filter { item ->
+                val searchItemList = initAllItemList.filter { item ->
                     val isSearchName = item
                         .name
                         .uppercase()
                         .replace(" ", "")
                         .contains(itemSearch)
 
-                    isSearchName && item.inStore == inStore
-                }
+                    if (inStore)
+                        isSearchName && item.inStore == inStore
+                    else
+                        isSearchName
+                }.sortedBy { it.gold.total }
 
-                emit(ResultData.Success(searchChampionList))
+
+                emit(ResultData.Success(searchItemList))
             } catch (e: Exception) {
                 emit(ResultData.Failed(e, itemDao.getAllItemData(version)))
             }
