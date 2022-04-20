@@ -5,9 +5,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.model.ChampionData
+import com.sandorln.champion.model.ItemData
 
-@Database(entities = [ChampionData::class], version = 1)
-@TypeConverters(LolChampionConverters::class)
+@Database(entities = [ChampionData::class, ItemData::class], version = 2)
+@TypeConverters(value = [LolChampionConverters::class, LolItemConverters::class])
 abstract class AppDatabase : RoomDatabase() {
     abstract fun championDao(): ChampionDao
 }

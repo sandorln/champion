@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.room.Room
 import com.google.gson.Gson
 import com.sandorln.champion.database.AppDatabase
+import com.sandorln.champion.database.LolChampionConverters
+import com.sandorln.champion.database.LolItemConverters
 import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.database.shareddao.VersionDao
 import com.sandorln.champion.database.shareddao.VersionDaoImpl
@@ -18,6 +20,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class LocalDbModule {
+    @Singleton
+    @Provides
+    fun providesGson(): Gson = Gson()
+
     /* Room */
     @Provides
     @Singleton
@@ -25,6 +31,8 @@ class LocalDbModule {
         Room
             .databaseBuilder(context, AppDatabase::class.java, "lol-champion")
             .fallbackToDestructiveMigration()
+            .addTypeConverter(LolChampionConverters::class)
+            .addTypeConverter(LolItemConverters::class)
             .build()
 
     @Provides
@@ -39,9 +47,6 @@ class LocalDbModule {
 
     @Singleton
     @Provides
-    fun providesSharedDao(sharedPreferences: SharedPreferences,gson: Gson): VersionDao = VersionDaoImpl(sharedPreferences,gson)
+    fun providesSharedDao(sharedPreferences: SharedPreferences, gson: Gson): VersionDao = VersionDaoImpl(sharedPreferences, gson)
 
-    @Singleton
-    @Provides
-    fun providesGson(): Gson = Gson()
 }
