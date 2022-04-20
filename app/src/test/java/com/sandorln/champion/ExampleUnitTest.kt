@@ -1,12 +1,7 @@
 package com.sandorln.champion
 
-import com.sandorln.champion.model.VersionLol
-import com.sandorln.champion.network.response.LolDataServiceResponse
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.concurrent.CountDownLatch
 
 /**
