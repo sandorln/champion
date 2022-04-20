@@ -2,8 +2,8 @@ package com.sandorln.champion.view.adapter.diff
 
 import androidx.recyclerview.widget.DiffUtil
 import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.ChampionSkin
-import com.sandorln.champion.model.ChampionSpell
+import com.sandorln.champion.model.ChampionData.ChampionSkin
+import com.sandorln.champion.model.ChampionData.ChampionSpell
 
 object DiffUtils {
     val DIFF_CHAMPION_DATA = object : DiffUtil.ItemCallback<ChampionData>() {

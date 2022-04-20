@@ -3,7 +3,7 @@ package com.sandorln.champion.database.shareddao
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.google.gson.Gson
-import com.sandorln.champion.model.VersionCategory
+import com.sandorln.champion.model.VersionLol.VersionCategory
 
 class VersionDaoImpl(
     private val pref: SharedPreferences,
