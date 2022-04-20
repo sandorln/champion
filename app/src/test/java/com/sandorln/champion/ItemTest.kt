@@ -26,8 +26,9 @@ class ItemTest {
     @Test
     fun testItemResponse() {
         runBlocking {
-            val itemResponse = itemService.getAllItem("12.7.1")
-            itemResponse.parsingData()
+            val itemVersion = "12.7.1"
+            val itemResponse = itemService.getAllItem(itemVersion)
+            itemResponse.parsingData(itemVersion)
             println("아이템 데이터 값 : ${itemResponse.itemList}")
         }
     }

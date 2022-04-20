@@ -15,15 +15,20 @@ data class LolItemResponse(
     var itemList: MutableList<ItemData> = mutableListOf()
 ) {
     /**
-     * 캐릭터 정보 값 Parsing
+     * 아이템 정보 값 Parsing
      */
-    fun parsingData() {
+    fun parsingData(version: String) {
         itemList = mutableListOf()
 
         if (data != null) {
             val gson = Gson()
-            for ((_, value) in data.entrySet())
-                itemList.add(gson.fromJson(value, ItemData::class.java))
+            for ((id, value) in data.entrySet()) {
+                val itemData = gson.fromJson(value, ItemData::class.java).apply {
+                    this.id = id
+                    this.version = version
+                }
+                itemList.add(itemData)
+            }
         } else
             throw Exception("값을 찾을 수 없습니다")
     }
