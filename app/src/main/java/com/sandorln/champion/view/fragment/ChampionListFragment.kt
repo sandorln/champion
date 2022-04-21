@@ -77,7 +77,6 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
             championViewModel.changeSearchChampionName(text.toString())
         }
         binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
-//        binding.tvVersion.text = "VERSION ${VersionManager.getVersion(this).totalVersion}"
     }
 
     override fun initObserverSetting() {

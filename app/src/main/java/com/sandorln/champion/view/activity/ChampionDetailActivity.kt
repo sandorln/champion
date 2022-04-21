@@ -146,7 +146,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
     override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
-            binding.imgChampionThumbnail.setChampionThumbnail(champion.id)
+            binding.imgChampionThumbnail.setChampionThumbnail(champion.version, champion.id)
             binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num)
 
             val championId = String.format("%04d", champion.key)
@@ -159,6 +159,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             /* 스킬 관련 */
             val skillList = champion.spells.toMutableList()
             skillList.add(0, champion.passive)
+            championThumbnailSkillAdapter.championVersion = champion.version
             championThumbnailSkillAdapter.submitList(skillList)
             championThumbnailSkillAdapter.onChangeSkillType = { championSpell, spellType ->
                 selectChampionSkill(championId, spellType, championSpell)
