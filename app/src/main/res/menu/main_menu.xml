@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-            android:id="@+id/frg_champion_list"
-            android:title="챔피언목록" />
+        android:id="@+id/frg_champion_list"
+        android:icon="@drawable/ic_main_champion"
+        android:title="챔피언목록" />
     <item
-            android:id="@+id/frg_item_list"
-            android:title="아이템목록" />
+        android:id="@+id/frg_item_list"
+        android:icon="@drawable/ic_main_item"
+        android:title="아이템목록" />
     <item
-            android:id="@+id/frg_summoner_spell_frg"
-            android:title="룬목록" />
+        android:id="@+id/frg_summoner_spell_frg"
+        android:icon="@drawable/ic_main_spell"
+        android:title="스펠 목록" />
     <item
-            android:id="@+id/frg_app_setting"
-            android:title="설정" />
+        android:id="@+id/frg_app_setting"
+        android:icon="@drawable/ic_main_special"
+        android:title="설정" />
 </menu>

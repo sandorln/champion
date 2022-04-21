@@ -11,6 +11,9 @@
     <color name="black_80_bg">#CB000000</color>
     <color name="black_10_bg">#1A000000</color>
 
+    <color name="gray_141414">#141414</color>
+    <color name="gray_353535">#353535</color>
+
     <color name="gray">#717171</color>
     <color name="light_gray">#C6C6C6</color>
 
