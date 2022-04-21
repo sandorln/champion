@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.view.isVisible
+import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.CustomHorizonItemThumbnailBinding
+import com.sandorln.champion.model.SummonerSpell
 
 class HorizonItemThumbnailList : LinearLayoutCompat {
     constructor(context: Context) : super(context) {
@@ -40,6 +42,25 @@ class HorizonItemThumbnailList : LinearLayoutCompat {
             }
         } else {
             binding.root.isVisible = false
+        }
+    }
+
+    fun setSummonerSpellList(summonerSpellList: List<SummonerSpell>, onClickSummonerSpellListener: (summonerSpell: SummonerSpell) -> Unit) {
+        if (summonerSpellList.isNotEmpty()) {
+            binding.root.isVisible = true
+            binding.layoutItems.removeAllViews()
+
+            summonerSpellList.forEach { summonerSpell ->
+                val versionImage = VersionImage(context)
+                versionImage.setSummonerSpellThumbnail(summonerSpell.version, summonerSpell.id)
+                versionImage.setOnClickListener { onClickSummonerSpellListener(summonerSpell) }
+                binding.layoutItems.addView(versionImage)
+                versionImage.updateLayoutParams<LinearLayout.LayoutParams> {
+                    width = 150
+                    height = 150
+                    setMargins(20)
+                }
+            }
         }
     }
 

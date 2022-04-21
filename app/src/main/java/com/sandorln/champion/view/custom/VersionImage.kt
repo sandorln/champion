@@ -41,4 +41,13 @@ class VersionImage : AppCompatImageView {
             .fitCenter()
             .into(this)
     }
+
+    fun setSummonerSpellThumbnail(summonerSpellVersion: String, summonerSpellId: String) {
+        GlideApp.with(this)
+            .load("http://ddragon.leagueoflegends.com/cdn/${summonerSpellVersion}/img/spell/${summonerSpellId}.png")
+            .thumbnail(0.5f)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .fitCenter()
+            .into(this)
+    }
 }

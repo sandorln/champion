@@ -22,8 +22,11 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun providesVersionRepository(versionRepoImpl: VersionRepositoryImpl): VersionRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindsItemRepository(itemRepositoryImpl: ItemRepositoryImpl): ItemRepository
 
     @Binds
     @Singleton
-    abstract fun bindsItemRepository(itemRepositoryImpl: ItemRepositoryImpl) : ItemRepository
+    abstract fun bindsSummonerSpellRepository(summonerSpellRepository: SummonerSpellRepositoryImpl): SummonerSpellRepository
 }

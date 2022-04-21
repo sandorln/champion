@@ -2,13 +2,13 @@ package com.sandorln.champion.di
 
 import com.sandorln.champion.repository.ChampionRepository
 import com.sandorln.champion.repository.ItemRepository
+import com.sandorln.champion.repository.SummonerSpellRepository
 import com.sandorln.champion.repository.VersionRepository
 import com.sandorln.champion.use_case.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import javax.inject.Singleton
 
 @InstallIn(ViewModelComponent::class)
 @Module
@@ -27,4 +27,7 @@ class UseCaseModule {
 
     @Provides
     fun providesFindItemById(getVersion: GetVersionCategory, itemRepo: ItemRepository) = FindItemById(getVersion, itemRepo)
+
+    @Provides
+    fun providesGetSummonerSpellList(getVersion: GetVersionCategory, summonerRepo: SummonerSpellRepository) = GetSummonerSpellList(getVersion, summonerRepo)
 }
