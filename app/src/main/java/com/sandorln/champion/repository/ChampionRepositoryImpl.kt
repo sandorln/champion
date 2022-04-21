@@ -58,7 +58,6 @@ class ChampionRepositoryImpl @Inject constructor(
 
     override fun getChampionInfo(championVersion: String, championId: String): Flow<ResultData<ChampionData>> = flow {
         try {
-            emit(ResultData.Loading)
             val response = championService.getChampionDetailInfo(championVersion, championId)
             response.parsingData()
             emit(ResultData.Success(response.championList.first().apply { version = championVersion }))
