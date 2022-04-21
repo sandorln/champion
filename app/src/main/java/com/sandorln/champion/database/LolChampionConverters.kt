@@ -1,50 +1,56 @@
 package com.sandorln.champion.database
 
+import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.sandorln.champion.model.*
+import com.sandorln.champion.model.ChampionData.ChampionSpell
+import com.sandorln.champion.model.ChampionData.ChampionSkin
+import com.sandorln.champion.model.ChampionData.ChampionStats
+import com.sandorln.champion.model.ChampionData.ChampionInfo
+import javax.inject.Inject
 
-class LolChampionConverters {
+@ProvidedTypeConverter
+class LolChampionConverters @Inject constructor(private val gson: Gson) {
     @TypeConverter
-    fun championInfoToJson(value: ChampionInfo) = Gson().toJson(value) ?: ""
-
-    @TypeConverter
-    fun JsonToChampionInfo(value: String) = Gson().fromJson(value, ChampionInfo::class.java)
-
-    @TypeConverter
-    fun lolImageToJson(value: LOLImage) = Gson().toJson(value) ?: ""
-
-    @TypeConverter
-    fun JsonToLolImage(value: String) = Gson().fromJson(value, LOLImage::class.java)
+    fun fromChampionInfo(value: ChampionInfo) = gson.toJson(value) ?: ""
 
     @TypeConverter
-    fun stringListToJson(value: List<String>) = Gson().toJson(value) ?: ""
+    fun toChampionInfo(value: String) = gson.fromJson(value, ChampionInfo::class.java)
 
     @TypeConverter
-    fun JsonToStringList(value: String) = Gson().fromJson(value, Array<String>::class.java).toList()
+    fun fromLolImage(value: LOLImage) = gson.toJson(value) ?: ""
 
     @TypeConverter
-    fun championStatsToJson(value: ChampionStats) = Gson().toJson(value) ?: ""
+    fun toLolImage(value: String) = gson.fromJson(value, LOLImage::class.java)
 
     @TypeConverter
-    fun JsonToChampionStats(value: String) = Gson().fromJson(value, ChampionStats::class.java)
+    fun fromStringList(value: List<String>) = gson.toJson(value) ?: ""
 
     @TypeConverter
-    fun championSpellToJson(value: ChampionSpell) = Gson().toJson(value) ?: ""
+    fun toStringList(value: String) = gson.fromJson(value, Array<String>::class.java).toList()
 
     @TypeConverter
-    fun JsonToChampionSpell(value: String) = Gson().fromJson(value, ChampionSpell::class.java)
+    fun fromChampionStats(value: ChampionStats) = gson.toJson(value) ?: ""
 
     @TypeConverter
-    fun championSpellListToJson(value: List<ChampionSpell>) = Gson().toJson(value) ?: ""
+    fun toChampionStats(value: String) = gson.fromJson(value, ChampionStats::class.java)
 
     @TypeConverter
-    fun JsonToChampionSpellList(value: String) = Gson().fromJson(value, Array<ChampionSpell>::class.java).toList()
+    fun fromChampionSpell(value: ChampionSpell) = gson.toJson(value) ?: ""
 
     @TypeConverter
-    fun championSkinListToJson(value: List<ChampionSkin>) = Gson().toJson(value) ?: ""
+    fun toChampionSpell(value: String) = gson.fromJson(value, ChampionSpell::class.java)
 
     @TypeConverter
-    fun JsonToChampionSkinList(value: String) = Gson().fromJson(value, Array<ChampionSkin>::class.java).toList()
+    fun fromChampionSpellList(value: List<ChampionSpell>) = gson.toJson(value) ?: ""
 
+    @TypeConverter
+    fun toChampionSpellList(value: String) = gson.fromJson(value, Array<ChampionSpell>::class.java).toList()
+
+    @TypeConverter
+    fun fromChampionSkinList(value: List<ChampionSkin>) = gson.toJson(value) ?: ""
+
+    @TypeConverter
+    fun toChampionSkinList(value: String) = gson.fromJson(value, Array<ChampionSkin>::class.java).toList()
 }

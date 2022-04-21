@@ -10,7 +10,7 @@ import com.sandorln.champion.model.ChampionBoard
 import javax.inject.Inject
 
 class BoardRepositoryImpl @Inject constructor() : BoardRepository {
-    override fun getChampionBoardPagingFlow(championId: String): Pager<QuerySnapshot, ChampionBoard> = Pager(
+    override fun getChampionBoardPaging(championId: String): Pager<QuerySnapshot, ChampionBoard> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
         initialKey = null,
         pagingSourceFactory = { ChampionBoardPagingSource(championId) }

@@ -5,5 +5,5 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.sandorln.champion.model.ChampionBoard
 
 interface BoardRepository {
-    fun getChampionBoardPagingFlow(championId: String): Pager<QuerySnapshot, ChampionBoard>
+    fun getChampionBoardPaging(championId: String): Pager<QuerySnapshot, ChampionBoard>
 }

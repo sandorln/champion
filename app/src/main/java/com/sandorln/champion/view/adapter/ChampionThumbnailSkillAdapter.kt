@@ -6,7 +6,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemChampionThumbnailSkillBinding
-import com.sandorln.champion.model.ChampionSpell
+import com.sandorln.champion.model.ChampionData.ChampionSpell
 import com.sandorln.champion.model.type.SpellType
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 
@@ -14,6 +14,7 @@ class ChampionThumbnailSkillAdapter(var onChangeSkillType: (championSpell: Champ
     ListAdapter<ChampionSpell, ChampionThumbnailSkillAdapter.ChampionThumbnailSkillViewHolder>(DiffUtils.DIFF_CHAMPION_SKILL) {
 
     private var selectSpellType: SpellType = SpellType.P
+    var championVersion = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChampionThumbnailSkillViewHolder =
         ChampionThumbnailSkillViewHolder(ItemChampionThumbnailSkillBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -23,7 +24,7 @@ class ChampionThumbnailSkillAdapter(var onChangeSkillType: (championSpell: Champ
             val spellType = spell.getSpellType(position)
 
             with(holder.binding) {
-                imgChampionSkill.setSkillIcon(spell.image.full, spellType == SpellType.P)
+                imgChampionSkill.setSkillIcon(championVersion, spell.image.full, spellType == SpellType.P)
                 tvSkillType.text = spellType.name
                 vSelect.isVisible = selectSpellType == spellType
             }

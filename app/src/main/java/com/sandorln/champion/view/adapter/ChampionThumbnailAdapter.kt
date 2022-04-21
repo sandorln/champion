@@ -21,7 +21,7 @@ class ChampionThumbnailAdapter(
 
         with(holder.binding) {
             tvChampionName.text = championData.name
-            imgChampionIcon.setChampionThumbnail(championData.id)
+            imgChampionIcon.setChampionThumbnail(championData.version, championData.id)
         }
     }
 

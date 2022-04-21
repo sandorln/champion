@@ -17,7 +17,7 @@ class SplashLoadingActivity : BaseActivity<ActivitySplashLoadingBinding>(R.layou
         lifecycleScope.launchWhenResumed {
             delay(750)
             val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this@SplashLoadingActivity, binding.imgLogo, "logo").toBundle()
-            startActivity(Intent(this@SplashLoadingActivity, MainActivity::class.java), option)
+            startActivity(Intent(this@SplashLoadingActivity, MainActivity::class.java))
         }
     }
 }

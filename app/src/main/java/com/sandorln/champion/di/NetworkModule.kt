@@ -2,6 +2,8 @@ package com.sandorln.champion.di
 
 import com.sandorln.champion.BuildConfig
 import com.sandorln.champion.network.ChampionService
+import com.sandorln.champion.network.ItemService
+import com.sandorln.champion.network.SummonerSpellService
 import com.sandorln.champion.network.VersionService
 import dagger.Module
 import dagger.Provides
@@ -32,4 +34,12 @@ class NetworkModule {
     @Provides
     @Singleton
     fun providesVersionService(retrofit: Retrofit): VersionService = retrofit.create(VersionService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesItemService(retrofit: Retrofit): ItemService = retrofit.create(ItemService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesSummonerSpellService(retrofit: Retrofit): SummonerSpellService = retrofit.create(SummonerSpellService::class.java)
 }

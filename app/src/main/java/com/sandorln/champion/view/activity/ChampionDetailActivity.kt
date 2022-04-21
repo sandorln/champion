@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Parcelable
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.core.view.get
 import androidx.core.view.isVisible
@@ -20,7 +21,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityChampionDetailBinding
 import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.ChampionSpell
+import com.sandorln.champion.model.ChampionData.ChampionSpell
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.type.SpellType
 import com.sandorln.champion.util.playChampionSkill
@@ -145,7 +146,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
     override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
-            binding.imgChampionThumbnail.setChampionThumbnail(champion.id)
+            binding.imgChampionThumbnail.setChampionThumbnail(champion.version, champion.id)
             binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num)
 
             val championId = String.format("%04d", champion.key)
@@ -158,6 +159,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             /* 스킬 관련 */
             val skillList = champion.spells.toMutableList()
             skillList.add(0, champion.passive)
+            championThumbnailSkillAdapter.championVersion = champion.version
             championThumbnailSkillAdapter.submitList(skillList)
             championThumbnailSkillAdapter.onChangeSkillType = { championSpell, spellType ->
                 selectChampionSkill(championId, spellType, championSpell)

@@ -1,7 +1,8 @@
 package com.sandorln.champion.repository
 
-import com.sandorln.champion.model.VersionCategory
+import com.sandorln.champion.model.VersionLol.VersionCategory
+import kotlinx.coroutines.flow.Flow
 
 interface VersionRepository {
-    suspend fun getLolVersionCategory() : VersionCategory
+    fun getLolVersionCategory(): Flow<VersionCategory>
 }

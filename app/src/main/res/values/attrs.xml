@@ -4,4 +4,8 @@
         <attr name="titleName" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="HorizonItemThumbnailList">
+        <attr name="itemListTitleName" format="string" />
+    </declare-styleable>
+
 </resources>
