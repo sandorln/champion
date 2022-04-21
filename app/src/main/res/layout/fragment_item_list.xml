@@ -44,7 +44,7 @@
                 android:orientation="vertical"
                 android:paddingStart="@dimen/padding_large"
                 android:paddingEnd="@dimen/padding_large"
-                android:paddingBottom="@dimen/padding_large"
+                android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/input_layout_search"
