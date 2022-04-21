@@ -1,5 +1,7 @@
 package com.sandorln.champion.view.dialog
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -79,7 +81,10 @@ class ItemDataInfoDialog : DialogFragment() {
             val dialogLayoutManager = dialog?.window?.attributes ?: throw Exception("정보를 불러올 수 없습니다")
             dialogLayoutManager.width = (width * 0.8).toInt()
 
-            dialog?.window?.attributes = dialogLayoutManager
+            dialog?.window?.apply {
+                attributes = dialogLayoutManager
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
         }
     }
 }

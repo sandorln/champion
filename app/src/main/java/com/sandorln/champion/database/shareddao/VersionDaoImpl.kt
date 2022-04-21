@@ -20,5 +20,9 @@ class VersionDaoImpl(
     }
 
     override fun getVersionCategory(): VersionCategory =
-        gson.fromJson(pref.getString(KEY_VERSION_CATEGORY, ""), VersionCategory::class.java)
+        try {
+            gson.fromJson(pref.getString(KEY_VERSION_CATEGORY, ""), VersionCategory::class.java)
+        }catch (e:Exception){
+            VersionCategory()
+        }
 }
