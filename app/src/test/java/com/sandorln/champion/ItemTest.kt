@@ -28,7 +28,7 @@ class ItemTest {
         runBlocking {
             val itemVersion = "12.7.1"
             val itemResponse = itemService.getAllItem(itemVersion)
-            itemResponse.parsingData(itemVersion)
+            itemResponse.parsingData()
             println("아이템 데이터 값 : ${itemResponse.itemList}")
         }
     }

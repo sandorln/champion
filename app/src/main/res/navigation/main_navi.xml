@@ -10,8 +10,8 @@
             android:id="@+id/frg_item_list"
             android:name="com.sandorln.champion.view.fragment.ItemListFragment" />
     <fragment
-            android:id="@+id/frg_rune_frg"
-            android:name="com.sandorln.champion.view.fragment.RuneListFragment" />
+            android:id="@+id/frg_summoner_spell_frg"
+            android:name="com.sandorln.champion.view.fragment.SummonerSpellListFragment" />
     <fragment
             android:id="@+id/frg_app_setting"
             android:name="com.sandorln.champion.view.fragment.AppSettingFragment" />

@@ -28,7 +28,7 @@ class ItemRepositoryImpl @Inject constructor(
             // 비어 있을 시 서버에서 값 가져오기
             if (allItemList.isEmpty()) {
                 val response = itemService.getAllItem(version)
-                response.parsingData(version)
+                response.parsingData()
                 itemDao.insertItemDataList(response.itemList)
 
                 allItemList = itemDao.getAllItemData(version) ?: mutableListOf()

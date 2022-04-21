@@ -9,6 +9,7 @@ import com.sandorln.champion.database.LolChampionConverters
 import com.sandorln.champion.database.LolItemConverters
 import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.database.roomdao.ItemDao
+import com.sandorln.champion.database.roomdao.SummonerSpellDao
 import com.sandorln.champion.database.shareddao.VersionDao
 import com.sandorln.champion.database.shareddao.VersionDaoImpl
 import dagger.Module
@@ -47,6 +48,10 @@ class LocalDbModule {
     @Provides
     @Singleton
     fun providesItemDao(appDatabase: AppDatabase): ItemDao = appDatabase.itemDao()
+
+    @Provides
+    @Singleton
+    fun providesSummonerSpellDao(appDatabase: AppDatabase): SummonerSpellDao = appDatabase.summonerSpellDao()
 
     /* SharedPreference */
     @Singleton
