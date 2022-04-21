@@ -11,7 +11,6 @@ import com.sandorln.champion.view.adapter.diff.DiffUtils
 
 class ItemThumbnailAdapter(private val onClickItemListener: (itemId: String) -> Unit) :
     ListAdapter<ItemData, ItemThumbnailAdapter.ItemThumbnailViewHolder>(DiffUtils.DIFF_ITEM_DATA) {
-    var itemVersion: String = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemThumbnailViewHolder =
         ItemThumbnailViewHolder(ItemItemThumbnailBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -21,7 +20,7 @@ class ItemThumbnailAdapter(private val onClickItemListener: (itemId: String) -> 
             try {
                 val itemData = getItem(position)
                 root.setOnClickListener { onClickItemListener(itemData.id) }
-                imgItemThumbnail.setItemThumbnail(itemVersion, itemData.id)
+                imgItemThumbnail.setItemThumbnail(itemData.version, itemData.id)
                 tvItemName.text = itemData.name.removeBrFromHtml()
             } catch (e: Exception) {
 

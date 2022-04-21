@@ -47,7 +47,6 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
                     itemViewModel
                         .itemVersion
                         .collectLatest { itemVersion ->
-                            itemThumbnailAdapter.itemVersion = itemVersion
                             if (itemThumbnailAdapter.itemCount > 0)
                                 itemThumbnailAdapter.notifyItemRangeChanged(0, itemThumbnailAdapter.itemCount)
                             binding.tvVersion.text = "ITEM VERSION $itemVersion"

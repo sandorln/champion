@@ -73,7 +73,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
 
     // Retrofit
-    def retrofit_version = "2.9.0"
+    def retrofit_version = "2.7.2"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
 
