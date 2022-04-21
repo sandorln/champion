@@ -8,6 +8,7 @@ import com.sandorln.champion.database.AppDatabase
 import com.sandorln.champion.database.LolChampionConverters
 import com.sandorln.champion.database.LolItemConverters
 import com.sandorln.champion.database.roomdao.ChampionDao
+import com.sandorln.champion.database.roomdao.ItemDao
 import com.sandorln.champion.database.shareddao.VersionDao
 import com.sandorln.champion.database.shareddao.VersionDaoImpl
 import dagger.Module
@@ -27,17 +28,25 @@ class LocalDbModule {
     /* Room */
     @Provides
     @Singleton
-    fun providesAppDatabase(@ApplicationContext context: Context): AppDatabase =
+    fun providesAppDatabase(
+        @ApplicationContext context: Context,
+        lolChampionConverters: LolChampionConverters,
+        lolItemConverters: LolItemConverters
+    ): AppDatabase =
         Room
             .databaseBuilder(context, AppDatabase::class.java, "lol-champion")
             .fallbackToDestructiveMigration()
-            .addTypeConverter(LolChampionConverters::class)
-            .addTypeConverter(LolItemConverters::class)
+            .addTypeConverter(lolChampionConverters)
+            .addTypeConverter(lolItemConverters)
             .build()
 
     @Provides
     @Singleton
     fun providesChampionDao(appDatabase: AppDatabase): ChampionDao = appDatabase.championDao()
+
+    @Provides
+    @Singleton
+    fun providesItemDao(appDatabase: AppDatabase): ItemDao = appDatabase.itemDao()
 
     /* SharedPreference */
     @Singleton

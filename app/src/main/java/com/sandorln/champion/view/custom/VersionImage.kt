@@ -32,4 +32,13 @@ class VersionImage : AppCompatImageView {
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(this)
     }
+
+    fun setItemThumbnail(itemVersion: String, itemId: String) {
+        GlideApp.with(this)
+            .load("http://ddragon.leagueoflegends.com/cdn/${itemVersion}/img/item/${itemId}.png")
+            .thumbnail(0.5f)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .fitCenter()
+            .into(this)
+    }
 }

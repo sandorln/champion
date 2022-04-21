@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@android:color/black"
+        app:cardCornerRadius="20dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <com.sandorln.champion.view.custom.VersionImage
+                android:id="@+id/img_item_thumbnail"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/tv_name"
+                style="@style/Base.Widget.AppCompat.TextView.TitleStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="이름"
+                android:textColor="@color/base" />
+
+            <TextView
+                android:id="@+id/tv_gold"
+                style="@style/Base.Widget.AppCompat.TextView.TipStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:gravity="center"
+                android:text="가격"
+                android:textColor="@color/base" />
+
+            <com.sandorln.champion.view.custom.HorizonItemThumbnailList
+                android:id="@+id/horizon_item_next_depth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemListTitleName="다음 아이템" />
+
+            <com.sandorln.champion.view.custom.HorizonItemThumbnailList
+                android:id="@+id/horizon_item_pre_depth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemListTitleName="제작 시 필요" />
+
+            <TextView
+                android:id="@+id/tv_description"
+                style="@style/Base.Widget.AppCompat.TextView.TipStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="설명" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.card.MaterialCardView>
+</layout>
