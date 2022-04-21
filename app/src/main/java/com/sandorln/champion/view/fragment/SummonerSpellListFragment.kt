@@ -6,13 +6,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentSummonerSpellListBinding
-import com.sandorln.champion.model.SummonerSpell
 import com.sandorln.champion.model.result.ResultData
+import com.sandorln.champion.view.adapter.SummonerSpellAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.SummonerSpellViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -20,10 +19,16 @@ class SummonerSpellListFragment : BaseFragment<FragmentSummonerSpellListBinding>
     /* ViewModels */
     private val summonerSpellViewModel: SummonerSpellViewModel by viewModels()
 
+    /* Adapters */
+    private lateinit var summonerSpellAdapter: SummonerSpellAdapter
+
+
     override fun initObjectSetting() {
+        summonerSpellAdapter = SummonerSpellAdapter()
     }
 
     override fun initViewSetting() {
+        binding.rvSummonerSpell.adapter = summonerSpellAdapter
     }
 
     override fun initObserverSetting() {
@@ -33,25 +38,14 @@ class SummonerSpellListFragment : BaseFragment<FragmentSummonerSpellListBinding>
                     summonerSpellViewModel
                         .getSummonerSpellList
                         .collectLatest { result ->
-                            val resultData = (result as? ResultData.Success)?.data ?: mutableListOf()
-                            binding.horizonSummonerSpell.setSummonerSpellList(resultData) {
-                                summonerSpellViewModel.selectedSummonerSpell(it)
-                            }
+                            when (result) {
+                                is ResultData.Success -> summonerSpellAdapter.submitList(result.data)
+                                is ResultData.Failed -> {
 
-                            if (resultData.isNotEmpty())
-                                summonerSpellViewModel.selectedSummonerSpell(resultData.first())
-                        }
-                }
-                launch {
-                    summonerSpellViewModel
-                        .summonerSpell
-                        .distinctUntilChangedBy { it.id }
-                        .collectLatest { summonerSpell: SummonerSpell ->
-                            with(binding) {
-                                imgSummonerSpell.setSummonerSpellThumbnail(summonerSpell.version, summonerSpell.id)
-                                tvCoolDown.text = "${summonerSpell.cooldownBurn} 초"
-                                tvDescription.text = summonerSpell.description
-                                tvName.text = summonerSpell.name
+                                }
+                                else -> {
+
+                                }
                             }
                         }
                 }

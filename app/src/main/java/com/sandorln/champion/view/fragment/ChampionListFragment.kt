@@ -97,9 +97,7 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                                 else -> mutableListOf()
                             }
 
-                            championThumbnailAdapter.submitList(championList) {
-                                binding.rvChampions.scrollToPosition(0)
-                            }
+                            championThumbnailAdapter.submitList(championList)
                         }
                 }
 
