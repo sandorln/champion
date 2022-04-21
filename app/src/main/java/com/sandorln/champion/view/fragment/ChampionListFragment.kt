@@ -84,13 +84,6 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     championViewModel
-                        .championVersion
-                        .collectLatest { championVersion ->
-                            binding.tvVersion.text = "CHAMPION VERSION $championVersion"
-                        }
-                }
-                launch {
-                    championViewModel
                         .showChampionList
                         .collectLatest { result ->
                             binding.pbContent.isVisible = result is ResultData.Loading

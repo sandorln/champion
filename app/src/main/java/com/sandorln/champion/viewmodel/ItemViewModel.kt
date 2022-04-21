@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.use_case.FindItemById
 import com.sandorln.champion.use_case.GetItemList
-import com.sandorln.champion.use_case.GetVersionCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +21,6 @@ import javax.inject.Inject
 class ItemViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val savedStateHandle: SavedStateHandle,
-    getVersionCategory: GetVersionCategory,
     getItemList: GetItemList,
     findItemById: FindItemById
 ) : AndroidViewModel(context as Application) {
@@ -30,17 +28,13 @@ class ItemViewModel @Inject constructor(
     fun changeSearchItemName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchItemName.emit(searchName) }
 
     private val _inStoreItem: MutableStateFlow<Boolean> = MutableStateFlow(true)
-    val inStoreItem: StateFlow<Boolean> get() = _inStoreItem
-    fun changeInStoreItem(inStore: Boolean) = viewModelScope.launch(Dispatchers.IO) { _inStoreItem.emit(inStore) }
-
-    val itemVersion = getVersionCategory().mapLatest { it.item }
 
     val itemList = _searchItemName
         .debounce(250)
         .combine(_inStoreItem) { search, inStore -> Pair(search, inStore) }
         .flatMapLatest { getItemList(it.first, it.second) }
         .onStart { delay(250) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ResultData.Loading)
 
 
     private val _itemId = savedStateHandle

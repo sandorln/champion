@@ -25,14 +25,12 @@ class ChampionViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val savedStateHandle: SavedStateHandle,
     private val getChampionList: GetChampionList,
-    private val getVersionCategory: GetVersionCategory,
     private val getChampionInfo: GetChampionInfo
 ) : AndroidViewModel(context as Application) {
     private val _searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
     val searchChampionData: StateFlow<String> get() = _searchChampionName
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
 
-    val championVersion = getVersionCategory().mapLatest { it.champion }
     val showChampionList = _searchChampionName
         .debounce(250)
         .flatMapLatest { search -> getChampionList(search) }
