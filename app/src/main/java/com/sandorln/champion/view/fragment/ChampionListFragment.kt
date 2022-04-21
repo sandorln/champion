@@ -84,13 +84,6 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     championViewModel
-                        .championVersion
-                        .collectLatest { championVersion ->
-                            binding.tvVersion.text = "CHAMPION VERSION $championVersion"
-                        }
-                }
-                launch {
-                    championViewModel
                         .showChampionList
                         .collectLatest { result ->
                             binding.pbContent.isVisible = result is ResultData.Loading
@@ -104,9 +97,7 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                                 else -> mutableListOf()
                             }
 
-                            championThumbnailAdapter.submitList(championList) {
-                                binding.rvChampions.scrollToPosition(0)
-                            }
+                            championThumbnailAdapter.submitList(championList)
                         }
                 }
 

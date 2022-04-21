@@ -36,23 +36,13 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
         binding.rvItemList.setHasFixedSize(true)
         binding.rvItemList.adapter = itemThumbnailAdapter
 
-        binding.cbInStore.isChecked = itemViewModel.inStoreItem.value
-        binding.cbInStore.setOnCheckedChangeListener { _, inStore -> itemViewModel.changeInStoreItem(inStore) }
+//        binding.cbInStore.isChecked = itemViewModel.inStoreItem.value
+//        binding.cbInStore.setOnCheckedChangeListener { _, inStore -> itemViewModel.changeInStoreItem(inStore) }
     }
 
     override fun initObserverSetting() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                launch {
-                    itemViewModel
-                        .itemVersion
-                        .collectLatest { itemVersion ->
-                            if (itemThumbnailAdapter.itemCount > 0)
-                                itemThumbnailAdapter.notifyItemRangeChanged(0, itemThumbnailAdapter.itemCount)
-                            binding.tvVersion.text = "ITEM VERSION $itemVersion"
-                        }
-                }
-
                 launch {
                     itemViewModel
                         .itemList

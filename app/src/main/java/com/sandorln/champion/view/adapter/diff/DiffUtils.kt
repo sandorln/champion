@@ -5,6 +5,7 @@ import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.ChampionData.ChampionSkin
 import com.sandorln.champion.model.ChampionData.ChampionSpell
 import com.sandorln.champion.model.ItemData
+import com.sandorln.champion.model.SummonerSpell
 
 object DiffUtils {
     val DIFF_CHAMPION_DATA = object : DiffUtil.ItemCallback<ChampionData>() {
@@ -28,5 +29,10 @@ object DiffUtils {
     val DIFF_ITEM_DATA = object : DiffUtil.ItemCallback<ItemData>() {
         override fun areItemsTheSame(oldItem: ItemData, newItem: ItemData): Boolean = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: ItemData, newItem: ItemData): Boolean = oldItem == newItem
+    }
+
+    val DIFF_SUMMONER_SPELL = object : DiffUtil.ItemCallback<SummonerSpell>() {
+        override fun areItemsTheSame(oldItem: SummonerSpell, newItem: SummonerSpell): Boolean = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: SummonerSpell, newItem: SummonerSpell): Boolean = oldItem == newItem
     }
 }
