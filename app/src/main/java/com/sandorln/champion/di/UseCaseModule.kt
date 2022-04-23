@@ -30,4 +30,13 @@ class UseCaseModule {
 
     @Provides
     fun providesGetSummonerSpellList(getVersion: GetVersionCategory, summonerRepo: SummonerSpellRepository) = GetSummonerSpellList(getVersion, summonerRepo)
+
+    @Provides
+    fun providesGetVersion(versionRepo: VersionRepository): GetVersion = GetVersion(versionRepo)
+
+    @Provides
+    fun providesGetVersionList(versionRepo: VersionRepository): GetVersionList = GetVersionList(versionRepo)
+
+    @Provides
+    fun providesChangeVersion(versionRepo: VersionRepository): ChangeVersion = ChangeVersion(versionRepo)
 }
