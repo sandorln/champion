@@ -9,7 +9,6 @@ data class ItemData(
     var id: String = "",
     var version: String = "",
     val name: String = "",
-    val colloq: String = "",
     val description: String = "",
 
     val depth: Int = 0,

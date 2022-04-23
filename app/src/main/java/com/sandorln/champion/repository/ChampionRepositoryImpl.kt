@@ -25,7 +25,7 @@ class ChampionRepositoryImpl @Inject constructor(
                 throw Exception("버전 정보가 없습니다")
 
             /* 인터넷으로 값 받아오기 */
-            if (!::allChampionList.isInitialized || allChampionList.first().version != championVersion) {
+            if (!::allChampionList.isInitialized || allChampionList.firstOrNull()?.version ?: "" != championVersion) {
                 allChampionList = championDao.getAllChampion(championVersion)
             }
 
