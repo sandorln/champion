@@ -4,7 +4,7 @@ import com.sandorln.champion.repository.ChampionRepository
 import com.sandorln.champion.repository.ItemRepository
 import com.sandorln.champion.repository.SummonerSpellRepository
 import com.sandorln.champion.repository.VersionRepository
-import com.sandorln.champion.use_case.*
+import com.sandorln.champion.usecase.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

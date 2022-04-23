@@ -1,4 +1,4 @@
-package com.sandorln.champion.use_case
+package com.sandorln.champion.usecase
 
 import com.sandorln.champion.model.ItemData
 import com.sandorln.champion.model.result.ResultData

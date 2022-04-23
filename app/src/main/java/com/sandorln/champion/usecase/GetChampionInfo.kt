@@ -1,4 +1,4 @@
-package com.sandorln.champion.use_case
+package com.sandorln.champion.usecase
 
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.result.ResultData
@@ -8,17 +8,17 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 
-class GetChampionList(
+class GetChampionInfo(
     private val getVersionCategory: GetVersionCategory,
     private val championRepository: ChampionRepository
 ) {
-    operator fun invoke(search: String): Flow<ResultData<List<ChampionData>>> =
+    operator fun invoke(championId: String): Flow<ResultData<ChampionData>> =
         getVersionCategory()
             .mapLatest { it.champion }
             .flatMapLatest { championVersion ->
                 if (championVersion.isEmpty())
                     flow { emit(ResultData.Failed(Exception("챔피언 버전 정보가 없습니다"))) }
                 else
-                    championRepository.getChampionList(championVersion, search)
+                    championRepository.getChampionInfo(championVersion, championId)
             }
 }

@@ -5,7 +5,7 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@android:color/black"
+        app:cardBackgroundColor="@color/gray_141414"
         app:cardCornerRadius="20dp">
 
         <androidx.appcompat.widget.LinearLayoutCompat
