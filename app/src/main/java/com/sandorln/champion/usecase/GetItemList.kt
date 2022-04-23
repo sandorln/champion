@@ -9,12 +9,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 
 class GetItemList(
-    private val getVersionCategory: GetVersionCategory,
+    private val getVersion: GetVersion,
     private val itemRepository: ItemRepository
 ) {
     operator fun invoke(search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>> =
-        getVersionCategory()
-            .mapLatest { it.item }
+        getVersion()
             .flatMapLatest { itemVersion ->
                 if (itemVersion.isEmpty())
                     flow { emit(ResultData.Failed(Exception("버전 정보를 알 수 없습니다"))) }

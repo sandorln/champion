@@ -9,12 +9,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 
 class GetChampionInfo(
-    private val getVersionCategory: GetVersionCategory,
+    private val getVersion: GetVersion,
     private val championRepository: ChampionRepository
 ) {
     operator fun invoke(championId: String): Flow<ResultData<ChampionData>> =
-        getVersionCategory()
-            .mapLatest { it.champion }
+        getVersion()
             .flatMapLatest { championVersion ->
                 if (championVersion.isEmpty())
                     flow { emit(ResultData.Failed(Exception("챔피언 버전 정보가 없습니다"))) }
