@@ -36,11 +36,11 @@ class VersionRepositoryImpl @Inject constructor(
     private val versionMutex = Mutex()
     override fun getLolVersion(): Flow<String> = flow {
         initLolVersion()
-        emit(versionDao.getVersion())
+        emit(versionDao.getTotalVersion())
     }.flowOn(Dispatchers.IO)
 
     override suspend fun changeLolVersion(version: String) {
-        versionDao.insertVersion(version)
+        versionDao.insertTotalVersion(version)
     }
 
     override fun getLolVersionList(): Flow<List<String>> = flow {
@@ -48,12 +48,18 @@ class VersionRepositoryImpl @Inject constructor(
         emit(initVersionList)
     }.flowOn(Dispatchers.IO)
 
+    override suspend fun getLolChampionVersion(totalVersion: String): String = try {
+        versionDao.getChampionVersion(totalVersion)
+    } catch (e: Exception) {
+        totalVersion
+    }
+
     private suspend fun initLolVersion() =
         versionMutex.withLock {
             initVersionList.ifEmpty {
                 try {
                     /* 로컬에서 값 가져오기 */
-                    val localVersionList = versionDao.getVersionList()
+                    val localVersionList = versionDao.getTotalVersionList()
                     /* 서버에서 값 가져오기 */
                     val serverVersionList = versionService.getVersionList()
                     initVersionList = when {
@@ -61,15 +67,15 @@ class VersionRepositoryImpl @Inject constructor(
                         localVersionList.isEmpty() ||
                                 /* 로컬 정보와 서버 정보가 달라졌을 시 */
                                 !localVersionList.containsAll(serverVersionList) -> {
-                            versionDao.insertVersionList(serverVersionList)
-                            versionDao.insertVersion(serverVersionList.first())
+                            versionDao.insertTotalVersionList(serverVersionList)
+                            versionDao.insertTotalVersion(serverVersionList.first())
                             serverVersionList
                         }
                         else -> localVersionList
                     }
                 } catch (e: Exception) {
                     /* 만약 서버에 접속할 수 없다면 Local DB 에서 가져오기 */
-                    initVersionList = versionDao.getVersionList()
+                    initVersionList = versionDao.getTotalVersionList()
                 }
             }
         }

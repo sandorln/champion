@@ -6,9 +6,12 @@ interface VersionDao {
     fun insertVersionCategory(versionCategory: VersionCategory)
     fun getVersionCategory(): VersionCategory
 
-    fun insertVersionList(versionList: List<String>)
-    fun getVersionList(): List<String>
+    fun insertTotalVersionList(versionList: List<String>)
+    fun getTotalVersionList(): List<String>
 
-    fun getVersion(): String
-    fun insertVersion(version: String)
+    fun getTotalVersion(): String
+    fun insertTotalVersion(version: String)
+
+    fun getChampionVersion(totalVersion: String): String
+    fun insertChampionVersion(totalVersion: String, championVersion: String)
 }

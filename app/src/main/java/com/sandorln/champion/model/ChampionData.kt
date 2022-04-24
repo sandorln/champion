@@ -2,8 +2,6 @@ package com.sandorln.champion.model
 
 import android.os.Parcelable
 import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
 import com.sandorln.champion.model.type.SpellType
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
@@ -29,7 +27,7 @@ data class ChampionData(
 
     var allytips: List<String> = mutableListOf(),
     var enemytips: List<String> = mutableListOf()
-) : Serializable, Parcelable{
+) : Serializable, Parcelable {
     @Parcelize
     data class ChampionInfo(
         var attack: Int = 0,
@@ -40,8 +38,8 @@ data class ChampionData(
 
     @Parcelize
     data class ChampionSkin(
-        var id: String = "",
-        var num: String = "",
+        var id: String? = null,
+        var num: String? = null,
         var name: String = "",
         var chromas: Boolean = false
     ) : Serializable, Parcelable

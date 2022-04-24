@@ -10,4 +10,10 @@ interface VersionRepository {
     fun getLolVersion(): Flow<String>
     suspend fun changeLolVersion(version: String)
     fun getLolVersionList(): Flow<List<String>>
+
+    /**
+     * Total Version 과 Champion Version 이 다른 경우가 있어서
+     * 해당 Total Version 에 맞는 Champion Version 을 불러오기
+     */
+    suspend fun getLolChampionVersion(totalVersion: String): String
 }
