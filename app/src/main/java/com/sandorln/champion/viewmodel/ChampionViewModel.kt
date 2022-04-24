@@ -36,6 +36,7 @@ class ChampionViewModel @Inject constructor(
         .onStart { delay(250) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
-    suspend fun getChampionDetailInfo(championId: String) = getChampionInfo(championId).firstOrNull()
+    suspend fun getChampionDetailInfo(championVersion: String, championId: String) = getChampionInfo(championVersion, championId)
+
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())
 }
