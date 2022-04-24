@@ -3,6 +3,7 @@ package com.sandorln.champion.database.shareddao
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.sandorln.champion.model.VersionLol.VersionCategory
 
 class VersionDaoImpl(
@@ -11,6 +12,12 @@ class VersionDaoImpl(
 ) : VersionDao {
     companion object {
         private const val KEY_VERSION_CATEGORY = "key_version_category"
+        private const val KEY_VERSION_LIST = "key_version_list"
+        private const val KEY_VERSION = "key_version"
+
+        private const val KEY_CHAMPION_VERSION = "key_champion_version"
+        private const val KEY_ITEM_VERSION = "key_item_version"
+        private const val KEY_SUMMONER_SPELL_VERSION = "key_summoner_spell_version"
     }
 
     override fun insertVersionCategory(versionCategory: VersionCategory) {
@@ -22,7 +29,64 @@ class VersionDaoImpl(
     override fun getVersionCategory(): VersionCategory =
         try {
             gson.fromJson(pref.getString(KEY_VERSION_CATEGORY, ""), VersionCategory::class.java)
-        }catch (e:Exception){
+        } catch (e: Exception) {
             VersionCategory()
         }
+
+    override fun insertTotalVersionList(versionList: List<String>) {
+        pref.edit(commit = true) {
+            putString(KEY_VERSION_LIST, gson.toJson(versionList))
+        }
+    }
+
+    override fun getTotalVersionList(): List<String> =
+        try {
+            val type = object : TypeToken<List<String>>() {}.type
+            gson.fromJson(pref.getString(KEY_VERSION_LIST, ""), type)
+        } catch (e: Exception) {
+            mutableListOf()
+        }
+
+    override fun insertTotalVersion(version: String) {
+        pref.edit(commit = true) { putString(KEY_VERSION, version) }
+    }
+
+    override fun getTotalVersion(): String = try {
+        pref.getString(KEY_VERSION, "") ?: ""
+    } catch (e: Exception) {
+        ""
+    }
+
+    override fun getChampionVersion(totalVersion: String): String =
+        try {
+            pref.getString(KEY_CHAMPION_VERSION + totalVersion, totalVersion) ?: totalVersion
+        } catch (e: Exception) {
+            totalVersion
+        }
+
+    override fun insertChampionVersion(totalVersion: String, championVersion: String) {
+        pref.edit(commit = true) { putString(KEY_CHAMPION_VERSION + totalVersion, championVersion) }
+    }
+
+    override fun getSummonerSpellVersion(totalVersion: String): String =
+        try {
+            pref.getString(KEY_SUMMONER_SPELL_VERSION + totalVersion, totalVersion) ?: totalVersion
+        } catch (e: Exception) {
+            totalVersion
+        }
+
+    override fun insertSummonerSpellVersion(totalVersion: String, summonerSpellVersion: String) {
+        pref.edit(commit = true) { putString(KEY_SUMMONER_SPELL_VERSION + totalVersion, summonerSpellVersion) }
+    }
+
+    override fun getItemVersion(totalVersion: String): String =
+        try {
+            pref.getString(KEY_ITEM_VERSION + totalVersion, totalVersion) ?: totalVersion
+        } catch (e: Exception) {
+            totalVersion
+        }
+
+    override fun insertItemVersion(totalVersion: String, itemVersion: String) {
+        pref.edit(commit = true) { putString(KEY_ITEM_VERSION + totalVersion, itemVersion) }
+    }
 }

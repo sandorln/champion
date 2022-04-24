@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.use_case.GetSummonerSpellList
+import com.sandorln.champion.usecase.GetSummonerSpellList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted

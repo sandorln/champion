@@ -9,9 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.use_case.GetChampionInfo
-import com.sandorln.champion.use_case.GetChampionList
-import com.sandorln.champion.use_case.GetVersionCategory
+import com.sandorln.champion.usecase.GetChampionInfo
+import com.sandorln.champion.usecase.GetChampionList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +36,7 @@ class ChampionViewModel @Inject constructor(
         .onStart { delay(250) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
-    suspend fun getChampionDetailInfo(championId: String) = getChampionInfo(championId).firstOrNull()
-    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA)
+    suspend fun getChampionDetailInfo(championVersion: String, championId: String) = getChampionInfo(championVersion, championId)
+
+    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())
 }

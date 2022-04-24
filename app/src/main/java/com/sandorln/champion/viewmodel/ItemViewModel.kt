@@ -7,8 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.use_case.FindItemById
-import com.sandorln.champion.use_case.GetItemList
+import com.sandorln.champion.usecase.FindItemById
+import com.sandorln.champion.usecase.GetItemList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -27,14 +27,16 @@ class ItemViewModel @Inject constructor(
     private val _searchItemName: MutableStateFlow<String> = MutableStateFlow("")
     fun changeSearchItemName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchItemName.emit(searchName) }
 
+    /* 이후 판매 중이 아닌 아이템도 볼 수 있도록 설정 */
     private val _inStoreItem: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val inStoreItem: StateFlow<Boolean> = _inStoreItem.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
     val itemList = _searchItemName
         .debounce(250)
-        .combine(_inStoreItem) { search, inStore -> Pair(search, inStore) }
+        .combine(inStoreItem) { search, inStore -> Pair(search, inStore) }
         .flatMapLatest { getItemList(it.first, it.second) }
         .onStart { delay(250) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ResultData.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
 
     private val _itemId = savedStateHandle

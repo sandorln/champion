@@ -25,7 +25,7 @@ class SummonerSpellTest {
     @Test
     fun testSummonerSpellResponse() {
         runBlocking {
-            val version = "12.7.1"
+            val version = "0.151.101"
             val spellResponse = summonerSpellService.getAllSummonerSpell(version)
             spellResponse.parsingData()
             println("아이템 데이터 값 : ${spellResponse.summonerSpellList}")

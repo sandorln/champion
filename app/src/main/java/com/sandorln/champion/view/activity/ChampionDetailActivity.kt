@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Parcelable
 import android.view.View
-import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.core.view.get
 import androidx.core.view.isVisible
@@ -50,7 +49,8 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
 
     companion object {
         fun newIntent(championData: ChampionData, context: Context): Intent = Intent(context, ChampionDetailActivity::class.java).apply {
-            putExtra(BundleKeys.CHAMPION_DATA, championData as Parcelable)
+            val parcelChampionData = championData as Parcelable
+            putExtra(BundleKeys.CHAMPION_DATA, parcelChampionData)
         }
     }
 
@@ -147,7 +147,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     override fun initObserverSetting() {
         championViewModel.championData.observe(this, Observer { champion ->
             binding.imgChampionThumbnail.setChampionThumbnail(champion.version, champion.id)
-            binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num)
+            binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num ?: "0")
 
             val championId = String.format("%04d", champion.key)
 
@@ -181,7 +181,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                         binding.imgChampionSplash.setImageDrawable(viewHolder.binding.imgChampionSkin.drawable)
                         binding.tvChampionName.text = if (position == 0) champion.name else champion.skins[position].name
                     } catch (e: Exception) {
-                        binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num)
+                        binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num ?: position.toString())
                         binding.tvChampionName.text = champion.name
                     }
                 }
@@ -199,7 +199,6 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                 championEnemyTipAdapter.notifyDataSetChanged()
             }
         })
-
     }
 
     /**

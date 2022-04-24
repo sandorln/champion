@@ -21,6 +21,7 @@ import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -38,18 +39,22 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
         championThumbnailAdapter = ChampionThumbnailAdapter {
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
-                when (val result = championViewModel.getChampionDetailInfo(it.id)) {
-                    is ResultData.Success -> result.data?.let { champion ->
-                        if (champion.name.isNotEmpty()) {
-                            /* 검색 중 챔피언을 눌렀을 시 _ 키보드 및 검색창 닫기 */
-                            if (binding.editSearchChamp.hasFocus()) {
-                                binding.editSearchChamp.clearFocus()
-                                inputMethodManager.hideSoftInputFromWindow(binding.editSearchChamp.windowToken, 0)
-                            }
-                        }
+                /* 검색 중 챔피언을 눌렀을 시 _ 키보드 및 검색창 닫기 */
+                if (binding.editSearchChamp.hasFocus()) {
+                    binding.editSearchChamp.clearFocus()
+                    inputMethodManager.hideSoftInputFromWindow(binding.editSearchChamp.windowToken, 0)
+                }
 
-                        startActivity(ChampionDetailActivity.newIntent(champion, requireContext()))
+                championViewModel.getChampionDetailInfo(it.version, it.id).firstOrNull { resultData ->
+                    val isLoading = resultData is ResultData.Loading
+                    binding.pbContent.isVisible = isLoading
+
+                    when (resultData) {
+                        is ResultData.Success -> startActivity(ChampionDetailActivity.newIntent(resultData.data ?: throw Exception(""), requireContext()))
+                        is ResultData.Failed -> Toast.makeText(requireContext(), "오류 발생 ${resultData.exception}", Toast.LENGTH_SHORT).show()
                     }
+
+                    !isLoading
                 }
             }
         }

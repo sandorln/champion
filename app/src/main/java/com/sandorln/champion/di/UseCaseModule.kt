@@ -4,7 +4,7 @@ import com.sandorln.champion.repository.ChampionRepository
 import com.sandorln.champion.repository.ItemRepository
 import com.sandorln.champion.repository.SummonerSpellRepository
 import com.sandorln.champion.repository.VersionRepository
-import com.sandorln.champion.use_case.*
+import com.sandorln.champion.usecase.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,17 +17,26 @@ class UseCaseModule {
     fun providesGetVersionCategory(versionRepo: VersionRepository): GetVersionCategory = GetVersionCategory(versionRepo)
 
     @Provides
-    fun providesGetChampionList(getVersion: GetVersionCategory, champRepo: ChampionRepository): GetChampionList = GetChampionList(getVersion, champRepo)
+    fun providesGetChampionList(getVersion: GetVersion, champRepo: ChampionRepository): GetChampionList = GetChampionList(getVersion, champRepo)
 
     @Provides
-    fun providesGetChampionInfo(getVersion: GetVersionCategory, champRepo: ChampionRepository): GetChampionInfo = GetChampionInfo(getVersion, champRepo)
+    fun providesGetChampionInfo(champRepo: ChampionRepository): GetChampionInfo = GetChampionInfo(champRepo)
 
     @Provides
-    fun providesGetItemList(getVersion: GetVersionCategory, itemRepo: ItemRepository) = GetItemList(getVersion, itemRepo)
+    fun providesGetItemList(getVersion: GetVersion, itemRepo: ItemRepository) = GetItemList(getVersion, itemRepo)
 
     @Provides
-    fun providesFindItemById(getVersion: GetVersionCategory, itemRepo: ItemRepository) = FindItemById(getVersion, itemRepo)
+    fun providesFindItemById(getVersion: GetVersion, itemRepo: ItemRepository) = FindItemById(getVersion, itemRepo)
 
     @Provides
-    fun providesGetSummonerSpellList(getVersion: GetVersionCategory, summonerRepo: SummonerSpellRepository) = GetSummonerSpellList(getVersion, summonerRepo)
+    fun providesGetSummonerSpellList(getVersion: GetVersion, summonerRepo: SummonerSpellRepository) = GetSummonerSpellList(getVersion, summonerRepo)
+
+    @Provides
+    fun providesGetVersion(versionRepo: VersionRepository): GetVersion = GetVersion(versionRepo)
+
+    @Provides
+    fun providesGetVersionList(versionRepo: VersionRepository): GetVersionList = GetVersionList(versionRepo)
+
+    @Provides
+    fun providesChangeVersion(versionRepo: VersionRepository): ChangeVersion = ChangeVersion(versionRepo)
 }
