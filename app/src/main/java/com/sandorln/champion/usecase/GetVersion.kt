@@ -6,9 +6,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 class GetVersion(private val versionRepository: VersionRepository) {
-    operator fun invoke(): Flow<String> = flow {
-        emit(versionRepository.getLolVersion())
-    }.catch {
-        emit("")
-    }
+    operator fun invoke(): Flow<String> =
+        flow {
+            emit(versionRepository.getLolVersion())
+        }.catch {
+            emit("")
+        }
 }

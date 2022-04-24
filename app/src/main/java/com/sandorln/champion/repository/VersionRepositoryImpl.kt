@@ -65,7 +65,6 @@ class VersionRepositoryImpl @Inject constructor(
             getVersionData()
         }
 
-
     override suspend fun getLolVersion(): String = initLolVersion {
         versionDao.getTotalVersion()
     }

@@ -32,12 +32,15 @@ class HorizonItemThumbnailList : LinearLayoutCompat {
             binding.layoutItems.removeAllViews()
             itemIdList.forEach { itemId ->
                 val versionImage = VersionImage(context)
-                versionImage.setItemThumbnail(itemVersion, itemId)
-                versionImage.setOnClickListener { onClickItemListener(itemId) }
-                binding.layoutItems.addView(versionImage)
-                versionImage.updateLayoutParams<LinearLayout.LayoutParams> {
-                    width = 100
-                    height = 100
+                /* 롤 낮은 버전에서는 널 값을 줄때가 있음 */
+                if (itemId != null) {
+                    versionImage.setItemThumbnail(itemVersion, itemId)
+                    versionImage.setOnClickListener { onClickItemListener(itemId) }
+                    binding.layoutItems.addView(versionImage)
+                    versionImage.updateLayoutParams<LinearLayout.LayoutParams> {
+                        width = 100
+                        height = 100
+                    }
                 }
             }
         } else {

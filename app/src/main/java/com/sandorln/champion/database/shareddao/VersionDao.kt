@@ -14,4 +14,8 @@ interface VersionDao {
 
     fun getChampionVersion(totalVersion: String): String
     fun insertChampionVersion(totalVersion: String, championVersion: String)
+    fun getSummonerSpellVersion(totalVersion: String): String
+    fun insertSummonerSpellVersion(totalVersion: String, summonerSpellVersion: String)
+    fun getItemVersion(totalVersion: String): String
+    fun insertItemVersion(totalVersion: String, itemVersion: String)
 }

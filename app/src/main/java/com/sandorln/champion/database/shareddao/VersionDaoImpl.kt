@@ -14,7 +14,10 @@ class VersionDaoImpl(
         private const val KEY_VERSION_CATEGORY = "key_version_category"
         private const val KEY_VERSION_LIST = "key_version_list"
         private const val KEY_VERSION = "key_version"
+
         private const val KEY_CHAMPION_VERSION = "key_champion_version"
+        private const val KEY_ITEM_VERSION = "key_item_version"
+        private const val KEY_SUMMONER_SPELL_VERSION = "key_summoner_spell_version"
     }
 
     override fun insertVersionCategory(versionCategory: VersionCategory) {
@@ -63,5 +66,27 @@ class VersionDaoImpl(
 
     override fun insertChampionVersion(totalVersion: String, championVersion: String) {
         pref.edit(commit = true) { putString(KEY_CHAMPION_VERSION + totalVersion, championVersion) }
+    }
+
+    override fun getSummonerSpellVersion(totalVersion: String): String =
+        try {
+            pref.getString(KEY_SUMMONER_SPELL_VERSION + totalVersion, totalVersion) ?: totalVersion
+        } catch (e: Exception) {
+            totalVersion
+        }
+
+    override fun insertSummonerSpellVersion(totalVersion: String, summonerSpellVersion: String) {
+        pref.edit(commit = true) { putString(KEY_SUMMONER_SPELL_VERSION + totalVersion, summonerSpellVersion) }
+    }
+
+    override fun getItemVersion(totalVersion: String): String =
+        try {
+            pref.getString(KEY_ITEM_VERSION + totalVersion, totalVersion) ?: totalVersion
+        } catch (e: Exception) {
+            totalVersion
+        }
+
+    override fun insertItemVersion(totalVersion: String, itemVersion: String) {
+        pref.edit(commit = true) { putString(KEY_ITEM_VERSION + totalVersion, itemVersion) }
     }
 }
