@@ -28,7 +28,7 @@
         <activity
                 android:name="com.sandorln.champion.view.activity.MainActivity"
                 android:exported="true"
-                android:screenOrientation="fullSensor"
+                android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -38,7 +38,7 @@
         <activity
                 android:name=".view.activity.ChampionDetailActivity"
                 android:exported="true"
-                android:screenOrientation="fullSensor" />
+                android:screenOrientation="portrait" />
     </application>
 
 </manifest>
