@@ -16,22 +16,29 @@ import javax.inject.Inject
 @HiltViewModel
 class AppSettingViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    getVersion: GetVersion,
+    private val getVersion: GetVersion,
     getVersionList: GetVersionList,
     private val changeVersion: ChangeVersion
 ) : AndroidViewModel(context as Application) {
-    private val versionRefresh = MutableStateFlow(true)
-    val version : StateFlow<String> = versionRefresh
-        .distinctUntilChangedBy { it }
-        .flatMapLatest {
-            versionRefresh.emit(false)
-            getVersion()
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
+    init {
+        refreshVersion()
+    }
+
+    private val _version: MutableStateFlow<String> = MutableStateFlow("")
+    val version: StateFlow<String> = _version.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
+
     val versionList = getVersionList()
+
 
     fun changeLolVersion(version: String) = viewModelScope.launch {
         changeVersion(version)
-        versionRefresh.emit(true)
+        refreshVersion()
     }
+
+    private fun refreshVersion() {
+        getVersion()
+            .onEach { version -> _version.emit(version) }
+            .launchIn(viewModelScope)
+    }
+
 }
