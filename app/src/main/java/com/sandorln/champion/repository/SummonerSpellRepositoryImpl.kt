@@ -46,7 +46,7 @@ class SummonerSpellRepositoryImpl @Inject constructor(
             getSummonerSpellData()
         }
 
-    override suspend fun getSummonerSpellList(version: String): List<SummonerSpell> = initSummonerSpellList(version) {
+    override suspend fun getSummonerSpellList(summonerSpellVersion: String): List<SummonerSpell> = initSummonerSpellList(summonerSpellVersion) {
         allSummonerSpellList
     }
 }

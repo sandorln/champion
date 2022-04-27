@@ -12,4 +12,6 @@ interface VersionRepository {
     suspend fun getLolVersionList(): List<String>
 
     suspend fun getLolChampionVersion(): String
+    suspend fun getLolItemVersion(): String
+    suspend fun getLolSummonerSpellVersion(): String
 }
