@@ -47,7 +47,7 @@ class ItemRepositoryImpl @Inject constructor(
             getItemData()
         }
 
-    override suspend fun getItemList(totalVersion: String, search: String, inStore: Boolean): List<ItemData> = initAllItemList(totalVersion) {
+    override suspend fun getItemList(itemVersion: String, search: String, inStore: Boolean): List<ItemData> = initAllItemList(itemVersion) {
         /* 검색어 / 검색 대상 공백 제거 */
         val itemSearch = search.replace(" ", "").uppercase()
 
@@ -69,7 +69,7 @@ class ItemRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun findItemById(totalVersion: String, itemId: String): ItemData = initAllItemList(totalVersion) {
+    override suspend fun findItemById(itemVersion: String, itemId: String): ItemData = initAllItemList(itemVersion) {
         allItemList.firstOrNull { it.id == itemId } ?: throw Exception("해당 아이템은 존재하지 않습니다")
     }
 }
