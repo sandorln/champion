@@ -35,7 +35,7 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
         binding.editSearchItem.doOnTextChanged { text, _, _, _ -> itemViewModel.changeSearchItemName(text.toString()) }
         binding.rvItemList.setHasFixedSize(true)
         binding.rvItemList.adapter = itemThumbnailAdapter
-
+        binding.refreshItem.setOnRefreshListener { itemViewModel.refreshItemList() }
 //        binding.cbInStore.isChecked = itemViewModel.inStoreItem.value
 //        binding.cbInStore.setOnCheckedChangeListener { _, inStore -> itemViewModel.changeInStoreItem(inStore) }
     }
@@ -47,6 +47,7 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
                     itemViewModel
                         .itemList
                         .collectLatest { result ->
+                            binding.refreshItem.isRefreshing = false
                             binding.pbContent.isVisible = result is ResultData.Loading
 
                             val itemList = when (result) {
