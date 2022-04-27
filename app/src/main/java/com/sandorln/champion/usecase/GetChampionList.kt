@@ -27,6 +27,7 @@ class GetChampionList(
                         throw Exception("버전 정보가 없습니다.")
 
                     emit(ResultData.Loading)
+                    /* 너무 빠르게 진행 시 해당 값이 무시됨 */
                     delay(250)
                     val championList = championRepository.getChampionList(championVersion, search)
                     emit(ResultData.Success(championList))

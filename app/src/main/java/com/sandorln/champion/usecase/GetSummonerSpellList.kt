@@ -3,6 +3,7 @@ package com.sandorln.champion.usecase
 import com.sandorln.champion.model.SummonerSpell
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.repository.SummonerSpellRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
@@ -17,6 +18,8 @@ class GetSummonerSpellList(
             .flatMapLatest { totalVersion ->
                 flow {
                     emit(ResultData.Loading)
+                    /* 너무 빠르게 진행 시 해당 값이 무시됨 */
+                    delay(250)
                     val summonerSpellList = summonerSpellRepository.getSummonerSpellList(totalVersion)
                     emit(ResultData.Success(summonerSpellList))
                 }.catch {
