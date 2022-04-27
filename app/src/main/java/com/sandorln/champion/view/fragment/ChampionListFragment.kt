@@ -87,6 +87,7 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
             onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
         }
 
+        binding.error.retry = { championViewModel.refreshChampionList() }
         binding.refreshChampion.setOnRefreshListener { championViewModel.refreshChampionList() }
     }
 
@@ -99,11 +100,12 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                         .collectLatest { result ->
                             binding.refreshChampion.isRefreshing = false
                             binding.pbContent.isVisible = result is ResultData.Loading
+                            binding.error.isVisible = result is ResultData.Failed
 
                             val championList = when (result) {
                                 is ResultData.Success -> result.data ?: mutableListOf()
                                 is ResultData.Failed -> {
-                                    Toast.makeText(requireContext(), result.exception.message, Toast.LENGTH_SHORT).show()
+                                    binding.error.errorMsg = result.exception.message ?: "오류 발생"
                                     result.data ?: mutableListOf()
                                 }
                                 else -> mutableListOf()

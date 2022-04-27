@@ -35,6 +35,7 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
         binding.editSearchItem.doOnTextChanged { text, _, _, _ -> itemViewModel.changeSearchItemName(text.toString()) }
         binding.rvItemList.setHasFixedSize(true)
         binding.rvItemList.adapter = itemThumbnailAdapter
+        binding.error.retry = { itemViewModel.refreshItemList() }
         binding.refreshItem.setOnRefreshListener { itemViewModel.refreshItemList() }
 //        binding.cbInStore.isChecked = itemViewModel.inStoreItem.value
 //        binding.cbInStore.setOnCheckedChangeListener { _, inStore -> itemViewModel.changeInStoreItem(inStore) }
@@ -49,10 +50,14 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
                         .collectLatest { result ->
                             binding.refreshItem.isRefreshing = false
                             binding.pbContent.isVisible = result is ResultData.Loading
+                            binding.error.isVisible = result is ResultData.Failed
 
                             val itemList = when (result) {
                                 is ResultData.Success -> result.data ?: mutableListOf()
-                                is ResultData.Failed -> result.data ?: mutableListOf()
+                                is ResultData.Failed -> {
+                                    binding.error.errorMsg = result.exception.message ?: "오류 발생"
+                                    result.data ?: mutableListOf()
+                                }
                                 else -> mutableListOf()
                             }
 
