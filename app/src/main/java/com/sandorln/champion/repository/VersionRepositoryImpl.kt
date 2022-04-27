@@ -77,10 +77,7 @@ class VersionRepositoryImpl @Inject constructor(
         initVersionList
     }
 
-    override suspend fun getLolChampionVersion(totalVersion: String): String = try {
-        versionDao.getChampionVersion(totalVersion)
-    } catch (e: Exception) {
-        totalVersion
+    override suspend fun getLolChampionVersion(): String = initLolVersion {
+        versionDao.getChampionVersion(versionDao.getTotalVersion())
     }
-
 }
