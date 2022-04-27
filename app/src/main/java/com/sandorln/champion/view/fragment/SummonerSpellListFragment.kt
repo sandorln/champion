@@ -29,6 +29,7 @@ class SummonerSpellListFragment : BaseFragment<FragmentSummonerSpellListBinding>
 
     override fun initViewSetting() {
         binding.rvSummonerSpell.adapter = summonerSpellAdapter
+        binding.refreshSpell.setOnRefreshListener { summonerSpellViewModel.refreshSummonerSpellList() }
     }
 
     override fun initObserverSetting() {
@@ -36,8 +37,10 @@ class SummonerSpellListFragment : BaseFragment<FragmentSummonerSpellListBinding>
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     summonerSpellViewModel
-                        .getSummonerSpellList
+                        .summonerSpellList
                         .collectLatest { result ->
+                            binding.refreshSpell.isRefreshing = false
+
                             when (result) {
                                 is ResultData.Success -> summonerSpellAdapter.submitList(result.data)
                                 is ResultData.Failed -> {

@@ -34,12 +34,19 @@ class ChampionViewModel @Inject constructor(
     private val _showChampionList: MutableStateFlow<ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
     val showChampionList = _showChampionList
         .onStart {
-            (_showChampionList.firstOrNull() as? ResultData.Success)?.data?.let { championList: List<ChampionData> ->
-                /* 현재 보여지고 있는 챔피언 버전과 설정에서 설정된 버전이 다를 시 갱신 */
-                val nowShowChampionVersion = championList.first().version
-                val localChampionVersion = getChampionVersion().first()
-                if (nowShowChampionVersion != localChampionVersion)
-                    refreshChampionList()
+            when (val result = _showChampionList.firstOrNull()) {
+                is ResultData.Success -> {
+                    result.data?.let { championList ->
+                        /* 현재 보여지고 있는 챔피언 버전과 설정에서 설정된 버전이 다를 시 갱신 */
+                        val nowShowChampionVersion = championList.first().version
+                        val localChampionVersion = getChampionVersion().first()
+                        if (nowShowChampionVersion != localChampionVersion)
+                            refreshChampionList()
+                    }
+                }
+                /* 오류 상태였을 경우 곧바로 갱신 */
+                is ResultData.Failed -> refreshChampionList()
+                else -> {}
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
