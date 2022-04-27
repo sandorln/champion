@@ -75,13 +75,19 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
     }
 
     override fun initViewSetting() {
-        binding.rvChampions.setHasFixedSize(true)
-        binding.rvChampions.adapter = championThumbnailAdapter
-
-        binding.editSearchChamp.doOnTextChanged { text, _, _, _ ->
-            championViewModel.changeSearchChampionName(text.toString())
+        with(binding.rvChampions) {
+            setHasFixedSize(true)
+            adapter = championThumbnailAdapter
         }
-        binding.editSearchChamp.onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
+
+        with(binding.editSearchChamp) {
+            doOnTextChanged { text, _, _, _ ->
+                championViewModel.changeSearchChampionName(text.toString())
+            }
+            onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
+        }
+
+        binding.refreshChampion.setOnRefreshListener { championViewModel.refreshChampionList() }
     }
 
     override fun initObserverSetting() {
@@ -91,6 +97,7 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                     championViewModel
                         .showChampionList
                         .collectLatest { result ->
+                            binding.refreshChampion.isRefreshing = false
                             binding.pbContent.isVisible = result is ResultData.Loading
 
                             val championList = when (result) {

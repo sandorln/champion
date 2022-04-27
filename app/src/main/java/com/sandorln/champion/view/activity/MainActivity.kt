@@ -14,7 +14,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override fun initViewSetting() {
-
     }
 
     override fun initObserverSetting() {
