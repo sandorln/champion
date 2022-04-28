@@ -18,13 +18,11 @@ class ChampionRepositoryImpl @Inject constructor(
     lateinit var allChampionList: List<ChampionData>
     private val championMutex = Mutex()
 
-    private suspend fun <T> initAllChampion(totalVersion: String, getChampionData: suspend () -> T): T =
+    private suspend fun <T> initAllChampion(championVersion: String, getChampionData: suspend () -> T): T =
         withContext(Dispatchers.IO) {
             championMutex.withLock {
-                if (totalVersion.isEmpty())
+                if (championVersion.isEmpty())
                     throw Exception("버전 정보가 없습니다")
-
-                val championVersion = versionDao.getChampionVersion(totalVersion)
 
                 /* 먼저 로컬에 있는 챔피언 정보 가져오기 */
                 if (!::allChampionList.isInitialized || allChampionList.firstOrNull()?.version ?: "" != championVersion)
@@ -32,24 +30,27 @@ class ChampionRepositoryImpl @Inject constructor(
 
                 /* 버전에 맞는 챔피언들이 저장이 안되어있을 시 서버에서 다시 받아오기 */
                 if (allChampionList.isEmpty()) {
-                    val response = championService.getAllChampion(totalVersion)
+                    val response = championService.getAllChampion(championVersion)
                     response.parsingData()
                     championDao.insertChampionList(response.championList)
 
-                    val serverChampionVersion = response.championList.firstOrNull()?.version ?: totalVersion
+                    val serverChampionVersion = response.championList.firstOrNull()?.version ?: championVersion
                     /* 다음번에 토탈 버전과 챔피언 버전을 매칭할 수 있도록 저장 */
-                    versionDao.insertChampionVersion(totalVersion, serverChampionVersion)
+                    versionDao.insertChampionVersion(championVersion, serverChampionVersion)
                     allChampionList = championDao.getAllChampion(serverChampionVersion)
                 }
             }
             getChampionData()
         }
 
-    override suspend fun getChampionList(totalVersion: String, search: String): List<ChampionData> = initAllChampion(totalVersion) {
+    override suspend fun getChampionList(championVersion: String, search: String): List<ChampionData> = initAllChampion(championVersion) {
         /* 검색어에 맞는 챔피언 필터 */
         allChampionList.filter { champion ->
             /* 검색어 / 검색 대상 공백 제거 */
-            champion.name.replace(" ", "").startsWith(search.replace(" ", ""))
+            val searchChampionName = search.replace(" ", "")
+            val championName = champion.name.replace(" ", "")
+
+            championName.contains(searchChampionName)
         }
     }
 

@@ -8,4 +8,7 @@
         <attr name="itemListTitleName" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="SearchBar">
+        <attr name="searchBarHint" format="string" />
+    </declare-styleable>
 </resources>

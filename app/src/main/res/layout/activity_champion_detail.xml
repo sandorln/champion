@@ -178,7 +178,7 @@
                         android:id="@+id/layout_no_skill"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:background="@drawable/bg_no_skill"
+                        android:background="@drawable/bg_error"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:visibility="gone"
@@ -188,7 +188,7 @@
                         <ImageView
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:src="@drawable/ic_no_skill" />
+                            android:src="@drawable/ic_error" />
 
                         <TextView
                             style="@style/Base.Widget.AppCompat.TextView.TitleStyle"

@@ -1,7 +1,6 @@
 package com.sandorln.champion.view.fragment
 
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,12 +31,10 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
     }
 
     override fun initViewSetting() {
-        binding.editSearchItem.doOnTextChanged { text, _, _, _ -> itemViewModel.changeSearchItemName(text.toString()) }
         binding.rvItemList.setHasFixedSize(true)
         binding.rvItemList.adapter = itemThumbnailAdapter
-
-//        binding.cbInStore.isChecked = itemViewModel.inStoreItem.value
-//        binding.cbInStore.setOnCheckedChangeListener { _, inStore -> itemViewModel.changeInStoreItem(inStore) }
+        binding.error.retry = { itemViewModel.refreshItemList() }
+        binding.refreshItem.setOnRefreshListener { itemViewModel.refreshItemList() }
     }
 
     override fun initObserverSetting() {
@@ -47,15 +44,29 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
                     itemViewModel
                         .itemList
                         .collectLatest { result ->
+                            binding.refreshItem.isRefreshing = false
                             binding.pbContent.isVisible = result is ResultData.Loading
+                            binding.error.isVisible = result is ResultData.Failed
 
                             val itemList = when (result) {
                                 is ResultData.Success -> result.data ?: mutableListOf()
-                                is ResultData.Failed -> result.data ?: mutableListOf()
+                                is ResultData.Failed -> {
+                                    binding.error.errorMsg = result.exception.message ?: "오류 발생"
+                                    result.data ?: mutableListOf()
+                                }
                                 else -> mutableListOf()
                             }
 
                             itemThumbnailAdapter.submitList(itemList)
+                        }
+                }
+
+                launch {
+                    binding
+                        .searchBar
+                        .inputTextFlow
+                        .collectLatest { search ->
+                            itemViewModel.changeSearchItemName(search)
                         }
                 }
             }

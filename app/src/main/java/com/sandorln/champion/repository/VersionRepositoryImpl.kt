@@ -65,22 +65,27 @@ class VersionRepositoryImpl @Inject constructor(
             getVersionData()
         }
 
-    override suspend fun getLolVersion(): String = initLolVersion {
-        versionDao.getTotalVersion()
-    }
-
     override suspend fun changeLolVersion(version: String) {
         versionDao.insertTotalVersion(version)
+    }
+
+    override suspend fun getLolVersion(): String = initLolVersion {
+        versionDao.getTotalVersion()
     }
 
     override suspend fun getLolVersionList(): List<String> = initLolVersion {
         initVersionList
     }
 
-    override suspend fun getLolChampionVersion(totalVersion: String): String = try {
-        versionDao.getChampionVersion(totalVersion)
-    } catch (e: Exception) {
-        totalVersion
+    override suspend fun getLolChampionVersion(): String = initLolVersion {
+        versionDao.getChampionVersion(versionDao.getTotalVersion())
     }
 
+    override suspend fun getLolItemVersion(): String = initLolVersion {
+        versionDao.getItemVersion(versionDao.getTotalVersion())
+    }
+
+    override suspend fun getLolSummonerSpellVersion(): String = initLolVersion {
+        versionDao.getSummonerSpellVersion(versionDao.getTotalVersion())
+    }
 }

@@ -11,9 +11,7 @@ interface VersionRepository {
     suspend fun changeLolVersion(version: String)
     suspend fun getLolVersionList(): List<String>
 
-    /**
-     * Total Version 과 Champion Version 이 다른 경우가 있어서
-     * 해당 Total Version 에 맞는 Champion Version 을 불러오기
-     */
-    suspend fun getLolChampionVersion(totalVersion: String): String
+    suspend fun getLolChampionVersion(): String
+    suspend fun getLolItemVersion(): String
+    suspend fun getLolSummonerSpellVersion(): String
 }

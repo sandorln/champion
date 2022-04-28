@@ -3,64 +3,57 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_height="match_parent"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <com.sandorln.champion.view.custom.SearchBar
+            android:id="@+id/search_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/input_layout_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:hint="아이템 이름"
-                android:paddingStart="@dimen/padding_large"
-                android:paddingEnd="@dimen/padding_large"
-                android:textColorHint="@android:color/white"
-                app:boxBackgroundColor="@android:color/white"
-                app:boxStrokeColor="@null"
-                app:hintTextColor="@color/colorAccent"
-                app:layout_constraintBottom_toTopOf="@id/rv_item_list"
-                app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/refresh_item"
+            app:layout_constraintTop_toTopOf="parent"
+            app:searchBarHint="아이템 검색" />
 
-                <com.sandorln.champion.view.custom.ClearFocusEditText
-                    android:id="@+id/edit_search_item"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/refresh_item"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_bar">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_item_list"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:overScrollMode="never"
+                    android:paddingStart="@dimen/padding_large"
+                    android:paddingEnd="@dimen/padding_large"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="7"
+                    tools:listitem="@layout/item_item_thumbnail" />
+
+                <androidx.core.widget.ContentLoadingProgressBar
+                    android:id="@+id/pb_content"
+                    style="@style/Widget.AppCompat.ProgressBar"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/black"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:textColor="@android:color/white"
-                    android:textCursorDrawable="@android:color/white" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    app:layout_constraintBottom_toBottomOf="@id/rv_item_list"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/rv_item_list" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_item_list"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:orientation="vertical"
-                android:paddingStart="@dimen/padding_large"
-                android:paddingEnd="@dimen/padding_large"
-                android:overScrollMode="never"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_layout_search"
-                app:spanCount="7"
-                tools:listitem="@layout/item_item_thumbnail" />
-
-            <androidx.core.widget.ContentLoadingProgressBar
-                android:id="@+id/pb_content"
-                style="@style/Widget.AppCompat.ProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/rv_item_list"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/rv_item_list" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                <com.sandorln.champion.view.custom.ErrorView
+                    android:id="@+id/error"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

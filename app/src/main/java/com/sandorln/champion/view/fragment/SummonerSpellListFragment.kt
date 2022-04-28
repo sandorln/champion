@@ -1,5 +1,6 @@
 package com.sandorln.champion.view.fragment
 
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +30,8 @@ class SummonerSpellListFragment : BaseFragment<FragmentSummonerSpellListBinding>
 
     override fun initViewSetting() {
         binding.rvSummonerSpell.adapter = summonerSpellAdapter
+        binding.error.retry = { summonerSpellViewModel.refreshSummonerSpellList() }
+        binding.refreshSpell.setOnRefreshListener { summonerSpellViewModel.refreshSummonerSpellList() }
     }
 
     override fun initObserverSetting() {
@@ -36,17 +39,21 @@ class SummonerSpellListFragment : BaseFragment<FragmentSummonerSpellListBinding>
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     summonerSpellViewModel
-                        .getSummonerSpellList
+                        .summonerSpellList
                         .collectLatest { result ->
-                            when (result) {
-                                is ResultData.Success -> summonerSpellAdapter.submitList(result.data)
+                            binding.refreshSpell.isRefreshing = false
+                            binding.pbContent.isVisible = result is ResultData.Loading
+                            binding.error.isVisible = result is ResultData.Failed
+
+                            val summonerSpellList = when (result) {
+                                is ResultData.Success -> result.data ?: mutableListOf()
                                 is ResultData.Failed -> {
-
+                                    binding.error.errorMsg = result.exception.message ?: "오류 발생"
+                                    result.data ?: mutableListOf()
                                 }
-                                else -> {
-
-                                }
+                                else -> mutableListOf()
                             }
+                            summonerSpellAdapter.submitList(summonerSpellList)
                         }
                 }
             }
