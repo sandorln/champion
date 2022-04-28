@@ -40,7 +40,7 @@ class ItemViewModel @Inject constructor(
                 is ResultData.Success -> {
                     result.data?.let { itemList ->
                         /* 현재 보여지고 있는 아이템 버전과 설정에서 설정된 버전이 다를 시 갱신 */
-                        val nowShowItemVersion = itemList.first().version
+                        val nowShowItemVersion = itemList.firstOrNull()?.version ?: ""
                         val localItemVersion = getItemVersion().first()
                         if (nowShowItemVersion != localItemVersion)
                             refreshItemList()
