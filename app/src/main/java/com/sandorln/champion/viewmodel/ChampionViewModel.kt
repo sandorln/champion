@@ -28,7 +28,6 @@ class ChampionViewModel @Inject constructor(
     private val getChampionInfo: GetChampionInfo
 ) : AndroidViewModel(context as Application) {
     private val _searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
-    val searchChampionData: StateFlow<String> get() = _searchChampionName
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
 
     private val _showChampionList: MutableStateFlow<ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
@@ -38,7 +37,7 @@ class ChampionViewModel @Inject constructor(
                 is ResultData.Success -> {
                     result.data?.let { championList ->
                         /* 현재 보여지고 있는 챔피언 버전과 설정에서 설정된 버전이 다를 시 갱신 */
-                        val nowShowChampionVersion = championList.first().version
+                        val nowShowChampionVersion = championList.firstOrNull()?.version ?: ""
                         val localChampionVersion = getChampionVersion().first()
                         if (nowShowChampionVersion != localChampionVersion)
                             refreshChampionList()

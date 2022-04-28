@@ -1,7 +1,6 @@
 package com.sandorln.champion.view.fragment
 
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,13 +31,10 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
     }
 
     override fun initViewSetting() {
-        binding.editSearchItem.doOnTextChanged { text, _, _, _ -> itemViewModel.changeSearchItemName(text.toString()) }
         binding.rvItemList.setHasFixedSize(true)
         binding.rvItemList.adapter = itemThumbnailAdapter
         binding.error.retry = { itemViewModel.refreshItemList() }
         binding.refreshItem.setOnRefreshListener { itemViewModel.refreshItemList() }
-//        binding.cbInStore.isChecked = itemViewModel.inStoreItem.value
-//        binding.cbInStore.setOnCheckedChangeListener { _, inStore -> itemViewModel.changeInStoreItem(inStore) }
     }
 
     override fun initObserverSetting() {
@@ -62,6 +58,15 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
                             }
 
                             itemThumbnailAdapter.submitList(itemList)
+                        }
+                }
+
+                launch {
+                    binding
+                        .searchBar
+                        .inputTextFlow
+                        .collectLatest { search ->
+                            itemViewModel.changeSearchItemName(search)
                         }
                 }
             }

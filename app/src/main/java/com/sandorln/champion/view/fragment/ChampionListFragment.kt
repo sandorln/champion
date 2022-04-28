@@ -1,13 +1,9 @@
 package com.sandorln.champion.view.fragment
 
 import android.content.Context
-import android.view.MotionEvent
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,18 +29,11 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
     private lateinit var championThumbnailAdapter: ChampionThumbnailAdapter
 
     private lateinit var inputMethodManager: InputMethodManager
-    private lateinit var cleanBtnClick: View.OnTouchListener                    /* 검색 창 오른쪽 X 버튼 */
 
     override fun initObjectSetting() {
         championThumbnailAdapter = ChampionThumbnailAdapter {
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
-                /* 검색 중 챔피언을 눌렀을 시 _ 키보드 및 검색창 닫기 */
-                if (binding.editSearchChamp.hasFocus()) {
-                    binding.editSearchChamp.clearFocus()
-                    inputMethodManager.hideSoftInputFromWindow(binding.editSearchChamp.windowToken, 0)
-                }
-
                 championViewModel.getChampionDetailInfo(it.version, it.id).firstOrNull { resultData ->
                     val isLoading = resultData is ResultData.Loading
                     binding.pbContent.isVisible = isLoading
@@ -60,31 +49,12 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
         }
 
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        cleanBtnClick = View.OnTouchListener { v, event ->
-            val DRAWABLE_RIGHT = 2
-
-            if (event!!.action == MotionEvent.ACTION_UP &&
-                event.rawX >= (binding.editSearchChamp.right - binding.editSearchChamp.compoundDrawables[DRAWABLE_RIGHT].bounds.width())
-            ) {
-                binding.editSearchChamp.setText("")
-                binding.editSearchChamp.clearFocus()
-                inputMethodManager.hideSoftInputFromWindow(binding.editSearchChamp.windowToken, 0)
-            }
-            return@OnTouchListener false
-        }
     }
 
     override fun initViewSetting() {
         with(binding.rvChampions) {
             setHasFixedSize(true)
             adapter = championThumbnailAdapter
-        }
-
-        with(binding.editSearchChamp) {
-            doOnTextChanged { text, _, _, _ ->
-                championViewModel.changeSearchChampionName(text.toString())
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _, _ -> }
         }
 
         binding.error.retry = { championViewModel.refreshChampionList() }
@@ -116,21 +86,10 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                 }
 
                 launch {
-                    championViewModel
-                        .searchChampionData
-                        .collectLatest { search ->
-                            with(binding.editSearchChamp) {
-                                if (search.isNotEmpty()) {
-                                    /* 검색어를 모두 지우는 아이콘 생성 */
-                                    setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(requireContext(), R.drawable.round_clear_white_18), null)
-                                    setOnTouchListener(cleanBtnClick)
-                                } else {
-                                    /* 검색어가 존재하지 않을 시 검색어를 모두 지우는 아이콘 삭제 */
-                                    setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-                                    setOnTouchListener(null)
-                                }
-                            }
-                        }
+                    binding
+                        .searchBar
+                        .inputTextFlow
+                        .collectLatest { search -> championViewModel.changeSearchChampionName(search) }
                 }
             }
         }
