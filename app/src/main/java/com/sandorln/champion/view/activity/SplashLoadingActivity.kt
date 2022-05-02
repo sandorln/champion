@@ -2,7 +2,6 @@ package com.sandorln.champion.view.activity
 
 import android.content.Intent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -29,31 +28,37 @@ class SplashLoadingActivity : BaseActivity<ActivitySplashLoadingBinding>(R.layou
                     .hasNewLolVersion
                     .collectLatest { result ->
                         when (result) {
-                            is ResultData.Failed -> {}
+                            is ResultData.Failed -> {
+                                showAlertDialog(
+                                    message = "버전 정보를 받아오지 못했습니다",
+                                    positiveBtnName = "재시도",
+                                    negativeBtnName = "종료"
+                                ) { isPositiveBtn ->
+                                    if (isPositiveBtn)
+                                        splashViewModel.refreshHasNewLolVersion()
+                                    else
+                                        finish()
+                                }
+                            }
                             is ResultData.Success -> {
                                 val hasNewLolVersion = result.data == true
 
-                                if (hasNewLolVersion) {
-                                    AlertDialog
-                                        .Builder(this@SplashLoadingActivity)
-                                        .setMessage("설정된 롤 버전보다 최신 롤 버전이 있습니다\n최신 롤 버전으로 변경하시겠습니까?")
-                                        .setPositiveButton("네") { dialog, _ ->
+                                if (hasNewLolVersion)
+                                    showAlertDialog(
+                                        message = "설정된 롤 버전보다 최신 롤 버전이 있습니다\n최신 롤 버전으로 변경하시겠습니까?",
+                                        positiveBtnName = "네",
+                                        negativeBtnName = "아니요"
+                                    ) { isPositiveBtn ->
+                                        if (isPositiveBtn)
                                             lifecycleScope.launchWhenResumed {
                                                 splashViewModel.changeNewestVersion()
-                                                dialog.dismiss()
                                                 startMainActivity()
                                             }
-                                        }
-                                        .setNegativeButton("아니요") { dialog, _ ->
-                                            dialog.dismiss()
+                                        else
                                             startMainActivity()
-                                        }
-                                        .setCancelable(false)
-                                        .create()
-                                        .show()
-                                } else {
+                                    }
+                                else
                                     startMainActivity()
-                                }
                             }
                             else -> {}
                         }
