@@ -34,7 +34,7 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutId
         positiveBtnName: String = "확인",
         negativeBtnName: String = "취소",
         onClickListener: (isPositiveBtn: Boolean) -> Unit = {}
-    ) = (requireContext().applicationContext as? ChampionApplication)?.showAlertDialog(message, title, positiveBtnName, negativeBtnName, onClickListener)
+    ) = (requireContext().applicationContext as? ChampionApplication)?.showAlertDialog(requireContext(), message, title, positiveBtnName, negativeBtnName, onClickListener)
 
     fun showToast(message: String) = (requireContext().applicationContext as? ChampionApplication)?.showToast(message)
 }
