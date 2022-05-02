@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.SummonerSpell
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.usecase.GetSummonerSpellList
-import com.sandorln.champion.usecase.GetSummonerSpellVersion
+import com.sandorln.champion.usecase.GetSummonerSpellListUseCase
+import com.sandorln.champion.usecase.GetSummonerSpellVersionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SummonerSpellViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val getSummonerSpellVersion: GetSummonerSpellVersion,
-    private val getSummonerSpellList: GetSummonerSpellList
+    private val getSummonerSpellVersionUseCase: GetSummonerSpellVersionUseCase,
+    private val getSummonerSpellListUseCase: GetSummonerSpellListUseCase
 ) : AndroidViewModel(context as Application) {
     private val _summonerSpellList: MutableStateFlow<ResultData<List<SummonerSpell>>> = MutableStateFlow(ResultData.Loading)
     val summonerSpellList = _summonerSpellList
@@ -29,7 +29,7 @@ class SummonerSpellViewModel @Inject constructor(
                     result.data?.let { itemList ->
                         /* 현재 보여지고 있는 소환사 주문 버전과 설정에서 설정된 버전이 다를 시 갱신 */
                         val nowShowSummonerSpellVersion = itemList.first().version
-                        val localSummonerSpellVersion = getSummonerSpellVersion().first()
+                        val localSummonerSpellVersion = getSummonerSpellVersionUseCase().first()
                         if (nowShowSummonerSpellVersion != localSummonerSpellVersion)
                             refreshSummonerSpellList()
                     }
@@ -41,6 +41,6 @@ class SummonerSpellViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
     fun refreshSummonerSpellList() = viewModelScope.launch(Dispatchers.IO) {
-        _summonerSpellList.emitAll(getSummonerSpellList())
+        _summonerSpellList.emitAll(getSummonerSpellListUseCase())
     }
 }
