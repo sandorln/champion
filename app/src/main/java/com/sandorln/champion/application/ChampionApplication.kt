@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.sandorln.champion.R
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.sandorln.champion">
+    package="com.sandorln.champion">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-            android:name=".application.ChampionApplication"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="${appName}"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/AppTheme"
-            android:usesCleartextTraffic="true">
+        android:name=".application.ChampionApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="${appName}"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
 
         <activity
-                android:name="com.sandorln.champion.view.activity.SplashLoadingActivity"
-                android:exported="true"
-                android:noHistory="true"
-                android:screenOrientation="fullSensor">
+            android:name="com.sandorln.champion.view.activity.SplashLoadingActivity"
+            android:exported="true"
+            android:noHistory="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -26,19 +26,19 @@
         </activity>
 
         <activity
-                android:name="com.sandorln.champion.view.activity.MainActivity"
-                android:exported="true"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustPan">
+            android:name="com.sandorln.champion.view.activity.MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
 
         <activity
-                android:name=".view.activity.ChampionDetailActivity"
-                android:exported="true"
-                android:screenOrientation="portrait" />
+            android:name=".view.activity.ChampionDetailActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
