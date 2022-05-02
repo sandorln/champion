@@ -30,7 +30,7 @@ abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId
         positiveBtnName: String = "확인",
         negativeBtnName: String = "취소",
         onClickListener: (isPositiveBtn: Boolean) -> Unit = {}
-    ) = (applicationContext as? ChampionApplication)?.showAlertDialog(message, title, positiveBtnName, negativeBtnName, onClickListener)
+    ) = (applicationContext as? ChampionApplication)?.showAlertDialog(this, message, title, positiveBtnName, negativeBtnName, onClickListener)
 
     fun showToast(message: String) = (applicationContext as? ChampionApplication)?.showToast(message)
 }

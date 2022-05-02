@@ -17,6 +17,7 @@ class ChampionApplication : Application() {
     }
 
     fun showAlertDialog(
+        context: Context,
         message: String,
         title: String = "",
         positiveBtnName: String = "확인",
@@ -24,7 +25,7 @@ class ChampionApplication : Application() {
         onClickListener: (isPositiveBtn: Boolean) -> Unit = {}
     ) {
         AlertDialog
-            .Builder(this).apply {
+            .Builder(context).apply {
                 if (title.isNotEmpty()) setTitle(title)
                 if (message.isNotEmpty()) setMessage(message)
 
