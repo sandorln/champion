@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class HasNewLolVersionUseCase @Inject constructor(
-    private val getVersionList: GetVersionList,
-    private val getVersion: GetVersion
+    private val getVersionList: GetVersionListUseCase,
+    private val getVersion: GetVersionUseCase
 ) {
     operator fun invoke(): Flow<ResultData<Boolean>> = flow {
         emit(ResultData.Loading)
