@@ -234,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/padding_xsmall"
                     android:padding="0dp"
-                    android:text="스킬 제목"
+                    android:text=""
                     android:textColor="@color/base"
                     android:textSize="12.5dp" />
 
@@ -246,7 +246,7 @@
                     android:minHeight="75dp"
                     android:paddingStart="@dimen/padding_xlarge"
                     android:paddingEnd="@dimen/padding_xlarge"
-                    android:text="스킬 정보" />
+                    android:text="" />
 
                 <!-- Skin -->
                 <com.sandorln.champion.view.custom.AdapterTitleTextView

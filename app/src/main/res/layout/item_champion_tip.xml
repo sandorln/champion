@@ -10,6 +10,6 @@
                 style="@style/Base.Widget.AppCompat.TextView.TipStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="팁입니다" />
+                android:text="" />
     </LinearLayout>
 </layout>
