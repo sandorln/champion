@@ -1,9 +1,6 @@
 package com.sandorln.champion.di
 
-import com.sandorln.champion.repository.ChampionRepository
-import com.sandorln.champion.repository.ItemRepository
-import com.sandorln.champion.repository.SummonerSpellRepository
-import com.sandorln.champion.repository.VersionRepository
+import com.sandorln.champion.repository.*
 import com.sandorln.champion.usecase.*
 import dagger.Module
 import dagger.Provides
@@ -20,7 +17,8 @@ class UseCaseModule {
     fun providesGetChampionVersion(versionRepo: VersionRepository): GetChampionVersionUseCase = GetChampionVersionUseCase(versionRepo)
 
     @Provides
-    fun providesGetChampionList(getChampionVersionUseCase: GetChampionVersionUseCase, champRepo: ChampionRepository): GetChampionListUseCase = GetChampionListUseCase(getChampionVersionUseCase, champRepo)
+    fun providesGetChampionList(getChampionVersionUseCase: GetChampionVersionUseCase, champRepo: ChampionRepository): GetChampionListUseCase =
+        GetChampionListUseCase(getChampionVersionUseCase, champRepo)
 
     @Provides
     fun providesGetChampionInfo(champRepo: ChampionRepository): GetChampionInfoUseCase = GetChampionInfoUseCase(champRepo)
@@ -48,4 +46,10 @@ class UseCaseModule {
 
     @Provides
     fun providesGetSummonerSpellVersion(versionRepo: VersionRepository): GetSummonerSpellVersionUseCase = GetSummonerSpellVersionUseCase(versionRepo)
+
+    @Provides
+    fun providesGetAppSetting(appSettingRepository: AppSettingRepository) = GetAppSettingUseCase(appSettingRepository)
+
+    @Provides
+    fun providesToggleAppSetting(appSettingRepository: AppSettingRepository) = ToggleAppSettingUseCase(appSettingRepository)
 }

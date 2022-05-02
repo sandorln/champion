@@ -29,4 +29,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindsSummonerSpellRepository(summonerSpellRepository: SummonerSpellRepositoryImpl): SummonerSpellRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindsAppSettingRepository(appSettingRepositoryImpl: AppSettingRepositoryImpl): AppSettingRepository
 }
