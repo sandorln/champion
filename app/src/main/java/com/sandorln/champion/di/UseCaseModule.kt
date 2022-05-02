@@ -48,4 +48,10 @@ class UseCaseModule {
 
     @Provides
     fun providesGetSummonerSpellVersion(versionRepo: VersionRepository): GetSummonerSpellVersion = GetSummonerSpellVersion(versionRepo)
+
+    @Provides
+    fun providesHasNewLolVersion(getVersionList: GetVersionList, getVersion: GetVersion) = HasNewLolVersionUseCase(getVersionList, getVersion)
+
+    @Provides
+    fun providesChangeNewestLolVersion(getVersionList: GetVersionList, changeVersion: ChangeVersion) = ChangeNewestVersionUseCase(getVersionList, changeVersion)
 }
