@@ -16,6 +16,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/padding_xxlarge"
+                android:checked="false"
                 app:cardBackgroundColor="@color/gray_141414"
                 app:cardCornerRadius="@dimen/padding_large"
                 app:contentPadding="@dimen/padding_small">
