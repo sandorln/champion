@@ -8,6 +8,7 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.sandorln.champion.application.ChampionApplication
 
 abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutId: Int) : Fragment() {
     lateinit var binding: T
@@ -26,4 +27,14 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutId
     abstract fun initObjectSetting()
     abstract fun initViewSetting()
     abstract fun initObserverSetting()
+
+    fun showAlertDialog(
+        message: String,
+        title: String = "",
+        positiveBtnName: String = "확인",
+        negativeBtnName: String = "취소",
+        onClickListener: (isPositiveBtn: Boolean) -> Unit = {}
+    ) = (requireContext().applicationContext as? ChampionApplication)?.showAlertDialog(requireContext(), message, title, positiveBtnName, negativeBtnName, onClickListener)
+
+    fun showToast(message: String) = (requireContext().applicationContext as? ChampionApplication)?.showToast(message)
 }

@@ -1,6 +1,7 @@
 package com.sandorln.champion.view.fragment
 
-import android.view.View
+import android.annotation.SuppressLint
+import android.view.MotionEvent
 import android.widget.PopupWindow
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -8,11 +9,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentAppSettingBinding
+import com.sandorln.champion.model.type.AppSettingType
 import com.sandorln.champion.util.showStringListPopup
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.AppSettingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -25,8 +28,9 @@ class AppSettingFragment : BaseFragment<FragmentAppSettingBinding>(R.layout.frag
     override fun initObjectSetting() {
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun initViewSetting() {
-        val changeVersionListener = View.OnClickListener {
+        binding.cardVersion.setOnClickListener {
             lifecycleScope.launchWhenResumed {
                 val versionList: List<String> = appSettingViewModel.versionList.firstOrNull() ?: mutableListOf()
                 PopupWindow(requireContext()).showStringListPopup(binding.tvVersion, versionList) { selectVersion ->
@@ -34,9 +38,13 @@ class AppSettingFragment : BaseFragment<FragmentAppSettingBinding>(R.layout.frag
                 }
             }
         }
-
-        binding.imgDown.setOnClickListener(changeVersionListener)
-        binding.tvVersion.setOnClickListener(changeVersionListener)
+        binding.checkQuestionNewestLolVersion.setOnTouchListener { view, motionEvent ->
+            if (motionEvent != null && motionEvent.actionMasked == MotionEvent.ACTION_DOWN) {
+                appSettingViewModel.changeAppSetting(AppSettingType.QUESTION_NEWEST_LOL_VERSION)
+                true
+            } else
+                false
+        }
     }
 
     override fun initObserverSetting() {
@@ -48,6 +56,16 @@ class AppSettingFragment : BaseFragment<FragmentAppSettingBinding>(R.layout.frag
                         .collectLatest { version ->
                             binding.tvVersion.text = version
                         }
+
+                }
+
+                launch {
+                    appSettingViewModel
+                        .questionNewestLolVersion
+                        .collectLatest {
+                            binding.checkQuestionNewestLolVersion.isChecked = it
+                        }
+
                 }
             }
         }

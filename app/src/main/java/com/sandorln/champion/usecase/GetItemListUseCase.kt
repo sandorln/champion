@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 
-class GetItemList(
-    private val getVersion: GetVersion,
+class GetItemListUseCase(
+    private val getVersionUseCase: GetVersionUseCase,
     private val itemRepository: ItemRepository
 ) {
     operator fun invoke(search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>> =
-        getVersion()
+        getVersionUseCase()
             .flatMapLatest { totalVersion ->
                 flow {
                     emit(ResultData.Loading)

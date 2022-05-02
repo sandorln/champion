@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 
-class FindItemById(
-    private val getVersion: GetVersion,
+class FindItemByIdUseCase(
+    private val getVersionUseCase: GetVersionUseCase,
     private val itemRepository: ItemRepository
 ) {
     operator fun invoke(itemId: String): Flow<ResultData<ItemData>> =
-        getVersion()
+        getVersionUseCase()
             .flatMapLatest { totalVersion ->
                 flow {
                     emit(ResultData.Loading)

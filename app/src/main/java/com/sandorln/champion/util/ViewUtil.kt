@@ -1,6 +1,5 @@
 package com.sandorln.champion.util
 
-import android.R
 import android.view.View
 import android.widget.*
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -17,7 +16,7 @@ fun ImageView.setChampionSplash(championId: String, skinNum: String) {
 
 fun PopupWindow.showStringListPopup(popupTargetView: View, versionList: List<String>, onClickVersionListener: (version: String) -> Unit) {
     val context = popupTargetView.context
-    val adapter: ArrayAdapter<String> = ArrayAdapter(context, R.layout.simple_dropdown_item_1line, versionList)
+    val adapter: ArrayAdapter<String> = ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, versionList)
     val listViewSort = ListView(context)
     listViewSort.adapter = adapter
 

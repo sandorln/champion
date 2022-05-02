@@ -9,9 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.usecase.GetChampionInfo
-import com.sandorln.champion.usecase.GetChampionList
-import com.sandorln.champion.usecase.GetChampionVersion
+import com.sandorln.champion.usecase.GetChampionInfoUseCase
+import com.sandorln.champion.usecase.GetChampionListUseCase
+import com.sandorln.champion.usecase.GetChampionVersionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +23,9 @@ import javax.inject.Inject
 class ChampionViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val savedStateHandle: SavedStateHandle,
-    private val getChampionVersion: GetChampionVersion,
-    private val getChampionList: GetChampionList,
-    private val getChampionInfo: GetChampionInfo
+    private val getChampionVersionUseCase: GetChampionVersionUseCase,
+    private val getChampionListUseCase: GetChampionListUseCase,
+    private val getChampionInfoUseCase: GetChampionInfoUseCase
 ) : AndroidViewModel(context as Application) {
     private val _searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
@@ -38,7 +38,7 @@ class ChampionViewModel @Inject constructor(
                     result.data?.let { championList ->
                         /* 현재 보여지고 있는 챔피언 버전과 설정에서 설정된 버전이 다를 시 갱신 */
                         val nowShowChampionVersion = championList.firstOrNull()?.version ?: ""
-                        val localChampionVersion = getChampionVersion().first()
+                        val localChampionVersion = getChampionVersionUseCase().first()
                         if (nowShowChampionVersion != localChampionVersion)
                             refreshChampionList()
                     }
@@ -50,16 +50,16 @@ class ChampionViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
-    fun refreshChampionList() = viewModelScope.launch(Dispatchers.IO) { _showChampionList.emitAll(getChampionList(_searchChampionName.value)) }
+    fun refreshChampionList() = viewModelScope.launch(Dispatchers.IO) { _showChampionList.emitAll(getChampionListUseCase(_searchChampionName.value)) }
 
 
-    fun getChampionDetailInfo(championVersion: String, championId: String) = getChampionInfo(championVersion, championId)
+    fun getChampionDetailInfo(championVersion: String, championId: String) = getChampionInfoUseCase(championVersion, championId)
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())
 
     init {
         viewModelScope.launch {
             _searchChampionName
-                .transform { search -> emitAll(getChampionList(search)) }
+                .transform { search -> emitAll(getChampionListUseCase(search)) }
                 .collectLatest { _showChampionList.emit(it) }
         }
     }

@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
-class GetVersionList(private val versionRepository: VersionRepository) {
-    operator fun invoke(): Flow<List<String>> =
+class GetVersionUseCase(private val versionRepository: VersionRepository) {
+    operator fun invoke(): Flow<String> =
         flow {
-            emit(versionRepository.getLolVersionList())
+            emit(versionRepository.getLolVersion())
         }.catch {
-            emit(mutableListOf())
+            emit("")
         }
 }

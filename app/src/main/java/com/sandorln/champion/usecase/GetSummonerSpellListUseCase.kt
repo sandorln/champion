@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 
-class GetSummonerSpellList(
-    private val getVersion: GetVersion,
+class GetSummonerSpellListUseCase(
+    private val getVersionUseCase: GetVersionUseCase,
     private val summonerSpellRepository: SummonerSpellRepository
 ) {
     operator fun invoke(): Flow<ResultData<List<SummonerSpell>>> =
-        getVersion()
+        getVersionUseCase()
             .flatMapLatest { totalVersion ->
                 flow {
                     emit(ResultData.Loading)

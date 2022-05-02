@@ -1,9 +1,6 @@
 package com.sandorln.champion.di
 
-import com.sandorln.champion.repository.ChampionRepository
-import com.sandorln.champion.repository.ItemRepository
-import com.sandorln.champion.repository.SummonerSpellRepository
-import com.sandorln.champion.repository.VersionRepository
+import com.sandorln.champion.repository.*
 import com.sandorln.champion.usecase.*
 import dagger.Module
 import dagger.Provides
@@ -17,35 +14,42 @@ class UseCaseModule {
     fun providesGetVersionCategory(versionRepo: VersionRepository): GetVersionCategory = GetVersionCategory(versionRepo)
 
     @Provides
-    fun providesGetChampionVersion(versionRepo: VersionRepository): GetChampionVersion = GetChampionVersion(versionRepo)
+    fun providesGetChampionVersion(versionRepo: VersionRepository): GetChampionVersionUseCase = GetChampionVersionUseCase(versionRepo)
 
     @Provides
-    fun providesGetChampionList(getChampionVersion: GetChampionVersion, champRepo: ChampionRepository): GetChampionList = GetChampionList(getChampionVersion, champRepo)
+    fun providesGetChampionList(getChampionVersionUseCase: GetChampionVersionUseCase, champRepo: ChampionRepository): GetChampionListUseCase =
+        GetChampionListUseCase(getChampionVersionUseCase, champRepo)
 
     @Provides
-    fun providesGetChampionInfo(champRepo: ChampionRepository): GetChampionInfo = GetChampionInfo(champRepo)
+    fun providesGetChampionInfo(champRepo: ChampionRepository): GetChampionInfoUseCase = GetChampionInfoUseCase(champRepo)
 
     @Provides
-    fun providesGetItemList(getVersion: GetVersion, itemRepo: ItemRepository) = GetItemList(getVersion, itemRepo)
+    fun providesGetItemList(getVersionUseCase: GetVersionUseCase, itemRepo: ItemRepository) = GetItemListUseCase(getVersionUseCase, itemRepo)
 
     @Provides
-    fun providesFindItemById(getVersion: GetVersion, itemRepo: ItemRepository) = FindItemById(getVersion, itemRepo)
+    fun providesFindItemById(getVersionUseCase: GetVersionUseCase, itemRepo: ItemRepository) = FindItemByIdUseCase(getVersionUseCase, itemRepo)
 
     @Provides
-    fun providesGetSummonerSpellList(getVersion: GetVersion, summonerRepo: SummonerSpellRepository) = GetSummonerSpellList(getVersion, summonerRepo)
+    fun providesGetSummonerSpellList(getVersionUseCase: GetVersionUseCase, summonerRepo: SummonerSpellRepository) = GetSummonerSpellListUseCase(getVersionUseCase, summonerRepo)
 
     @Provides
-    fun providesGetVersion(versionRepo: VersionRepository): GetVersion = GetVersion(versionRepo)
+    fun providesGetVersion(versionRepo: VersionRepository): GetVersionUseCase = GetVersionUseCase(versionRepo)
 
     @Provides
-    fun providesGetVersionList(versionRepo: VersionRepository): GetVersionList = GetVersionList(versionRepo)
+    fun providesGetVersionList(versionRepo: VersionRepository): GetVersionListUseCase = GetVersionListUseCase(versionRepo)
 
     @Provides
-    fun providesChangeVersion(versionRepo: VersionRepository): ChangeVersion = ChangeVersion(versionRepo)
+    fun providesChangeVersion(versionRepo: VersionRepository): ChangeVersionUseCase = ChangeVersionUseCase(versionRepo)
 
     @Provides
-    fun providesGetItemVersion(versionRepo: VersionRepository): GetItemVersion = GetItemVersion(versionRepo)
+    fun providesGetItemVersion(versionRepo: VersionRepository): GetItemVersionUseCase = GetItemVersionUseCase(versionRepo)
 
     @Provides
-    fun providesGetSummonerSpellVersion(versionRepo: VersionRepository): GetSummonerSpellVersion = GetSummonerSpellVersion(versionRepo)
+    fun providesGetSummonerSpellVersion(versionRepo: VersionRepository): GetSummonerSpellVersionUseCase = GetSummonerSpellVersionUseCase(versionRepo)
+
+    @Provides
+    fun providesGetAppSetting(appSettingRepository: AppSettingRepository) = GetAppSettingUseCase(appSettingRepository)
+
+    @Provides
+    fun providesToggleAppSetting(appSettingRepository: AppSettingRepository) = ToggleAppSettingUseCase(appSettingRepository)
 }
