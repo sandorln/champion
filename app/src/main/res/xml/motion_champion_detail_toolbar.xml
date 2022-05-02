@@ -52,10 +52,14 @@
         <Constraint
             android:id="@+id/tv_champion_name"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="55dp"
             android:layout_marginStart="0dp"
+            android:layout_marginBottom="10dp"
             android:textColor="@color/base"
             app:layout_constraintBottom_toBottomOf="parent">
+            <CustomAttribute
+                app:attributeName="gravity"
+                app:customStringValue="center" />
             <CustomAttribute
                 app:attributeName="textColor"
                 app:customColorValue="@color/base" />
@@ -67,7 +71,7 @@
         <Constraint
             android:id="@+id/tv_champion_title"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             app:layout_constraintBottom_toTopOf="@id/tv_champion_name"
             app:layout_constraintStart_toStartOf="@id/tv_champion_name">
             <CustomAttribute
@@ -123,11 +127,15 @@
         <Constraint
             android:id="@+id/tv_champion_name"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="25dp"
             android:layout_marginStart="10dp"
+            android:layout_marginBottom="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/card_splash_champion">
+            <CustomAttribute
+                app:attributeName="gravity"
+                app:customStringValue="bottom" />
             <CustomAttribute
                 app:attributeName="textColor"
                 app:customColorValue="@android:color/white" />
@@ -139,7 +147,7 @@
         <Constraint
             android:id="@+id/tv_champion_title"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_champion_name">
