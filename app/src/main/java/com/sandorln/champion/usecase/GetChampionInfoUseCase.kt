@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
-class GetChampionInfo(private val championRepository: ChampionRepository) {
+class GetChampionInfoUseCase(private val championRepository: ChampionRepository) {
     operator fun invoke(championVersion: String, championId: String): Flow<ResultData<ChampionData>> =
         flow {
             emit(ResultData.Loading)

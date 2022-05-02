@@ -12,15 +12,15 @@ import kotlinx.coroutines.flow.flow
 /**
  * 현재 설정된 TotalVersion 에 맞는 챔피언 목록을 가져옴
  *
- * @param getChampionVersion    현재 선택된 TotalVersion 에 맞는 ChampionVersion 을 가져옴
+ * @param getChampionVersionUseCase    현재 선택된 TotalVersion 에 맞는 ChampionVersion 을 가져옴
  *                              만일, 해당 값이 존재하지 않을 시 TotalVersion 을 되돌려줌
  */
-class GetChampionList(
-    private val getChampionVersion: GetChampionVersion,
+class GetChampionListUseCase(
+    private val getChampionVersionUseCase: GetChampionVersionUseCase,
     private val championRepository: ChampionRepository
 ) {
     operator fun invoke(search: String): Flow<ResultData<List<ChampionData>>> =
-        getChampionVersion()
+        getChampionVersionUseCase()
             .flatMapLatest { championVersion ->
                 flow {
                     if (championVersion.isEmpty())

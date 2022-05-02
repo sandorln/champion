@@ -8,9 +8,9 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.ItemData
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.usecase.FindItemById
-import com.sandorln.champion.usecase.GetItemList
-import com.sandorln.champion.usecase.GetItemVersion
+import com.sandorln.champion.usecase.FindItemByIdUseCase
+import com.sandorln.champion.usecase.GetItemListUseCase
+import com.sandorln.champion.usecase.GetItemVersionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +22,9 @@ import javax.inject.Inject
 class ItemViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val savedStateHandle: SavedStateHandle,
-    private val getItemVersion: GetItemVersion,
-    private val getItemList: GetItemList,
-    findItemById: FindItemById
+    private val getItemVersionUseCase: GetItemVersionUseCase,
+    private val getItemListUseCase: GetItemListUseCase,
+    findItemByIdUseCase: FindItemByIdUseCase
 ) : AndroidViewModel(context as Application) {
     private val _searchItemName: MutableStateFlow<String> = MutableStateFlow("")
     fun changeSearchItemName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchItemName.emit(searchName) }
@@ -41,7 +41,7 @@ class ItemViewModel @Inject constructor(
                     result.data?.let { itemList ->
                         /* 현재 보여지고 있는 아이템 버전과 설정에서 설정된 버전이 다를 시 갱신 */
                         val nowShowItemVersion = itemList.firstOrNull()?.version ?: ""
-                        val localItemVersion = getItemVersion().first()
+                        val localItemVersion = getItemVersionUseCase().first()
                         if (nowShowItemVersion != localItemVersion)
                             refreshItemList()
                     }
@@ -53,7 +53,7 @@ class ItemViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
-    fun refreshItemList() = viewModelScope.launch { _itemList.emitAll(getItemList(_searchItemName.value, true)) }
+    fun refreshItemList() = viewModelScope.launch { _itemList.emitAll(getItemListUseCase(_searchItemName.value, true)) }
 
     private val _itemId = savedStateHandle
         .getLiveData<String>("itemId")
@@ -63,13 +63,13 @@ class ItemViewModel @Inject constructor(
     fun changeFindItemId(itemId: String) = savedStateHandle.set("itemId", itemId)
 
     val findItemData = _itemId
-        .flatMapLatest { itemId -> findItemById(itemId) }
+        .flatMapLatest { itemId -> findItemByIdUseCase(itemId) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _searchItemName
-                .transform { search -> emitAll(getItemList(search, true)) }
+                .transform { search -> emitAll(getItemListUseCase(search, true)) }
                 .collectLatest { _itemList.emit(it) }
         }
     }
