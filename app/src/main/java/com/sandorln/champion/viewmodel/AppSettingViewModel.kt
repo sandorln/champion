@@ -34,19 +34,19 @@ class AppSettingViewModel @Inject constructor(
         _version.emit(version)
     }
 
-    private val _questionNewestLolVersion = MutableStateFlow(false).apply {
-        viewModelScope.launch {
-            /* 초기 값 설정 */
-            emit(getAppSettingUseCase(AppSettingType.QUESTION_NEWEST_LOL_VERSION))
-        }
-    }
-    val questionNewestLolVersion: StateFlow<Boolean> = _questionNewestLolVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
     fun changeAppSetting(appSettingType: AppSettingType) {
         viewModelScope.launch(Dispatchers.IO) {
             val toggleValue = toggleAppSettingUseCase(appSettingType)
             when (appSettingType) {
                 AppSettingType.QUESTION_NEWEST_LOL_VERSION -> _questionNewestLolVersion.emit(toggleValue)
+                AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY -> _videoWifiModeAutoPlay.emit(toggleValue)
             }
         }
     }
+
+    private val _questionNewestLolVersion = MutableStateFlow(true).apply { viewModelScope.launch { emit(getAppSettingUseCase(AppSettingType.QUESTION_NEWEST_LOL_VERSION)) } }
+    val questionNewestLolVersion: StateFlow<Boolean> = _questionNewestLolVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+
+    private val _videoWifiModeAutoPlay = MutableStateFlow(true).apply { viewModelScope.launch { emit(getAppSettingUseCase(AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY)) } }
+    val videoWifiModeAutoPlay: StateFlow<Boolean> = _videoWifiModeAutoPlay.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 }

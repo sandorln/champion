@@ -3,6 +3,7 @@
     package="com.sandorln.champion">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".application.ChampionApplication"
@@ -39,6 +40,7 @@
             android:name=".view.activity.ChampionDetailActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>

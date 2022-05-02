@@ -4,11 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.get
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.DefaultRenderersFactory
@@ -30,14 +34,17 @@ import com.sandorln.champion.view.adapter.ChampionFullSkinAdapter
 import com.sandorln.champion.view.adapter.ChampionThumbnailSkillAdapter
 import com.sandorln.champion.view.adapter.ChampionTipAdapter
 import com.sandorln.champion.view.base.BaseActivity
-import com.sandorln.champion.viewmodel.ChampionViewModel
+import com.sandorln.champion.viewmodel.ChampionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @AndroidEntryPoint
 class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.layout.activity_champion_detail) {
     /* ViewModels */
-    private val championViewModel: ChampionViewModel by viewModels()
+    private val championDetailViewModel: ChampionDetailViewModel by viewModels()
 
     /* Adapters */
     private lateinit var championThumbnailSkillAdapter: ChampionThumbnailSkillAdapter
@@ -66,8 +73,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             .setTrackSelector(DefaultTrackSelector(this))
             .build()
             .apply {
-                playWhenReady = true
-                repeatMode = ExoPlayer.REPEAT_MODE_ONE
+                repeatMode = ExoPlayer.REPEAT_MODE_OFF
                 addListener(object : Player.Listener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         super.onPlaybackStateChanged(playbackState)
@@ -145,7 +151,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     }
 
     override fun initObserverSetting() {
-        championViewModel.championData.observe(this, Observer { champion ->
+        championDetailViewModel.championData.observe(this, Observer { champion ->
             binding.imgChampionThumbnail.setChampionThumbnail(champion.version, champion.id)
             binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num ?: "0")
 
@@ -172,6 +178,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             binding.vpFullSkin.offscreenPageLimit = champion.skins.size
             championFullSkinAdapter.championId = champion.id
             championFullSkinAdapter.submitList(champion.skins)
+
             /* 스킨 변경에 따른 상단 이름 및 썸네일 변경 */
             binding.vpFullSkin.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -199,6 +206,24 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                 championEnemyTipAdapter.notifyDataSetChanged()
             }
         })
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                launch {
+                    try {
+                        championDetailViewModel
+                            .getIsWifiConnectFlow()
+                            .collectLatest { isWifiConnect ->
+                                skillExoPlayer?.playWhenReady = if (championDetailViewModel.isVideoWifiModeAutoPlay()) isWifiConnect else true
+                            }
+                    } catch (e: CancellationException) {
+                        Log.e("LOGE", "JOB CANCEL EXCEPTION")
+                    } catch (e: Exception) {
+                        showToast(e.message ?: "Network Callback Error")
+                    }
+                }
+            }
+        }
     }
 
     /**
