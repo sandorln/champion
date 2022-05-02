@@ -13,6 +13,7 @@ class HasNewLolVersionUseCase @Inject constructor(
         emit(ResultData.Loading)
         val version = getVersion().last()
         val versionList = getVersionList().last()
+
         val versionIndex = versionList.indexOfFirst { it == version }
         emit(ResultData.Success(versionIndex != 0))
     }.catch {

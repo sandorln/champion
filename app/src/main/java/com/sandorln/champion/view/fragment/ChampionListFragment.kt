@@ -2,7 +2,6 @@ package com.sandorln.champion.view.fragment
 
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -40,7 +39,8 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
 
                     when (resultData) {
                         is ResultData.Success -> startActivity(ChampionDetailActivity.newIntent(resultData.data ?: throw Exception(""), requireContext()))
-                        is ResultData.Failed -> Toast.makeText(requireContext(), "오류 발생 ${resultData.exception}", Toast.LENGTH_SHORT).show()
+                        is ResultData.Failed -> showToast("오류 발생 ${resultData.exception.message}")
+                        else -> {}
                     }
 
                     !isLoading
