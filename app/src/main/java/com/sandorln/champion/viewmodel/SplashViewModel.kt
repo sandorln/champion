@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.usecase.ChangeNewestVersionUseCase
+import com.sandorln.champion.usecase.GetAppSettingUseCase
 import com.sandorln.champion.usecase.HasNewLolVersionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
