@@ -12,6 +12,7 @@ class ToggleAppSettingUseCase @Inject constructor(
     suspend operator fun invoke(appSettingType: AppSettingType) = withContext(Dispatchers.IO) {
         when (appSettingType) {
             AppSettingType.QUESTION_NEWEST_LOL_VERSION -> appSettingRepository.toggleAppSettingQuestionNewestLolVersion()
+            AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY -> appSettingRepository.toggleAppSettingVideoWifiModeOnlyPlay()
         }
     }
 }

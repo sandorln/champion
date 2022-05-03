@@ -10,7 +10,6 @@
                 android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="챔피언 댓글"
                 android:textColor="@android:color/white"
                 android:textSize="9dp"
                 app:layout_constraintBottom_toBottomOf="parent"

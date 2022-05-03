@@ -4,4 +4,13 @@
     <string name="not_find_data">Not Find Data</string>
     <string name="unknown">UNKNOWN</string>
     <string name="champion_info_title">&lt; %s &gt;</string>
+    <string name="app_setting_newest_lol_version">앱 실행 시 매번 롤 최신 버전으로 변경 여부 묻기</string>
+    <string name="app_setting_video_wifi_mode_only_play">WIFI 모드 시에만 동영상 자동 재생</string>
+    <string name="version">VERSION</string>
+    <string name="search_champion">챔피언 검색</string>
+    <string name="search_item">아이템 검색</string>
+    <string name="retry">다시 시도</string>
+    <string name="pause">pause</string>
+    <string name="play">play</string>
+    <string name="volume">volume</string>
 </resources>

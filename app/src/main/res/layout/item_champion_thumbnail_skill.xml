@@ -34,7 +34,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/padding_xsmall"
                 android:padding="0dp"
-                android:text="Q"
                 app:layout_constraintBottom_toBottomOf="@id/img_champion_skill"
                 app:layout_constraintEnd_toEndOf="@id/img_champion_skill" />
     </androidx.constraintlayout.widget.ConstraintLayout>

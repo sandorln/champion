@@ -23,7 +23,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:singleLine="true"
-                android:text="스킨이름"
                 android:textStyle="italic|bold"
                 app:layout_constraintBottom_toBottomOf="@id/img_champion_skin" />
     </androidx.constraintlayout.widget.ConstraintLayout>

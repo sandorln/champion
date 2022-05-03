@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/refresh_item"
             app:layout_constraintTop_toTopOf="parent"
-            app:searchBarHint="아이템 검색" />
+            app:searchBarHint="@string/search_item" />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refresh_item"

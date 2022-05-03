@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/refresh_champion"
             app:layout_constraintTop_toTopOf="parent"
-            app:searchBarHint="챔피언 검색" />
+            app:searchBarHint="@string/search_champion" />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refresh_champion"
