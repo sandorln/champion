@@ -171,12 +171,15 @@
                         android:id="@+id/exo_player_skill"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
+                        app:show_buffering="always"
                         android:layout_marginTop="@dimen/padding_small"
+                        app:show_timeout="1000"
+                        app:controller_layout_id="@layout/exoplayer_controller"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintDimensionRatio="16:9"
                         app:layout_constraintTop_toTopOf="parent"
                         app:resize_mode="fill"
-                        app:use_controller="false" />
+                        app:use_controller="true" />
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/layout_no_skill"

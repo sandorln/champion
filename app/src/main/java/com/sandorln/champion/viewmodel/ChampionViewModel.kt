@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
+import com.sandorln.champion.usecase.GetAppSettingUseCase
 import com.sandorln.champion.usecase.GetChampionInfoUseCase
 import com.sandorln.champion.usecase.GetChampionListUseCase
 import com.sandorln.champion.usecase.GetChampionVersionUseCase
@@ -25,7 +26,8 @@ class ChampionViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getChampionVersionUseCase: GetChampionVersionUseCase,
     private val getChampionListUseCase: GetChampionListUseCase,
-    private val getChampionInfoUseCase: GetChampionInfoUseCase
+    private val getChampionInfoUseCase: GetChampionInfoUseCase,
+    private val getAppSettingUseCase: GetAppSettingUseCase
 ) : AndroidViewModel(context as Application) {
     private val _searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
@@ -51,7 +53,6 @@ class ChampionViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
     fun refreshChampionList() = viewModelScope.launch(Dispatchers.IO) { _showChampionList.emitAll(getChampionListUseCase(_searchChampionName.value)) }
-
 
     fun getChampionDetailInfo(championVersion: String, championId: String) = getChampionInfoUseCase(championVersion, championId)
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())

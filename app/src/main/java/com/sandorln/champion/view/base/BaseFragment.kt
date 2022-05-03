@@ -28,13 +28,15 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutId
     abstract fun initViewSetting()
     abstract fun initObserverSetting()
 
+    private fun getChampionApplication(): ChampionApplication? = requireContext().applicationContext as? ChampionApplication
+
     fun showAlertDialog(
         message: String,
         title: String = "",
         positiveBtnName: String = "확인",
         negativeBtnName: String = "취소",
         onClickListener: (isPositiveBtn: Boolean) -> Unit = {}
-    ) = (requireContext().applicationContext as? ChampionApplication)?.showAlertDialog(requireContext(), message, title, positiveBtnName, negativeBtnName, onClickListener)
+    ) = getChampionApplication()?.showAlertDialog(requireContext(), message, title, positiveBtnName, negativeBtnName, onClickListener)
 
-    fun showToast(message: String) = (requireContext().applicationContext as? ChampionApplication)?.showToast(message)
+    fun showToast(message: String) = getChampionApplication()?.showToast(message)
 }

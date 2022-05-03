@@ -8,4 +8,6 @@ class AppSettingRepositoryImpl @Inject constructor(
 ) : AppSettingRepository {
     override suspend fun getAppSettingQuestionNewestLolVersion(): Boolean = appSettingDao.settingQuestionNewestLolVersion()
     override suspend fun toggleAppSettingQuestionNewestLolVersion(): Boolean = appSettingDao.toggleAppSettingQuestionNewestLolVersion()
+    override suspend fun getAppSettingVideoWifiModeAutoPlay(): Boolean = appSettingDao.settingVideoWifiModeAutoPlay()
+    override suspend fun toggleAppSettingVideoWifiModeOnlyPlay(): Boolean = appSettingDao.toggleAppSettingVideoWifiModeAutoPlay()
 }

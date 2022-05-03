@@ -2,10 +2,13 @@ package com.sandorln.champion.application
 
 import android.app.Application
 import android.content.Context
+import android.content.IntentFilter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.sandorln.champion.R
+import com.sandorln.champion.service.WifiConnectReceiver
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 
 @HiltAndroidApp
 class ChampionApplication : Application() {
@@ -44,5 +47,15 @@ class ChampionApplication : Application() {
             }
             .create()
             .show()
+    }
+
+    val isWifiConnectFlow = callbackFlow {
+        val wifiConnectReceiver = WifiConnectReceiver { isWifiConnect -> trySend(isWifiConnect) }
+        val intentFilter = IntentFilter().apply {
+            addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        }
+        registerReceiver(wifiConnectReceiver, intentFilter)
+
+        awaitClose { unregisterReceiver(wifiConnectReceiver) }
     }
 }
