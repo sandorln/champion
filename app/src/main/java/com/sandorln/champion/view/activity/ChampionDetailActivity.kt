@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.os.Parcelable
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.get
 import androidx.core.view.isVisible
@@ -21,6 +22,7 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.ui.PlayerControlView
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityChampionDetailBinding
 import com.sandorln.champion.model.ChampionData
@@ -53,6 +55,8 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     private lateinit var championEnemyTipAdapter: ChampionTipAdapter
 
     private var skillExoPlayer: ExoPlayer? = null
+    private var exoController: PlayerControlView? = null
+    private var exoControllerVolume: ImageView? = null
 
     companion object {
         fun newIntent(championData: ChampionData, context: Context): Intent = Intent(context, ChampionDetailActivity::class.java).apply {
@@ -73,21 +77,22 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
             .setTrackSelector(DefaultTrackSelector(this))
             .build()
             .apply {
+                playWhenReady = false
                 repeatMode = ExoPlayer.REPEAT_MODE_OFF
                 addListener(object : Player.Listener {
+                    override fun onVolumeChanged(volume: Float) {
+                        exoControllerVolume?.isSelected = volume > 0
+                    }
+
                     override fun onPlaybackStateChanged(playbackState: Int) {
-                        super.onPlaybackStateChanged(playbackState)
-                        binding.pbLoadingSkill.isVisible = playbackState == Player.STATE_BUFFERING
                         binding.layoutNoSkill.isVisible = playbackState == Player.STATE_IDLE
                     }
 
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
-                        super.onIsPlayingChanged(isPlaying)
                         binding.layoutNoSkill.isVisible = false
                     }
 
                     override fun onPlayerError(error: PlaybackException) {
-                        super.onPlayerError(error)
                         binding.layoutNoSkill.isVisible = true
                     }
                 })
@@ -98,6 +103,18 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
         initAppbarHeight()
 
         binding.imgBack.setOnClickListener { finish() }
+        exoController = binding.exoPlayerSkill.findViewById(R.id.exo_controller)
+        exoControllerVolume = exoController?.findViewById(R.id.exo_volume)
+        exoControllerVolume?.isSelected = true
+        exoControllerVolume?.setOnClickListener {
+            if (exoControllerVolume?.isSelected == true) {
+                binding.exoPlayerSkill.player?.volume = 0f
+                exoControllerVolume?.isSelected = false
+            } else {
+                binding.exoPlayerSkill.player?.volume = 1f
+                exoControllerVolume?.isSelected = true
+            }
+        }
 
         /* 스킬 관련 */
         binding.exoPlayerSkill.player = skillExoPlayer
@@ -212,9 +229,9 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
                 launch {
                     try {
                         championDetailViewModel
-                            .getIsWifiConnectFlow()
-                            .collectLatest { isWifiConnect ->
-                                skillExoPlayer?.playWhenReady = if (championDetailViewModel.isVideoWifiModeAutoPlay()) isWifiConnect else true
+                            .isVideoAutoPlay
+                            .collectLatest { isVideoAutoPlay ->
+                                skillExoPlayer?.playWhenReady = isVideoAutoPlay
                             }
                     } catch (e: CancellationException) {
                         Log.e("LOGE", "JOB CANCEL EXCEPTION")
@@ -260,6 +277,9 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
      * 챔피언 스킬 변경시 사용
      */
     private fun selectChampionSkill(championId: String, spellType: SpellType, championSpell: ChampionSpell) {
+        if (!championDetailViewModel.isVideoAutoPlay.value)
+            skillExoPlayer?.pause()
+
         skillExoPlayer?.playChampionSkill(championId, spellType)
         binding.tvSkillDescription.text = championSpell.description.removeBrFromHtml()
         binding.tvSpellName.text = championSpell.name

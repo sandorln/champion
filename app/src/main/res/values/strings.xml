@@ -10,4 +10,7 @@
     <string name="search_champion">챔피언 검색</string>
     <string name="search_item">아이템 검색</string>
     <string name="retry">다시 시도</string>
+    <string name="pause">pause</string>
+    <string name="play">play</string>
+    <string name="volume">volume</string>
 </resources>

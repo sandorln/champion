@@ -3,7 +3,6 @@ package com.sandorln.champion.application
 import android.app.Application
 import android.content.Context
 import android.content.IntentFilter
-import android.net.ConnectivityManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.sandorln.champion.service.WifiConnectReceiver
@@ -53,7 +52,6 @@ class ChampionApplication : Application() {
     val isWifiConnectFlow = callbackFlow {
         val wifiConnectReceiver = WifiConnectReceiver { isWifiConnect -> trySend(isWifiConnect) }
         val intentFilter = IntentFilter().apply {
-//            addAction("android.net.wifi.STATE_CHANGE")
             addAction("android.net.conn.CONNECTIVITY_CHANGE")
         }
         registerReceiver(wifiConnectReceiver, intentFilter)
