@@ -28,9 +28,12 @@ class ChampionDetailViewModel @Inject constructor(
 ) : AndroidViewModel(context as Application) {
     val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())
 
-    val isVideoAutoPlay = getApplication<ChampionApplication>().isWifiConnectFlow.transform { isWifiConnect ->
-        val isVideoWifiModeAutoPlay = getAppSettingUseCase(AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY)
-        emit(if (isVideoWifiModeAutoPlay) isWifiConnect else true)
-    }.flowOn(Dispatchers.IO)
+    val isVideoAutoPlay = getApplication<ChampionApplication>()
+        .isWifiConnectFlow
+        .transform { isWifiConnect ->
+            val isVideoWifiModeAutoPlay = getAppSettingUseCase(AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY)
+            emit(if (isVideoWifiModeAutoPlay) isWifiConnect else true)
+        }
+        .flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Parcelable
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -38,7 +37,6 @@ import com.sandorln.champion.view.adapter.ChampionTipAdapter
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.ChampionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -227,17 +225,11 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
-                    try {
-                        championDetailViewModel
-                            .isVideoAutoPlay
-                            .collectLatest { isVideoAutoPlay ->
-                                skillExoPlayer?.playWhenReady = isVideoAutoPlay
-                            }
-                    } catch (e: CancellationException) {
-                        Log.e("LOGE", "JOB CANCEL EXCEPTION")
-                    } catch (e: Exception) {
-                        showToast(e.message ?: "Network Callback Error")
-                    }
+                    championDetailViewModel
+                        .isVideoAutoPlay
+                        .collectLatest { isVideoAutoPlay ->
+                            skillExoPlayer?.playWhenReady = isVideoAutoPlay
+                        }
                 }
             }
         }

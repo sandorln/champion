@@ -8,6 +8,8 @@ import androidx.appcompat.app.AlertDialog
 import com.sandorln.champion.service.WifiConnectReceiver
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 
 @HiltAndroidApp
@@ -50,10 +52,10 @@ class ChampionApplication : Application() {
     }
 
     val isWifiConnectFlow = callbackFlow {
-        val wifiConnectReceiver = WifiConnectReceiver { isWifiConnect -> trySend(isWifiConnect) }
-        val intentFilter = IntentFilter().apply {
-            addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        val wifiConnectReceiver = WifiConnectReceiver { isWifiConnect ->
+            trySend(isWifiConnect)
         }
+        val intentFilter = IntentFilter().apply { addAction("android.net.conn.CONNECTIVITY_CHANGE") }
         registerReceiver(wifiConnectReceiver, intentFilter)
 
         awaitClose { unregisterReceiver(wifiConnectReceiver) }
