@@ -8,7 +8,7 @@ import com.sandorln.champion.R
 import com.sandorln.champion.databinding.CustomAdapterTitleBinding
 
 class AdapterTitleTextView : FrameLayout {
-    lateinit var binding: CustomAdapterTitleBinding
+    val binding: CustomAdapterTitleBinding = CustomAdapterTitleBinding.inflate(LayoutInflater.from(context), this, true)
     var titleName: String = ""
         set(value) {
             field = value
@@ -27,14 +27,11 @@ class AdapterTitleTextView : FrameLayout {
         initViews(context, attrs, defStyleAttr)
     }
 
-
     private fun initViews(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) {
-        binding = CustomAdapterTitleBinding.inflate(LayoutInflater.from(context), null, false)
         attrs?.let {
             val attrsValue = context.obtainStyledAttributes(it, R.styleable.AdapterTitleTextView, defStyleAttr, 0)
             titleName = attrsValue.getString(R.styleable.AdapterTitleTextView_titleName)?.uppercase() ?: ""
             attrsValue.recycle()
         }
-        addView(binding.root)
     }
 }

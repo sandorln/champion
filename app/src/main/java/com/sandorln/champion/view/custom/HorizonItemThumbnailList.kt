@@ -13,19 +13,28 @@ import com.sandorln.champion.databinding.CustomHorizonItemThumbnailBinding
 import com.sandorln.champion.model.SummonerSpell
 
 class HorizonItemThumbnailList : LinearLayoutCompat {
+    val binding: CustomHorizonItemThumbnailBinding = CustomHorizonItemThumbnailBinding.inflate(LayoutInflater.from(context), this, true)
+
     constructor(context: Context) : super(context) {
-        init(context)
+        initViews(context)
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context, attrs)
+        initViews(context, attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        init(context, attrs, defStyleAttr)
+        initViews(context, attrs, defStyleAttr)
     }
 
-    lateinit var binding: CustomHorizonItemThumbnailBinding
+    private fun initViews(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) {
+        attrs?.let {
+            val attrsValue = context.obtainStyledAttributes(it, R.styleable.HorizonItemThumbnailList, defStyleAttr, 0)
+            binding.tvTitle.titleName = attrsValue.getString(R.styleable.HorizonItemThumbnailList_itemListTitleName)?.uppercase() ?: ""
+            attrsValue.recycle()
+        }
+    }
+
     fun setItemIdList(itemIdList: List<String>, itemVersion: String, onClickItemListener: (itemId: String) -> Unit) {
         if (itemIdList.isNotEmpty()) {
             binding.root.isVisible = true
@@ -67,13 +76,5 @@ class HorizonItemThumbnailList : LinearLayoutCompat {
         }
     }
 
-    private fun init(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) {
-        binding = CustomHorizonItemThumbnailBinding.inflate(LayoutInflater.from(context), null, false)
-        attrs?.let {
-            val attrsValue = context.obtainStyledAttributes(it, R.styleable.HorizonItemThumbnailList, defStyleAttr, 0)
-            binding.tvTitle.titleName = attrsValue.getString(R.styleable.HorizonItemThumbnailList_itemListTitleName)?.uppercase() ?: ""
-            attrsValue.recycle()
-        }
-        addView(binding.root)
-    }
+
 }

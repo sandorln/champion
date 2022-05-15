@@ -8,19 +8,14 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.sandorln.champion.databinding.CustomErrorViewBinding
 
-class ErrorView : FrameLayout {
-    lateinit var binding: CustomErrorViewBinding
+class ErrorView @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
 
-    constructor(context: Context) : super(context) {
-        initViews(context)
-    }
+    val binding: CustomErrorViewBinding = CustomErrorViewBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        initViews(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        initViews(context)
+    init {
+        binding.tvSubmit.setOnClickListener { findViewTreeLifecycleOwner()?.lifecycleScope?.launchWhenResumed { retry() } }
     }
 
     var retry: suspend () -> Unit = {}
@@ -30,9 +25,4 @@ class ErrorView : FrameLayout {
             field = value
         }
 
-    private fun initViews(context: Context) {
-        binding = CustomErrorViewBinding.inflate(LayoutInflater.from(context), null, false)
-        binding.tvSubmit.setOnClickListener { findViewTreeLifecycleOwner()?.lifecycleScope?.launchWhenResumed { retry() } }
-        addView(binding.root)
-    }
 }
