@@ -2,15 +2,17 @@ package com.sandorln.champion.view.fragment
 
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentChampionListBinding
+import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
-import com.sandorln.champion.view.activity.ChampionDetailActivity
 import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionViewModel
@@ -38,7 +40,9 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                     binding.pbContent.isVisible = isLoading
 
                     when (resultData) {
-                        is ResultData.Success -> startActivity(ChampionDetailActivity.newIntent(resultData.data ?: throw Exception(""), requireContext()))
+                        is ResultData.Success -> {
+                            findNavController().navigate(R.id.action_global_frg_champion_detail, bundleOf(BundleKeys.CHAMPION_DATA to resultData.data))
+                        }
                         is ResultData.Failed -> showToast("오류 발생 ${resultData.exception.message}")
                         else -> {}
                     }
@@ -53,7 +57,6 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
 
     override fun initViewSetting() {
         with(binding.rvChampions) {
-            setHasFixedSize(true)
             adapter = championThumbnailAdapter
         }
 

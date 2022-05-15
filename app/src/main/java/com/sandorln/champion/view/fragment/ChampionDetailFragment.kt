@@ -1,18 +1,16 @@
-package com.sandorln.champion.view.activity
+package com.sandorln.champion.view.fragment
 
-import android.content.Context
-import android.content.Intent
 import android.graphics.Rect
-import android.os.Parcelable
 import android.view.View
 import android.widget.ImageView
-import androidx.activity.viewModels
 import androidx.core.view.get
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.DefaultRenderersFactory
@@ -23,10 +21,8 @@ import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.sandorln.champion.R
-import com.sandorln.champion.databinding.ActivityChampionDetailBinding
+import com.sandorln.champion.databinding.FragmentChampionDetailBinding
 import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.ChampionData.ChampionSpell
-import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.type.SpellType
 import com.sandorln.champion.util.playChampionSkill
 import com.sandorln.champion.util.removeBrFromHtml
@@ -34,7 +30,7 @@ import com.sandorln.champion.util.setChampionSplash
 import com.sandorln.champion.view.adapter.ChampionFullSkinAdapter
 import com.sandorln.champion.view.adapter.ChampionThumbnailSkillAdapter
 import com.sandorln.champion.view.adapter.ChampionTipAdapter
-import com.sandorln.champion.view.base.BaseActivity
+import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -42,7 +38,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @AndroidEntryPoint
-class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.layout.activity_champion_detail) {
+class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.layout.fragment_champion_detail) {
     /* ViewModels */
     private val championDetailViewModel: ChampionDetailViewModel by viewModels()
 
@@ -56,12 +52,6 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     private var exoController: PlayerControlView? = null
     private var exoControllerVolume: ImageView? = null
 
-    companion object {
-        fun newIntent(championData: ChampionData, context: Context): Intent = Intent(context, ChampionDetailActivity::class.java).apply {
-            val parcelChampionData = championData as Parcelable
-            putExtra(BundleKeys.CHAMPION_DATA, parcelChampionData)
-        }
-    }
 
     override fun initObjectSetting() {
         championThumbnailSkillAdapter = ChampionThumbnailSkillAdapter()
@@ -69,10 +59,10 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
         championTipAdapter = ChampionTipAdapter()
         championEnemyTipAdapter = ChampionTipAdapter()
 
-        skillExoPlayer = ExoPlayer.Builder(this)
-            .setRenderersFactory(DefaultRenderersFactory(this))
-            .setMediaSourceFactory(DefaultMediaSourceFactory(this))
-            .setTrackSelector(DefaultTrackSelector(this))
+        skillExoPlayer = ExoPlayer.Builder(requireContext())
+            .setRenderersFactory(DefaultRenderersFactory(requireContext()))
+            .setMediaSourceFactory(DefaultMediaSourceFactory(requireContext()))
+            .setTrackSelector(DefaultTrackSelector(requireContext()))
             .build()
             .apply {
                 playWhenReady = false
@@ -100,7 +90,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     override fun initViewSetting() {
         initAppbarHeight()
 
-        binding.imgBack.setOnClickListener { finish() }
+        binding.imgBack.setOnClickListener { findNavController().navigateUp() }
         exoController = binding.exoPlayerSkill.findViewById(R.id.exo_controller)
         exoControllerVolume = exoController?.findViewById(R.id.exo_volume)
         exoControllerVolume?.isSelected = true
@@ -223,7 +213,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
         })
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     championDetailViewModel
                         .isVideoAutoPlay
@@ -240,9 +230,9 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
      */
     private fun initAppbarHeight() {
         val width = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            windowManager.currentWindowMetrics.bounds.width()
+            requireActivity().windowManager.currentWindowMetrics.bounds.width()
         } else
-            windowManager.defaultDisplay.width
+            requireActivity().windowManager.defaultDisplay.width
 
         val layoutParams = binding.appbar.layoutParams
         layoutParams.height = width / 16 * 9
@@ -268,7 +258,7 @@ class ChampionDetailActivity : BaseActivity<ActivityChampionDetailBinding>(R.lay
     /**
      * 챔피언 스킬 변경시 사용
      */
-    private fun selectChampionSkill(championId: String, spellType: SpellType, championSpell: ChampionSpell) {
+    private fun selectChampionSkill(championId: String, spellType: SpellType, championSpell: ChampionData.ChampionSpell) {
         if (!championDetailViewModel.isVideoAutoPlay.value)
             skillExoPlayer?.pause()
 

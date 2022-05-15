@@ -35,12 +35,6 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".view.activity.ChampionDetailActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
-
     </application>
 
 </manifest>
