@@ -12,7 +12,7 @@ class AdapterTitleTextView : FrameLayout {
     var titleName: String = ""
         set(value) {
             field = value
-            binding.tvTitle.text = value
+            binding.tvTitle.text = value.uppercase()
         }
 
     constructor(context: Context) : super(context) {
@@ -30,7 +30,7 @@ class AdapterTitleTextView : FrameLayout {
     private fun initViews(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) {
         attrs?.let {
             val attrsValue = context.obtainStyledAttributes(it, R.styleable.AdapterTitleTextView, defStyleAttr, 0)
-            titleName = attrsValue.getString(R.styleable.AdapterTitleTextView_titleName)?.uppercase() ?: ""
+            titleName = attrsValue.getString(R.styleable.AdapterTitleTextView_titleName) ?: ""
             attrsValue.recycle()
         }
     }

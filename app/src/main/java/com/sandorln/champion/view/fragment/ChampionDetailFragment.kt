@@ -1,9 +1,6 @@
 package com.sandorln.champion.view.fragment
 
-import android.graphics.Rect
-import android.view.View
 import android.widget.ImageView
-import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -11,8 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.PlaybackException
@@ -26,8 +21,6 @@ import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.type.SpellType
 import com.sandorln.champion.util.playChampionSkill
 import com.sandorln.champion.util.removeBrFromHtml
-import com.sandorln.champion.util.setChampionSplash
-import com.sandorln.champion.view.adapter.ChampionFullSkinAdapter
 import com.sandorln.champion.view.adapter.ChampionThumbnailSkillAdapter
 import com.sandorln.champion.view.adapter.ChampionTipAdapter
 import com.sandorln.champion.view.base.BaseFragment
@@ -35,7 +28,6 @@ import com.sandorln.champion.viewmodel.ChampionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 @AndroidEntryPoint
 class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.layout.fragment_champion_detail) {
@@ -44,9 +36,6 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
 
     /* Adapters */
     private lateinit var championThumbnailSkillAdapter: ChampionThumbnailSkillAdapter
-    private lateinit var championFullSkinAdapter: ChampionFullSkinAdapter
-    private lateinit var championTipAdapter: ChampionTipAdapter
-    private lateinit var championEnemyTipAdapter: ChampionTipAdapter
 
     private var skillExoPlayer: ExoPlayer? = null
     private var exoController: PlayerControlView? = null
@@ -54,10 +43,9 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
 
 
     override fun initObjectSetting() {
+        binding.championDetailVM = championDetailViewModel
+
         championThumbnailSkillAdapter = ChampionThumbnailSkillAdapter()
-        championFullSkinAdapter = ChampionFullSkinAdapter()
-        championTipAdapter = ChampionTipAdapter()
-        championEnemyTipAdapter = ChampionTipAdapter()
 
         skillExoPlayer = ExoPlayer.Builder(requireContext())
             .setRenderersFactory(DefaultRenderersFactory(requireContext()))
@@ -107,65 +95,13 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
         /* 스킬 관련 */
         binding.exoPlayerSkill.player = skillExoPlayer
         binding.rvThumbnailSkill.adapter = championThumbnailSkillAdapter
-
-        /* 스킨 관련 */
-        binding.vpFullSkin.apply {
-            adapter = championFullSkinAdapter
-
-            /* 양옆 미리보기 처리 */
-            val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.padding_xlarge)
-            val pagerWidth = resources.getDimensionPixelOffset(R.dimen.padding_middle)
-
-            setPageTransformer { page, position ->
-                page.translationX = -(pageMarginPx + pagerWidth) * position
-                page.scaleY = 1 - (0.10f * abs(position))
-            }
-
-            addItemDecoration(object : RecyclerView.ItemDecoration() {
-                override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-                    super.getItemOffsets(outRect, view, parent, state)
-                    outRect.right = pageMarginPx
-                    outRect.left = pageMarginPx
-                }
-            })
-        }
-
-        binding.vVpFullSkinPre.setOnClickListener {
-            try {
-                val index = binding.vpFullSkin.currentItem
-                if (index > 0)
-                    binding.vpFullSkin.setCurrentItem(index - 1, true)
-            } catch (e: Exception) {
-
-            }
-        }
-
-        binding.vVpFullSkinNext.setOnClickListener {
-            try {
-                val index = binding.vpFullSkin.currentItem
-                if (index < championFullSkinAdapter.currentList.size - 1)
-                    binding.vpFullSkin.setCurrentItem(index + 1, true)
-            } catch (e: Exception) {
-
-            }
-        }
-
-        /* 팁 관련 */
-        binding.rvAllyTips.adapter = championTipAdapter
-        binding.rvEnemyTips.adapter = championEnemyTipAdapter
     }
 
     override fun initObserverSetting() {
         championDetailViewModel.championData.observe(this, Observer { champion ->
             binding.imgChampionThumbnail.setChampionThumbnail(champion.version, champion.id)
-            binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num ?: "0")
 
             val championId = String.format("%04d", champion.key)
-
-            /* 스토리 관련 */
-            binding.tvChampionName.text = champion.name
-            binding.tvChampionTitle.text = champion.title
-            binding.tvChampionStory.text = champion.blurb
 
             /* 스킬 관련 */
             val skillList = champion.spells.toMutableList()
@@ -178,38 +114,6 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
 
             /* 스킬 선택 초기화 */
             selectChampionSkill(championId, SpellType.P, skillList.first())
-
-            /* 스킨 관련 */
-            binding.vpFullSkin.offscreenPageLimit = champion.skins.size
-            championFullSkinAdapter.championId = champion.id
-            championFullSkinAdapter.submitList(champion.skins)
-
-            /* 스킨 변경에 따른 상단 이름 및 썸네일 변경 */
-            binding.vpFullSkin.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    try {
-                        val viewHolder = (binding.vpFullSkin[0] as RecyclerView).findViewHolderForAdapterPosition(position) as ChampionFullSkinAdapter.ChampionFullSkinViewHolder
-                        binding.imgChampionSplash.setImageDrawable(viewHolder.binding.imgChampionSkin.drawable)
-                        binding.tvChampionName.text = if (position == 0) champion.name else champion.skins[position].name
-                    } catch (e: Exception) {
-                        binding.imgChampionSplash.setChampionSplash(champion.id, champion.skins.first().num ?: position.toString())
-                        binding.tvChampionName.text = champion.name
-                    }
-                }
-            })
-
-            /* 팁 관련 */
-            if (champion.allytips.isNotEmpty()) {
-                binding.layoutTips.isVisible = true
-                championTipAdapter.tips = champion.allytips
-                championTipAdapter.notifyDataSetChanged()
-            }
-            if (champion.enemytips.isNotEmpty()) {
-                binding.layoutEnemyTips.isVisible = true
-                championEnemyTipAdapter.tips = champion.enemytips
-                championEnemyTipAdapter.notifyDataSetChanged()
-            }
         })
 
         lifecycleScope.launch {
