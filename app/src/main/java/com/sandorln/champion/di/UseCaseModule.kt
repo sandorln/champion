@@ -17,8 +17,16 @@ class UseCaseModule {
     fun providesGetChampionVersion(versionRepo: VersionRepository): GetChampionVersionUseCase = GetChampionVersionUseCase(versionRepo)
 
     @Provides
-    fun providesGetChampionList(getChampionVersionUseCase: GetChampionVersionUseCase, champRepo: ChampionRepository): GetChampionListUseCase =
-        GetChampionListUseCase(getChampionVersionUseCase, champRepo)
+    fun providesGetChampionList(
+        getChampionVersionUseCase: GetChampionVersionUseCase,
+        champRepo: ChampionRepository,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase
+    ): GetChampionListUseCase =
+        GetChampionListUseCase(
+            getChampionVersionUseCase = getChampionVersionUseCase,
+            getLanguageCodeUseCase = getLanguageCodeUseCase,
+            championRepository = champRepo
+        )
 
     @Provides
     fun providesGetChampionInfo(champRepo: ChampionRepository, getLanguageCodeUseCase: GetLanguageCodeUseCase): GetChampionInfoUseCase =

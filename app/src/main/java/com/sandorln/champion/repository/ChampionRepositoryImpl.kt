@@ -54,6 +54,12 @@ class ChampionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getChampionListByLanguage(championVersion: String, search: String, languageCode: String): List<ChampionData> {
+        return championService.getAllChampionByLanguageCode(championVersion, languageCode).apply {
+            parsingData()
+        }.championList
+    }
+
     override suspend fun getChampionInfo(championVersion: String, championId: String): ChampionData = withContext(Dispatchers.IO) {
         val response = championService.getChampionDetailInfo(championVersion, championId)
         response.parsingData()

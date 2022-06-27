@@ -18,19 +18,23 @@ import kotlinx.coroutines.flow.flow
  */
 class GetChampionListUseCase(
     private val getChampionVersionUseCase: GetChampionVersionUseCase,
+    private val getLanguageCodeUseCase: GetLanguageCodeUseCase,
     private val championRepository: ChampionRepository
 ) {
     operator fun invoke(search: String): Flow<ResultData<List<ChampionData>>> =
         getChampionVersionUseCase()
             .flatMapLatest { championVersion ->
                 flow {
+                    val languageCode = getLanguageCodeUseCase()
+
                     if (championVersion.isEmpty())
                         throw Exception("버전 정보가 없습니다.")
 
                     emit(ResultData.Loading)
                     /* 너무 빠르게 진행 시 해당 값이 무시됨 */
                     delay(250)
-                    val championList = championRepository.getChampionList(championVersion, search)
+//                    val championList = championRepository.getChampionList(championVersion, search)
+                    val championList = championRepository.getChampionListByLanguage(championVersion, search, languageCode)
                     emit(ResultData.Success(championList))
                 }.catch {
                     emit(ResultData.Failed(Exception(it)))
