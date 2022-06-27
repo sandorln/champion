@@ -5,4 +5,5 @@ import com.sandorln.champion.model.ChampionData
 interface ChampionRepository {
     suspend fun getChampionList(championVersion: String, search: String): List<ChampionData>
     suspend fun getChampionInfo(championVersion: String, championId: String): ChampionData
+    suspend fun getChampionInfoByLanguage(championVersion: String, championId: String, languageCode: String): ChampionData
 }

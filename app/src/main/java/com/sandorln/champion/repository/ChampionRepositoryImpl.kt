@@ -25,7 +25,7 @@ class ChampionRepositoryImpl @Inject constructor(
                     throw Exception("버전 정보가 없습니다")
 
                 /* 먼저 로컬에 있는 챔피언 정보 가져오기 */
-                if (!::allChampionList.isInitialized || allChampionList.firstOrNull()?.version ?: "" != championVersion)
+                if (!::allChampionList.isInitialized || (allChampionList.firstOrNull()?.version ?: "") != championVersion)
                     allChampionList = championDao.getAllChampion(championVersion)
 
                 /* 버전에 맞는 챔피언들이 저장이 안되어있을 시 서버에서 다시 받아오기 */
@@ -59,4 +59,11 @@ class ChampionRepositoryImpl @Inject constructor(
         response.parsingData()
         response.championList.first().copy(version = championVersion)
     }
+
+    override suspend fun getChampionInfoByLanguage(championVersion: String, championId: String, languageCode: String): ChampionData =
+        withContext(Dispatchers.IO) {
+            val response = championService.getChampionDetailInfoByLanguageCode(championVersion, championId, languageCode)
+            response.parsingData()
+            response.championList.first().copy(version = championVersion)
+        }
 }

@@ -21,7 +21,8 @@ class UseCaseModule {
         GetChampionListUseCase(getChampionVersionUseCase, champRepo)
 
     @Provides
-    fun providesGetChampionInfo(champRepo: ChampionRepository): GetChampionInfoUseCase = GetChampionInfoUseCase(champRepo)
+    fun providesGetChampionInfo(champRepo: ChampionRepository, getLanguageCodeUseCase: GetLanguageCodeUseCase): GetChampionInfoUseCase =
+        GetChampionInfoUseCase(champRepo, getLanguageCodeUseCase)
 
     @Provides
     fun providesGetItemList(getVersionUseCase: GetVersionUseCase, itemRepo: ItemRepository) = GetItemListUseCase(getVersionUseCase, itemRepo)
@@ -52,4 +53,7 @@ class UseCaseModule {
 
     @Provides
     fun providesToggleAppSetting(appSettingRepository: AppSettingRepository) = ToggleAppSettingUseCase(appSettingRepository)
+
+    @Provides
+    fun providesGetLanguageCode(languageRepository: LanguageRepository) = GetLanguageCodeUseCase(languageRepository)
 }
