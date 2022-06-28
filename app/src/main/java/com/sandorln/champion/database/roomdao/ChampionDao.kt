@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChampionDao {
-    @Query("SELECT * FROM ChampionData WHERE version == :version ORDER BY name")
-    fun getAllChampion(version: String): List<ChampionData>
+    @Query("SELECT * FROM ChampionData WHERE version == :version AND languageCode == :languageCode ORDER BY name")
+    fun getAllChampion(version: String, languageCode: String): List<ChampionData>
 
     @Insert(onConflict = REPLACE)
     suspend fun insertChampionList(championList: List<ChampionData>)

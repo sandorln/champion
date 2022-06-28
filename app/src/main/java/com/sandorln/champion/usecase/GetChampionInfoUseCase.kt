@@ -15,8 +15,7 @@ class GetChampionInfoUseCase(
         flow {
             emit(ResultData.Loading)
             val languageCode = getLanguageCodeUseCase()
-//            val championData = championRepository.getChampionInfo(championVersion, championId)
-            val championData = championRepository.getChampionInfoByLanguage(championVersion, championId, languageCode)
+            val championData = championRepository.getChampionInfo(championVersion, championId, languageCode)
             emit(ResultData.Success(championData))
         }.catch {
             emit(ResultData.Failed(Exception(it)))

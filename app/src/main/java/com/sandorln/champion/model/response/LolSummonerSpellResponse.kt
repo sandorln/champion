@@ -6,7 +6,7 @@ import com.sandorln.champion.model.SummonerSpell
 data class LolSummonerSpellResponse(
     val summonerSpellList: MutableList<SummonerSpell> = mutableListOf()
 ) : BaseLolResponse() {
-    override fun parsingData() {
+    override fun parsingData(languageCode: String) {
         val spellVersion = version
 
         val gson = Gson()

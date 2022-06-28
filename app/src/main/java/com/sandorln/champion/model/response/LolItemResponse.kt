@@ -10,7 +10,7 @@ data class LolItemResponse(
     /**
      * 아이템 정보 값 Parsing
      */
-    override fun parsingData() {
+    override fun parsingData(languageCode: String) {
         itemList = mutableListOf()
         val itemVersion = version
 

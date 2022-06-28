@@ -33,8 +33,7 @@ class GetChampionListUseCase(
                     emit(ResultData.Loading)
                     /* 너무 빠르게 진행 시 해당 값이 무시됨 */
                     delay(250)
-//                    val championList = championRepository.getChampionList(championVersion, search)
-                    val championList = championRepository.getChampionListByLanguage(championVersion, search, languageCode)
+                    val championList = championRepository.getChampionList(championVersion, search, languageCode)
                     emit(ResultData.Success(championList))
                 }.catch {
                     emit(ResultData.Failed(Exception(it)))
