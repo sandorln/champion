@@ -17,4 +17,5 @@ class CollapsibleToolbar @JvmOverloads constructor(
         super.onAttachedToWindow()
         (parent as? AppBarLayout)?.addOnOffsetChangedListener(this)
     }
+
 }

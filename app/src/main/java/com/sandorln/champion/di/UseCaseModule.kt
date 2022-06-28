@@ -17,20 +17,53 @@ class UseCaseModule {
     fun providesGetChampionVersion(versionRepo: VersionRepository): GetChampionVersionUseCase = GetChampionVersionUseCase(versionRepo)
 
     @Provides
-    fun providesGetChampionList(getChampionVersionUseCase: GetChampionVersionUseCase, champRepo: ChampionRepository): GetChampionListUseCase =
-        GetChampionListUseCase(getChampionVersionUseCase, champRepo)
+    fun providesGetChampionList(
+        getChampionVersionUseCase: GetChampionVersionUseCase,
+        champRepo: ChampionRepository,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase
+    ): GetChampionListUseCase =
+        GetChampionListUseCase(
+            getChampionVersionUseCase = getChampionVersionUseCase,
+            getLanguageCodeUseCase = getLanguageCodeUseCase,
+            championRepository = champRepo
+        )
 
     @Provides
-    fun providesGetChampionInfo(champRepo: ChampionRepository): GetChampionInfoUseCase = GetChampionInfoUseCase(champRepo)
+    fun providesGetChampionInfo(champRepo: ChampionRepository, getLanguageCodeUseCase: GetLanguageCodeUseCase): GetChampionInfoUseCase =
+        GetChampionInfoUseCase(champRepo, getLanguageCodeUseCase)
 
     @Provides
-    fun providesGetItemList(getVersionUseCase: GetVersionUseCase, itemRepo: ItemRepository) = GetItemListUseCase(getVersionUseCase, itemRepo)
+    fun providesGetItemList(
+        getVersionUseCase: GetVersionUseCase,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase,
+        itemRepo: ItemRepository
+    ) = GetItemListUseCase(
+        getVersionUseCase = getVersionUseCase,
+        itemRepository = itemRepo,
+        getLanguageCodeUseCase = getLanguageCodeUseCase
+    )
 
     @Provides
-    fun providesFindItemById(getVersionUseCase: GetVersionUseCase, itemRepo: ItemRepository) = FindItemByIdUseCase(getVersionUseCase, itemRepo)
+    fun providesFindItemById(
+        getVersionUseCase: GetVersionUseCase,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase,
+        itemRepo: ItemRepository,
+    ) = FindItemByIdUseCase(
+        getVersionUseCase = getVersionUseCase,
+        itemRepository = itemRepo,
+        getLanguageCodeUseCase = getLanguageCodeUseCase
+    )
 
     @Provides
-    fun providesGetSummonerSpellList(getVersionUseCase: GetVersionUseCase, summonerRepo: SummonerSpellRepository) = GetSummonerSpellListUseCase(getVersionUseCase, summonerRepo)
+    fun providesGetSummonerSpellList(
+        getVersionUseCase: GetVersionUseCase,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase,
+        summonerRepo: SummonerSpellRepository
+    ) = GetSummonerSpellListUseCase(
+        getVersionUseCase = getVersionUseCase,
+        summonerSpellRepository = summonerRepo,
+        getLanguageCodeUseCase = getLanguageCodeUseCase
+    )
 
     @Provides
     fun providesGetVersion(versionRepo: VersionRepository): GetVersionUseCase = GetVersionUseCase(versionRepo)
@@ -52,4 +85,7 @@ class UseCaseModule {
 
     @Provides
     fun providesToggleAppSetting(appSettingRepository: AppSettingRepository) = ToggleAppSettingUseCase(appSettingRepository)
+
+    @Provides
+    fun providesGetLanguageCode(languageRepository: LanguageRepository) = GetLanguageCodeUseCase(languageRepository)
 }

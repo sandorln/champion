@@ -10,14 +10,20 @@ import kotlinx.coroutines.flow.flow
 
 class FindItemByIdUseCase(
     private val getVersionUseCase: GetVersionUseCase,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val getLanguageCodeUseCase: GetLanguageCodeUseCase
 ) {
     operator fun invoke(itemId: String): Flow<ResultData<ItemData>> =
         getVersionUseCase()
             .flatMapLatest { totalVersion ->
                 flow {
+                    val languageCode = getLanguageCodeUseCase()
                     emit(ResultData.Loading)
-                    val item = itemRepository.findItemById(totalVersion, itemId)
+                    val item = itemRepository.findItemById(
+                        itemVersion = totalVersion,
+                        itemId = itemId,
+                        languageCode = languageCode
+                    )
                     emit(ResultData.Success(item))
                 }.catch {
                     emit(ResultData.Failed(Exception(it)))

@@ -6,7 +6,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:paddingBottom="?attr/actionBarSize">
 
         <com.sandorln.champion.view.custom.SearchBar
             android:id="@+id/search_bar"

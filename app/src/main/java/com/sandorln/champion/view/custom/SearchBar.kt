@@ -8,14 +8,14 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import com.sandorln.champion.R
-import com.sandorln.champion.databinding.CustomSearchBarBinding
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.onStart
+import com.sandorln.champion.databinding.CustomSearchBarBinding
 
 class SearchBar : FrameLayout {
-    lateinit var binding: CustomSearchBarBinding
+    val binding: CustomSearchBarBinding = CustomSearchBarBinding.inflate(LayoutInflater.from(context), this, true)
 
     private var hintText: String = ""
         set(value) {
@@ -36,14 +36,12 @@ class SearchBar : FrameLayout {
     }
 
     private fun initViews(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) {
-        binding = CustomSearchBarBinding.inflate(LayoutInflater.from(context), null, false)
         attrs?.let {
             val attrsValue = context.obtainStyledAttributes(it, R.styleable.SearchBar, defStyleAttr, 0)
             hintText = attrsValue.getString(R.styleable.SearchBar_searchBarHint)?.uppercase() ?: ""
             attrsValue.recycle()
         }
         binding.imgCancel.setOnClickListener { binding.editSearch.setText("") }
-        addView(binding.root)
     }
 
     val inputTextFlow = callbackFlow {

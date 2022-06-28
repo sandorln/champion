@@ -10,7 +10,8 @@
         android:animateLayoutChanges="true"
         android:background="@android:color/black"
         android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:paddingBottom="?attr/actionBarSize">
 
         <com.sandorln.champion.view.custom.SearchBar
             android:id="@+id/search_bar"

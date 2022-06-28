@@ -10,7 +10,7 @@ import com.sandorln.champion.model.ChampionData
 import com.sandorln.champion.model.ItemData
 import com.sandorln.champion.model.SummonerSpell
 
-@Database(entities = [ChampionData::class, ItemData::class, SummonerSpell::class], version = 5)
+@Database(entities = [ChampionData::class, ItemData::class, SummonerSpell::class], version = 7)
 @TypeConverters(value = [LolChampionConverters::class, LolItemConverters::class])
 abstract class AppDatabase : RoomDatabase() {
     abstract fun championDao(): ChampionDao

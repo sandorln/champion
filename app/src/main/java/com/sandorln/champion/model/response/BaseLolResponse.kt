@@ -9,5 +9,5 @@ abstract class BaseLolResponse {
     /* 해당 Data 를 받아와서 별도의 Parsing 을 해줌 */
     val data: JsonObject = JsonObject()
 
-    abstract fun parsingData()
+    abstract fun parsingData(languageCode : String = "")
 }

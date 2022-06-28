@@ -1,7 +1,9 @@
 package com.sandorln.champion.util
 
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.*
+import androidx.databinding.BindingAdapter
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.sandorln.champion.di.GlideApp
 
@@ -12,6 +14,19 @@ fun ImageView.setChampionSplash(championId: String, skinNum: String) {
         .fitCenter()
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(this)
+}
+
+@BindingAdapter(value = ["championSkinDrawable", "championId"], requireAll = false)
+fun ImageView.setChampionSplash(championSkinDrawable: Drawable?, championId: String?) {
+    if (championSkinDrawable == null) {
+        GlideApp.with(context)
+            .load("http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg")
+            .fitCenter()
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(this)
+    } else {
+        setImageDrawable(championSkinDrawable)
+    }
 }
 
 fun PopupWindow.showStringListPopup(popupTargetView: View, versionList: List<String>, onClickVersionListener: (version: String) -> Unit) {

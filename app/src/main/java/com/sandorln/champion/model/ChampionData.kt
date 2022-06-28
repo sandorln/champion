@@ -7,9 +7,10 @@ import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
-@Entity(primaryKeys = ["version", "id"])
+@Entity(primaryKeys = ["version", "languageCode", "id"])
 data class ChampionData(
     var version: String = "",
+    var languageCode: String = "",
     var id: String = "",
     var key: Int = 0,
     var name: String = "",

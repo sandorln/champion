@@ -33,4 +33,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindsAppSettingRepository(appSettingRepositoryImpl: AppSettingRepositoryImpl): AppSettingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindsLanguageRepository(languageRepositoryImpl: LanguageRepositoryImpl) : LanguageRepository
 }

@@ -1,22 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LOL Library</string>
     <string name="app_name_dev">LOL Library DEV</string>
-    <string name="not_find_data" translatable="false">Not Find Data</string>
-    <string name="unknown" translatable="false">UNKNOWN</string>
-    <string name="champion_info_title" translatable="false">&lt; %s &gt;</string>
     <string name="app_setting_newest_lol_version">Ask if I want to change to the latest version every time I run the app</string>
     <string name="app_setting_video_wifi_mode_only_play">Automatically play movies only when in WIFI mode</string>
-    <string name="version" translatable="false">VERSION</string>
     <string name="search_champion">Champion Search</string>
     <string name="search_item">Item Search</string>
     <string name="retry">Retry</string>
-    <string name="pause" translatable="false">pause</string>
-    <string name="play" translatable="false">play</string>
-    <string name="volume" translatable="false">volume</string>
     <string name="name">Name</string>
     <string name="price">Price</string>
+    <string name="description">Description</string>
     <string name="next_depth_item">NEXT DEPTH ITEM</string>
     <string name="pre_depth_item">PRE DEPTH ITEM</string>
     <string name="not_showing_skill_video">Not Showing Skill Video</string>
-    <string name="description">Description</string>
 </resources>

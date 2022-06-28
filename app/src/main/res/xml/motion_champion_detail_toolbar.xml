@@ -58,9 +58,6 @@
             android:textColor="@color/base"
             app:layout_constraintBottom_toBottomOf="parent">
             <CustomAttribute
-                app:attributeName="gravity"
-                app:customStringValue="center" />
-            <CustomAttribute
                 app:attributeName="textColor"
                 app:customColorValue="@color/base" />
             <CustomAttribute
@@ -133,9 +130,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/card_splash_champion">
-            <CustomAttribute
-                app:attributeName="gravity"
-                app:customStringValue="bottom" />
             <CustomAttribute
                 app:attributeName="textColor"
                 app:customColorValue="@android:color/white" />
