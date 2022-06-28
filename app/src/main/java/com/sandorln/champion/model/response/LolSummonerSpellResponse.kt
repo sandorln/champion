@@ -13,6 +13,7 @@ data class LolSummonerSpellResponse(
         for ((_, value) in data.entrySet()) {
             val itemData = gson.fromJson(value, SummonerSpell::class.java).apply {
                 this.version = spellVersion
+                this.languageCode = languageCode
             }
             summonerSpellList.add(itemData)
         }

@@ -19,6 +19,7 @@ data class LolItemResponse(
             val itemData = gson.fromJson(value, ItemData::class.java).apply {
                 this.id = id
                 this.version = itemVersion
+                this.languageCode = languageCode
             }
             itemList.add(itemData)
         }

@@ -24,7 +24,10 @@ class ChampionRepositoryImpl @Inject constructor(
                     throw Exception("버전 정보가 없습니다")
 
                 /* 먼저 로컬에 있는 챔피언 정보 가져오기 */
-                if (!::allChampionList.isInitialized || (allChampionList.firstOrNull()?.version ?: "") != championVersion)
+                if (!::allChampionList.isInitialized ||
+                    (allChampionList.firstOrNull()?.version ?: "") != championVersion ||
+                    (allChampionList.firstOrNull()?.languageCode ?: "") != languageCode
+                )
                     allChampionList = championDao.getAllChampion(championVersion, languageCode)
 
                 /* 버전에 맞는 챔피언들이 저장이 안되어있을 시 서버에서 다시 받아오기 */
@@ -43,12 +46,11 @@ class ChampionRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getChampionList(championVersion: String, search: String, languageCode: String): List<ChampionData> = initAllChampion(championVersion, languageCode) {
+        val searchChampionName = search.replace(" ", "").lowercase()
         /* 검색어에 맞는 챔피언 필터 */
         allChampionList.filter { champion ->
             /* 검색어 / 검색 대상 공백 제거 */
-            val searchChampionName = search.replace(" ", "").lowercase()
             val championName = champion.name.replace(" ", "").lowercase()
-
             championName.contains(searchChampionName)
         }
     }

@@ -4,10 +4,11 @@ package com.sandorln.champion.model
 import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
-@Entity(primaryKeys = ["id", "version"])
+@Entity(primaryKeys = ["id", "version", "languageCode"])
 data class ItemData(
     var id: String = "",
     var version: String = "",
+    var languageCode: String = "",
     val name: String = "",
     val description: String = "",
 

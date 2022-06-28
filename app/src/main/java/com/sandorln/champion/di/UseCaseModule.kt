@@ -33,13 +33,37 @@ class UseCaseModule {
         GetChampionInfoUseCase(champRepo, getLanguageCodeUseCase)
 
     @Provides
-    fun providesGetItemList(getVersionUseCase: GetVersionUseCase, itemRepo: ItemRepository) = GetItemListUseCase(getVersionUseCase, itemRepo)
+    fun providesGetItemList(
+        getVersionUseCase: GetVersionUseCase,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase,
+        itemRepo: ItemRepository
+    ) = GetItemListUseCase(
+        getVersionUseCase = getVersionUseCase,
+        itemRepository = itemRepo,
+        getLanguageCodeUseCase = getLanguageCodeUseCase
+    )
 
     @Provides
-    fun providesFindItemById(getVersionUseCase: GetVersionUseCase, itemRepo: ItemRepository) = FindItemByIdUseCase(getVersionUseCase, itemRepo)
+    fun providesFindItemById(
+        getVersionUseCase: GetVersionUseCase,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase,
+        itemRepo: ItemRepository,
+    ) = FindItemByIdUseCase(
+        getVersionUseCase = getVersionUseCase,
+        itemRepository = itemRepo,
+        getLanguageCodeUseCase = getLanguageCodeUseCase
+    )
 
     @Provides
-    fun providesGetSummonerSpellList(getVersionUseCase: GetVersionUseCase, summonerRepo: SummonerSpellRepository) = GetSummonerSpellListUseCase(getVersionUseCase, summonerRepo)
+    fun providesGetSummonerSpellList(
+        getVersionUseCase: GetVersionUseCase,
+        getLanguageCodeUseCase: GetLanguageCodeUseCase,
+        summonerRepo: SummonerSpellRepository
+    ) = GetSummonerSpellListUseCase(
+        getVersionUseCase = getVersionUseCase,
+        summonerSpellRepository = summonerRepo,
+        getLanguageCodeUseCase = getLanguageCodeUseCase
+    )
 
     @Provides
     fun providesGetVersion(versionRepo: VersionRepository): GetVersionUseCase = GetVersionUseCase(versionRepo)
