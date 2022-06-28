@@ -10,7 +10,7 @@ data class LolItemResponse(
     /**
      * 아이템 정보 값 Parsing
      */
-    override fun parsingData() {
+    override fun parsingData(languageCode: String) {
         itemList = mutableListOf()
         val itemVersion = version
 
@@ -19,6 +19,7 @@ data class LolItemResponse(
             val itemData = gson.fromJson(value, ItemData::class.java).apply {
                 this.id = id
                 this.version = itemVersion
+                this.languageCode = languageCode
             }
             itemList.add(itemData)
         }

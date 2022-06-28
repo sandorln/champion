@@ -1,10 +1,7 @@
 package com.sandorln.champion.di
 
 import com.sandorln.champion.BuildConfig
-import com.sandorln.champion.network.ChampionService
-import com.sandorln.champion.network.ItemService
-import com.sandorln.champion.network.SummonerSpellService
-import com.sandorln.champion.network.VersionService
+import com.sandorln.champion.network.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,4 +39,8 @@ class NetworkModule {
     @Provides
     @Singleton
     fun providesSummonerSpellService(retrofit: Retrofit): SummonerSpellService = retrofit.create(SummonerSpellService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesLanguageService(retrofit: Retrofit): LanguageService = retrofit.create(LanguageService::class.java)
 }

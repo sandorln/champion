@@ -7,11 +7,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
-class GetChampionInfoUseCase(private val championRepository: ChampionRepository) {
+class GetChampionInfoUseCase(
+    private val championRepository: ChampionRepository,
+    private val getLanguageCodeUseCase: GetLanguageCodeUseCase
+) {
     operator fun invoke(championVersion: String, championId: String): Flow<ResultData<ChampionData>> =
         flow {
             emit(ResultData.Loading)
-            val championData = championRepository.getChampionInfo(championVersion, championId)
+            val languageCode = getLanguageCodeUseCase()
+            val championData = championRepository.getChampionInfo(championVersion, championId, languageCode)
             emit(ResultData.Success(championData))
         }.catch {
             emit(ResultData.Failed(Exception(it)))

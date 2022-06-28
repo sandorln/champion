@@ -12,11 +12,14 @@ data class LolChampionResponse(
     /**
      * 캐릭터 정보 값 Parsing
      */
-    override fun parsingData() {
+    override fun parsingData(languageCode: String) {
         championList.clear()
 
         val gson = Gson()
-        for ((_, value) in data.entrySet())
-            championList.add(gson.fromJson(value, ChampionData::class.java))
+        for ((_, value) in data.entrySet()) {
+            val championData = gson.fromJson(value, ChampionData::class.java)
+            championData.languageCode = languageCode
+            championList.add(championData)
+        }
     }
 }

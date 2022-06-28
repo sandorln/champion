@@ -10,10 +10,7 @@ import com.sandorln.champion.database.LolItemConverters
 import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.database.roomdao.ItemDao
 import com.sandorln.champion.database.roomdao.SummonerSpellDao
-import com.sandorln.champion.database.shareddao.AppSettingDao
-import com.sandorln.champion.database.shareddao.AppSettingDaoImpl
-import com.sandorln.champion.database.shareddao.VersionDao
-import com.sandorln.champion.database.shareddao.VersionDaoImpl
+import com.sandorln.champion.database.shareddao.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -67,5 +64,9 @@ class LocalDbModule {
 
     @Singleton
     @Provides
-    fun providesAppSettingDao(sharedPreferences: SharedPreferences) : AppSettingDao = AppSettingDaoImpl(sharedPreferences)
+    fun providesAppSettingDao(sharedPreferences: SharedPreferences): AppSettingDao = AppSettingDaoImpl(sharedPreferences)
+
+    @Singleton
+    @Provides
+    fun providesLanguageDao(sharedPreferences: SharedPreferences, gson: Gson): LanguageDao = LanguageDaoImpl(sharedPreferences, gson)
 }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 
 class GetSummonerSpellListUseCase(
     private val getVersionUseCase: GetVersionUseCase,
+    private val getLanguageCodeUseCase: GetLanguageCodeUseCase,
     private val summonerSpellRepository: SummonerSpellRepository
 ) {
     operator fun invoke(): Flow<ResultData<List<SummonerSpell>>> =
@@ -20,7 +21,11 @@ class GetSummonerSpellListUseCase(
                     emit(ResultData.Loading)
                     /* 너무 빠르게 진행 시 해당 값이 무시됨 */
                     delay(250)
-                    val summonerSpellList = summonerSpellRepository.getSummonerSpellList(totalVersion)
+                    val languageCode = getLanguageCodeUseCase()
+                    val summonerSpellList = summonerSpellRepository.getSummonerSpellList(
+                        summonerSpellVersion = totalVersion,
+                        languageCode = languageCode
+                    )
                     emit(ResultData.Success(summonerSpellList))
                 }.catch {
                     emit(ResultData.Failed(Exception(it)))

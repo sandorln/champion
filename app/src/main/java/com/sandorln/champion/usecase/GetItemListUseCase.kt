@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.flow
 
 class GetItemListUseCase(
     private val getVersionUseCase: GetVersionUseCase,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val getLanguageCodeUseCase: GetLanguageCodeUseCase
 ) {
     operator fun invoke(search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>> =
         getVersionUseCase()
@@ -20,7 +21,13 @@ class GetItemListUseCase(
                     emit(ResultData.Loading)
                     /* 너무 빠르게 진행 시 해당 값이 무시됨 */
                     delay(250)
-                    val itemList = itemRepository.getItemList(totalVersion, search, inStore)
+                    val languageCode = getLanguageCodeUseCase()
+                    val itemList = itemRepository.getItemList(
+                        itemVersion = totalVersion,
+                        search = search,
+                        inStore = inStore,
+                        languageCode = languageCode
+                    )
                     emit(ResultData.Success(itemList))
                 }.catch {
                     emit(ResultData.Failed(Exception(it)))
