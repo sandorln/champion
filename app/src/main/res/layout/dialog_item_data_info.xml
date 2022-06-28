@@ -31,7 +31,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:text="이름"
+                        android:text="@string/name"
                         android:textColor="@color/base" />
 
                 <TextView
@@ -41,20 +41,20 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="0dp"
                         android:gravity="center"
-                        android:text="가격"
+                        android:text="@string/price"
                         android:textColor="@color/base" />
 
                 <com.sandorln.champion.view.custom.HorizonItemThumbnailList
                         android:id="@+id/horizon_item_next_depth"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:itemListTitleName="다음 아이템" />
+                        app:itemListTitleName="@string/next_depth_item" />
 
                 <com.sandorln.champion.view.custom.HorizonItemThumbnailList
                         android:id="@+id/horizon_item_pre_depth"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:itemListTitleName="제작 시 필요" />
+                        app:itemListTitleName="@string/pre_depth_item" />
 
                 <TextView
                         android:id="@+id/tv_description"
@@ -62,7 +62,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="설명" />
+                        android:text="@string/description" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.core.widget.NestedScrollView>
     </com.google.android.material.card.MaterialCardView>

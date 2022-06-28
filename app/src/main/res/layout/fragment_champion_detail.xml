@@ -210,7 +210,7 @@
                             style="@style/Base.Widget.AppCompat.TextView.TitleStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="이 스킬을 영상 형식으로 표시할 수 없습니다" />
+                            android:text="@string/not_showing_skill_video" />
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
                     <androidx.core.widget.ContentLoadingProgressBar
