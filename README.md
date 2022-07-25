@@ -6,6 +6,9 @@
 - 한번 불러온 정보는 내장 저장소에 저장되며, 이후 인터넷이 되지 않는 상황에서도 불러올 수 있습니다.
 (단, 현재 챔피언 상세 정보는 내장 저장소에 저장되고 있지 않습니다. - 이후 구현 예정)
 
+## Google Play Store
+https://play.google.com/store/apps/details?id=com.sandorln.champion
+
 ## 개발 환경
 - Kotlin, MVVM, ViewBinding, Hilt, Coroutine, Retrofit2, Glide, Exoplayer, Motion Layout, Room, Navigation Component
 - Min SDK 21
