@@ -16,8 +16,8 @@ android {
         applicationId "com.sandorln.champion"
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 46
-        versionName "1.2.02"
+        versionCode 47
+        versionName "1.3.00"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "BASE_URL", "\"http://ddragon.leagueoflegends.com\""
