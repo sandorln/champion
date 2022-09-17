@@ -2,6 +2,9 @@ package com.sandorln.champion.model
 
 import android.os.Parcelable
 import androidx.room.Entity
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.sandorln.champion.model.type.SpellType
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
@@ -83,5 +86,16 @@ data class ChampionData(
         var attackspeed: Double = 0.0,
         var attackspeedoffset: Double = 0.0,
         var attackspeedperlevel: Double = 0.0
-    ) : Serializable, Parcelable
+    ) : Serializable, Parcelable {
+        fun changeJsonArray(): JsonArray {
+            val gson = Gson()
+            val statusJson = gson.fromJson(gson.toJson(this), JsonObject::class.java)
+            val statusArray = JsonArray()
+            for ((key, value) in statusJson.entrySet()) {
+                val statusJsonObject = JsonObject().apply { this.addProperty(key, value.asDouble) }
+                statusArray.add(statusJsonObject)
+            }
+            return statusArray
+        }
+    }
 }

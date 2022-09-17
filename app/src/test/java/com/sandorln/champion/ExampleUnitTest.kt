@@ -1,6 +1,7 @@
 package com.sandorln.champion
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.sandorln.champion.model.ChampionData
@@ -44,8 +45,14 @@ class ExampleUnitTest {
         val gson = Gson()
         val status = ChampionData.ChampionStats()
         val statusJson = gson.fromJson(gson.toJson(status), JsonObject::class.java)
-        for((key,value) in statusJson.entrySet()){
+        val statusArray = JsonArray()
+        for ((key, value) in statusJson.entrySet()) {
+            val ab = JsonObject().apply {
+                this.addProperty(key, value.asDouble)
+            }
+            statusArray.add(ab)
             println("$key = $value")
         }
+        println(statusArray)
     }
 }

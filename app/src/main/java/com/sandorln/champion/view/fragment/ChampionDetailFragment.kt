@@ -1,6 +1,7 @@
 package com.sandorln.champion.view.fragment
 
 import android.widget.ImageView
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,11 +19,11 @@ import com.google.android.exoplayer2.ui.PlayerControlView
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentChampionDetailBinding
 import com.sandorln.champion.model.ChampionData
+import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.type.SpellType
 import com.sandorln.champion.util.playChampionSkill
 import com.sandorln.champion.util.removeBrFromHtml
 import com.sandorln.champion.view.adapter.ChampionThumbnailSkillAdapter
-import com.sandorln.champion.view.adapter.ChampionTipAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,6 +101,12 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
     override fun initObserverSetting() {
         championDetailViewModel.championData.observe(this, Observer { champion ->
             binding.imgChampionThumbnail.setChampionThumbnail(champion.version, champion.id)
+            /* 능력치 관련 */
+            val championCompareBundle = bundleOf(BundleKeys.CHAMPION_ID to champion.id, BundleKeys.CHAMPION_VERSION to champion.version)
+            childFragmentManager
+                .beginTransaction()
+                .replace(binding.frgChampionStatusCompare.id, ChampionStatusCompareFragment::class.java, championCompareBundle)
+                .commitNowAllowingStateLoss()
 
             val championId = String.format("%04d", champion.key)
 

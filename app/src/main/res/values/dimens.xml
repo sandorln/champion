@@ -3,13 +3,17 @@
 
     <!-- layout Size -->
     <dimen name="champion_icon_size">50dp</dimen>
+    <dimen name="champion_status_icon_size">18dp</dimen>
     <dimen name="main_collapsing_layout_height">150dp</dimen>
 
     <!-- Padding -->
+    <dimen name="padding_tiny">2.5dp</dimen>
     <dimen name="padding_xsmall">5dp</dimen>
     <dimen name="padding_small">10dp</dimen>
     <dimen name="padding_middle">15dp</dimen>
     <dimen name="padding_large">20dp</dimen>
     <dimen name="padding_xlarge">30dp</dimen>
     <dimen name="padding_xxlarge">50dp</dimen>
+
+    <dimen name="text_tiny">7.5dp</dimen>
 </resources>
