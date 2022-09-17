@@ -80,6 +80,7 @@ data class ChampionData(
         var critperlevel: Double = 0.0,
         var attackdamage: Double = 0.0,
         var attackdamageperlevel: Double = 0.0,
+        var attackspeed: Double = 0.0,
         var attackspeedoffset: Double = 0.0,
         var attackspeedperlevel: Double = 0.0
     ) : Serializable, Parcelable
