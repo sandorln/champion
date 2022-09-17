@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.model.ItemData
+import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.usecase.FindItemByIdUseCase
 import com.sandorln.champion.usecase.GetItemListUseCase
@@ -56,11 +57,11 @@ class ItemViewModel @Inject constructor(
     fun refreshItemList() = viewModelScope.launch { _itemList.emitAll(getItemListUseCase(_searchItemName.value, true)) }
 
     private val _itemId = savedStateHandle
-        .getLiveData<String>("itemId")
+        .getLiveData<String>(BundleKeys.ITEM_ID)
         .asFlow()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    fun changeFindItemId(itemId: String) = savedStateHandle.set("itemId", itemId)
+    fun changeFindItemId(itemId: String) = savedStateHandle.set(BundleKeys.ITEM_ID, itemId)
 
     val findItemData = _itemId
         .flatMapLatest { itemId -> findItemByIdUseCase(itemId) }

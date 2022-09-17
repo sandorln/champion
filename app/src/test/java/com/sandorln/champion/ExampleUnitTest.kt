@@ -1,7 +1,10 @@
 package com.sandorln.champion
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import com.sandorln.champion.model.ChampionData
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -35,5 +38,21 @@ class ExampleUnitTest {
         println("기존의 Version : $versions")
         val sortVersions = versions.sorted()
         println("정렬 변환 Version : $sortVersions")
+    }
+
+    @Test
+    fun 객체를JSON으로변환() {
+        val gson = Gson()
+        val status = ChampionData.ChampionStats()
+        val statusJson = gson.fromJson(gson.toJson(status), JsonObject::class.java)
+        val statusArray = JsonArray()
+        for ((key, value) in statusJson.entrySet()) {
+            val ab = JsonObject().apply {
+                this.addProperty(key, value.asDouble)
+            }
+            statusArray.add(ab)
+            println("$key = $value")
+        }
+        println(statusArray)
     }
 }

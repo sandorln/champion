@@ -88,4 +88,7 @@ class VersionRepositoryImpl @Inject constructor(
     override suspend fun getLolSummonerSpellVersion(): String = initLolVersion {
         versionDao.getSummonerSpellVersion(versionDao.getTotalVersion())
     }
+
+    override suspend fun getLolChampionVersionByVersionName(version: String): String =
+        versionDao.getChampionVersion(version)
 }
