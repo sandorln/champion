@@ -164,6 +164,13 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <!-- Status -->
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/frg_champion_status_compare"
+                    tools:layout="@layout/fragment_champion_status_compare"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <!-- Skill -->
                 <com.sandorln.champion.view.custom.AdapterTitleTextView
                     android:layout_width="match_parent"
