@@ -41,4 +41,7 @@
     <string name="attackspeed" translatable="false">공격속도</string>
     <string name="attackspeedoffset" translatable="false">공격속도 (옛날)</string>
     <string name="error" translatable="false">ERROR</string>
+    <string name="version_title" translatable="false">Ver &lt;font color="#CAAB67">%1$s&lt;/font></string>
+    <string name="vs">VS</string>
+    <string name="action_changed">변경하기</string>
 </resources>

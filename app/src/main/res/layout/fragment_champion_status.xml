@@ -15,11 +15,6 @@
             android:descendantFocusability="blocksDescendants"
             android:orientation="vertical">
 
-            <com.sandorln.champion.view.custom.AdapterTitleTextView
-                android:id="@+id/tv_version"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_status"
                 android:layout_width="match_parent"
@@ -29,6 +24,5 @@
                 tools:listitem="@layout/item_champion_status" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
-
     </androidx.core.widget.NestedScrollView>
 </layout>

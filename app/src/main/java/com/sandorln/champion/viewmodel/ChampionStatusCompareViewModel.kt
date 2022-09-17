@@ -26,12 +26,26 @@ class ChampionStatusCompareViewModel @Inject constructor(
     private val getChampionInfoUseCase: GetChampionInfoUseCase,
     private val getChampionVersionByVersionUseCase: GetChampionVersionByVersionUseCase
 ) : AndroidViewModel(context as Application) {
-    private val versionList: StateFlow<List<String>> = getVersionListUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mutableListOf())
+    val versionList = getVersionListUseCase()
 
     private val _championId: String = savedStateHandle.get<String>(BundleKeys.CHAMPION_ID) ?: ""
-    private val _firstChampionVersion: MutableStateFlow<String> = MutableStateFlow("")
-    private val _secondChampionVersion: MutableStateFlow<String> = MutableStateFlow("")
+
+    private val initVersion = savedStateHandle.get<String>(BundleKeys.CHAMPION_VERSION) ?: ""
+    private val _firstChampionVersion: MutableStateFlow<String> = MutableStateFlow(initVersion)
+    val firstChampionVersion = _firstChampionVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), initVersion)
+    fun changeFirstVersion(selectVersion: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _firstChampionVersion.emit(selectVersion)
+        }
+    }
+
+    private val _secondChampionVersion: MutableStateFlow<String> = MutableStateFlow(initVersion)
+    val secondChampionVersion = _secondChampionVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), initVersion)
+    fun changeSecondVersion(selectVersion: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _secondChampionVersion.emit(selectVersion)
+        }
+    }
 
     private val _errorMsg: MutableSharedFlow<Exception> = MutableSharedFlow()
     val errorMsg = _errorMsg.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
@@ -43,6 +57,7 @@ class ChampionStatusCompareViewModel @Inject constructor(
                 val championData = (getChampionInfoUseCase(championVersion, _championId).last() as? ResultData.Success<ChampionData>)?.data ?: throw Exception("데이터를 불러올 수 없습니다")
                 emit(championData.stats)
             } catch (e: Exception) {
+                emit(ChampionData.ChampionStats())
                 _errorMsg.emit(e)
             }
         }
@@ -50,12 +65,4 @@ class ChampionStatusCompareViewModel @Inject constructor(
 
     val firstChampionStatus: Flow<ChampionData.ChampionStats> = _firstChampionVersion.transform(championInfoFlowCollector)
     val secondChampionStatus: Flow<ChampionData.ChampionStats> = _secondChampionVersion.transform(championInfoFlowCollector)
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            val championInitVersion = savedStateHandle.get<String>(BundleKeys.CHAMPION_VERSION) ?: ""
-            _firstChampionVersion.emit(championInitVersion)
-            _secondChampionVersion.emit("4.3.12")
-        }
-    }
 }

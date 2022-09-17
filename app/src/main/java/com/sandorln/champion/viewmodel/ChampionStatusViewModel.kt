@@ -23,7 +23,6 @@ class ChampionStatusViewModel @Inject constructor(
     private val _otherChampionStatus: Flow<ChampionData.ChampionStats> =
         savedStateHandle.getLiveData<ChampionData.ChampionStats>(BundleKeys.CHAMPION_OTHER_STATUS_KEY).asFlow()
 
-    val originalChampionVersion: Flow<String> = savedStateHandle.getLiveData<String>(BundleKeys.CHAMPION_VERSION).asFlow()
     val originalChampionStatus = _originalChampionStatus.transform { status -> emit(status.changeJsonArray()) }
     val otherChampionStatus = _otherChampionStatus.transform { status -> emit(status.changeJsonArray()) }
 }

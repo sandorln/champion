@@ -16,4 +16,6 @@
     <dimen name="padding_xxlarge">50dp</dimen>
 
     <dimen name="text_tiny">7.5dp</dimen>
+    <dimen name="text_xsmall">9dp</dimen>
+    <dimen name="card_radius">20dp</dimen>
 </resources>

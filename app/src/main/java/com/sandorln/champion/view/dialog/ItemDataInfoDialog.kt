@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.window.layout.WindowMetricsCalculator
 import com.sandorln.champion.databinding.DialogItemDataInfoBinding
+import com.sandorln.champion.model.keys.BundleKeys
 import com.sandorln.champion.model.result.ResultData
 import com.sandorln.champion.viewmodel.ItemViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +26,7 @@ class ItemDataInfoDialog : DialogFragment() {
     companion object {
         fun newInstance(itemId: String): ItemDataInfoDialog {
             val args = Bundle()
-            args.putString("itemId", itemId)
+            args.putString(BundleKeys.ITEM_ID, itemId)
             val fragment = ItemDataInfoDialog()
             fragment.arguments = args
             return fragment

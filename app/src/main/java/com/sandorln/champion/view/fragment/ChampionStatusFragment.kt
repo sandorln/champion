@@ -11,7 +11,6 @@ import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionStatusViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -34,23 +33,14 @@ class ChampionStatusFragment : BaseFragment<FragmentChampionStatusBinding>(R.lay
     override fun initObserverSetting() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                launch {
-                    championStatusViewModel
-                        .originalChampionVersion
-                        .collectLatest {
-                            binding.tvVersion.titleName = it
-                        }
-                }
-                launch {
-                    championStatusViewModel
-                        .originalChampionStatus
-                        .combine(championStatusViewModel.otherChampionStatus) { original, other ->
-                            championStatusAdapter.status = original
-                            championStatusAdapter.otherStatus = other
-                            championStatusAdapter.notifyDataSetChanged()
-                        }
-                        .collect()
-                }
+                championStatusViewModel
+                    .originalChampionStatus
+                    .combine(championStatusViewModel.otherChampionStatus) { original, other ->
+                        championStatusAdapter.status = original
+                        championStatusAdapter.otherStatus = other
+                        championStatusAdapter.notifyDataSetChanged()
+                    }
+                    .collect()
             }
         }
     }

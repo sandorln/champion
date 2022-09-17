@@ -6,7 +6,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/gray_141414"
-            app:cardCornerRadius="20dp">
+            app:cardCornerRadius="@dimen/card_radius">
 
         <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
