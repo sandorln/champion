@@ -5,5 +5,6 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.google.service) apply false
     alias(libs.plugins.serialization) apply false
-    id("com.google.firebase.crashlytics") version "2.9.9" apply false
+    alias(libs.plugins.firebase.crashlytices) apply false
+    alias(libs.plugins.ksp) apply false
 }

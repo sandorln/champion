@@ -3,9 +3,10 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.service)
+    alias(libs.plugins.firebase.crashlytices)
+    alias(libs.plugins.ksp)
     kotlin("kapt")
     id("kotlin-parcelize")
-    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -72,14 +73,14 @@ dependencies {
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
 
     // Retrofit
     implementation("com.squareup.retrofit2:converter-gson:2.7.2")
     implementation("com.squareup.retrofit2:retrofit:2.7.2")
 
     // Gson
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation(libs.google.gson)
 
     // Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
@@ -88,12 +89,12 @@ dependencies {
     // ViewPager2
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 
-    implementation("com.github.bumptech.glide:glide:4.12.0")
-    kapt("com.github.bumptech.glide:compiler:4.12.0")
+    implementation(libs.glide)
+    kapt(libs.glide.compiler)
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.48.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     // lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
@@ -101,17 +102,15 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
 
     // Exoplayer
-    implementation("com.google.android.exoplayer:exoplayer:2.17.1")
-    implementation("com.google.android.exoplayer:exoplayer-core:2.17.1")
-    implementation("com.google.android.exoplayer:exoplayer-ui:2.17.1")
+    implementation(libs.exoplayer)
+    implementation(libs.exoplayer.core)
+    implementation(libs.exoplayer.ui)
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:28.3.0"))
-    implementation("com.google.firebase:firebase-core")
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-firestore")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     // Paging
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")

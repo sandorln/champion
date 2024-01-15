@@ -2,6 +2,7 @@
 activityCompose = "1.8.0"
 coreKtx = "1.12.0"
 espressoCore = "3.5.1"
+exoplayer = "2.19.1"
 gradle = "8.1.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -16,7 +17,7 @@ hilt = "2.48.1"
 hiltCompose = "1.0.0"
 activityKtx = "1.8.0"
 fragmentKtx = "1.6.2"
-glide = "4.16.0"
+glide = "4.12.0"
 swipe = "1.1.0"
 navigtaion = "2.7.5"
 holixBottomSheetDialog = "1.4.0"
@@ -27,7 +28,8 @@ serialization = "1.9.0"
 paging = "3.2.1"
 webview = "0.24.13-rc"
 datastore = "1.0.0"
-crashlytics = "2.8.1"
+crashlytics = "2.9.9"
+ksp = "1.9.0-1.0.13"
 
 complieSdk = "34"
 material = "1.10.0"
@@ -55,6 +57,11 @@ androidx-compose-constraintlayout = { module = "androidx.constraintlayout:constr
 androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 androidx-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
+exoplayer-core = { module = "com.google.android.exoplayer:exoplayer-core", version.ref = "exoplayer" }
+exoplayer-ui = { module = "com.google.android.exoplayer:exoplayer-ui", version.ref = "exoplayer" }
+
 google-accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "webview" }
 
 holix-bottomsheetdialog-compose = { module = "com.holix.android:bottomsheetdialog-compose", version.ref = "holixBottomSheetDialog" }
@@ -70,6 +77,7 @@ coroutine-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
@@ -81,6 +89,10 @@ ktor-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 
 firebase-bom = "com.google.firebase:firebase-bom:32.6.0"
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
@@ -90,4 +102,5 @@ kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-service = { id = "com.google.gms.google-services", version.ref = "gms" }
-firebase-crashlytices = {id = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "crashlytics"}
+firebase-crashlytices = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
