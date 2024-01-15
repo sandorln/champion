@@ -3,8 +3,8 @@ package com.sandorln.champion.database
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.google.gson.Gson
-import com.sandorln.champion.model.ItemData.Gold
-import com.sandorln.champion.model.ItemData.Maps
+import com.sandorln.model.ItemData.Gold
+import com.sandorln.model.ItemData.Maps
 import javax.inject.Inject
 
 @ProvidedTypeConverter

@@ -7,7 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentItemListBinding
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.view.adapter.ItemThumbnailAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.view.dialog.ItemDataInfoDialog
@@ -45,12 +45,12 @@ class ItemListFragment : BaseFragment<FragmentItemListBinding>(R.layout.fragment
                         .itemList
                         .collectLatest { result ->
                             binding.refreshItem.isRefreshing = false
-                            binding.pbContent.isVisible = result is ResultData.Loading
-                            binding.error.isVisible = result is ResultData.Failed
+                            binding.pbContent.isVisible = result is com.sandorln.model.result.ResultData.Loading
+                            binding.error.isVisible = result is com.sandorln.model.result.ResultData.Failed
 
                             val itemList = when (result) {
-                                is ResultData.Success -> result.data ?: mutableListOf()
-                                is ResultData.Failed -> {
+                                is com.sandorln.model.result.ResultData.Success -> result.data ?: mutableListOf()
+                                is com.sandorln.model.result.ResultData.Failed -> {
                                     binding.error.errorMsg = result.exception.message ?: "오류 발생"
                                     result.data ?: mutableListOf()
                                 }

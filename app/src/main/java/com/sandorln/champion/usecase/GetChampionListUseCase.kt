@@ -1,7 +1,7 @@
 package com.sandorln.champion.usecase
 
-import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.ChampionData
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.repository.ChampionRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +21,7 @@ class GetChampionListUseCase(
     private val getLanguageCodeUseCase: GetLanguageCodeUseCase,
     private val championRepository: ChampionRepository
 ) {
-    operator fun invoke(search: String): Flow<ResultData<List<ChampionData>>> =
+    operator fun invoke(search: String): Flow<com.sandorln.model.result.ResultData<List<com.sandorln.model.ChampionData>>> =
         getChampionVersionUseCase()
             .flatMapLatest { championVersion ->
                 flow {
@@ -30,13 +30,13 @@ class GetChampionListUseCase(
                     if (championVersion.isEmpty())
                         throw Exception("버전 정보가 없습니다.")
 
-                    emit(ResultData.Loading)
+                    emit(com.sandorln.model.result.ResultData.Loading)
                     /* 너무 빠르게 진행 시 해당 값이 무시됨 */
                     delay(250)
                     val championList = championRepository.getChampionList(championVersion, search, languageCode)
-                    emit(ResultData.Success(championList))
+                    emit(com.sandorln.model.result.ResultData.Success(championList))
                 }.catch {
-                    emit(ResultData.Failed(Exception(it)))
+                    emit(com.sandorln.model.result.ResultData.Failed(Exception(it)))
                 }
             }
 }

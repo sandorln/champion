@@ -2,7 +2,7 @@ package com.sandorln.champion.repository
 
 import com.sandorln.champion.database.roomdao.SummonerSpellDao
 import com.sandorln.champion.database.shareddao.VersionDao
-import com.sandorln.champion.model.SummonerSpell
+import com.sandorln.model.SummonerSpell
 import com.sandorln.champion.network.SummonerSpellService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -15,7 +15,7 @@ class SummonerSpellRepositoryImpl @Inject constructor(
     private val summonerSpellDao: SummonerSpellDao,
     private val versionDao: VersionDao
 ) : SummonerSpellRepository {
-    private lateinit var allSummonerSpellList: List<SummonerSpell>
+    private lateinit var allSummonerSpellList: List<com.sandorln.model.SummonerSpell>
     private val summonerSpellMutex = Mutex()
     private suspend fun <T> initSummonerSpellList(
         totalVersion: String,
@@ -56,7 +56,7 @@ class SummonerSpellRepositoryImpl @Inject constructor(
     override suspend fun getSummonerSpellList(
         summonerSpellVersion: String,
         languageCode: String
-    ): List<SummonerSpell> = initSummonerSpellList(
+    ): List<com.sandorln.model.SummonerSpell> = initSummonerSpellList(
         totalVersion = summonerSpellVersion,
         languageCode = languageCode
     ) {

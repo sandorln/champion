@@ -1,7 +1,7 @@
 package com.sandorln.champion.repository
 
-import com.sandorln.champion.model.SummonerSpell
+import com.sandorln.model.SummonerSpell
 
 interface SummonerSpellRepository {
-    suspend fun getSummonerSpellList(summonerSpellVersion: String, languageCode : String): List<SummonerSpell>
+    suspend fun getSummonerSpellList(summonerSpellVersion: String, languageCode : String): List<com.sandorln.model.SummonerSpell>
 }

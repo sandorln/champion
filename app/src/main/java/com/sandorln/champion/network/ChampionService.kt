@@ -1,6 +1,6 @@
 package com.sandorln.champion.network
 
-import com.sandorln.champion.model.response.LolChampionResponse
+import com.sandorln.model.response.LolChampionResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -10,7 +10,7 @@ interface ChampionService {
     suspend fun getAllChampion(
         @Path("champion_version") champVersion: String,
         @Path("languageCode") languageCode: String
-    ): LolChampionResponse
+    ): com.sandorln.model.response.LolChampionResponse
 
     /* 특정 챔피언 정보 가져오기 by LanguageCode */
     @GET("/cdn/{champion_version}/data/{languageCode}/champion/{champion_name}.json")
@@ -18,5 +18,5 @@ interface ChampionService {
         @Path("champion_version") champVersion: String,
         @Path("champion_name") champName: String,
         @Path("languageCode") languageCode: String
-    ): LolChampionResponse
+    ): com.sandorln.model.response.LolChampionResponse
 }

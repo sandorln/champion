@@ -1,7 +1,7 @@
-package com.sandorln.champion.model.response
+package com.sandorln.model.response
 
 import com.google.gson.Gson
-import com.sandorln.champion.model.ItemData
+import com.sandorln.model.ItemData
 
 data class LolItemResponse(
     /* 위의 data 를 Parsing 하여 생성 될 아이템 정보 리스트 */

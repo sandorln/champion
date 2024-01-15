@@ -1,11 +1,11 @@
-package com.sandorln.champion.model
+package com.sandorln.model
 
 import android.os.Parcelable
 import androidx.room.Entity
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.sandorln.champion.model.type.SpellType
+import com.sandorln.model.type.SpellType
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 

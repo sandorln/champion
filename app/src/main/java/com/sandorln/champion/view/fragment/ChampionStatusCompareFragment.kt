@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentChampionStatusCompareBinding
-import com.sandorln.champion.model.keys.BundleKeys
+import com.sandorln.model.keys.BundleKeys
 import com.sandorln.champion.util.showStringListPopup
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionStatusCompareViewModel
@@ -68,16 +68,16 @@ class ChampionStatusCompareFragment : BaseFragment<FragmentChampionStatusCompare
                                 .beginTransaction()
                                 .replace(
                                     binding.frgOriginal.id, ChampionStatusFragment::class.java, bundleOf(
-                                        BundleKeys.CHAMPION_VERSION to firstVer,
-                                        BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to firstStatus,
-                                        BundleKeys.CHAMPION_OTHER_STATUS_KEY to secondStatus
+                                        com.sandorln.model.keys.BundleKeys.CHAMPION_VERSION to firstVer,
+                                        com.sandorln.model.keys.BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to firstStatus,
+                                        com.sandorln.model.keys.BundleKeys.CHAMPION_OTHER_STATUS_KEY to secondStatus
                                     )
                                 )
                                 .replace(
                                     binding.frgOther.id, ChampionStatusFragment::class.java, bundleOf(
-                                        BundleKeys.CHAMPION_VERSION to secondVer,
-                                        BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to secondStatus,
-                                        BundleKeys.CHAMPION_OTHER_STATUS_KEY to firstStatus
+                                        com.sandorln.model.keys.BundleKeys.CHAMPION_VERSION to secondVer,
+                                        com.sandorln.model.keys.BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to secondStatus,
+                                        com.sandorln.model.keys.BundleKeys.CHAMPION_OTHER_STATUS_KEY to firstStatus
                                     )
                                 )
                                 .commitNowAllowingStateLoss()

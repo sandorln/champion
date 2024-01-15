@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentAppSettingBinding
-import com.sandorln.champion.model.type.AppSettingType
+import com.sandorln.model.type.AppSettingType
 import com.sandorln.champion.util.showStringListPopup
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.AppSettingViewModel
@@ -31,8 +31,8 @@ class AppSettingFragment : BaseFragment<FragmentAppSettingBinding>(R.layout.frag
         onTouchListener = View.OnTouchListener { view, motionEvent ->
             if (motionEvent != null && motionEvent.actionMasked == MotionEvent.ACTION_DOWN) {
                 when (view.id) {
-                    binding.checkQuestionNewestLolVersion.id -> AppSettingType.QUESTION_NEWEST_LOL_VERSION
-                    binding.checkVideoWifiModeOnlyPlay.id -> AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY
+                    binding.checkQuestionNewestLolVersion.id -> com.sandorln.model.type.AppSettingType.QUESTION_NEWEST_LOL_VERSION
+                    binding.checkVideoWifiModeOnlyPlay.id -> com.sandorln.model.type.AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY
                     else -> null
                 }?.let { appSettingType ->
                     appSettingViewModel.changeAppSetting(appSettingType)

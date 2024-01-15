@@ -1,7 +1,7 @@
 package com.sandorln.champion.usecase
 
-import com.sandorln.champion.model.ItemData
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.ItemData
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.repository.ItemRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -14,11 +14,11 @@ class GetItemListUseCase(
     private val itemRepository: ItemRepository,
     private val getLanguageCodeUseCase: GetLanguageCodeUseCase
 ) {
-    operator fun invoke(search: String, inStore: Boolean): Flow<ResultData<List<ItemData>>> =
+    operator fun invoke(search: String, inStore: Boolean): Flow<com.sandorln.model.result.ResultData<List<com.sandorln.model.ItemData>>> =
         getVersionUseCase()
             .flatMapLatest { totalVersion ->
                 flow {
-                    emit(ResultData.Loading)
+                    emit(com.sandorln.model.result.ResultData.Loading)
                     /* 너무 빠르게 진행 시 해당 값이 무시됨 */
                     delay(250)
                     val languageCode = getLanguageCodeUseCase()
@@ -28,9 +28,9 @@ class GetItemListUseCase(
                         inStore = inStore,
                         languageCode = languageCode
                     )
-                    emit(ResultData.Success(itemList))
+                    emit(com.sandorln.model.result.ResultData.Success(itemList))
                 }.catch {
-                    emit(ResultData.Failed(Exception(it)))
+                    emit(com.sandorln.model.result.ResultData.Failed(Exception(it)))
                 }
             }
 }

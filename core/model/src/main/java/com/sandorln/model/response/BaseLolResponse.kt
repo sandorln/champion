@@ -1,4 +1,4 @@
-package com.sandorln.champion.model.response
+package com.sandorln.model.response
 
 import com.google.gson.JsonObject
 

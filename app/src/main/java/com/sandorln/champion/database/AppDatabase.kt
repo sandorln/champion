@@ -6,11 +6,11 @@ import androidx.room.TypeConverters
 import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.database.roomdao.ItemDao
 import com.sandorln.champion.database.roomdao.SummonerSpellDao
-import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.ItemData
-import com.sandorln.champion.model.SummonerSpell
+import com.sandorln.model.ChampionData
+import com.sandorln.model.ItemData
+import com.sandorln.model.SummonerSpell
 
-@Database(entities = [ChampionData::class, ItemData::class, SummonerSpell::class], version = 7)
+@Database(entities = [com.sandorln.model.ChampionData::class, com.sandorln.model.ItemData::class, com.sandorln.model.SummonerSpell::class], version = 7)
 @TypeConverters(value = [LolChampionConverters::class, LolItemConverters::class])
 abstract class AppDatabase : RoomDatabase() {
     abstract fun championDao(): ChampionDao

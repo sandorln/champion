@@ -1,7 +1,7 @@
 package com.sandorln.champion.usecase
 
-import com.sandorln.champion.model.ItemData
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.ItemData
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.repository.ItemRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -13,20 +13,20 @@ class FindItemByIdUseCase(
     private val itemRepository: ItemRepository,
     private val getLanguageCodeUseCase: GetLanguageCodeUseCase
 ) {
-    operator fun invoke(itemId: String): Flow<ResultData<ItemData>> =
+    operator fun invoke(itemId: String): Flow<com.sandorln.model.result.ResultData<com.sandorln.model.ItemData>> =
         getVersionUseCase()
             .flatMapLatest { totalVersion ->
                 flow {
                     val languageCode = getLanguageCodeUseCase()
-                    emit(ResultData.Loading)
+                    emit(com.sandorln.model.result.ResultData.Loading)
                     val item = itemRepository.findItemById(
                         itemVersion = totalVersion,
                         itemId = itemId,
                         languageCode = languageCode
                     )
-                    emit(ResultData.Success(item))
+                    emit(com.sandorln.model.result.ResultData.Success(item))
                 }.catch {
-                    emit(ResultData.Failed(Exception(it)))
+                    emit(com.sandorln.model.result.ResultData.Failed(Exception(it)))
                 }
             }
 }

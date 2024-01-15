@@ -1,4 +1,4 @@
-package com.sandorln.champion.model.keys
+package com.sandorln.model.keys
 
 object BundleKeys {
     const val ITEM_ID = "item_id"

@@ -1,7 +1,7 @@
 package com.sandorln.champion.usecase
 
-import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.ChampionData
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.repository.ChampionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -11,13 +11,13 @@ class GetChampionInfoUseCase(
     private val championRepository: ChampionRepository,
     private val getLanguageCodeUseCase: GetLanguageCodeUseCase
 ) {
-    operator fun invoke(championVersion: String, championId: String): Flow<ResultData<ChampionData>> =
+    operator fun invoke(championVersion: String, championId: String): Flow<com.sandorln.model.result.ResultData<com.sandorln.model.ChampionData>> =
         flow {
-            emit(ResultData.Loading)
+            emit(com.sandorln.model.result.ResultData.Loading)
             val languageCode = getLanguageCodeUseCase()
             val championData = championRepository.getChampionInfo(championVersion, championId, languageCode)
-            emit(ResultData.Success(championData))
+            emit(com.sandorln.model.result.ResultData.Success(championData))
         }.catch {
-            emit(ResultData.Failed(Exception(it)))
+            emit(com.sandorln.model.result.ResultData.Failed(Exception(it)))
         }
 }

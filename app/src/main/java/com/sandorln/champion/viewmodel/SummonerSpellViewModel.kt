@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.champion.model.SummonerSpell
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.SummonerSpell
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.GetSummonerSpellListUseCase
 import com.sandorln.champion.usecase.GetSummonerSpellVersionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,11 +21,11 @@ class SummonerSpellViewModel @Inject constructor(
     private val getSummonerSpellVersionUseCase: GetSummonerSpellVersionUseCase,
     private val getSummonerSpellListUseCase: GetSummonerSpellListUseCase
 ) : AndroidViewModel(context as Application) {
-    private val _summonerSpellList: MutableStateFlow<ResultData<List<SummonerSpell>>> = MutableStateFlow(ResultData.Loading)
+    private val _summonerSpellList: MutableStateFlow<com.sandorln.model.result.ResultData<List<com.sandorln.model.SummonerSpell>>> = MutableStateFlow(com.sandorln.model.result.ResultData.Loading)
     val summonerSpellList = _summonerSpellList
         .onStart {
             when (val result = _summonerSpellList.firstOrNull()) {
-                is ResultData.Success -> {
+                is com.sandorln.model.result.ResultData.Success -> {
                     result.data?.let { itemList ->
                         /* 현재 보여지고 있는 소환사 주문 버전과 설정에서 설정된 버전이 다를 시 갱신 */
                         val nowShowSummonerSpellVersion = itemList.first().version
@@ -38,7 +38,7 @@ class SummonerSpellViewModel @Inject constructor(
                 else -> refreshSummonerSpellList()
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), com.sandorln.model.result.ResultData.Loading)
 
     fun refreshSummonerSpellList() = viewModelScope.launch(Dispatchers.IO) {
         _summonerSpellList.emitAll(getSummonerSpellListUseCase())

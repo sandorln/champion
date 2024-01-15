@@ -14,8 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.window.layout.WindowMetricsCalculator
 import com.sandorln.champion.databinding.DialogItemDataInfoBinding
-import com.sandorln.champion.model.keys.BundleKeys
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.viewmodel.ItemViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -26,7 +26,7 @@ class ItemDataInfoDialog : DialogFragment() {
     companion object {
         fun newInstance(itemId: String): ItemDataInfoDialog {
             val args = Bundle()
-            args.putString(BundleKeys.ITEM_ID, itemId)
+            args.putString(com.sandorln.model.keys.BundleKeys.ITEM_ID, itemId)
             val fragment = ItemDataInfoDialog()
             fragment.arguments = args
             return fragment
@@ -51,7 +51,7 @@ class ItemDataInfoDialog : DialogFragment() {
                         .findItemData
                         .collectLatest { result ->
                             when (result) {
-                                is ResultData.Success -> {
+                                is com.sandorln.model.result.ResultData.Success -> {
                                     val item = result.data ?: throw Exception("아이템을 찾을 수 없습니다")
                                     with(binding) {
                                         imgItemThumbnail.setItemThumbnail(item.version, item.id)

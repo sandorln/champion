@@ -1,4 +1,4 @@
-package com.sandorln.champion.model
+package com.sandorln.model
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemChampionFullSkinBinding
-import com.sandorln.champion.model.ChampionData.ChampionSkin
+import com.sandorln.model.ChampionData.ChampionSkin
 import com.sandorln.champion.util.setChampionSplash
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 

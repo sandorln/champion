@@ -4,10 +4,10 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.sandorln.champion.model.*
-import com.sandorln.champion.model.ChampionData.ChampionSpell
-import com.sandorln.champion.model.ChampionData.ChampionSkin
-import com.sandorln.champion.model.ChampionData.ChampionStats
-import com.sandorln.champion.model.ChampionData.ChampionInfo
+import com.sandorln.model.ChampionData.ChampionSpell
+import com.sandorln.model.ChampionData.ChampionSkin
+import com.sandorln.model.ChampionData.ChampionStats
+import com.sandorln.model.ChampionData.ChampionInfo
 import javax.inject.Inject
 
 @ProvidedTypeConverter
@@ -19,10 +19,10 @@ class LolChampionConverters @Inject constructor(private val gson: Gson) {
     fun toChampionInfo(value: String) = gson.fromJson(value, ChampionInfo::class.java)
 
     @TypeConverter
-    fun fromLolImage(value: LOLImage) = gson.toJson(value) ?: ""
+    fun fromLolImage(value: com.sandorln.model.LOLImage) = gson.toJson(value) ?: ""
 
     @TypeConverter
-    fun toLolImage(value: String) = gson.fromJson(value, LOLImage::class.java)
+    fun toLolImage(value: String) = gson.fromJson(value, com.sandorln.model.LOLImage::class.java)
 
     @TypeConverter
     fun fromStringList(value: List<String>) = gson.toJson(value) ?: ""

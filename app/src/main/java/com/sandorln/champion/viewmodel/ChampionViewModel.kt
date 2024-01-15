@@ -6,9 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.keys.BundleKeys
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.ChampionData
+import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.GetAppSettingUseCase
 import com.sandorln.champion.usecase.GetChampionInfoUseCase
 import com.sandorln.champion.usecase.GetChampionListUseCase
@@ -32,11 +32,11 @@ class ChampionViewModel @Inject constructor(
     private val _searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
 
-    private val _showChampionList: MutableStateFlow<ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
+    private val _showChampionList: MutableStateFlow<com.sandorln.model.result.ResultData<List<com.sandorln.model.ChampionData>>> = MutableStateFlow(com.sandorln.model.result.ResultData.Loading)
     val showChampionList = _showChampionList
         .onStart {
             when (val result = _showChampionList.firstOrNull()) {
-                is ResultData.Success -> {
+                is com.sandorln.model.result.ResultData.Success -> {
                     result.data?.let { championList ->
                         /* 현재 보여지고 있는 챔피언 버전과 설정에서 설정된 버전이 다를 시 갱신 */
                         val nowShowChampionVersion = championList.firstOrNull()?.version ?: ""
@@ -46,16 +46,16 @@ class ChampionViewModel @Inject constructor(
                     }
                 }
                 /* 오류 상태였을 경우 곧바로 갱신 */
-                is ResultData.Failed -> refreshChampionList()
+                is com.sandorln.model.result.ResultData.Failed -> refreshChampionList()
                 else -> {}
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), com.sandorln.model.result.ResultData.Loading)
 
     fun refreshChampionList() = viewModelScope.launch(Dispatchers.IO) { _showChampionList.emitAll(getChampionListUseCase(_searchChampionName.value)) }
 
     fun getChampionDetailInfo(championVersion: String, championId: String) = getChampionInfoUseCase(championVersion, championId)
-    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())
+    val championData: LiveData<com.sandorln.model.ChampionData> = savedStateHandle.getLiveData(com.sandorln.model.keys.BundleKeys.CHAMPION_DATA, com.sandorln.model.ChampionData())
 
     init {
         viewModelScope.launch {

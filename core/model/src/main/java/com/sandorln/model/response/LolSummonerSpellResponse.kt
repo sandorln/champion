@@ -1,7 +1,7 @@
-package com.sandorln.champion.model.response
+package com.sandorln.model.response
 
 import com.google.gson.Gson
-import com.sandorln.champion.model.SummonerSpell
+import com.sandorln.model.SummonerSpell
 
 data class LolSummonerSpellResponse(
     val summonerSpellList: MutableList<SummonerSpell> = mutableListOf()

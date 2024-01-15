@@ -29,7 +29,7 @@
         app:popExitAnim="@animator/nav_default_exit_anim">
         <argument
             android:name="championData"
-            app:argType="com.sandorln.champion.model.ChampionData"
+            app:argType="com.sandorln.model.ChampionData"
             app:nullable="true" />
     </action>
 </navigation>

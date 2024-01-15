@@ -1,7 +1,7 @@
-package com.sandorln.champion.model.response
+package com.sandorln.model.response
 
 import com.google.gson.Gson
-import com.sandorln.champion.model.ChampionData
+import com.sandorln.model.ChampionData
 
 data class LolChampionResponse(
     var format: String = "",

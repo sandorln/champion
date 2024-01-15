@@ -1,14 +1,11 @@
-package com.sandorln.champion.model
-
+package com.sandorln.database.model
 
 import androidx.room.Entity
-import com.google.gson.annotations.SerializedName
 
-@Entity(primaryKeys = ["id", "version", "languageCode"])
-data class ItemData(
+@Entity(primaryKeys = ["id", "version"])
+data class ItemEntity(
     var id: String = "",
     var version: String = "",
-    var languageCode: String = "",
     val name: String = "",
     val description: String = "",
 
@@ -18,26 +15,23 @@ data class ItemData(
     val from: List<String> = mutableListOf(),
     val into: List<String> = mutableListOf(),
 
-    val gold: Gold = Gold(),
+    val gold: GoldEntity = GoldEntity(),
 
     val tags: List<String> = mutableListOf(),
-    val maps: Maps = Maps(),
+    /* TODO :: [칼바람]과 [소환사 협곡]만 저장 되도록 */
+    val maps: MapsEntity = MapsEntity(),
 ) {
-    data class Gold(
+    data class GoldEntity(
         val base: Int = 0,
         val purchasable: Boolean = true,
         val sell: Int = 0,
         val total: Int = 0
     )
 
-    data class Maps(
-        @SerializedName("1")
+    data class MapsEntity(
         val x1: Boolean = false,
-        @SerializedName("10")
         val x10: Boolean = false,
-        @SerializedName("12")
         val x12: Boolean = false,
-        @SerializedName("8")
         val x8: Boolean = false
     )
 }

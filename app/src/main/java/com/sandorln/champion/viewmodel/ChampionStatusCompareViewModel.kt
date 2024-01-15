@@ -5,9 +5,9 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.keys.BundleKeys
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.ChampionData
+import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.GetChampionInfoUseCase
 import com.sandorln.champion.usecase.GetChampionVersionByVersionUseCase
 import com.sandorln.champion.usecase.GetVersionListUseCase
@@ -28,9 +28,9 @@ class ChampionStatusCompareViewModel @Inject constructor(
 ) : AndroidViewModel(context as Application) {
     val versionList = getVersionListUseCase()
 
-    private val _championId: String = savedStateHandle.get<String>(BundleKeys.CHAMPION_ID) ?: ""
+    private val _championId: String = savedStateHandle.get<String>(com.sandorln.model.keys.BundleKeys.CHAMPION_ID) ?: ""
 
-    private val initVersion = savedStateHandle.get<String>(BundleKeys.CHAMPION_VERSION) ?: ""
+    private val initVersion = savedStateHandle.get<String>(com.sandorln.model.keys.BundleKeys.CHAMPION_VERSION) ?: ""
     private val _firstChampionVersion: MutableStateFlow<String> = MutableStateFlow(initVersion)
     val firstChampionVersion = _firstChampionVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), initVersion)
     fun changeFirstVersion(selectVersion: String) {
@@ -50,19 +50,19 @@ class ChampionStatusCompareViewModel @Inject constructor(
     private val _errorMsg: MutableSharedFlow<Exception> = MutableSharedFlow()
     val errorMsg = _errorMsg.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    private val championInfoFlowCollector: suspend FlowCollector<ChampionData.ChampionStats>.(value: String) -> Unit = { version ->
+    private val championInfoFlowCollector: suspend FlowCollector<com.sandorln.model.ChampionData.ChampionStats>.(value: String) -> Unit = { version ->
         val championVersion = getChampionVersionByVersionUseCase(version).first()
         if (championVersion.isNotEmpty()) {
             try {
-                val championData = (getChampionInfoUseCase(championVersion, _championId).last() as? ResultData.Success<ChampionData>)?.data ?: throw Exception("데이터를 불러올 수 없습니다")
+                val championData = (getChampionInfoUseCase(championVersion, _championId).last() as? com.sandorln.model.result.ResultData.Success<com.sandorln.model.ChampionData>)?.data ?: throw Exception("데이터를 불러올 수 없습니다")
                 emit(championData.stats)
             } catch (e: Exception) {
-                emit(ChampionData.ChampionStats())
+                emit(com.sandorln.model.ChampionData.ChampionStats())
                 _errorMsg.emit(e)
             }
         }
     }
 
-    val firstChampionStatus: Flow<ChampionData.ChampionStats> = _firstChampionVersion.transform(championInfoFlowCollector)
-    val secondChampionStatus: Flow<ChampionData.ChampionStats> = _secondChampionVersion.transform(championInfoFlowCollector)
+    val firstChampionStatus: Flow<com.sandorln.model.ChampionData.ChampionStats> = _firstChampionVersion.transform(championInfoFlowCollector)
+    val secondChampionStatus: Flow<com.sandorln.model.ChampionData.ChampionStats> = _secondChampionVersion.transform(championInfoFlowCollector)
 }

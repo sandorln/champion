@@ -2,7 +2,7 @@ package com.sandorln.champion.repository
 
 import com.sandorln.champion.database.roomdao.ItemDao
 import com.sandorln.champion.database.shareddao.VersionDao
-import com.sandorln.champion.model.ItemData
+import com.sandorln.model.ItemData
 import com.sandorln.champion.network.ItemService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -15,7 +15,7 @@ class ItemRepositoryImpl @Inject constructor(
     private val itemDao: ItemDao,
     private val versionDao: VersionDao
 ) : ItemRepository {
-    lateinit var allItemList: List<ItemData>
+    lateinit var allItemList: List<com.sandorln.model.ItemData>
     private val itemMutex = Mutex()
     private suspend fun <T> initAllItemList(totalVersion: String, languageCode: String, getItemData: suspend () -> T): T =
         withContext(Dispatchers.IO) {
@@ -55,7 +55,7 @@ class ItemRepositoryImpl @Inject constructor(
         search: String,
         inStore: Boolean,
         languageCode: String
-    ): List<ItemData> = initAllItemList(itemVersion, languageCode) {
+    ): List<com.sandorln.model.ItemData> = initAllItemList(itemVersion, languageCode) {
         /* 검색어 / 검색 대상 공백 제거 */
         val itemSearch = search.replace(" ", "").uppercase()
 
@@ -81,7 +81,7 @@ class ItemRepositoryImpl @Inject constructor(
         itemVersion: String,
         itemId: String,
         languageCode: String
-    ): ItemData = initAllItemList(itemVersion, languageCode) {
+    ): com.sandorln.model.ItemData = initAllItemList(itemVersion, languageCode) {
         allItemList.firstOrNull { it.id == itemId } ?: throw Exception("해당 아이템은 존재하지 않습니다")
     }
 }

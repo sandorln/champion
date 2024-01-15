@@ -1,6 +1,6 @@
 package com.sandorln.champion.repository
 
-import com.sandorln.champion.model.VersionLol.VersionCategory
+import com.sandorln.model.VersionLol.VersionCategory
 import kotlinx.coroutines.flow.Flow
 
 interface VersionRepository {

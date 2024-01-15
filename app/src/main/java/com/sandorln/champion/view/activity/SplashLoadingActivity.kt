@@ -7,7 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivitySplashLoadingBinding
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.view.base.BaseActivity
 import com.sandorln.champion.viewmodel.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +28,7 @@ class SplashLoadingActivity : BaseActivity<ActivitySplashLoadingBinding>(R.layou
                     .hasNewLolVersion
                     .collectLatest { result ->
                         when (result) {
-                            is ResultData.Failed -> {
+                            is com.sandorln.model.result.ResultData.Failed -> {
                                 showAlertDialog(
                                     message = "버전 정보를 받아오지 못했습니다",
                                     positiveBtnName = "재시도",
@@ -40,7 +40,7 @@ class SplashLoadingActivity : BaseActivity<ActivitySplashLoadingBinding>(R.layou
                                         finish()
                                 }
                             }
-                            is ResultData.Success -> {
+                            is com.sandorln.model.result.ResultData.Success -> {
                                 val hasNewLolVersion = result.data == true
 
                                 if (hasNewLolVersion)

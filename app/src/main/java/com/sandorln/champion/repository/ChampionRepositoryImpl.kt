@@ -2,7 +2,7 @@ package com.sandorln.champion.repository
 
 import com.sandorln.champion.database.roomdao.ChampionDao
 import com.sandorln.champion.database.shareddao.VersionDao
-import com.sandorln.champion.model.ChampionData
+import com.sandorln.model.ChampionData
 import com.sandorln.champion.network.ChampionService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -15,7 +15,7 @@ class ChampionRepositoryImpl @Inject constructor(
     private val championDao: ChampionDao,
     private val versionDao: VersionDao
 ) : ChampionRepository {
-    lateinit var allChampionList: List<ChampionData>
+    lateinit var allChampionList: List<com.sandorln.model.ChampionData>
     private val championMutex = Mutex()
     private suspend fun <T> initAllChampion(championVersion: String, languageCode: String, getChampionData: suspend () -> T): T =
         withContext(Dispatchers.IO) {
@@ -45,7 +45,7 @@ class ChampionRepositoryImpl @Inject constructor(
             getChampionData()
         }
 
-    override suspend fun getChampionList(championVersion: String, search: String, languageCode: String): List<ChampionData> = initAllChampion(championVersion, languageCode) {
+    override suspend fun getChampionList(championVersion: String, search: String, languageCode: String): List<com.sandorln.model.ChampionData> = initAllChampion(championVersion, languageCode) {
         val searchChampionName = search.replace(" ", "").lowercase()
         /* 검색어에 맞는 챔피언 필터 */
         allChampionList.filter { champion ->
@@ -55,7 +55,7 @@ class ChampionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getChampionInfo(championVersion: String, championId: String, languageCode: String): ChampionData = withContext(Dispatchers.IO) {
+    override suspend fun getChampionInfo(championVersion: String, championId: String, languageCode: String): com.sandorln.model.ChampionData = withContext(Dispatchers.IO) {
         val response = championService.getChampionDetailInfo(championVersion, championId, languageCode)
         response.parsingData()
         response.championList.first().copy(version = championVersion)

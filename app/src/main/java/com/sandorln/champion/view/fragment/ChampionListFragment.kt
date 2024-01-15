@@ -11,8 +11,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentChampionListBinding
-import com.sandorln.champion.model.keys.BundleKeys
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionViewModel
@@ -36,14 +36,14 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
                 championViewModel.getChampionDetailInfo(it.version, it.id).firstOrNull { resultData ->
-                    val isLoading = resultData is ResultData.Loading
+                    val isLoading = resultData is com.sandorln.model.result.ResultData.Loading
                     binding.pbContent.isVisible = isLoading
 
                     when (resultData) {
-                        is ResultData.Success -> {
-                            findNavController().navigate(R.id.action_global_frg_champion_detail, bundleOf(BundleKeys.CHAMPION_DATA to resultData.data))
+                        is com.sandorln.model.result.ResultData.Success -> {
+                            findNavController().navigate(R.id.action_global_frg_champion_detail, bundleOf(com.sandorln.model.keys.BundleKeys.CHAMPION_DATA to resultData.data))
                         }
-                        is ResultData.Failed -> showToast("오류 발생 ${resultData.exception.message}")
+                        is com.sandorln.model.result.ResultData.Failed -> showToast("오류 발생 ${resultData.exception.message}")
                         else -> {}
                     }
 
@@ -72,12 +72,12 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                         .showChampionList
                         .collectLatest { result ->
                             binding.refreshChampion.isRefreshing = false
-                            binding.pbContent.isVisible = result is ResultData.Loading
-                            binding.error.isVisible = result is ResultData.Failed
+                            binding.pbContent.isVisible = result is com.sandorln.model.result.ResultData.Loading
+                            binding.error.isVisible = result is com.sandorln.model.result.ResultData.Failed
 
                             val championList = when (result) {
-                                is ResultData.Success -> result.data ?: mutableListOf()
-                                is ResultData.Failed -> {
+                                is com.sandorln.model.result.ResultData.Success -> result.data ?: mutableListOf()
+                                is com.sandorln.model.result.ResultData.Failed -> {
                                     binding.error.errorMsg = result.exception.message ?: "오류 발생"
                                     result.data ?: mutableListOf()
                                 }

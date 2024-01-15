@@ -12,7 +12,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.sandorln.champion.databinding.CustomChampionSkinsBinding
-import com.sandorln.champion.model.ChampionData
+import com.sandorln.model.ChampionData
 import com.sandorln.champion.view.adapter.ChampionFullSkinAdapter
 import kotlin.math.abs
 
@@ -80,7 +80,7 @@ fun ChampionSkins.setChampionId(championId: String) {
 }
 
 @BindingAdapter(value = ["skins", "changeSelectSkin"], requireAll = false)
-fun ChampionSkins.setSkins(skins: List<ChampionData.ChampionSkin>?, changeSelectSkin: (drawable: Drawable?, skinName: String?) -> Unit?) {
+fun ChampionSkins.setSkins(skins: List<com.sandorln.model.ChampionData.ChampionSkin>?, changeSelectSkin: (drawable: Drawable?, skinName: String?) -> Unit?) {
     skinAdapter.submitList(skins)
     {
         binding.vpFullSkin.offscreenPageLimit = skins?.size ?: 0

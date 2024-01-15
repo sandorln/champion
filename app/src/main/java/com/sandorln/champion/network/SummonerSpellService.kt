@@ -1,6 +1,6 @@
 package com.sandorln.champion.network
 
-import com.sandorln.champion.model.response.LolSummonerSpellResponse
+import com.sandorln.model.response.LolSummonerSpellResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -9,5 +9,5 @@ interface SummonerSpellService {
     suspend fun getAllSummonerSpell(
         @Path("version") spellVr: String,
         @Path("languageCode") languageCode: String
-    ): LolSummonerSpellResponse
+    ): com.sandorln.model.response.LolSummonerSpellResponse
 }

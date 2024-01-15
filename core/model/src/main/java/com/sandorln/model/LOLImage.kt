@@ -1,4 +1,4 @@
-package com.sandorln.champion.model
+package com.sandorln.model
 
 import android.os.Parcelable
 import androidx.room.Entity

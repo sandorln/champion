@@ -4,9 +4,8 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.champion.model.result.ResultData
+import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.ChangeNewestVersionUseCase
-import com.sandorln.champion.usecase.GetAppSettingUseCase
 import com.sandorln.champion.usecase.HasNewLolVersionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,8 +26,8 @@ class SplashViewModel @Inject constructor(
         refreshHasNewLolVersion()
     }
 
-    private val _hasNewLolVersion: MutableStateFlow<ResultData<Boolean>> = MutableStateFlow(ResultData.Loading)
-    val hasNewLolVersion = _hasNewLolVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
+    private val _hasNewLolVersion: MutableStateFlow<com.sandorln.model.result.ResultData<Boolean>> = MutableStateFlow(com.sandorln.model.result.ResultData.Loading)
+    val hasNewLolVersion = _hasNewLolVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), com.sandorln.model.result.ResultData.Loading)
     fun refreshHasNewLolVersion() {
         viewModelScope.launch { _hasNewLolVersion.emitAll(hasNewLolVersionUseCase()) }
     }

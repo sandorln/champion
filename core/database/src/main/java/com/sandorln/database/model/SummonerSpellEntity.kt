@@ -1,12 +1,11 @@
-package com.sandorln.champion.model
+package com.sandorln.database.model
 
 import androidx.room.Entity
 
-@Entity(primaryKeys = ["id", "version", "languageCode"])
-data class SummonerSpell(
+@Entity(primaryKeys = ["id", "version"])
+data class SummonerSpellEntity(
     val id: String = "",
     var version: String = "",
-    var languageCode: String = "",
     val name: String = "",
     val description: String = "",
     val cooldownBurn: String = ""

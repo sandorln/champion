@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.sandorln.champion.model.VersionLol.VersionCategory
+import com.sandorln.model.VersionLol.VersionCategory
 
 class VersionDaoImpl(
     private val pref: SharedPreferences,

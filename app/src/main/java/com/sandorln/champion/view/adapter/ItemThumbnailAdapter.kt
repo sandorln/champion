@@ -5,12 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemItemThumbnailBinding
-import com.sandorln.champion.model.ItemData
+import com.sandorln.model.ItemData
 import com.sandorln.champion.util.removeBrFromHtml
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 
 class ItemThumbnailAdapter(private val onClickItemListener: (itemId: String) -> Unit) :
-    ListAdapter<ItemData, ItemThumbnailAdapter.ItemThumbnailViewHolder>(DiffUtils.DIFF_ITEM_DATA) {
+    ListAdapter<com.sandorln.model.ItemData, ItemThumbnailAdapter.ItemThumbnailViewHolder>(DiffUtils.DIFF_ITEM_DATA) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemThumbnailViewHolder =
         ItemThumbnailViewHolder(ItemItemThumbnailBinding.inflate(LayoutInflater.from(parent.context), parent, false))

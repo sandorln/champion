@@ -8,9 +8,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.application.ChampionApplication
-import com.sandorln.champion.model.ChampionData
-import com.sandorln.champion.model.keys.BundleKeys
-import com.sandorln.champion.model.type.AppSettingType
+import com.sandorln.model.ChampionData
+import com.sandorln.model.keys.BundleKeys
 import com.sandorln.champion.usecase.GetAppSettingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -24,7 +23,7 @@ class ChampionDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getAppSettingUseCase: GetAppSettingUseCase
 ) : AndroidViewModel(context as Application) {
-    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())
+    val championData: LiveData<com.sandorln.model.ChampionData> = savedStateHandle.getLiveData(com.sandorln.model.keys.BundleKeys.CHAMPION_DATA, com.sandorln.model.ChampionData())
 
     val selectChampionSkinDrawable: MutableStateFlow<Drawable?> = MutableStateFlow(null)
     val selectChampionSkinName: MutableStateFlow<String> = MutableStateFlow(championData.value?.name ?: "")
@@ -36,7 +35,7 @@ class ChampionDetailViewModel @Inject constructor(
     val isVideoAutoPlay = getApplication<ChampionApplication>()
         .isWifiConnectFlow
         .transform { isWifiConnect ->
-            val isVideoWifiModeAutoPlay = getAppSettingUseCase(AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY)
+            val isVideoWifiModeAutoPlay = getAppSettingUseCase(com.sandorln.model.type.AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY)
             emit(if (isVideoWifiModeAutoPlay) isWifiConnect else true)
         }
         .flowOn(Dispatchers.IO)
