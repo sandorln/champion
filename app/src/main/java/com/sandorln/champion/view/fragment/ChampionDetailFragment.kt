@@ -80,7 +80,7 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
         initAppbarHeight()
 
         binding.imgBack.setOnClickListener { findNavController().navigateUp() }
-        exoController = binding.exoPlayerSkill.findViewById(R.id.exo_controller)
+        exoController = binding.exoPlayerSkill.findViewById(com.google.android.exoplayer2.R.id.exo_controller)
         exoControllerVolume = exoController?.findViewById(R.id.exo_volume)
         exoControllerVolume?.isSelected = true
         exoControllerVolume?.setOnClickListener {
