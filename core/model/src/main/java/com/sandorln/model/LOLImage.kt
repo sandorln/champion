@@ -1,12 +1,5 @@
 package com.sandorln.model
 
-import android.os.Parcelable
-import androidx.room.Entity
-import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
-import java.io.Serializable
-
-@Parcelize
 data class LOLImage(
     var full: String = "",
     var sprite: String = "",
@@ -16,4 +9,4 @@ data class LOLImage(
     var y: Int = 0,
     var w: Int = 0,
     var h: Int = 0
-) : Serializable, Parcelable
+)

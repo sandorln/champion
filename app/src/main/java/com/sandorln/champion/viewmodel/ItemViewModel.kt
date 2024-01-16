@@ -34,11 +34,11 @@ class ItemViewModel @Inject constructor(
     private val _inStoreItem: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val inStoreItem: StateFlow<Boolean> = _inStoreItem.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
-    private val _itemList: MutableStateFlow<com.sandorln.model.result.ResultData<List<com.sandorln.model.ItemData>>> = MutableStateFlow(com.sandorln.model.result.ResultData.Loading)
+    private val _itemList: MutableStateFlow<ResultData<List<ItemData>>> = MutableStateFlow(ResultData.Loading)
     val itemList = _itemList
         .onStart {
             when (val result = _itemList.firstOrNull()) {
-                is com.sandorln.model.result.ResultData.Success -> {
+                is ResultData.Success -> {
                     result.data?.let { itemList ->
                         /* 현재 보여지고 있는 아이템 버전과 설정에서 설정된 버전이 다를 시 갱신 */
                         val nowShowItemVersion = itemList.firstOrNull()?.version ?: ""
@@ -48,24 +48,24 @@ class ItemViewModel @Inject constructor(
                     }
                 }
                 /* 오류 상태였을 경우 곧바로 갱신 */
-                is com.sandorln.model.result.ResultData.Failed -> refreshItemList()
+                is ResultData.Failed -> refreshItemList()
                 else -> {}
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), com.sandorln.model.result.ResultData.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
     fun refreshItemList() = viewModelScope.launch { _itemList.emitAll(getItemListUseCase(_searchItemName.value, true)) }
 
     private val _itemId = savedStateHandle
-        .getLiveData<String>(com.sandorln.model.keys.BundleKeys.ITEM_ID)
+        .getLiveData<String>(BundleKeys.ITEM_ID)
         .asFlow()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    fun changeFindItemId(itemId: String) = savedStateHandle.set(com.sandorln.model.keys.BundleKeys.ITEM_ID, itemId)
+    fun changeFindItemId(itemId: String) = savedStateHandle.set(BundleKeys.ITEM_ID, itemId)
 
     val findItemData = _itemId
         .flatMapLatest { itemId -> findItemByIdUseCase(itemId) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), com.sandorln.model.result.ResultData.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultData.Loading)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {

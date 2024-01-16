@@ -26,7 +26,7 @@ class SplashViewModel @Inject constructor(
         refreshHasNewLolVersion()
     }
 
-    private val _hasNewLolVersion: MutableStateFlow<com.sandorln.model.result.ResultData<Boolean>> = MutableStateFlow(com.sandorln.model.result.ResultData.Loading)
+    private val _hasNewLolVersion: MutableStateFlow<ResultData<Boolean>> = MutableStateFlow(com.sandorln.model.result.ResultData.Loading)
     val hasNewLolVersion = _hasNewLolVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), com.sandorln.model.result.ResultData.Loading)
     fun refreshHasNewLolVersion() {
         viewModelScope.launch { _hasNewLolVersion.emitAll(hasNewLolVersionUseCase()) }

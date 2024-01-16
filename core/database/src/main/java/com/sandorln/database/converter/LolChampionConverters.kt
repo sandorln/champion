@@ -4,8 +4,11 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.sandorln.database.model.ChampionEntity.*
+import com.sandorln.database.model.base.LOLImageEntity
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 @ProvidedTypeConverter
 class LolChampionConverters @Inject constructor(private val gson: Gson) {
     @TypeConverter

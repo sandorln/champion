@@ -1,16 +1,5 @@
 package com.sandorln.model
 
-import android.os.Parcelable
-import androidx.room.Entity
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.sandorln.model.type.SpellType
-import kotlinx.parcelize.Parcelize
-import java.io.Serializable
-
-@Parcelize
-@Entity(primaryKeys = ["version", "languageCode", "id"])
 data class ChampionData(
     var version: String = "",
     var languageCode: String = "",
@@ -31,39 +20,28 @@ data class ChampionData(
 
     var allytips: List<String> = mutableListOf(),
     var enemytips: List<String> = mutableListOf()
-) : Serializable, Parcelable {
-    @Parcelize
+) {
     data class ChampionInfo(
         var attack: Int = 0,
         var defense: Int = 0,
         var magic: Int = 0,
         var difficulty: Int = 0
-    ) : Serializable, Parcelable
+    )
 
-    @Parcelize
     data class ChampionSkin(
         var id: String? = null,
         var num: String? = null,
         var name: String = "",
         var chromas: Boolean = false
-    ) : Serializable, Parcelable
+    )
 
-    @Parcelize
     data class ChampionSpell(
         var id: String = "P",
         var name: String = "",
         var description: String = "",
         var image: LOLImage = LOLImage()
-    ) : Serializable, Parcelable {
-        fun getSpellType(position: Int): SpellType =
-            try {
-                SpellType.values()[position]
-            } catch (e: Exception) {
-                SpellType.P
-            }
-    }
+    )
 
-    @Parcelize
     data class ChampionStats(
         var hp: Double = 0.0,
         var hpperlevel: Double = 0.0,
@@ -86,16 +64,5 @@ data class ChampionData(
         var attackspeed: Double = 0.0,
         var attackspeedoffset: Double = 0.0,
         var attackspeedperlevel: Double = 0.0
-    ) : Serializable, Parcelable {
-        fun changeJsonArray(): JsonArray {
-            val gson = Gson()
-            val statusJson = gson.fromJson(gson.toJson(this), JsonObject::class.java)
-            val statusArray = JsonArray()
-            for ((key, value) in statusJson.entrySet()) {
-                val statusJsonObject = JsonObject().apply { this.addProperty(key, value.asDouble) }
-                statusArray.add(statusJsonObject)
-            }
-            return statusArray
-        }
-    }
+    )
 }

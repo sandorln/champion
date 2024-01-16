@@ -1,18 +1,17 @@
 package com.sandorln.champion.usecase
 
 import com.sandorln.model.type.AppSettingType
-import com.sandorln.champion.repository.AppSettingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class GetAppSettingUseCase @Inject constructor(
-    private val appSettingRepository: AppSettingRepository
-) {
-    suspend operator fun invoke(appSettingType: com.sandorln.model.type.AppSettingType): Boolean = withContext(Dispatchers.IO) {
+@Singleton
+class GetAppSettingUseCase @Inject constructor() {
+    suspend operator fun invoke(appSettingType: AppSettingType): Boolean = withContext(Dispatchers.IO) {
         when (appSettingType) {
-            com.sandorln.model.type.AppSettingType.QUESTION_NEWEST_LOL_VERSION -> appSettingRepository.getAppSettingQuestionNewestLolVersion()
-            com.sandorln.model.type.AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY -> appSettingRepository.getAppSettingVideoWifiModeAutoPlay()
+            AppSettingType.QUESTION_NEWEST_LOL_VERSION -> false
+            AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY -> false
         }
     }
 }

@@ -9,7 +9,7 @@ import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.dao.SummonerSpellDao
 import com.sandorln.database.model.ChampionEntity
-import com.sandorln.database.model.CompleteVersionEntity
+import com.sandorln.database.model.VersionEntity
 import com.sandorln.database.model.ItemEntity
 import com.sandorln.database.model.SummonerSpellEntity
 
@@ -18,7 +18,7 @@ import com.sandorln.database.model.SummonerSpellEntity
         ChampionEntity::class,
         ItemEntity::class,
         SummonerSpellEntity::class,
-        CompleteVersionEntity::class
+        VersionEntity::class
     ],
     version = 8
 )

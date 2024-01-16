@@ -21,20 +21,18 @@ class ChampionThumbnailSkillAdapter(var onChangeSkillType: (championSpell: Champ
 
     override fun onBindViewHolder(holder: ChampionThumbnailSkillViewHolder, position: Int) {
         getItem(position)?.let { spell ->
-            val spellType = spell.getSpellType(position)
-
             with(holder.binding) {
-                imgChampionSkill.setSkillIcon(championVersion, spell.image.full, spellType == com.sandorln.model.type.SpellType.P)
-                tvSkillType.text = spellType.name
-                vSelect.isVisible = selectSpellType == spellType
+                imgChampionSkill.setSkillIcon(championVersion, spell.image.full, true)
+                tvSkillType.text = ""
+                vSelect.isVisible = true
             }
 
             holder.itemView.setOnClickListener {
-                if (selectSpellType != spellType) {
-                    selectSpellType = spellType
-                    onChangeSkillType(spell, spellType)
-                    notifyDataSetChanged()
-                }
+//                if (selectSpellType != spellType) {
+//                    selectSpellType = spellType
+//                    onChangeSkillType(spell, spellType)
+//                    notifyDataSetChanged()
+//                }
             }
         }
     }

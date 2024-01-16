@@ -6,7 +6,9 @@ import com.google.gson.Gson
 import com.sandorln.database.model.ItemEntity.GoldEntity
 import com.sandorln.database.model.ItemEntity.MapsEntity
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 @ProvidedTypeConverter
 class LolItemConverters @Inject constructor(private val gson: Gson) {
     @TypeConverter

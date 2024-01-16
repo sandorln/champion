@@ -23,7 +23,7 @@ class ChampionDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getAppSettingUseCase: GetAppSettingUseCase
 ) : AndroidViewModel(context as Application) {
-    val championData: LiveData<com.sandorln.model.ChampionData> = savedStateHandle.getLiveData(com.sandorln.model.keys.BundleKeys.CHAMPION_DATA, com.sandorln.model.ChampionData())
+    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(com.sandorln.model.keys.BundleKeys.CHAMPION_DATA, ChampionData())
 
     val selectChampionSkinDrawable: MutableStateFlow<Drawable?> = MutableStateFlow(null)
     val selectChampionSkinName: MutableStateFlow<String> = MutableStateFlow(championData.value?.name ?: "")

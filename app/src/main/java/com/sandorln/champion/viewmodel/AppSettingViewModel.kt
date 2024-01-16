@@ -34,19 +34,19 @@ class AppSettingViewModel @Inject constructor(
         _version.emit(version)
     }
 
-    fun changeAppSetting(appSettingType: com.sandorln.model.type.AppSettingType) {
+    fun changeAppSetting(appSettingType: AppSettingType) {
         viewModelScope.launch(Dispatchers.IO) {
             val toggleValue = toggleAppSettingUseCase(appSettingType)
             when (appSettingType) {
-                com.sandorln.model.type.AppSettingType.QUESTION_NEWEST_LOL_VERSION -> _questionNewestLolVersion.emit(toggleValue)
-                com.sandorln.model.type.AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY -> _videoWifiModeAutoPlay.emit(toggleValue)
+                AppSettingType.QUESTION_NEWEST_LOL_VERSION -> _questionNewestLolVersion.emit(false)
+                AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY -> _videoWifiModeAutoPlay.emit(false)
             }
         }
     }
 
-    private val _questionNewestLolVersion = MutableStateFlow(true).apply { viewModelScope.launch { emit(getAppSettingUseCase(com.sandorln.model.type.AppSettingType.QUESTION_NEWEST_LOL_VERSION)) } }
+    private val _questionNewestLolVersion = MutableStateFlow(true).apply { viewModelScope.launch { emit(getAppSettingUseCase(AppSettingType.QUESTION_NEWEST_LOL_VERSION)) } }
     val questionNewestLolVersion: StateFlow<Boolean> = _questionNewestLolVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
-    private val _videoWifiModeAutoPlay = MutableStateFlow(true).apply { viewModelScope.launch { emit(getAppSettingUseCase(com.sandorln.model.type.AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY)) } }
+    private val _videoWifiModeAutoPlay = MutableStateFlow(true).apply { viewModelScope.launch { emit(getAppSettingUseCase(AppSettingType.VIDEO_WIFI_MODE_AUTO_PLAY)) } }
     val videoWifiModeAutoPlay: StateFlow<Boolean> = _videoWifiModeAutoPlay.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 }

@@ -1,6 +1,7 @@
 package com.sandorln.database.model
 
 import androidx.room.Entity
+import com.sandorln.database.model.base.LOLImageEntity
 
 @Entity(primaryKeys = ["id", "version"])
 data class ItemEntity(
@@ -15,8 +16,9 @@ data class ItemEntity(
     val from: List<String> = mutableListOf(),
     val into: List<String> = mutableListOf(),
 
-    val gold: GoldEntity = GoldEntity(),
+    var image: LOLImageEntity = LOLImageEntity(),
 
+    val gold: GoldEntity = GoldEntity(),
     val tags: List<String> = mutableListOf(),
     /* TODO :: [칼바람]과 [소환사 협곡]만 저장 되도록 */
     val maps: MapsEntity = MapsEntity(),

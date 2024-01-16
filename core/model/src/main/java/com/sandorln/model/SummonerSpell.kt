@@ -1,8 +1,5 @@
 package com.sandorln.model
 
-import androidx.room.Entity
-
-@Entity(primaryKeys = ["id", "version", "languageCode"])
 data class SummonerSpell(
     val id: String = "",
     var version: String = "",

@@ -24,9 +24,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        buildConfigField("String", "BASE_URL", "\"http://ddragon.leagueoflegends.com\"")
-        buildConfigField("String", "DEFAULT_LANGUAGE", "\"en_US\"")
     }
 
     buildTypes {
@@ -42,7 +39,6 @@ android {
     }
     buildFeatures {
         dataBinding = true
-        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -121,5 +117,7 @@ dependencies {
 
     // WindowManager
     implementation("androidx.window:window:1.1.0-alpha01")
+
+    implementation(project(":core:model"))
 }
 

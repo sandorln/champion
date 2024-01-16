@@ -1,6 +1,7 @@
 package com.sandorln.database.model
 
 import androidx.room.Entity
+import com.sandorln.database.model.base.LOLImageEntity
 
 @Entity(primaryKeys = ["version", "id"])
 data class ChampionEntity(
@@ -16,15 +17,6 @@ data class ChampionEntity(
     var partype: String = "",
     var stats: ChampionStatsEntity = ChampionStatsEntity()
 ) {
-    data class LOLImageEntity(
-        var sprite: String = "",
-        /* 이미지 좌표 */
-        var x: Int = 0,
-        var y: Int = 0,
-        var w: Int = 0,
-        var h: Int = 0
-    )
-
     data class ChampionInfoEntity(
         var attack: Int = 0,
         var defense: Int = 0,

@@ -1,7 +1,10 @@
 package com.sandorln.champion.usecase
 
-import com.sandorln.champion.repository.VersionRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ChangeVersionUseCase(private val versionRepository: VersionRepository) {
-    suspend operator fun invoke(version : String) = versionRepository.changeLolVersion(version)
+@Singleton
+class ChangeVersionUseCase @Inject constructor() {
+    operator fun invoke(version : String) {
+    }
 }
