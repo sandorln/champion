@@ -6,12 +6,15 @@ import com.sandorln.network.model.response.BaseLolResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.utils.io.jvm.javaio.toInputStream
+import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ChampionService @Inject constructor(
-    private val ktorClient: HttpClient
+    private val ktorClient: HttpClient,
 ) {
     /**
      * 해당 버전의 간략한 챔피온 정보 가져오기

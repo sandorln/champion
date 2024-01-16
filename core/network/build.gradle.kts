@@ -38,7 +38,6 @@ dependencies {
     androidTestImplementation(libs.test.androidx.junit)
 
     implementation(libs.hilt.android)
-    implementation(project(":app"))
     ksp(libs.hilt.compiler)
 
     implementation(libs.coroutine.android)
@@ -48,5 +47,4 @@ dependencies {
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.logging)
-
 }

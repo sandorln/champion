@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.google.gson.Gson
 import com.sandorln.database.AppDatabase
+import com.sandorln.database.converter.BitmapConverters
 import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
 import com.sandorln.database.dao.ChampionDao
@@ -30,14 +31,15 @@ object DatabaseModule {
     fun providesAppDatabase(
         @ApplicationContext context: Context,
         lolChampionConverters: LolChampionConverters,
-        lolItemConverters: LolItemConverters
-    ): AppDatabase =
-        Room
-            .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-            .fallbackToDestructiveMigration()
-            .addTypeConverter(lolChampionConverters)
-            .addTypeConverter(lolItemConverters)
-            .build()
+        lolItemConverters: LolItemConverters,
+        bitmapConverters: BitmapConverters
+    ): AppDatabase = Room
+        .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+        .fallbackToDestructiveMigration()
+        .addTypeConverter(lolChampionConverters)
+        .addTypeConverter(lolItemConverters)
+        .addTypeConverter(bitmapConverters)
+        .build()
 
     @Provides
     @Singleton
