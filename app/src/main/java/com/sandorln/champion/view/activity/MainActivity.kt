@@ -1,16 +1,24 @@
 package com.sandorln.champion.view.activity
 
+import android.util.Log
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.ActivityMainBinding
 import com.sandorln.champion.view.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
+    private val mainViewModel: MainViewModel by viewModels()
+
     override fun initObjectSetting() {
         binding.btmNaviMain.setupWithNavController(findNavController(R.id.frg_container))
     }
@@ -23,6 +31,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     override fun initObserverSetting() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                launch {
+                    mainViewModel
+                        .currentSummaryChampionList
+                        .collectLatest {
+                            Log.d("ChampionList", "List Size : ${it.size}")
+                            Log.d("ChampionList", "List : $it")
+                        }
+                }
+            }
+        }
     }
-
 }

@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemSummonerSpellBinding
-import com.sandorln.model.SummonerSpell
+import com.sandorln.model.data.spell.SummonerSpell
 import com.sandorln.champion.view.adapter.diff.DiffUtils
 
-class SummonerSpellAdapter : ListAdapter<com.sandorln.model.SummonerSpell, SummonerSpellAdapter.SummonerSpellViewHolder>(DiffUtils.DIFF_SUMMONER_SPELL) {
+class SummonerSpellAdapter : ListAdapter<SummonerSpell, SummonerSpellAdapter.SummonerSpellViewHolder>(DiffUtils.DIFF_SUMMONER_SPELL) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SummonerSpellViewHolder =
         SummonerSpellViewHolder(ItemSummonerSpellBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 

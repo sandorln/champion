@@ -10,7 +10,7 @@ import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.CustomHorizonItemThumbnailBinding
-import com.sandorln.model.SummonerSpell
+import com.sandorln.model.data.spell.SummonerSpell
 
 class HorizonItemThumbnailList : LinearLayoutCompat {
     val binding: CustomHorizonItemThumbnailBinding = CustomHorizonItemThumbnailBinding.inflate(LayoutInflater.from(context), this, true)
@@ -57,7 +57,7 @@ class HorizonItemThumbnailList : LinearLayoutCompat {
         }
     }
 
-    fun setSummonerSpellList(summonerSpellList: List<com.sandorln.model.SummonerSpell>, onClickSummonerSpellListener: (summonerSpell: com.sandorln.model.SummonerSpell) -> Unit) {
+    fun setSummonerSpellList(summonerSpellList: List<SummonerSpell>, onClickSummonerSpellListener: (summonerSpell: SummonerSpell) -> Unit) {
         if (summonerSpellList.isNotEmpty()) {
             binding.root.isVisible = true
             binding.layoutItems.removeAllViews()

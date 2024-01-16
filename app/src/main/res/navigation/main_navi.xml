@@ -26,10 +26,5 @@
         app:enterAnim="@anim/nav_default_enter_anim"
         app:exitAnim="@anim/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_exit_anim">
-        <argument
-            android:name="championData"
-            app:argType="com.sandorln.model.ChampionData"
-            app:nullable="true" />
-    </action>
+        app:popExitAnim="@animator/nav_default_exit_anim"/>
 </navigation>

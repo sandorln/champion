@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import com.sandorln.model.ChampionData
+import com.sandorln.model.data.champion.ChampionData
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -43,7 +43,7 @@ class ExampleUnitTest {
     @Test
     fun 객체를JSON으로변환() {
         val gson = Gson()
-        val status = com.sandorln.model.ChampionData.ChampionStats()
+        val status = ChampionData.ChampionStats()
         val statusJson = gson.fromJson(gson.toJson(status), JsonObject::class.java)
         val statusArray = JsonArray()
         for ((key, value) in statusJson.entrySet()) {

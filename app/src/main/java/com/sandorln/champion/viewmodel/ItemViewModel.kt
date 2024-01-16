@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.sandorln.model.ItemData
+import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.keys.BundleKeys
 import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.FindItemByIdUseCase

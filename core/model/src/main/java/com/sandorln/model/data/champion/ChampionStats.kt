@@ -1,30 +1,6 @@
-package com.sandorln.network.model
+package com.sandorln.model.data.champion
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class NetworkChampion(
-    var id: String = "",
-    var key: Int = 0,
-    var name: String = "",
-    var title: String = "",
-    var blurb: String = "",
-    var info: NetworkChampionInfo = NetworkChampionInfo(),
-    var image: NetworkLOLImage = NetworkLOLImage(),
-    var tags: List<String> = mutableListOf(),
-    var partype: String = "",
-    var stats: NetworkChampionStats = NetworkChampionStats()
-) {
-    @Serializable
-    data class NetworkChampionInfo(
-        var attack: Int = 0,
-        var defense: Int = 0,
-        var magic: Int = 0,
-        var difficulty: Int = 0
-    )
-
-    @Serializable
-    data class NetworkChampionStats(
+data class ChampionStats(
         var hp: Double = 0.0,
         var hpperlevel: Double = 0.0,
         var mp: Double = 0.0,
@@ -47,4 +23,3 @@ data class NetworkChampion(
         var attackspeedoffset: Double = 0.0,
         var attackspeedperlevel: Double = 0.0
     )
-}

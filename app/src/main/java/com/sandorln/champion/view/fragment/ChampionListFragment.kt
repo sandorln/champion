@@ -11,11 +11,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentChampionListBinding
-import com.sandorln.model.keys.BundleKeys
-import com.sandorln.model.result.ResultData
 import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionViewModel
+import com.sandorln.model.keys.BundleKeys
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
@@ -41,8 +40,9 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
 
                     when (resultData) {
                         is com.sandorln.model.result.ResultData.Success -> {
-                            findNavController().navigate(R.id.action_global_frg_champion_detail, bundleOf(com.sandorln.model.keys.BundleKeys.CHAMPION_DATA to resultData.data))
+                            findNavController().navigate(R.id.action_global_frg_champion_detail, bundleOf(BundleKeys.CHAMPION_DATA to resultData.data))
                         }
+
                         is com.sandorln.model.result.ResultData.Failed -> showToast("오류 발생 ${resultData.exception.message}")
                         else -> {}
                     }
@@ -81,6 +81,7 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
                                     binding.error.errorMsg = result.exception.message ?: "오류 발생"
                                     result.data ?: mutableListOf()
                                 }
+
                                 else -> mutableListOf()
                             }
 

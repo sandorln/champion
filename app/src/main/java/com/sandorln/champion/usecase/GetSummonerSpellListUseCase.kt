@@ -1,6 +1,6 @@
 package com.sandorln.champion.usecase
 
-import com.sandorln.model.SummonerSpell
+import com.sandorln.model.data.spell.SummonerSpell
 import com.sandorln.model.result.ResultData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

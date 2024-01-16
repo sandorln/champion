@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sandorln.champion.databinding.ItemChampionIconBinding
-import com.sandorln.model.ChampionData
 import com.sandorln.champion.view.adapter.diff.DiffUtils
+import com.sandorln.model.data.champion.ChampionData
 
 class ChampionThumbnailAdapter(
-    var onClickItem: (selectChampion: com.sandorln.model.ChampionData) -> Unit
+    var onClickItem: (selectChampion: ChampionData) -> Unit
 ) :
-    ListAdapter<com.sandorln.model.ChampionData, ChampionThumbnailAdapter.ThumbnailChampionViewHolder>(DiffUtils.DIFF_CHAMPION_DATA) {
+    ListAdapter<ChampionData, ChampionThumbnailAdapter.ThumbnailChampionViewHolder>(DiffUtils.DIFF_CHAMPION_DATA) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThumbnailChampionViewHolder =
         ThumbnailChampionViewHolder(ItemChampionIconBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 

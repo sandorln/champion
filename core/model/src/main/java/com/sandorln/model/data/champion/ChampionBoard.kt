@@ -1,4 +1,4 @@
-package com.sandorln.model
+package com.sandorln.model.data.champion
 
 data class ChampionBoard(
     var writerId: String,

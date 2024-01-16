@@ -8,9 +8,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.sandorln.champion.application.ChampionApplication
-import com.sandorln.model.ChampionData
-import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.data.champion.ChampionData
 import com.sandorln.champion.usecase.GetAppSettingUseCase
+import com.sandorln.model.keys.BundleKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +23,7 @@ class ChampionDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getAppSettingUseCase: GetAppSettingUseCase
 ) : AndroidViewModel(context as Application) {
-    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(com.sandorln.model.keys.BundleKeys.CHAMPION_DATA, ChampionData())
+    val championData: LiveData<ChampionData> = savedStateHandle.getLiveData(BundleKeys.CHAMPION_DATA, ChampionData())
 
     val selectChampionSkinDrawable: MutableStateFlow<Drawable?> = MutableStateFlow(null)
     val selectChampionSkinName: MutableStateFlow<String> = MutableStateFlow(championData.value?.name ?: "")

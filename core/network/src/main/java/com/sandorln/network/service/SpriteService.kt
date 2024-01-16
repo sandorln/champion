@@ -13,7 +13,7 @@ import javax.inject.Singleton
 class SpriteService @Inject constructor(
     private val ktorClient: HttpClient
 ) {
-    suspend fun getChampionSpriteFile(version: String, fileName: String): InputStream =
+    suspend fun getSpriteFile(version: String, fileName: String): InputStream =
         ktorClient
             .get(BuildConfig.BASE_URL + "/cdn/${version}/img/sprite/${fileName}")
             .bodyAsChannel()

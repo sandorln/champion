@@ -68,16 +68,16 @@ class ChampionStatusCompareFragment : BaseFragment<FragmentChampionStatusCompare
                                 .beginTransaction()
                                 .replace(
                                     binding.frgOriginal.id, ChampionStatusFragment::class.java, bundleOf(
-                                        com.sandorln.model.keys.BundleKeys.CHAMPION_VERSION to firstVer,
-                                        com.sandorln.model.keys.BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to firstStatus,
-                                        com.sandorln.model.keys.BundleKeys.CHAMPION_OTHER_STATUS_KEY to secondStatus
+                                        BundleKeys.CHAMPION_VERSION to firstVer,
+                                        BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to firstStatus,
+                                        BundleKeys.CHAMPION_OTHER_STATUS_KEY to secondStatus
                                     )
                                 )
                                 .replace(
                                     binding.frgOther.id, ChampionStatusFragment::class.java, bundleOf(
-                                        com.sandorln.model.keys.BundleKeys.CHAMPION_VERSION to secondVer,
-                                        com.sandorln.model.keys.BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to secondStatus,
-                                        com.sandorln.model.keys.BundleKeys.CHAMPION_OTHER_STATUS_KEY to firstStatus
+                                        BundleKeys.CHAMPION_VERSION to secondVer,
+                                        BundleKeys.CHAMPION_ORIGIN_STATUS_KEY to secondStatus,
+                                        BundleKeys.CHAMPION_OTHER_STATUS_KEY to firstStatus
                                     )
                                 )
                                 .commitNowAllowingStateLoss()

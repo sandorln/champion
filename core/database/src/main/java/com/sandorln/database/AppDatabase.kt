@@ -8,7 +8,9 @@ import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
+import com.sandorln.database.dao.SpriteImageDao
 import com.sandorln.database.dao.SummonerSpellDao
+import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.ChampionEntity
 import com.sandorln.database.model.ItemEntity
 import com.sandorln.database.model.SpriteImageEntity
@@ -30,4 +32,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun championDao(): ChampionDao
     abstract fun itemDao(): ItemDao
     abstract fun summonerSpellDao(): SummonerSpellDao
+    abstract fun versionDao(): VersionDao
+    abstract fun spriteImageDao() : SpriteImageDao
 }

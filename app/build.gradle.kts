@@ -119,5 +119,6 @@ dependencies {
     implementation("androidx.window:window:1.1.0-alpha01")
 
     implementation(project(":core:model"))
+    implementation(project(":core:data"))
 }
 

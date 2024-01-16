@@ -9,7 +9,7 @@ import com.sandorln.database.model.ItemEntity
 @Dao
 interface ItemDao {
     @Query("SELECT * FROM ItemEntity WHERE version == :version")
-    fun getAllItemData(version: String, languageCode: String): List<ItemEntity>
+    fun getAllItemData(version: String): List<ItemEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItemDataList(championList: List<ItemEntity>)

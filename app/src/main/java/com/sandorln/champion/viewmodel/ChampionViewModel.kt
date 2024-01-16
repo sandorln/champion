@@ -6,8 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.sandorln.model.ChampionData
-import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.data.champion.ChampionData
 import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.GetAppSettingUseCase
 import com.sandorln.champion.usecase.GetChampionInfoUseCase

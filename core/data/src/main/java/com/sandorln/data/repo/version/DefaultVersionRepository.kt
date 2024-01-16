@@ -5,7 +5,7 @@ import com.sandorln.database.model.VersionEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.network.service.VersionService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ class DefaultVersionRepository @Inject constructor(
 
     override suspend fun refreshVersionList() {
         val serverVersionList = versionService.getVersionList()
-        val localVersionList = allVersionList.first()
+        val localVersionList = allVersionList.firstOrNull() ?: emptyList()
 
         serverVersionList.filter { version ->
             !localVersionList.contains(version)

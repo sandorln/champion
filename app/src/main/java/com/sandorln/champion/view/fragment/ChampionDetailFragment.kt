@@ -18,14 +18,12 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.sandorln.champion.R
 import com.sandorln.champion.databinding.FragmentChampionDetailBinding
-import com.sandorln.model.ChampionData
-import com.sandorln.model.keys.BundleKeys
-import com.sandorln.model.type.SpellType
 import com.sandorln.champion.util.playChampionSkill
 import com.sandorln.champion.util.removeBrFromHtml
 import com.sandorln.champion.view.adapter.ChampionThumbnailSkillAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionDetailViewModel
+import com.sandorln.model.data.champion.ChampionSpell
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -102,7 +100,8 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
         championDetailViewModel.championData.observe(this, Observer { champion ->
             binding.imgChampionThumbnail.setChampionThumbnail(champion.version, champion.id)
             /* 능력치 관련 */
-            val championCompareBundle = bundleOf(com.sandorln.model.keys.BundleKeys.CHAMPION_ID to champion.id, com.sandorln.model.keys.BundleKeys.CHAMPION_VERSION to champion.version)
+            val championCompareBundle =
+                bundleOf(com.sandorln.model.keys.BundleKeys.CHAMPION_ID to champion.id, com.sandorln.model.keys.BundleKeys.CHAMPION_VERSION to champion.version)
             childFragmentManager
                 .beginTransaction()
                 .replace(binding.frgChampionStatusCompare.id, ChampionStatusCompareFragment::class.java, championCompareBundle)
@@ -169,7 +168,7 @@ class ChampionDetailFragment : BaseFragment<FragmentChampionDetailBinding>(R.lay
     /**
      * 챔피언 스킬 변경시 사용
      */
-    private fun selectChampionSkill(championId: String, spellType: com.sandorln.model.type.SpellType, championSpell: com.sandorln.model.ChampionData.ChampionSpell) {
+    private fun selectChampionSkill(championId: String, spellType: com.sandorln.model.type.SpellType, championSpell: ChampionSpell) {
         if (!championDetailViewModel.isVideoAutoPlay.value)
             skillExoPlayer?.pause()
 

@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.model.SummonerSpell
+import com.sandorln.model.data.spell.SummonerSpell
 import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.GetSummonerSpellListUseCase
 import com.sandorln.champion.usecase.GetSummonerSpellVersionUseCase

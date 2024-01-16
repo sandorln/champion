@@ -1,4 +1,4 @@
-package com.sandorln.model
+package com.sandorln.model.data.spell
 
 data class SummonerSpell(
     val id: String = "",

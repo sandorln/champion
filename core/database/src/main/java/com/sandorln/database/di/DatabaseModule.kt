@@ -9,7 +9,9 @@ import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
+import com.sandorln.database.dao.SpriteImageDao
 import com.sandorln.database.dao.SummonerSpellDao
+import com.sandorln.database.dao.VersionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,4 +54,12 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun providesSummonerSpellDao(appDatabase: AppDatabase): SummonerSpellDao = appDatabase.summonerSpellDao()
+
+    @Provides
+    @Singleton
+    fun providesVersionDao(appDatabase: AppDatabase): VersionDao = appDatabase.versionDao()
+
+    @Provides
+    @Singleton
+    fun providesSpriteImageDao(appDatabase: AppDatabase): SpriteImageDao = appDatabase.spriteImageDao()
 }

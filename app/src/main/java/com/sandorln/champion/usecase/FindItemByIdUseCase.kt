@@ -1,6 +1,6 @@
 package com.sandorln.champion.usecase
 
-import com.sandorln.model.ItemData
+import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.result.ResultData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

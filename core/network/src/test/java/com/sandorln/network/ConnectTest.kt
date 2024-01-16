@@ -140,7 +140,7 @@ class ConnectTest {
 
                     val deferredList = spriteFileNameList.map {
                         async {
-                            _spriteService.getChampionSpriteFile(latestVersion, it)
+                            _spriteService.getSpriteFile(latestVersion, it)
                         }
                     }
 
@@ -166,7 +166,7 @@ class ConnectTest {
                             val spriteFileNameList = championList.map { it.image.sprite }.distinct()
                             val spriteDeferredList = spriteFileNameList.map { fileName ->
                                 async {
-                                    val file = _spriteService.getChampionSpriteFile(version, fileName)
+                                    val file = _spriteService.getSpriteFile(version, fileName)
                                     val size = file.readAllBytes().size
                                     totalFileSize += size
                                     println("fileName: $fileName, Size : $size byte")

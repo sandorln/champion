@@ -1,4 +1,4 @@
-package com.sandorln.model
+package com.sandorln.model.data.image
 
 data class LOLImage(
     var full: String = "",
