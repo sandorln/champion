@@ -1,4 +1,4 @@
-package com.sandorln.data.repo.champion
+package com.sandorln.data.repository.champion
 
 import com.sandorln.data.util.asData
 import com.sandorln.data.util.asEntity
@@ -25,10 +25,12 @@ class DefaultChampionRepository @Inject constructor(
             }
         }
 
-    override suspend fun refreshChampionList(version: String): Result<Any> =
+    override suspend fun refreshChampionList(version: String): Result<List<SummaryChampion>> =
         runCatching {
             val response = championService.getAllChampionDataMap(version)
             val championEntityList = response.values.map { it.asEntity(version = version) }
             championDao.insertChampionList(championEntityList)
+
+            championEntityList.map(ChampionEntity::asData)
         }
 }

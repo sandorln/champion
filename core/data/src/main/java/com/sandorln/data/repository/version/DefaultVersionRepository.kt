@@ -1,4 +1,4 @@
-package com.sandorln.data.repo.version
+package com.sandorln.data.repository.version
 
 import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.VersionEntity

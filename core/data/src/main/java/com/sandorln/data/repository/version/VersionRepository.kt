@@ -1,4 +1,4 @@
-package com.sandorln.data.repo.version
+package com.sandorln.data.repository.version
 
 import kotlinx.coroutines.flow.Flow
 

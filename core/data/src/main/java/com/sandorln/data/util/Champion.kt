@@ -50,9 +50,11 @@ fun NetworkChampion.asEntity(version: String): ChampionEntity = ChampionEntity(
     name = name,
     title = title,
     blurb = blurb,
+    tags = tags,
+    partype = partype,
     stats = stats.asEntity(),
     info = info.asEntity(),
-    image = image.asEntity()
+    image = image.asEntity(),
 )
 
 fun NetworkChampion.NetworkChampionInfo.asEntity(): ChampionEntity.ChampionInfoEntity = ChampionEntity.ChampionInfoEntity(

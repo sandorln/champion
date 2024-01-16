@@ -1,4 +1,4 @@
-package com.sandorln.data.repo.sprite
+package com.sandorln.data.repository.sprite
 
 import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow

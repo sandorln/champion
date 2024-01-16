@@ -1,11 +1,11 @@
 package com.sandorln.data.di
 
-import com.sandorln.data.repo.champion.ChampionRepository
-import com.sandorln.data.repo.champion.DefaultChampionRepository
-import com.sandorln.data.repo.sprite.DefaultSpriteRepository
-import com.sandorln.data.repo.sprite.SpriteRepository
-import com.sandorln.data.repo.version.DefaultVersionRepository
-import com.sandorln.data.repo.version.VersionRepository
+import com.sandorln.data.repository.champion.ChampionRepository
+import com.sandorln.data.repository.champion.DefaultChampionRepository
+import com.sandorln.data.repository.sprite.DefaultSpriteRepository
+import com.sandorln.data.repository.sprite.SpriteRepository
+import com.sandorln.data.repository.version.DefaultVersionRepository
+import com.sandorln.data.repository.version.VersionRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
