@@ -1,4 +1,4 @@
-package com.sandorln.core.network
+package com.sandorln.network
 
 import com.sandorln.network.service.ChampionService
 import com.sandorln.network.service.ItemService
