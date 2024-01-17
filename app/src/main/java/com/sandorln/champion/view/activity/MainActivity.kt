@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     private val mainViewModel: MainViewModel by viewModels()
-    private var index = 0
 
     override fun initObjectSetting() {
         binding.btmNaviMain.setupWithNavController(findNavController(R.id.frg_container))
@@ -40,27 +39,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                         .collectLatest {
                             Log.d("ChampionList", "List Size : ${it.size}")
                             Log.d("ChampionList", "List : $it")
-                        }
-                }
-                launch {
-                    mainViewModel
-                        .currentSpriteList
-                        .collectLatest {
-                            val bitmapList = it.values.ifEmpty { return@collectLatest }.toList()
-                            val firstImage = bitmapList.firstOrNull()
-                            index = 0
-                            binding.imgSprite.setImageBitmap(firstImage)
-                            binding.imgSprite.setOnClickListener {
-                                if (index < bitmapList.size - 1)
-                                    index += 1
-                                else
-                                    index = 0
-
-                                binding.imgSprite.setImageBitmap(bitmapList[index])
-
-                            }
-                            Log.d("SpriteList", "MAP Size : ${it.size}")
-                            Log.d("SpriteList", "MAP : $it")
                         }
                 }
             }

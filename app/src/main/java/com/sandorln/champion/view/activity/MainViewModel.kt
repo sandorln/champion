@@ -23,7 +23,7 @@ class MainViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     val currentSpriteList = spriteRepository
-        .currentVersionSpriteFileMap
+        .currentSpriteFileMap
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     init {

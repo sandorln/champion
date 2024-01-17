@@ -15,11 +15,6 @@
             app:defaultNavHost="true"
             app:navGraph="@navigation/main_navi" />
 
-        <ImageView
-            android:id="@+id/img_sprite"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/btm_navi_main"
             android:layout_width="match_parent"

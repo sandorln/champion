@@ -19,7 +19,7 @@ class DefaultSpriteRepository @Inject constructor(
     private val spriteImageDao: SpriteImageDao,
     versionDatasource: VersionDatasource,
 ) : SpriteRepository {
-    override val currentVersionSpriteFileMap: Flow<Map<String, Bitmap?>> = versionDatasource
+    override val currentSpriteFileMap: Flow<Map<String, Bitmap?>> = versionDatasource
         .currentVersion
         .flatMapLatest { version ->
             spriteImageDao.getSpriteImageList(version).map { spriteImageEntity ->

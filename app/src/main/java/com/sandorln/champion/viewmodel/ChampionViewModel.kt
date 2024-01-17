@@ -6,16 +6,26 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.sandorln.model.data.champion.ChampionData
-import com.sandorln.model.result.ResultData
 import com.sandorln.champion.usecase.GetAppSettingUseCase
 import com.sandorln.champion.usecase.GetChampionInfoUseCase
 import com.sandorln.champion.usecase.GetChampionListUseCase
 import com.sandorln.champion.usecase.GetChampionVersionUseCase
+import com.sandorln.data.repository.champion.ChampionRepository
+import com.sandorln.data.repository.sprite.SpriteRepository
+import com.sandorln.model.data.champion.ChampionData
+import com.sandorln.model.result.ResultData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,12 +36,22 @@ class ChampionViewModel @Inject constructor(
     private val getChampionVersionUseCase: GetChampionVersionUseCase,
     private val getChampionListUseCase: GetChampionListUseCase,
     private val getChampionInfoUseCase: GetChampionInfoUseCase,
-    private val getAppSettingUseCase: GetAppSettingUseCase
+    private val getAppSettingUseCase: GetAppSettingUseCase,
+    private val championRepository: ChampionRepository,
+    private val spriteRepository: SpriteRepository
 ) : AndroidViewModel(context as Application) {
     private val _searchChampionName: MutableStateFlow<String> = MutableStateFlow("")
     fun changeSearchChampionName(searchName: String) = viewModelScope.launch(Dispatchers.IO) { _searchChampionName.emit(searchName) }
 
-    private val _showChampionList: MutableStateFlow<com.sandorln.model.result.ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
+    val currentChampionList = championRepository
+        .currentSummaryChampionList
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    val currentSpriteMap = spriteRepository
+        .currentSpriteFileMap
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    private val _showChampionList: MutableStateFlow<ResultData<List<ChampionData>>> = MutableStateFlow(ResultData.Loading)
     val showChampionList = _showChampionList
         .onStart {
             when (val result = _showChampionList.firstOrNull()) {

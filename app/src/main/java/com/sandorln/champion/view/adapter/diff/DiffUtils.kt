@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.sandorln.model.data.champion.ChampionData
 import com.sandorln.model.data.champion.ChampionSkin
 import com.sandorln.model.data.champion.ChampionSpell
+import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.spell.SummonerSpell
 
@@ -14,6 +15,11 @@ object DiffUtils {
 
         override fun areContentsTheSame(oldItem: ChampionData, newItem: ChampionData): Boolean =
             oldItem == newItem
+    }
+
+    val DIFF_SUMMARY_CHAMPION_DATA = object : DiffUtil.ItemCallback<SummaryChampion>() {
+        override fun areItemsTheSame(oldItem: SummaryChampion, newItem: SummaryChampion): Boolean = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: SummaryChampion, newItem: SummaryChampion): Boolean = oldItem == newItem
     }
 
     val DIFF_CHAMPION_SKIN = object : DiffUtil.ItemCallback<ChampionSkin>() {

@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow
 
 interface SpriteRepository {
-    val currentVersionSpriteFileMap: Flow<Map<String, Bitmap?>>
+    val currentSpriteFileMap: Flow<Map<String, Bitmap?>>
 
     suspend fun refreshSpriteBitmap(version: String, fileNameList: List<String>): Result<Any>
 }

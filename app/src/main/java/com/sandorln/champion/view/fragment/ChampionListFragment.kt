@@ -15,6 +15,7 @@ import com.sandorln.champion.view.adapter.ChampionThumbnailAdapter
 import com.sandorln.champion.view.base.BaseFragment
 import com.sandorln.champion.viewmodel.ChampionViewModel
 import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.result.ResultData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
@@ -35,15 +36,15 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
             // 해당 챔피언의 상세 내용을 가져옴
             lifecycleScope.launchWhenResumed {
                 championViewModel.getChampionDetailInfo(it.version, it.id).firstOrNull { resultData ->
-                    val isLoading = resultData is com.sandorln.model.result.ResultData.Loading
+                    val isLoading = resultData is ResultData.Loading
                     binding.pbContent.isVisible = isLoading
 
                     when (resultData) {
-                        is com.sandorln.model.result.ResultData.Success -> {
+                        is ResultData.Success -> {
                             findNavController().navigate(R.id.action_global_frg_champion_detail, bundleOf(BundleKeys.CHAMPION_DATA to resultData.data))
                         }
 
-                        is com.sandorln.model.result.ResultData.Failed -> showToast("오류 발생 ${resultData.exception.message}")
+                        is ResultData.Failed -> showToast("오류 발생 ${resultData.exception.message}")
                         else -> {}
                     }
 
@@ -69,23 +70,17 @@ class ChampionListFragment : BaseFragment<FragmentChampionListBinding>(R.layout.
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
                     championViewModel
-                        .showChampionList
-                        .collectLatest { result ->
-                            binding.refreshChampion.isRefreshing = false
-                            binding.pbContent.isVisible = result is com.sandorln.model.result.ResultData.Loading
-                            binding.error.isVisible = result is com.sandorln.model.result.ResultData.Failed
-
-                            val championList = when (result) {
-                                is com.sandorln.model.result.ResultData.Success -> result.data ?: mutableListOf()
-                                is com.sandorln.model.result.ResultData.Failed -> {
-                                    binding.error.errorMsg = result.exception.message ?: "오류 발생"
-                                    result.data ?: mutableListOf()
-                                }
-
-                                else -> mutableListOf()
-                            }
-
-                            championThumbnailAdapter.submitList(championList)
+                        .currentSpriteMap
+                        .collect {
+                            championThumbnailAdapter.spriteImageMap = it
+                            championThumbnailAdapter.notifyDataSetChanged()
+                        }
+                }
+                launch {
+                    championViewModel
+                        .currentChampionList
+                        .collect {
+                            championThumbnailAdapter.submitList(it)
                         }
                 }
 
