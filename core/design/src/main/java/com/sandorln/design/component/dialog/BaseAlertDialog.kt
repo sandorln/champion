@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sandorln.design.component.BaseButton
 import com.sandorln.design.theme.Colors
-import com.sandorln.design.theme.GodadviceTheme
+import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
@@ -97,7 +97,7 @@ fun BaseAlertTextDialog(
 @Preview
 @Composable
 fun BaseAlertDialogPreview() {
-    GodadviceTheme {
+    LolChampionTheme {
         Surface {
             BaseAlertTextDialog()
         }

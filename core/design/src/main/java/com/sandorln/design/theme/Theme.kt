@@ -18,7 +18,7 @@ private val darkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun GodadviceTheme(
+fun LolChampionTheme(
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current

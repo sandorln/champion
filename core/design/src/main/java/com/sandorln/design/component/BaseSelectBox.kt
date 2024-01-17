@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sandorln.design.R
 import com.sandorln.design.theme.Colors
-import com.sandorln.design.theme.GodadviceTheme
+import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
@@ -71,7 +71,7 @@ fun BaseSelectBox(
 @Preview
 @Composable
 fun BaseSelectBoxPreview() {
-    GodadviceTheme {
+    LolChampionTheme {
         Surface {
             BaseSelectBox(
                 modifier = Modifier

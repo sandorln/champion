@@ -28,7 +28,7 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.sandorln.design.R
 import com.sandorln.design.theme.Colors
-import com.sandorln.design.theme.GodadviceTheme
+import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
@@ -141,7 +141,7 @@ fun ExperienceYearItem(
 @Composable
 @Preview
 fun SelectExperienceYearBodyPreview() {
-    GodadviceTheme {
+    LolChampionTheme {
         Surface {
             SelectExperienceYearBody()
         }

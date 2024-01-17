@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.sandorln.design.R
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
-import com.sandorln.design.theme.GodadviceTheme
+import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
@@ -164,7 +164,7 @@ fun HomeToolbar(
 @Preview
 @Composable
 fun BaseToolbarPreview() {
-    GodadviceTheme {
+    LolChampionTheme {
         Surface {
             BaseToolbar()
         }
@@ -174,7 +174,7 @@ fun BaseToolbarPreview() {
 @Preview
 @Composable
 fun ButtonToolbarPreview() {
-    GodadviceTheme {
+    LolChampionTheme {
         Surface {
             ButtonToolbar()
         }

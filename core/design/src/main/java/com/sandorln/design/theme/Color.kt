@@ -26,4 +26,6 @@ object Colors{
 
     val OverlayGreen10 = Color(0x1AA0FBA3)
     val OverlayGreen50 = Color(0x80A0FBA3)
+
+    val BaseColor = Color(0xFFCAAB67)
 }

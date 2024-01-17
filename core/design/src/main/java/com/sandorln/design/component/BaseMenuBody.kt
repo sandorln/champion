@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.sandorln.design.theme.Colors
-import com.sandorln.design.theme.GodadviceTheme
+import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 
@@ -69,7 +69,7 @@ fun BaseMenuBody(
 @Preview
 @Composable
 fun BaseMenuBodyPreview() {
-    GodadviceTheme {
+    LolChampionTheme {
         Surface {
             BaseMenuBody()
         }

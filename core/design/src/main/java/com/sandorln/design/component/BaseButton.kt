@@ -13,7 +13,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sandorln.design.theme.Colors
-import com.sandorln.design.theme.GodadviceTheme
+import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.TextStyles
 
@@ -49,7 +49,7 @@ fun BaseButton(
 @Composable
 @Preview
 fun BaseButtonPreview() {
-    GodadviceTheme {
+    LolChampionTheme {
         BaseButton()
     }
 }

@@ -30,4 +30,3 @@ object TextStyles {
     val Body02 = TextStyle(fontFamily = pretendardFont, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 20.sp, color = Colors.BasicWhite)
     val Body03 = TextStyle(fontFamily = pretendardFont, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 18.sp, color = Colors.BasicWhite)
 }
-
