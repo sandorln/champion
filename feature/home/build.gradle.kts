@@ -1,10 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.sandorln.design"
+    namespace = "com.sandorln.home"
     compileSdk = libs.versions.complieSdk.get().toInt()
 
     defaultConfig {
@@ -28,13 +30,22 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.hilt)
+
+    testImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.androidx.junit)
+    androidTestImplementation(libs.test.androidx.espresso.core)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material)
 
-    implementation(libs.holix.bottomsheetdialog.compose)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(project(":core:design"))
 }
