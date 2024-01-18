@@ -22,7 +22,7 @@ fun BaseButton(
     modifier: Modifier = Modifier,
     titleStyle: TextStyle = TextStyles.Title03,
     title: String = "",
-    titleColor : Color = Colors.Gray900,
+    titleColor : Color = Colors.Gray09,
     pinContainerColor: Color? = null,
     isEnabled: Boolean = false,
     onClickBtn: () -> Unit = {}
@@ -31,8 +31,8 @@ fun BaseButton(
         enabled = isEnabled,
         modifier = modifier.heightIn(min = 50.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = pinContainerColor ?: Colors.Green300,
-            disabledContainerColor = pinContainerColor ?: Colors.Gray600,
+            containerColor = pinContainerColor ?: Colors.BaseColor,
+            disabledContainerColor = pinContainerColor ?: Colors.Gray06,
         ),
         onClick = onClickBtn,
         contentPadding = PaddingValues(0.dp),

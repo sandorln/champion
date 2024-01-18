@@ -53,14 +53,14 @@ fun BaseMenuBody(
             Icon(
                 painter = painterResource(id = com.sandorln.design.R.drawable.ic_chevron_right),
                 contentDescription = null,
-                tint = Colors.Gray400
+                tint = Colors.Gray04
             )
         } else {
             Text(
                 modifier = Modifier.padding(end = Spacings.Spacing02),
                 text = endTitle,
                 style = TextStyles.Body01,
-                color = Colors.Gray400
+                color = Colors.Gray04
             )
         }
     }

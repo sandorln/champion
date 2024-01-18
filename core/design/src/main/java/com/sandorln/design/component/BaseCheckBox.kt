@@ -31,7 +31,7 @@ fun BaseCheckBox(
     modifier: Modifier = Modifier,
     isCheck: Boolean = false,
     iconSize: Dp = IconSize.LargeSize,
-    disableIconColor: Color = Colors.Gray300,
+    disableIconColor: Color = Colors.Gray03,
     title: String = "",
     titleStyle: TextStyle = TextStyles.Body01,
     iconAndTextPadding: Dp = Spacings.Spacing03,

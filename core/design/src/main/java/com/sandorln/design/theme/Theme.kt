@@ -10,11 +10,11 @@ import androidx.compose.ui.platform.LocalView
 
 private val darkColorScheme = darkColorScheme(
     onPrimary = Colors.BasicWhite,
-    background = Colors.Gray900,
-    onBackground = Colors.Gray900,
-    surface = Colors.Gray900,
-    onSurface = Colors.Gray900,
-    outlineVariant = Colors.Gray800
+    background = Colors.Gray09,
+    onBackground = Colors.Gray09,
+    surface = Colors.Gray09,
+    onSurface = Colors.Gray09,
+    outlineVariant = Colors.Gray08
 )
 
 @Composable
@@ -25,7 +25,7 @@ fun LolChampionTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Colors.Gray900.toArgb()
+            window.statusBarColor = Colors.Gray09.toArgb()
         }
     }
 

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionTheme
+import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
@@ -111,12 +112,12 @@ internal fun HomeBottomNavigation(
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         HorizontalDivider(
-            color = Colors.Gray800,
+            color = Colors.Gray08,
             thickness = 1.dp
         )
 
         BottomNavigation(
-            backgroundColor = Colors.Gray900
+            backgroundColor = Colors.Blue06
         ) {
             homeItems.forEachIndexed { index, homeScreenType ->
                 val isSelected = selectedIndex == index
@@ -127,7 +128,9 @@ internal fun HomeBottomNavigation(
                     },
                     icon = {
                         Icon(
-                            modifier = Modifier.size(IconSize.LargeSize),
+                            modifier = Modifier
+                                .padding(bottom = Spacings.Spacing00)
+                                .size(IconSize.LargeSize),
                             painter = painterResource(id = homeScreenType.svgId),
                             contentDescription = null
                         )
@@ -142,7 +145,7 @@ internal fun HomeBottomNavigation(
                     },
                     alwaysShowLabel = false,
                     selectedContentColor = Colors.BaseColor,
-                    unselectedContentColor = Colors.Gray500
+                    unselectedContentColor = Colors.Gray07
                 )
             }
         }

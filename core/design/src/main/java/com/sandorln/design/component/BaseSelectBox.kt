@@ -33,15 +33,15 @@ fun BaseSelectBox(
     onClickSelectBox: () -> Unit = {}
 ) {
     val textColor = when (isEnable) {
-        null -> Colors.Gray300
+        null -> Colors.Gray03
         true -> Colors.BasicWhite
-        false -> Colors.Gray600
+        false -> Colors.Gray06
     }
-    val iconColor = if (isEnable == false) Colors.Gray600 else Colors.Gray500
+    val iconColor = if (isEnable == false) Colors.Gray06 else Colors.Gray05
     Row(
         modifier = modifier
             .background(
-                color = Colors.Gray800,
+                color = Colors.Gray08,
                 shape = RoundedCornerShape(Radius.Radius03)
             )
             .clickable {

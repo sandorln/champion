@@ -40,7 +40,7 @@ fun BaseToolbar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(Dimens.BaseToolbarHeight)
-                .background(Colors.Gray900)
+                .background(Colors.Gray09)
                 .padding(
                     top = Spacings.Spacing02,
                     bottom = Spacings.Spacing02,
@@ -90,7 +90,7 @@ fun ButtonToolbar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(Dimens.BaseToolbarHeight)
-                .background(Colors.Gray900)
+                .background(Colors.Gray09)
                 .padding(
                     vertical = Spacings.Spacing02,
                     horizontal = Spacings.Spacing03
@@ -140,7 +140,7 @@ fun HomeToolbar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(Dimens.BaseToolbarHeight)
-                .background(Colors.Gray900)
+                .background(Colors.Gray09)
                 .padding(
                     vertical = Spacings.Spacing02,
                     horizontal = Spacings.Spacing05

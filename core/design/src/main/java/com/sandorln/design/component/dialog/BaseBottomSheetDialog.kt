@@ -35,7 +35,7 @@ fun BaseBottomSheetDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = Colors.Gray800,
+                    color = Colors.Gray08,
                     shape = RoundedCornerShape(
                         topStart = Radius.Radius04,
                         topEnd = Radius.Radius04
@@ -49,7 +49,7 @@ fun BaseBottomSheetDialog(
                     .width(40.dp)
                     .height(4.dp)
                     .background(
-                        color = Colors.Gray700,
+                        color = Colors.Gray07,
                         shape = RoundedCornerShape(2.dp)
                     )
             )

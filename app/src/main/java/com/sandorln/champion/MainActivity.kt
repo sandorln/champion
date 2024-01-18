@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
             LolChampionTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Colors.Gray900
+                    color = Colors.Blue06
                 ) {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = HomeScreenRoute) {

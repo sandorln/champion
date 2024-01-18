@@ -28,10 +28,10 @@ import com.sandorln.design.theme.TextStyles
 fun BaseAlertTextDialog(
     title: String = "제목",
     body: String = "",
-    submitColor: Color = Colors.Green300,
-    submitTitleColor: Color = Colors.Gray900,
+    submitColor: Color = Colors.BaseColor,
+    submitTitleColor: Color = Colors.Gray09,
     cancelTitleColor: Color = Colors.BasicWhite,
-    cancelColor: Color = Colors.Gray700,
+    cancelColor: Color = Colors.Gray07,
     submitBtn: String = "네",
     cancelBtn: String = "아니요",
     onDismissRequest: () -> Unit = {},
@@ -41,7 +41,7 @@ fun BaseAlertTextDialog(
     Dialog(onDismissRequest = onDismissRequest) {
         Column(
             modifier = Modifier
-                .background(color = Colors.Gray800, shape = RoundedCornerShape(Radius.Radius06))
+                .background(color = Colors.Gray08, shape = RoundedCornerShape(Radius.Radius06))
                 .padding(
                     top = Spacings.Spacing07,
                     bottom = Spacings.Spacing05,
@@ -60,7 +60,7 @@ fun BaseAlertTextDialog(
                 Text(
                     text = body,
                     style = TextStyles.Body01,
-                    color = Colors.Gray200
+                    color = Colors.Gray02
                 )
             }
 

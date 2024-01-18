@@ -63,7 +63,7 @@ fun SelectExperienceYearBody(
             topStart = Radius.Radius04,
             topEnd = Radius.Radius04
         ),
-        colors = CardDefaults.cardColors(containerColor = Colors.Gray800)
+        colors = CardDefaults.cardColors(containerColor = Colors.Gray08)
     ) {
         Column(
             modifier = Modifier
@@ -74,7 +74,7 @@ fun SelectExperienceYearBody(
             Spacer(
                 modifier = Modifier
                     .padding(top = Spacings.Spacing02)
-                    .background(Colors.Gray700, RoundedCornerShape(Radius.Radius01))
+                    .background(Colors.Gray07, RoundedCornerShape(Radius.Radius01))
                     .width(40.dp)
                     .height(4.dp)
             )
@@ -126,14 +126,14 @@ fun ExperienceYearItem(
         Text(
             text = if (year > 14) "15년 이상" else year.toString(),
             style = TextStyles.SubTitle01,
-            color = if (isSelectYear) Colors.Green300 else Colors.BasicWhite
+            color = if (isSelectYear) Colors.BaseColor else Colors.BasicWhite
         )
 
         if (isSelectYear)
             Icon(
                 painter = painterResource(id = R.drawable.ic_check),
                 contentDescription = null,
-                tint = Colors.Green300
+                tint = Colors.BaseColor
             )
     }
 }

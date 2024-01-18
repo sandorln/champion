@@ -39,9 +39,9 @@ fun BaseTextEditor(
         mutableStateOf(false)
     }
     val borderColor = if (textFocus) {
-        Colors.Green300
+        Colors.BaseColor
     } else {
-        Colors.Gray500
+        Colors.Gray05
     }
 
     Box(
@@ -69,14 +69,14 @@ fun BaseTextEditor(
         BasicTextField(
             modifier = Modifier.align(Alignment.CenterStart),
             value = text,
-            cursorBrush = SolidColor(Colors.Green300),
+            cursorBrush = SolidColor(Colors.BaseColor),
             onValueChange = onChangeTextListener,
             textStyle = textStyle,
             decorationBox = { innerTextField ->
                 if (text.isEmpty())
                     Text(
                         text = hint,
-                        color = Colors.Gray500,
+                        color = Colors.Gray05,
                         style = textStyle,
                     )
                 innerTextField.invoke()
