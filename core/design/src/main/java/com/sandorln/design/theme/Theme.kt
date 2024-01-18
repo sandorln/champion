@@ -1,19 +1,22 @@
 package com.sandorln.design.theme
 
 import android.app.Activity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 
 private val darkColorScheme = darkColorScheme(
-    onPrimary = Colors.BasicWhite,
-    background = Colors.Gray09,
-    onBackground = Colors.Gray09,
-    surface = Colors.Gray09,
-    onSurface = Colors.Gray09,
+    onPrimary = Colors.BaseColor,
+    background = Colors.Blue06,
+    onBackground = Colors.Blue06,
+    surface = Colors.Blue06,
+    onSurface = Colors.Blue06,
     outlineVariant = Colors.Gray08
 )
 
@@ -25,7 +28,7 @@ fun LolChampionTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Colors.Gray09.toArgb()
+            window.statusBarColor = Colors.Blue07.toArgb()
         }
     }
 
@@ -33,4 +36,18 @@ fun LolChampionTheme(
         colorScheme = darkColorScheme,
         content = content
     )
+}
+
+@Composable
+fun LolChampionThemePreview(
+    content: @Composable () -> Unit
+) {
+    LolChampionTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            contentColor = Colors.Blue06
+        ) {
+            content.invoke()
+        }
+    }
 }

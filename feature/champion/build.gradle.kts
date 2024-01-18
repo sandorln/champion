@@ -47,5 +47,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material)
 
+    implementation(libs.glide)
+
     implementation(project(":core:design"))
+    implementation(project(":core:data"))
+    implementation(project(":core:model"))
 }

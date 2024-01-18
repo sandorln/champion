@@ -36,4 +36,12 @@ object IconSize {
 
 object Dimens {
     val BaseToolbarHeight = 56.dp
+
+    val PullHeight = 80.dp
+    val PullIndicatorSize = 50.dp
+}
+
+object AnimationConfig {
+    const val Fast = 500
+    const val Normal = 750
 }
