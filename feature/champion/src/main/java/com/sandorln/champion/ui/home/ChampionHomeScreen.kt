@@ -11,13 +11,12 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,15 +31,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
-import com.sandorln.design.component.BasePullIndicator
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -112,12 +111,13 @@ private fun ChampionIconBody(
     champion: SummaryChampion? = null,
     currentSpriteMap: Map<String, Bitmap?>
 ) {
-    Box(
-        modifier = Modifier.size(IconSize.XXLargeSize)
+    Column(
+        modifier = Modifier.width(IconSize.XXLargeSize),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (champion != null) {
             val imageInfo = champion.image
-            val originalBitmap = currentSpriteMap[imageInfo.sprite] ?: return@Box
+            val originalBitmap = currentSpriteMap[imageInfo.sprite] ?: return
             val bitmap = Bitmap.createBitmap(
                 originalBitmap,
                 imageInfo.x,
@@ -126,10 +126,21 @@ private fun ChampionIconBody(
                 imageInfo.h
             )
             Image(
-                modifier = Modifier.matchParentSize(),
+                modifier = Modifier.size(IconSize.XXLargeSize),
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
+            )
+            Text(
+                modifier = Modifier
+                    .background(color = Colors.BasicBlack)
+                    .padding(vertical = 1.dp),
+                text = champion.name,
+                style = TextStyles.Body03.copy(fontSize = 8.sp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                color = Colors.Gray02
             )
         }
     }
@@ -170,7 +181,7 @@ private fun FavoriteChampionBody(
                     .padding(Spacings.Spacing01)
             ) {
                 Text(
-                    text = championId,
+                    text = "아트록스",
                     style = TextStyles.SubTitle03,
                     color = Colors.Gold03,
                     maxLines = 1,

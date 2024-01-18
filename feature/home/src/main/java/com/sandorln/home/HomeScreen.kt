@@ -35,10 +35,10 @@ import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
 
 sealed class HomeScreenType(val title: String, @DrawableRes val svgId: Int) {
-    data object Champion : HomeScreenType("CHAMPION", designR.drawable.ic_main_champion)
-    data object Item : HomeScreenType("ITEM", designR.drawable.ic_main_item)
-    data object SummonerSpell : HomeScreenType("SPELL", designR.drawable.ic_main_spell)
-    data object Setting : HomeScreenType("SETTING", designR.drawable.ic_main_special)
+    data object Champion : HomeScreenType("챔피온", designR.drawable.ic_main_champion)
+    data object Item : HomeScreenType("아이템", designR.drawable.ic_main_item)
+    data object SummonerSpell : HomeScreenType("스펠", designR.drawable.ic_main_spell)
+    data object Setting : HomeScreenType("설정", designR.drawable.ic_main_special)
 }
 
 private val homeItems = listOf(
