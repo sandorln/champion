@@ -1,4 +1,4 @@
-package com.sandorln.home
+package com.sandorln.home.ui.home
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -19,7 +19,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -31,6 +36,8 @@ import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.home.ui.intro.IntroScreen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
 
@@ -53,46 +60,60 @@ private val homeItems = listOf(
 fun HomeScreen() {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
+    var isIntro by remember {
+        mutableStateOf(true)
+    }
+
+    LaunchedEffect(isIntro) {
+        delay(2000)
+        isIntro = false
+    }
 
     Scaffold(
         bottomBar = {
-            HomeBottomNavigation(
-                selectedIndex = pagerState.currentPage,
-                onSelectedIndex = { index ->
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(index)
+            if (!isIntro) {
+                HomeBottomNavigation(
+                    selectedIndex = pagerState.currentPage,
+                    onSelectedIndex = { index ->
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            HorizontalPager(state = pagerState) { page: Int ->
-                when (homeItems[page]) {
-                    HomeScreenType.Champion -> ChampionHomeScreen(moveToChampionDetailScreen = {})
+            if (isIntro) {
+                IntroScreen()
+            } else {
+                HorizontalPager(state = pagerState) { page: Int ->
+                    when (homeItems[page]) {
+                        HomeScreenType.Champion -> ChampionHomeScreen(moveToChampionDetailScreen = {})
 
-                    HomeScreenType.Item -> Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Red)
-                    ) {
+                        HomeScreenType.Item -> Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Red)
+                        ) {
 
-                    }
+                        }
 
-                    HomeScreenType.Setting -> Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Green)
-                    ) {
+                        HomeScreenType.Setting -> Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Green)
+                        ) {
 
-                    }
+                        }
 
-                    HomeScreenType.SummonerSpell -> Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Magenta)
-                    ) {
+                        HomeScreenType.SummonerSpell -> Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Magenta)
+                        ) {
 
+                        }
                     }
                 }
             }

@@ -48,5 +48,6 @@ dependencies {
     implementation(libs.androidx.compose.material)
 
     implementation(project(":core:design"))
+    implementation(project(":core:data"))
     implementation(project(":feature:champion"))
 }

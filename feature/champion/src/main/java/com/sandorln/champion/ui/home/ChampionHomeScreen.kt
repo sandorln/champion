@@ -89,7 +89,10 @@ fun ChampionHomeScreen(
             }
 
             items(chunkChampionList.size) { columnIndex ->
-                LazyRow {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     items(spanCount) { rowIndex ->
                         val champion = runCatching {
                             chunkChampionList[columnIndex][rowIndex]
@@ -98,7 +101,10 @@ fun ChampionHomeScreen(
                             onSuccess = { it }
                         )
 
-                        ChampionIconBody(champion, currentSpriteMap)
+                        ChampionIconBody(
+                            champion = champion,
+                            currentSpriteMap = currentSpriteMap
+                        )
                     }
                 }
             }
@@ -116,31 +122,21 @@ private fun ChampionIconBody(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (champion != null) {
-            val imageInfo = champion.image
-            val originalBitmap = currentSpriteMap[imageInfo.sprite] ?: return
-            val bitmap = Bitmap.createBitmap(
-                originalBitmap,
-                imageInfo.x,
-                imageInfo.y,
-                imageInfo.w,
-                imageInfo.h
-            )
+            val image = champion.getImageBitmap(currentSpriteMap) ?: return
             Image(
                 modifier = Modifier.size(IconSize.XXLargeSize),
-                bitmap = bitmap.asImageBitmap(),
+                bitmap = image.asImageBitmap(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
             Text(
-                modifier = Modifier
-                    .background(color = Colors.BasicBlack)
-                    .padding(vertical = 1.dp),
+                modifier = Modifier.padding(vertical = 1.dp),
                 text = champion.name,
                 style = TextStyles.Body03.copy(fontSize = 8.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
-                color = Colors.Gray02
+                color = Colors.Gold02
             )
         }
     }
