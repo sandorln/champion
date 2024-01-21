@@ -19,17 +19,15 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.champion.ui.home.ChampionHomeScreen
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
@@ -37,7 +35,7 @@ import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.home.ui.intro.IntroScreen
-import kotlinx.coroutines.delay
+import com.sandorln.home.ui.intro.IntroViewModel
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
 
@@ -57,21 +55,16 @@ private val homeItems = listOf(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    introViewModel: IntroViewModel = hiltViewModel()
+) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
-    var isIntro by remember {
-        mutableStateOf(true)
-    }
-
-    LaunchedEffect(isIntro) {
-        delay(2000)
-        isIntro = false
-    }
+    val isInitComplete by introViewModel.isInitComplete.collectAsState()
 
     Scaffold(
         bottomBar = {
-            if (!isIntro) {
+            if (isInitComplete) {
                 HomeBottomNavigation(
                     selectedIndex = pagerState.currentPage,
                     onSelectedIndex = { index ->
@@ -84,7 +77,7 @@ fun HomeScreen() {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            if (isIntro) {
+            if (!isInitComplete) {
                 IntroScreen()
             } else {
                 HorizontalPager(state = pagerState) { page: Int ->

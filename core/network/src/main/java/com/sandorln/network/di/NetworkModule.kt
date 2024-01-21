@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -35,15 +36,21 @@ object NetworkModule {
             })
         }
 
+        /* 모든 정보를 가져올 때 필요한 설정 */
+        install(HttpTimeout) {
+            requestTimeoutMillis = HttpTimeout.INFINITE_TIMEOUT_MS
+            connectTimeoutMillis = HttpTimeout.INFINITE_TIMEOUT_MS
+        }
+
         if (BuildConfig.DEBUG)
             install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        Log.d("serverConnect", message)
-                    }
-                }
-
-                level = LogLevel.ALL
+//                logger = object : Logger {
+//                    override fun log(message: String) {
+//                        Log.d("serverConnect", message)
+//                    }
+//                }
+//
+//                level = LogLevel.ALL
             }
 
         install(DefaultRequest) {

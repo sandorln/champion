@@ -6,5 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ChampionRepository {
     val currentSummaryChampionList: Flow<List<SummaryChampion>>
 
-    suspend fun refreshChampionList(version: String): Result<List<SummaryChampion>>
+    suspend fun refreshChampionList(version: String): Result<Any>
+
+    suspend fun getSummaryChampionListByVersion(version: String): List<SummaryChampion>
 }

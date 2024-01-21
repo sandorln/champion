@@ -5,9 +5,11 @@ import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.model.ChampionEntity
 import com.sandorln.datastore.version.VersionDatasource
+import com.sandorln.model.data.champion.ChampionData
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.network.service.ChampionService
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -25,12 +27,13 @@ class DefaultChampionRepository @Inject constructor(
             }
         }
 
-    override suspend fun refreshChampionList(version: String): Result<List<SummaryChampion>> =
-        runCatching {
-            val response = championService.getAllChampionDataMap(version)
-            val championEntityList = response.values.map { it.asEntity(version = version) }
-            championDao.insertChampionList(championEntityList)
+    override suspend fun refreshChampionList(version: String): Result<Any> = runCatching {
+        val response = championService.getAllChampionDataMap(version)
+        val championEntityList = response.values.map { it.asEntity(version = version) }
+        championDao.insertChampionList(championEntityList)
+    }
 
-            championEntityList.map(ChampionEntity::asData)
-        }
+    override suspend fun getSummaryChampionListByVersion(version: String): List<SummaryChampion> {
+       return championDao.getChampionList(version).firstOrNull()?.map(ChampionEntity::asData) ?: emptyList()
+    }
 }

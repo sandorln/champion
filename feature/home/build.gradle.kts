@@ -49,5 +49,6 @@ dependencies {
 
     implementation(project(":core:design"))
     implementation(project(":core:data"))
+    implementation(project(":core:model"))
     implementation(project(":feature:champion"))
 }

@@ -2,9 +2,9 @@ package com.sandorln.database.model
 
 import androidx.room.Entity
 
-@Entity(primaryKeys = ["version"])
+@Entity(primaryKeys = ["name"])
 data class VersionEntity(
-    val version: String = "",
+    val name: String = "",
 
     val isCompleteChampions: Boolean = false,
     val isDownLoadChampionIconSprite: Boolean = false,
@@ -14,4 +14,9 @@ data class VersionEntity(
 
     val isCompleteSummonerSpell: Boolean = false,
     val isDownLoadSpellIconSprite: Boolean = false
-)
+) {
+    val isInitCompleteVersion
+        get() = isCompleteChampions && isDownLoadChampionIconSprite &&
+                isCompleteItems && isDownLoadItemIconSprite &&
+                isCompleteSummonerSpell && isDownLoadSpellIconSprite
+}
