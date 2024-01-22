@@ -37,10 +37,11 @@ object DatabaseModule {
         bitmapConverters: BitmapConverters
     ): AppDatabase = Room
         .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-        .fallbackToDestructiveMigration()
+        .createFromAsset("database/lol_champion.db")
         .addTypeConverter(lolChampionConverters)
         .addTypeConverter(lolItemConverters)
         .addTypeConverter(bitmapConverters)
+        .fallbackToDestructiveMigration()
         .build()
 
     @Provides

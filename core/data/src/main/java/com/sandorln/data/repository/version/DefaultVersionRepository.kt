@@ -8,6 +8,7 @@ import com.sandorln.model.data.version.Version
 import com.sandorln.network.service.VersionService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -16,7 +17,16 @@ class DefaultVersionRepository @Inject constructor(
     private val versionDatasource: VersionDatasource,
     private val versionDao: VersionDao
 ) : VersionRepository {
-    override val currentVersion: Flow<String> = versionDatasource.currentVersion
+    override val currentVersion: Flow<Version> = versionDatasource
+        .currentVersion
+        .flatMapLatest { version ->
+            versionDao
+                .getVersionEntity(version)
+                .map {
+                    it.firstOrNull()?.asData() ?: Version()
+                }
+        }
+
     override val allVersionList: Flow<List<Version>> = versionDao
         .getAllVersion()
         .map { versionEntityList ->
@@ -27,17 +37,6 @@ class DefaultVersionRepository @Inject constructor(
 
     override suspend fun changeCurrentVersion(versionName: String) {
         versionDatasource.changeCurrentVersion(versionName)
-    }
-
-    override suspend fun refreshVersionList() {
-        val serverVersionList = versionService.getVersionList()
-        val localVersionList = allVersionList.firstOrNull() ?: emptyList()
-
-//        serverVersionList.filter { version ->
-//            !localVersionList.contains(version)
-//        }.forEach { newVersion ->
-//            versionDao.insertVersion(VersionEntity(name = newVersion))
-//        }
     }
 
     override suspend fun getNotInitCompleteVersionList(): List<Version> {

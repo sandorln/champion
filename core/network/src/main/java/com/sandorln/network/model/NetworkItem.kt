@@ -6,17 +6,18 @@ import kotlinx.serialization.Serializable
 data class NetworkItem(
     val name: String = "",
     val description: String = "",
+    val image: NetworkLOLImage = NetworkLOLImage(),
 
     val depth: Int = 0,
     val inStore: Boolean = true,
 
-    val from: List<String> = mutableListOf(),
-    val into: List<String> = mutableListOf(),
+    val from: List<String?> = mutableListOf(),
+    val into: List<String?> = mutableListOf(),
 
     val gold: NetworkGold = NetworkGold(),
 
     val tags: List<String> = mutableListOf(),
-){
+) {
     @Serializable
     data class NetworkGold(
         val base: Int = 0,

@@ -25,7 +25,7 @@ import com.sandorln.database.model.VersionEntity
         VersionEntity::class,
         SpriteImageEntity::class
     ],
-    version = 8
+    version = 10
 )
 @TypeConverters(value = [LolChampionConverters::class, LolItemConverters::class, BitmapConverters::class])
 abstract class AppDatabase : RoomDatabase() {

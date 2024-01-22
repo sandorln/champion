@@ -2,6 +2,10 @@ package com.sandorln.data.di
 
 import com.sandorln.data.repository.champion.ChampionRepository
 import com.sandorln.data.repository.champion.DefaultChampionRepository
+import com.sandorln.data.repository.item.DefaultItemRepository
+import com.sandorln.data.repository.item.ItemRepository
+import com.sandorln.data.repository.spell.DefaultSummonerSpellRepository
+import com.sandorln.data.repository.spell.SummonerSpellRepository
 import com.sandorln.data.repository.sprite.DefaultSpriteRepository
 import com.sandorln.data.repository.sprite.SpriteRepository
 import com.sandorln.data.repository.version.DefaultVersionRepository
@@ -26,4 +30,12 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindsChampionRepository(defaultChampionRepository: DefaultChampionRepository): ChampionRepository
+
+    @Binds
+    @Singleton
+    fun bindsItemRepository(defaultItemRepository: DefaultItemRepository): ItemRepository
+
+    @Binds
+    @Singleton
+    fun bindsSummonerSpellRepository(defaultSummonerSpellRepository: DefaultSummonerSpellRepository): SummonerSpellRepository
 }

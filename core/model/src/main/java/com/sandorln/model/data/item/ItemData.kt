@@ -1,12 +1,14 @@
 package com.sandorln.model.data.item
 
+import com.sandorln.model.data.image.LOLImage
+
 
 data class ItemData(
     var id: String = "",
     var version: String = "",
-    var languageCode: String = "",
     val name: String = "",
     val description: String = "",
+    val image: LOLImage = LOLImage(),
 
     val depth: Int = 0,
     val inStore: Boolean = true,

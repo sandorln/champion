@@ -16,7 +16,5 @@ data class VersionEntity(
     val isDownLoadSpellIconSprite: Boolean = false
 ) {
     val isInitCompleteVersion
-        get() = isCompleteChampions && isDownLoadChampionIconSprite &&
-                isCompleteItems && isDownLoadItemIconSprite &&
-                isCompleteSummonerSpell && isDownLoadSpellIconSprite
+        get() = isCompleteChampions && isCompleteItems && isCompleteSummonerSpell
 }

@@ -10,7 +10,6 @@ data class ChampionEntity(
     var key: Int = 0,
     var name: String = "",
     var title: String = "",
-    var blurb: String = "",
     var info: ChampionInfoEntity = ChampionInfoEntity(),
     var image: LOLImageEntity = LOLImageEntity(),
     var tags: List<String> = mutableListOf(),

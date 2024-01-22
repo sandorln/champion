@@ -8,7 +8,6 @@ data class NetworkChampion(
     var key: Int = 0,
     var name: String = "",
     var title: String = "",
-    var blurb: String = "",
     var info: NetworkChampionInfo = NetworkChampionInfo(),
     var image: NetworkLOLImage = NetworkLOLImage(),
     var tags: List<String> = mutableListOf(),

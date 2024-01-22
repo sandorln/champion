@@ -13,7 +13,7 @@ interface VersionDao {
     fun getAllVersion(): Flow<List<VersionEntity>>
 
     @Query("SELECT * FROM VersionEntity WHERE name == :versionName")
-    fun getVersionEntity(versionName : String) : List<VersionEntity>
+    fun getVersionEntity(versionName : String) : Flow<List<VersionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVersion(versionEntity: VersionEntity)

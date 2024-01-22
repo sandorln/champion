@@ -8,7 +8,6 @@ data class SummaryChampion(
     var key: Int = 0,
     var name: String = "",
     var title: String = "",
-    var blurb: String = "",
     var tags: List<String> = mutableListOf(),
     var partype: String = "",
 
