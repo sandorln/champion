@@ -1,5 +1,6 @@
 package com.sandorln.design.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -61,6 +62,10 @@ fun BaseTextEditor(
                         .border(
                             width = 1.dp,
                             color = focusColor,
+                            shape = RoundedCornerShape(Radius.Radius02)
+                        )
+                        .background(
+                            color = Colors.Blue06,
                             shape = RoundedCornerShape(Radius.Radius02)
                         )
                         .padding(

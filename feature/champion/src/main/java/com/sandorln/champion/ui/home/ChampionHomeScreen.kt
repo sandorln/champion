@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,9 +19,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
+import com.sandorln.design.component.BaseTextEditor
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -47,7 +50,6 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.champion.SummaryChampion
-import kotlinx.coroutines.delay
 import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -56,15 +58,22 @@ fun ChampionHomeScreen(
     championHomeViewModel: ChampionHomeViewModel = hiltViewModel(),
     moveToChampionDetailScreen: (championId: String) -> Unit
 ) {
-    val currentChampionList by championHomeViewModel.currentChampionList.collectAsState()
+    val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
+    val uiState by championHomeViewModel.championUiState.collectAsState()
+
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PullHeight
     )
 
+    LaunchedEffect(uiState.isLoading) {
+        if (!uiState.isLoading)
+            pullToRefreshState.endRefresh()
+    }
+
     LaunchedEffect(pullToRefreshState.isRefreshing) {
-        delay(1000)
-        pullToRefreshState.endRefresh()
+        if (pullToRefreshState.isRefreshing)
+            championHomeViewModel.sendAction(ChampionHomeAction.RefreshChampionData)
     }
 
     BoxWithConstraints {
@@ -78,13 +87,33 @@ fun ChampionHomeScreen(
             }
 
             stickyHeader {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                        .background(Colors.BaseColor)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Colors.Blue06.copy(alpha = 1f),
+                                    Colors.Blue06.copy(alpha = 0.0f)
+                                ),
+                                startY = Spacings.Spacing08.value
+                            )
+                        )
                 ) {
-
+                    BaseTextEditor(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = Spacings.Spacing05,
+                                vertical = Spacings.Spacing03
+                            ),
+                        text = uiState.searchKeyword,
+                        hint = "챔피언 목록 검색",
+                        onChangeTextListener = { search ->
+                            val action = ChampionHomeAction.ChangeChampionSearchKeyword(search)
+                            championHomeViewModel.sendAction(action)
+                        }
+                    )
                 }
             }
 
@@ -122,13 +151,21 @@ private fun ChampionIconBody(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (champion != null) {
-            val image = champion.getImageBitmap(currentSpriteMap) ?: return
-            Image(
-                modifier = Modifier.size(IconSize.XXLargeSize),
-                bitmap = image.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
+
+            val image = champion.getImageBitmap(currentSpriteMap)
+            if (image != null) {
+                Image(
+                    modifier = Modifier.size(IconSize.XXLargeSize),
+                    bitmap = image.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(IconSize.XXLargeSize)
+                )
+            }
+
             Text(
                 modifier = Modifier.padding(vertical = 1.dp),
                 text = champion.name,
@@ -167,7 +204,7 @@ private fun FavoriteChampionBody(
             .widthIn(max = 80.dp)
             .aspectRatio(0.55f),
         shape = RoundedCornerShape(0),
-        backgroundColor = Colors.Blue05
+        colors = CardDefaults.cardColors(containerColor = Colors.Blue05)
     ) {
         Box {
             BaseChampionSplashImage(championId = championId)

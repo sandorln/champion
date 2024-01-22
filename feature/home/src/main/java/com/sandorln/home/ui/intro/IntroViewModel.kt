@@ -5,12 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.data.repository.champion.ChampionRepository
 import com.sandorln.data.repository.item.ItemRepository
 import com.sandorln.data.repository.spell.SummonerSpellRepository
-import com.sandorln.data.repository.sprite.SpriteRepository
 import com.sandorln.data.repository.version.VersionRepository
+import com.sandorln.model.data.version.Version
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,8 +21,7 @@ class IntroViewModel @Inject constructor(
     versionRepository: VersionRepository,
     championRepository: ChampionRepository,
     itemRepository: ItemRepository,
-    summonerSpellRepository: SummonerSpellRepository,
-    spriteRepository: SpriteRepository
+    summonerSpellRepository: SummonerSpellRepository
 ) : ViewModel() {
     private val _isInitComplete: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInitComplete = _isInitComplete.asStateFlow()
@@ -66,6 +66,19 @@ class IntroViewModel @Inject constructor(
                 }
 
                 _isInitComplete.emit(true)
+            }
+            launch {
+                versionRepository
+                    .allVersionList
+                    .first { versionList ->
+                        val currentVersion = versionRepository.currentVersion.firstOrNull() ?: Version()
+                        if (currentVersion.name.isEmpty()) {
+                            val latestVersion = versionList.firstOrNull() ?: return@first false
+                            versionRepository.changeCurrentVersion(latestVersion.name)
+                        }
+
+                        currentVersion.name.isNotEmpty()
+                    }
             }
         }
     }
