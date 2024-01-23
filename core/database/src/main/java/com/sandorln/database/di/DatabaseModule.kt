@@ -7,6 +7,7 @@ import com.sandorln.database.AppDatabase
 import com.sandorln.database.converter.BitmapConverters
 import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
+import com.sandorln.database.converter.MapsConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.dao.SpriteImageDao
@@ -34,13 +35,15 @@ object DatabaseModule {
         @ApplicationContext context: Context,
         lolChampionConverters: LolChampionConverters,
         lolItemConverters: LolItemConverters,
-        bitmapConverters: BitmapConverters
+        bitmapConverters: BitmapConverters,
+        mapsConverters: MapsConverters
     ): AppDatabase = Room
         .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-        .createFromAsset("database/lol_champion.db")
+//        .createFromAsset("database/lol_champion.db")
         .addTypeConverter(lolChampionConverters)
         .addTypeConverter(lolItemConverters)
         .addTypeConverter(bitmapConverters)
+        .addTypeConverter(mapsConverters)
         .fallbackToDestructiveMigration()
         .build()
 

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.data.repository.item.ItemRepository
 import com.sandorln.data.repository.sprite.SpriteRepository
 import com.sandorln.data.repository.version.VersionRepository
+import com.sandorln.model.data.map.MapType
+import com.sandorln.model.type.ItemTagType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -34,11 +37,26 @@ class ItemHomeViewModel @Inject constructor(
     val itemUiState = _itemUiState.asStateFlow()
     val displayItemList = combine(_itemUiState, _currentItemList) { uiState, itemList ->
         val searchKeyword = uiState.searchKeyword
+        val selectMapType = uiState.isSelectMapType
 
         itemList.filter { item ->
-            item.name.startsWith(searchKeyword)
+            if (!item.inStore) return@filter false
+
+            /* Tag Type Filter */
+            when {
+                uiState.selectTag.isEmpty() -> {}
+                !item.tags.containsAll(uiState.selectTag) -> return@filter false
+            }
+
+            /* Map Type Filter */
+            when {
+                selectMapType == MapType.ALL && item.mapType != MapType.NONE -> {}
+                item.mapType == MapType.ALL && (selectMapType == MapType.SUMMONER_RIFT || selectMapType == MapType.ARAM) -> {}
+                selectMapType != item.mapType -> return@filter false
+            }
+            item.name.contains(searchKeyword)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _itemAction = MutableSharedFlow<ItemHomeAction>()
     fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
@@ -61,6 +79,21 @@ class ItemHomeViewModel @Inject constructor(
 
                             is ItemHomeAction.ChangeItemSearchKeyword -> {
                                 _itemUiState.emit(currentUiState.copy(searchKeyword = action.searchKeyword))
+                            }
+
+                            is ItemHomeAction.ChangeMapTypeFilter -> {
+                                _itemUiState.emit(currentUiState.copy(isSelectMapType = action.mapType))
+                            }
+
+                            is ItemHomeAction.ToggleItemTagType -> {
+                                val isSelected = currentUiState.selectTag.contains(action.itemTagType)
+                                val selectTag = currentUiState.selectTag.toMutableSet()
+                                if (isSelected) {
+                                    selectTag.remove(action.itemTagType)
+                                } else {
+                                    selectTag.add(action.itemTagType)
+                                }
+                                _itemUiState.emit(currentUiState.copy(selectTag = selectTag.toSet()))
                             }
                         }
                     }
@@ -85,10 +118,15 @@ class ItemHomeViewModel @Inject constructor(
 
 data class ItemHomeUiState(
     val isLoading: Boolean = false,
-    val searchKeyword: String = ""
+    val searchKeyword: String = "",
+    val isSelectMapType: MapType = MapType.ALL,
+    val selectTag: Set<ItemTagType> = emptySet()
 )
 
 sealed interface ItemHomeAction {
     data object RefreshItemData : ItemHomeAction
+
+    data class ToggleItemTagType(val itemTagType: ItemTagType) : ItemHomeAction
+    data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
 }

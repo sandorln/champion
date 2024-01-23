@@ -1,16 +1,22 @@
 package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
 import com.sandorln.design.theme.Colors
@@ -40,6 +47,8 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.data.map.MapType
+import com.sandorln.model.type.ItemTagType
 import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -50,6 +59,9 @@ fun ItemHomeScreen(
     val currentItemList by itemHomeViewModel.displayItemList.collectAsState()
     val currentSpriteMap by itemHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by itemHomeViewModel.itemUiState.collectAsState()
+
+    val (bootItemList, notBootItemList) = currentItemList.partition { it.tags.contains(ItemTagType.Boots) }
+    val (consumableItemList, normalItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) }
 
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PullHeight
@@ -66,11 +78,42 @@ fun ItemHomeScreen(
     }
 
     BoxWithConstraints {
-        val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
-        val chunkItemList = currentItemList.chunked(spanCount)
+        val spanCount = floor((this.maxWidth - Spacings.Spacing08) / IconSize.XXLargeSize).toInt()
+        val bootsItemListChunkList = bootItemList.chunked(spanCount)
+        val consumableItemChunkList = consumableItemList.chunked(spanCount)
+        val normalItemChunkList = normalItemList.chunked(spanCount)
+
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            vertical = Spacings.Spacing03,
+                            horizontal = Spacings.Spacing05
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+                ) {
+                    ItemTagTypeFilerList(
+                        selectItemTag = uiState.selectTag,
+                        onToggleItemTagTypeFilter = { itemTagType ->
+                            val action = ItemHomeAction.ToggleItemTagType(itemTagType)
+                            itemHomeViewModel.sendAction(action)
+                        }
+                    )
+
+                    ItemMapFilerList(
+                        isSelectMapType = uiState.isSelectMapType,
+                        onClickMapFilterTag = {
+                            val action = ItemHomeAction.ChangeMapTypeFilter(it)
+                            itemHomeViewModel.sendAction(action)
+                        }
+                    )
+                }
+            }
+
             stickyHeader {
                 Column(
                     modifier = Modifier
@@ -102,26 +145,32 @@ fun ItemHomeScreen(
                 }
             }
 
-            items(chunkItemList.size) { columnIndex ->
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    items(spanCount) { rowIndex ->
-                        val item = runCatching {
-                            chunkItemList[columnIndex][rowIndex]
-                        }.fold(
-                            onFailure = { null },
-                            onSuccess = { it }
-                        )
+            /* 장화 아이템 */
+            if (bootsItemListChunkList.isNotEmpty())
+                baseItemList(
+                    title = "장화",
+                    spanCount = spanCount,
+                    spriteMap = currentSpriteMap,
+                    itemChunkList = bootsItemListChunkList
+                )
 
-                        ItemIconBody(
-                            item = item,
-                            currentSpriteMap = currentSpriteMap
-                        )
-                    }
-                }
-            }
+            /* 소모성 아이템 */
+            if (consumableItemChunkList.isNotEmpty())
+                baseItemList(
+                    title = "소모성 아이템",
+                    spanCount = spanCount,
+                    spriteMap = currentSpriteMap,
+                    itemChunkList = consumableItemChunkList
+                )
+
+            /* 보통 아이템 */
+            if (normalItemChunkList.isNotEmpty())
+                baseItemList(
+                    title = "일반 아이템",
+                    spanCount = spanCount,
+                    spriteMap = currentSpriteMap,
+                    itemChunkList = normalItemChunkList
+                )
         }
     }
 }
@@ -133,33 +182,148 @@ fun ItemIconBody(
 ) {
     Column(
         modifier = Modifier.width(IconSize.XXLargeSize),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        if (item != null) {
-            val bitmap = item.image.getImageBitmap(currentSpriteMap)
-            if (bitmap != null) {
+        val bitmap = item?.image?.getImageBitmap(currentSpriteMap)
+        when {
+            bitmap != null -> {
                 Image(
                     modifier = Modifier.size(IconSize.XXLargeSize),
                     bitmap = bitmap.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
-            } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(IconSize.XXLargeSize)
-                )
             }
 
-            Text(
-                modifier = Modifier.padding(vertical = 1.dp),
-                text = item.name,
-                style = TextStyles.Body03.copy(fontSize = 8.sp),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                color = Colors.Gold02
-            )
+            item != null -> {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(IconSize.XXLargeSize)
+                        .padding(Spacings.Spacing00),
+                    color = Colors.BaseColor,
+                    strokeWidth = 3.dp
+                )
+            }
         }
+
+        Text(
+            modifier = Modifier.padding(vertical = 1.dp),
+            text = item?.name ?: "",
+            style = TextStyles.Body03.copy(fontSize = 8.sp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            color = Colors.Gold02
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ItemMapFilerList(
+    isSelectMapType: MapType = MapType.ALL,
+    onClickMapFilterTag: (mapType: MapType) -> Unit = {}
+) {
+    Column {
+        Text(
+            text = "등장 맵",
+            style = TextStyles.SubTitle02,
+            color = Colors.Gold02
+        )
+        Spacer(modifier = Modifier.height(Spacings.Spacing00))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+        ) {
+            MapType.entries.forEach { mapType ->
+                BaseFilterTag(
+                    isCheck = isSelectMapType == mapType,
+                    title = mapType.mapName,
+                    onClickTag = {
+                        onClickMapFilterTag.invoke(mapType)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ItemTagTypeFilerList(
+    selectItemTag: Set<ItemTagType> = emptySet(),
+    onToggleItemTagTypeFilter: (itemTagType: ItemTagType) -> Unit = {}
+) {
+    Column {
+        Text(
+            text = "아이템 능력",
+            style = TextStyles.SubTitle02,
+            color = Colors.Gold02
+        )
+        Spacer(modifier = Modifier.height(Spacings.Spacing00))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+        ) {
+            ItemTagType.entries.forEach { itemTagType ->
+                if (itemTagType == ItemTagType.Boots || itemTagType == ItemTagType.Consumable) return@forEach
+
+                BaseFilterTag(
+                    isCheck = selectItemTag.contains(itemTagType),
+                    title = itemTagType.typeName,
+                    onClickTag = {
+                        onToggleItemTagTypeFilter.invoke(itemTagType)
+                    }
+                )
+            }
+        }
+    }
+}
+
+private fun LazyListScope.baseItemList(
+    title: String = "제목",
+    spanCount: Int = 5,
+    spriteMap: Map<String, Bitmap?> = emptyMap(),
+    itemChunkList: List<List<ItemData>> = mutableListOf()
+) {
+    item {
+        Text(
+            modifier = Modifier.padding(
+                start = Spacings.Spacing05,
+                top = Spacings.Spacing03,
+                bottom = Spacings.Spacing00
+            ),
+            text = title,
+            style = TextStyles.Body02,
+            color = Colors.Gray05
+        )
+    }
+
+    items(itemChunkList.size) { columnIndex ->
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            items(spanCount) { rowIndex ->
+                val item = runCatching {
+                    itemChunkList[columnIndex][rowIndex]
+                }.getOrNull()
+
+                ItemIconBody(
+                    item = item,
+                    currentSpriteMap = spriteMap
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun ItemFilerListPreview() {
+    LolChampionThemePreview {
+        ItemMapFilerList()
     }
 }
 

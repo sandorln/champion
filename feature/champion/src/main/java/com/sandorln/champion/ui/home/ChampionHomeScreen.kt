@@ -125,10 +125,7 @@ fun ChampionHomeScreen(
                     items(spanCount) { rowIndex ->
                         val champion = runCatching {
                             chunkChampionList[columnIndex][rowIndex]
-                        }.fold(
-                            onFailure = { null },
-                            onSuccess = { it }
-                        )
+                        }.getOrNull()
 
                         ChampionIconBody(
                             champion = champion,
@@ -161,7 +158,8 @@ private fun ChampionIconBody(
                 )
             } else {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(IconSize.XXLargeSize)
+                    color = Colors.BaseColor,
+                    strokeWidth = 3.dp
                 )
             }
 

@@ -43,10 +43,7 @@ fun LolChampionThemePreview(
     content: @Composable () -> Unit
 ) {
     LolChampionTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            contentColor = Colors.Blue06
-        ) {
+        Surface(contentColor = Colors.Blue06) {
             content.invoke()
         }
     }

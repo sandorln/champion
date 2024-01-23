@@ -20,8 +20,8 @@ data class ItemEntity(
 
     val gold: GoldEntity = GoldEntity(),
     val tags: List<String> = mutableListOf(),
-    /* TODO :: [칼바람]과 [소환사 협곡]만 저장 되도록 */
-    val maps: MapsEntity = MapsEntity(),
+
+    val maps: MapTypeEntity = MapTypeEntity.NONE,
 ) {
     data class GoldEntity(
         val base: Int = 0,
@@ -30,10 +30,10 @@ data class ItemEntity(
         val total: Int = 0
     )
 
-    data class MapsEntity(
-        val x1: Boolean = false,
-        val x10: Boolean = false,
-        val x12: Boolean = false,
-        val x8: Boolean = false
-    )
+    enum class MapTypeEntity {
+        ALL,
+        SUMMONER_RIFT,
+        ARAM,
+        NONE
+    }
 }

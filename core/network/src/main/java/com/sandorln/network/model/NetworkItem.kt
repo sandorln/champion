@@ -17,6 +17,7 @@ data class NetworkItem(
     val gold: NetworkGold = NetworkGold(),
 
     val tags: List<String> = mutableListOf(),
+    val maps: Map<String, Boolean> = mapOf()
 ) {
     @Serializable
     data class NetworkGold(

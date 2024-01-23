@@ -1,7 +1,8 @@
 package com.sandorln.model.data.item
 
 import com.sandorln.model.data.image.LOLImage
-
+import com.sandorln.model.data.map.MapType
+import com.sandorln.model.type.ItemTagType
 
 data class ItemData(
     var id: String = "",
@@ -18,7 +19,8 @@ data class ItemData(
 
     val gold: Gold = Gold(),
 
-    val tags: List<String> = mutableListOf(),
+    val tags: Set<ItemTagType> = emptySet(),
+    val mapType: MapType = MapType.ALL
 ) {
     data class Gold(
         val base: Int = 0,
