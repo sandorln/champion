@@ -1,5 +1,6 @@
 package com.sandorln.design.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,7 +16,9 @@ fun BaseLazyColumnWithPull(
     content: LazyListScope.() -> Unit = {}
 ) {
     LazyColumn(
-        modifier = Modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)
+        modifier = Modifier
+            .nestedScroll(pullToRefreshState.nestedScrollConnection),
+        verticalArrangement = Arrangement.Top
     ) {
         item {
             BasePullIndicator(pullToRefreshState = pullToRefreshState)
