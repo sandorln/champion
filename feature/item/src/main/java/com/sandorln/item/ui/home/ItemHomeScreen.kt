@@ -78,7 +78,7 @@ fun ItemHomeScreen(
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val spanCount = floor((this.maxWidth - Spacings.Spacing08) / IconSize.XXLargeSize).toInt()
+        val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
         val bootsItemListChunkList = bootItemList.chunked(spanCount)
         val consumableItemChunkList = consumableItemList.chunked(spanCount)
         val normalItemChunkList = normalItemList.chunked(spanCount)
@@ -290,7 +290,7 @@ private fun LazyListScope.baseItemList(
     item {
         Text(
             modifier = Modifier.padding(
-                start = Spacings.Spacing05,
+                start = Spacings.Spacing01,
                 top = Spacings.Spacing03,
                 bottom = Spacings.Spacing00
             ),
