@@ -51,4 +51,5 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":feature:champion"))
+    implementation(project(":feature:item"))
 }

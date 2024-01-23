@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.sandorln.champion"
+    namespace = "com.sandorln.item"
     compileSdk = libs.versions.complieSdk.get().toInt()
 
     defaultConfig {

@@ -36,6 +36,7 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.home.ui.intro.IntroViewModel
+import com.sandorln.item.ui.home.ItemHomeScreen
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
 
@@ -84,13 +85,7 @@ fun HomeScreen(
                     when (homeItems[page]) {
                         HomeScreenType.Champion -> ChampionHomeScreen(moveToChampionDetailScreen = {})
 
-                        HomeScreenType.Item -> Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Red)
-                        ) {
-
-                        }
+                        HomeScreenType.Item -> ItemHomeScreen()
 
                         HomeScreenType.Setting -> Box(
                             modifier = Modifier

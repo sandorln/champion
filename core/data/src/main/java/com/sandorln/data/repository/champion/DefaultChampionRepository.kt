@@ -7,6 +7,7 @@ import com.sandorln.database.model.ChampionEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.network.service.ChampionService
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -18,6 +19,7 @@ class DefaultChampionRepository @Inject constructor(
     private val championDao: ChampionDao,
     private val championService: ChampionService
 ) : ChampionRepository {
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val currentSummaryChampionList: Flow<List<SummaryChampion>> = versionDatasource
         .currentVersion
         .flatMapLatest { version ->
