@@ -1,7 +1,6 @@
 package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -77,7 +77,7 @@ fun ItemHomeScreen(
             itemHomeViewModel.sendAction(ItemHomeAction.RefreshItemData)
     }
 
-    BoxWithConstraints {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val spanCount = floor((this.maxWidth - Spacings.Spacing08) / IconSize.XXLargeSize).toInt()
         val bootsItemListChunkList = bootItemList.chunked(spanCount)
         val consumableItemChunkList = consumableItemList.chunked(spanCount)
