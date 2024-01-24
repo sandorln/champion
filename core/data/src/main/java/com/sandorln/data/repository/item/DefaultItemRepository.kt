@@ -37,19 +37,23 @@ class DefaultItemRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
 
     private var allVersionList: List<VersionEntity> = mutableListOf()
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val currentNewItemList: Flow<List<ItemData>> = versionDatasource.currentVersion
-        .mapLatest { currentVersionName ->
+    override val currentNewItemList: Flow<List<ItemData>> = currentItemList
+        .mapLatest { currentItemList ->
             if (allVersionList.isEmpty()) {
                 allVersionList = versionDao.getAllVersionOrderByDesc()
             }
 
+            val currentVersionName = currentItemList.firstOrNull()?.version ?: return@mapLatest emptyList()
             val currentIndex = allVersionList.indexOfFirst { it.name == currentVersionName }
-            val preVersionName = runCatching {
-                allVersionList[currentIndex + 1]
-            }.getOrNull()?.name ?: ""
-            itemDao.getDifferenceItemListByVersion(currentVersionName, preVersionName).map(ItemEntity::asData)
+            val preVersionName = runCatching { allVersionList[currentIndex + 1] }.getOrNull()?.name ?: ""
+            val preVersionList = itemDao.getAllItemData(preVersionName).firstOrNull()?.map(ItemEntity::asData) ?: emptyList()
+
+            currentItemList.filter { currentItem ->
+                preVersionList.none { preVersionItem ->
+                    currentItem.id == preVersionItem.id || currentItem.name == preVersionItem.name
+                }
+            }
         }.flowOn(Dispatchers.IO)
 
     override suspend fun refreshItemList(version: String): Result<Any> = runCatching {
@@ -57,7 +61,6 @@ class DefaultItemRepository @Inject constructor(
         val itemEntityList = response.map { it.value.asEntity(id = it.key, version = version) }
         itemDao.insertItemDataList(itemEntityList)
     }.onFailure {
-        Log.e("item", "refresh Error : ${it.message}")
     }
 
     override suspend fun getItemListByVersion(version: String): List<ItemData> =

@@ -118,7 +118,6 @@ class ItemHomeViewModel @Inject constructor(
                     versionRepository.currentVersion.distinctUntilChangedBy { setOf(it.isDownLoadItemIconSprite, it.name) },
                     _currentItemList
                 ) { version, itemList ->
-                    Log.d("combine" , "combine Call")
                     if (version.isDownLoadItemIconSprite || itemList.isEmpty())
                         return@combine
 

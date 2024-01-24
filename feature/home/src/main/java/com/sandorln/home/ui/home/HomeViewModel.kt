@@ -53,22 +53,26 @@ class HomeViewModel @Inject constructor(
         allVersionList.indexOfFirst { it.name == currentVersion.name } + 1 <= allVersionList.lastIndex
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
+    private var _allVersionList: List<Version> = emptyList()
+
     init {
         viewModelScope.launch {
-            launch {
+            launch(Dispatchers.IO) {
                 _homeAction.collect { action ->
+                    if (_allVersionList.isEmpty()) {
+                        _allVersionList = versionRepository.allVersionList.firstOrNull() ?: emptyList()
+                    }
                     val currentVersion = versionRepository.currentVersion.firstOrNull() ?: return@collect
-                    val allVersionList = versionRepository.allVersionList.firstOrNull() ?: return@collect
-                    val currentVersionIndex = allVersionList.indexOfFirst { it.name == currentVersion.name }
+                    val currentVersionIndex = _allVersionList.indexOfFirst { it.name == currentVersion.name }
                     when (action) {
                         HomeAction.ChangeNextVersion -> {
                             if (currentVersionIndex > 0)
-                                versionRepository.changeCurrentVersion(allVersionList[currentVersionIndex - 1].name)
+                                versionRepository.changeCurrentVersion(_allVersionList[currentVersionIndex - 1].name)
                         }
 
                         HomeAction.ChangePreVersion -> {
-                            if (currentVersionIndex < allVersionList.lastIndex)
-                                versionRepository.changeCurrentVersion(allVersionList[currentVersionIndex + 1].name)
+                            if (currentVersionIndex < _allVersionList.lastIndex)
+                                versionRepository.changeCurrentVersion(_allVersionList[currentVersionIndex + 1].name)
                         }
                     }
                 }
