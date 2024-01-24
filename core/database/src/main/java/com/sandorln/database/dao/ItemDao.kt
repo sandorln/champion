@@ -14,4 +14,11 @@ interface ItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItemDataList(championList: List<ItemEntity>)
+
+    @Query(
+        "SELECT * FROM itementity WHERE version == :currentVersion\n" +
+                "AND id NOT IN (SELECT id FROM itementity WHERE version == :preVersion)\n" +
+                "AND name NOT IN (SELECT name FROM itementity WHERE version == :preVersion);"
+    )
+    suspend fun getDifferenceItemListByVersion(currentVersion: String, preVersion: String): List<ItemEntity>
 }

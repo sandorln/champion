@@ -1,10 +1,12 @@
 package com.sandorln.item.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.data.repository.item.ItemRepository
 import com.sandorln.data.repository.sprite.SpriteRepository
 import com.sandorln.data.repository.version.VersionRepository
+import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
 import com.sandorln.model.type.ItemTagType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,16 +33,24 @@ class ItemHomeViewModel @Inject constructor(
     spriteRepository: SpriteRepository
 ) : ViewModel() {
     private val _currentItemList = itemRepository.currentItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _currentNewItemList = itemRepository.currentNewItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     val currentSpriteMap = spriteRepository.currentSpriteFileMap.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
     private val _itemMutex = Mutex()
 
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
-    val displayItemList = combine(_itemUiState, _currentItemList) { uiState, itemList ->
+
+    private val _itemAction = MutableSharedFlow<ItemHomeAction>()
+    fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
+        _itemAction.emit(itemHomeAction)
+    }
+
+    private val _itemFilter: suspend (ItemHomeUiState, List<ItemData>, List<ItemData>) -> List<ItemData> = { uiState, itemList, newItemList ->
         val searchKeyword = uiState.searchKeyword
         val selectMapType = uiState.isSelectMapType
+        val filterItemList = if (uiState.isSelectNewItem) newItemList else itemList
 
-        itemList.filter { item ->
+        filterItemList.filter { item ->
             if (!item.inStore) return@filter false
 
             /* Tag Type Filter */
@@ -56,12 +67,10 @@ class ItemHomeViewModel @Inject constructor(
             }
             item.name.contains(searchKeyword)
         }
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
-    private val _itemAction = MutableSharedFlow<ItemHomeAction>()
-    fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
-        _itemAction.emit(itemHomeAction)
     }
+    val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemList, _itemFilter)
+        .flowOn(Dispatchers.IO)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
         viewModelScope.launch {
@@ -95,13 +104,21 @@ class ItemHomeViewModel @Inject constructor(
                                 }
                                 _itemUiState.emit(currentUiState.copy(selectTag = selectTag.toSet()))
                             }
+
+                            is ItemHomeAction.ToggleSelectNewItem -> {
+                                _itemUiState.emit(currentUiState.copy(isSelectNewItem = !currentUiState.isSelectNewItem))
+                            }
                         }
                     }
                 }
             }
 
             launch(Dispatchers.IO) {
-                combine(versionRepository.currentVersion, _currentItemList) { version, itemList ->
+                combine(
+                    versionRepository.currentVersion.distinctUntilChangedBy { setOf(it.isDownLoadItemIconSprite, it.name) },
+                    _currentItemList
+                ) { version, itemList ->
+                    Log.d("combine" , "combine Call")
                     if (version.isDownLoadItemIconSprite || itemList.isEmpty())
                         return@combine
 
@@ -120,11 +137,13 @@ data class ItemHomeUiState(
     val isLoading: Boolean = false,
     val searchKeyword: String = "",
     val isSelectMapType: MapType = MapType.ALL,
-    val selectTag: Set<ItemTagType> = emptySet()
+    val selectTag: Set<ItemTagType> = emptySet(),
+    val isSelectNewItem: Boolean = false
 )
 
 sealed interface ItemHomeAction {
     data object RefreshItemData : ItemHomeAction
+    data object ToggleSelectNewItem : ItemHomeAction
 
     data class ToggleItemTagType(val itemTagType: ItemTagType) : ItemHomeAction
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction

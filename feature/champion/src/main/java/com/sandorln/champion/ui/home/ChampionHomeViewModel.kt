@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -68,7 +69,10 @@ class ChampionHomeViewModel @Inject constructor(
             }
 
             launch(Dispatchers.IO) {
-                combine(versionRepository.currentVersion, _currentChampionList) { version, championList ->
+                combine(
+                    versionRepository.currentVersion.distinctUntilChangedBy { it.isDownLoadChampionIconSprite },
+                    _currentChampionList
+                ) { version, championList ->
                     if (version.isDownLoadChampionIconSprite || championList.isEmpty())
                         return@combine
 

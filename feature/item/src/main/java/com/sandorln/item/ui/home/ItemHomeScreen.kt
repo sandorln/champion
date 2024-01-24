@@ -96,6 +96,13 @@ fun ItemHomeScreen(
                         ),
                     verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
                 ) {
+                    ItemNewFilerList(
+                        isNewItemSelect = uiState.isSelectNewItem,
+                        onToggleNewItemFilter = {
+                            itemHomeViewModel.sendAction(ItemHomeAction.ToggleSelectNewItem)
+                        }
+                    )
+
                     ItemTagTypeFilerList(
                         selectItemTag = uiState.selectTag,
                         onToggleItemTagTypeFilter = { itemTagType ->
@@ -216,6 +223,37 @@ fun ItemIconBody(
             textAlign = TextAlign.Center,
             color = Colors.Gold02
         )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ItemNewFilerList(
+    isNewItemSelect: Boolean = false,
+    onToggleNewItemFilter: () -> Unit = {}
+) {
+    Column {
+        Text(
+            text = "아이템 목록",
+            style = TextStyles.SubTitle02,
+            color = Colors.Gold02
+        )
+        Spacer(modifier = Modifier.height(Spacings.Spacing00))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+        ) {
+            BaseFilterTag(
+                !isNewItemSelect,
+                title = "모든 아이템",
+                onClickTag = onToggleNewItemFilter
+            )
+            BaseFilterTag(
+                isNewItemSelect,
+                title = "새로운 아이템",
+                onClickTag = onToggleNewItemFilter
+            )
+        }
     }
 }
 

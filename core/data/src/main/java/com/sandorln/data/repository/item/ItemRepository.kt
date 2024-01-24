@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ItemRepository {
     val currentItemList: Flow<List<ItemData>>
+    val currentNewItemList : Flow<List<ItemData>>
 
     suspend fun refreshItemList(version: String): Result<Any>
 
