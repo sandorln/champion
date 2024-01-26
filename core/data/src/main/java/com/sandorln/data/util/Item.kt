@@ -1,6 +1,7 @@
 package com.sandorln.data.util
 
 import com.sandorln.database.model.ItemEntity
+import com.sandorln.database.model.SummaryItemEntity
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
 import com.sandorln.network.model.NetworkItem
@@ -14,6 +15,14 @@ fun ItemEntity.asData(): ItemData = ItemData(
     inStore = inStore,
     from = from,
     into = into,
+    tags = tags.asItemTagTypeSet(),
+    image = image.asData(),
+    mapType = maps.asData()
+)
+
+fun SummaryItemEntity.asData(): ItemData = ItemData(
+    id = id,
+    name = name,
     tags = tags.asItemTagTypeSet(),
     image = image.asData(),
     mapType = maps.asData()

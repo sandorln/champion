@@ -120,18 +120,18 @@ fun HomeScreen(
 
                         HomeScreenType.Item -> ItemHomeScreen()
 
-                        HomeScreenType.Setting -> Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Green)
-                        ) {
-
-                        }
-
                         HomeScreenType.SummonerSpell -> Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(Color.Magenta)
+                        ) {
+
+                        }
+
+                        HomeScreenType.Setting -> Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Green)
                         ) {
 
                         }

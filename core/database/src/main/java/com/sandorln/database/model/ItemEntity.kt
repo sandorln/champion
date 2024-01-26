@@ -37,3 +37,11 @@ data class ItemEntity(
         NONE
     }
 }
+
+data class SummaryItemEntity(
+    var id: String = "",
+    val name: String = "",
+    var image: LOLImageEntity = LOLImageEntity(),
+    val tags: List<String> = mutableListOf(),
+    val maps: ItemEntity.MapTypeEntity = ItemEntity.MapTypeEntity.NONE,
+)

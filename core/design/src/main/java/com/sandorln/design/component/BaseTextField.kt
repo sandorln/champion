@@ -23,10 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.nativeKeyCode
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -51,6 +49,7 @@ fun BaseTextEditor(
     onChangeTextListener: (String) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
+    val keyboardManager = LocalSoftwareKeyboardController.current
     var textFocus by remember {
         mutableStateOf(false)
     }
@@ -78,36 +77,26 @@ fun BaseTextEditor(
                             horizontal = Spacings.Spacing03,
                             vertical = Spacings.Spacing00
                         )
-                } else
+                } else {
                     this
+                }
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
             modifier = Modifier
-                .onKeyEvent { event ->
-                    if (event.key.nativeKeyCode == android.view.KeyEvent.KEYCODE_BACK) {
-                        focusManager.clearFocus()
-                        true
-                    } else {
-                        false
-                    }
-                }
                 .onFocusChanged { textFocus = it.isFocused }
                 .weight(1f),
             value = text,
             cursorBrush = SolidColor(Colors.BaseColor),
             onValueChange = onChangeTextListener,
             maxLines = 1,
-            keyboardActions = KeyboardActions {
-                focusManager.clearFocus()
-            },
+            keyboardActions = KeyboardActions { focusManager.clearFocus() },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             textStyle = textStyle,
             decorationBox = { innerTextField ->
                 if (text.isEmpty())
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
                         text = hint,
                         color = Colors.Gray05,
                         style = textStyle,

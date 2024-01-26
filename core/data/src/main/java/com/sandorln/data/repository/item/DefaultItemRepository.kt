@@ -1,12 +1,12 @@
 package com.sandorln.data.repository.item
 
-import android.util.Log
 import com.sandorln.data.util.asData
 import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.dao.getAllVersionOrderByDesc
 import com.sandorln.database.model.ItemEntity
+import com.sandorln.database.model.SummaryItemEntity
 import com.sandorln.database.model.VersionEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.item.ItemData
@@ -31,12 +31,13 @@ class DefaultItemRepository @Inject constructor(
     override val currentItemList: Flow<List<ItemData>> = versionDatasource
         .currentVersion
         .flatMapLatest { version ->
-            itemDao.getAllItemData(version).map { entityList ->
-                entityList.map(ItemEntity::asData)
+            itemDao.getAllSummaryItemData(version).map { entityList ->
+                entityList.map(SummaryItemEntity::asData)
             }
         }.flowOn(Dispatchers.IO)
 
     private var allVersionList: List<VersionEntity> = mutableListOf()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override val currentNewItemList: Flow<List<ItemData>> = currentItemList
         .mapLatest { currentItemList ->
@@ -44,10 +45,10 @@ class DefaultItemRepository @Inject constructor(
                 allVersionList = versionDao.getAllVersionOrderByDesc()
             }
 
-            val currentVersionName = currentItemList.firstOrNull()?.version ?: return@mapLatest emptyList()
+            val currentVersionName = versionDatasource.currentVersion.firstOrNull() ?: ""
             val currentIndex = allVersionList.indexOfFirst { it.name == currentVersionName }
             val preVersionName = runCatching { allVersionList[currentIndex + 1] }.getOrNull()?.name ?: ""
-            val preVersionList = itemDao.getAllItemData(preVersionName).firstOrNull()?.map(ItemEntity::asData) ?: emptyList()
+            val preVersionList = itemDao.getAllSummaryItemData(preVersionName).firstOrNull()?.map(SummaryItemEntity::asData) ?: emptyList()
 
             currentItemList.filter { currentItem ->
                 preVersionList.none { preVersionItem ->

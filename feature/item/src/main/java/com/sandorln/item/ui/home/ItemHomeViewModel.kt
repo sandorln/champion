@@ -1,25 +1,26 @@
 package com.sandorln.item.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.data.repository.item.ItemRepository
 import com.sandorln.data.repository.sprite.SpriteRepository
 import com.sandorln.data.repository.version.VersionRepository
+import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
+import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
+import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
+import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
 import com.sandorln.model.type.ItemTagType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -28,15 +29,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ItemHomeViewModel @Inject constructor(
-    versionRepository: VersionRepository,
     itemRepository: ItemRepository,
-    spriteRepository: SpriteRepository
+    refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
+    getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
+    getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType
 ) : ViewModel() {
-    private val _currentItemList = itemRepository.currentItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    private val _currentNewItemList = itemRepository.currentNewItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    val currentSpriteMap = spriteRepository.currentSpriteFileMap.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
-    private val _itemMutex = Mutex()
-
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
 
@@ -68,8 +65,14 @@ class ItemHomeViewModel @Inject constructor(
             item.name.contains(searchKeyword)
         }
     }
+
+    private val _itemMutex = Mutex()
+
+    private val _currentItemList = itemRepository.currentItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _currentNewItemList = itemRepository.currentNewItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
     val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemList, _itemFilter)
-        .flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
@@ -80,9 +83,16 @@ class ItemHomeViewModel @Inject constructor(
                         val currentUiState = _itemUiState.value
                         when (action) {
                             is ItemHomeAction.RefreshItemData -> {
-                                /* TODO :: 아이템 목록 / 아이콘 갱신 */
                                 _itemUiState.emit(currentUiState.copy(isLoading = true))
-                                delay(2000)
+                                val spriteFileList = _currentItemList.value.map { item -> item.image.sprite }.distinct()
+
+                                refreshDownloadSpriteBitmap.invoke(
+                                    spriteType = SpriteType.Item,
+                                    fileNameList = spriteFileList
+                                ).onFailure {
+                                    /* TODO :: 에러 처리 필요 */
+                                }
+
                                 _itemUiState.emit(currentUiState.copy(isLoading = false))
                             }
 
@@ -114,19 +124,20 @@ class ItemHomeViewModel @Inject constructor(
             }
 
             launch(Dispatchers.IO) {
-                combine(
-                    versionRepository.currentVersion.distinctUntilChangedBy { setOf(it.isDownLoadItemIconSprite, it.name) },
-                    _currentItemList
-                ) { version, itemList ->
+                combine(getCurrentVersionDistinctBySpriteType.invoke(SpriteType.Item), _currentItemList) { version, itemList ->
                     if (version.isDownLoadItemIconSprite || itemList.isEmpty())
-                        return@combine
+                        return@combine null
 
-                    val spriteFileList = itemList.map { it.image.sprite }.distinct()
-                    val spriteResult = spriteRepository.refreshSpriteBitmap(version.name, spriteFileList).isSuccess
-
-                    val tempVersion = version.copy(isDownLoadChampionIconSprite = spriteResult)
-                    versionRepository.updateVersionData(tempVersion)
-                }.collect()
+                    itemList.map { item -> item.image.sprite }.distinct()
+                }.filterNotNull()
+                    .collectLatest { spriteFileList ->
+                        refreshDownloadSpriteBitmap.invoke(
+                            spriteType = SpriteType.Item,
+                            fileNameList = spriteFileList
+                        ).onFailure {
+                            /* TODO :: 오류 발생 시 처리 */
+                        }
+                    }
             }
         }
     }

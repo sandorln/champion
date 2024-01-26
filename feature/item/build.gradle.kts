@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.glide)
 
     implementation(project(":core:design"))
+    implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":core:model"))
 }

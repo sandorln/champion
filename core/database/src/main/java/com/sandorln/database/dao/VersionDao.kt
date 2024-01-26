@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.sandorln.database.model.ItemEntity
+import androidx.room.Update
 import com.sandorln.database.model.VersionEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -20,6 +20,9 @@ interface VersionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVersion(versionEntity: VersionEntity)
+
+    @Update
+    suspend fun updateVersion(versionEntity: VersionEntity)
 }
 
 suspend fun VersionDao.getAllVersionOrderByDesc() : List<VersionEntity> = getAllVersion().map { versionList ->
