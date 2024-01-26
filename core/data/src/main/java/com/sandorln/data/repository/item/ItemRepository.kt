@@ -10,4 +10,6 @@ interface ItemRepository {
     suspend fun refreshItemList(version: String): Result<Any>
 
     suspend fun getItemListByVersion(version: String): List<ItemData>
+
+    suspend fun getNewItemListByCurrentVersion(currentVersionName: String, preVersionName: String) : List<ItemData>
 }

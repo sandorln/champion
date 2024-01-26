@@ -2,9 +2,8 @@ package com.sandorln.item.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.data.repository.item.ItemRepository
-import com.sandorln.data.repository.sprite.SpriteRepository
-import com.sandorln.data.repository.version.VersionRepository
+import com.sandorln.domain.usecase.item.GetItemListByCurrentVersion
+import com.sandorln.domain.usecase.item.GetNewItemListByCurrentVersion
 import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
@@ -29,7 +28,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ItemHomeViewModel @Inject constructor(
-    itemRepository: ItemRepository,
+    getItemListByCurrentVersion: GetItemListByCurrentVersion,
+    getNewItemListByCurrentVersion: GetNewItemListByCurrentVersion,
     refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType
@@ -68,8 +68,8 @@ class ItemHomeViewModel @Inject constructor(
 
     private val _itemMutex = Mutex()
 
-    private val _currentItemList = itemRepository.currentItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    private val _currentNewItemList = itemRepository.currentNewItemList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _currentItemList = getItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _currentNewItemList = getNewItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemList, _itemFilter)

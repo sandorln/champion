@@ -114,7 +114,10 @@ fun HomeScreen(
                     color = Colors.Gray08,
                     thickness = 1.dp
                 )
-                HorizontalPager(state = pagerState) { page: Int ->
+                HorizontalPager(
+                    state = pagerState,
+                    beyondBoundsPageCount = homeItems.size
+                ) { page: Int ->
                     when (homeItems[page]) {
                         HomeScreenType.Champion -> ChampionHomeScreen(moveToChampionDetailScreen = {})
 

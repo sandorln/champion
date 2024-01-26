@@ -10,6 +10,9 @@ import com.sandorln.model.data.version.Version
 import com.sandorln.model.exception.SpriteException
 import com.sandorln.network.service.SpriteService
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
@@ -25,29 +28,35 @@ class DefaultSpriteRepository @Inject constructor(
 
     override suspend fun refreshDownloadSpriteBitmap(version: Version, spriteType: SpriteType, fileNameList: List<String>): Result<Any> =
         _spriteMutex.withLock {
-            runCatching {
-                val versionDirPath = "$_fileDirPath${File.separator}${version.name}"
-                val versionDir = File(versionDirPath)
-                if (!versionDir.exists()) {
-                    versionDir.mkdirs()
-                }
-
-                fileNameList.forEach { fileName ->
-                    val bitmapFile = File("${versionDirPath}${File.separator}${fileName}")
-                    if (!bitmapFile.exists()) {
-                        val spriteInputStream = spriteService.getSpriteFile(version.name, fileName)
-                        bitmapFile.outputStream().write(spriteInputStream.readBytes())
-                        spriteInputStream.close()
+            coroutineScope {
+                runCatching {
+                    val versionDirPath = "$_fileDirPath${File.separator}${version.name}"
+                    val versionDir = File(versionDirPath)
+                    if (!versionDir.exists()) {
+                        versionDir.mkdirs()
                     }
-                }
 
-                val tempVersion = when (spriteType) {
-                    SpriteType.Champion -> version.copy(isDownLoadChampionIconSprite = true)
-                    SpriteType.Item -> version.copy(isDownLoadItemIconSprite = true)
-                    SpriteType.Spell -> version.copy(isDownLoadSpellIconSprite = true)
-                }
+                    val downloadAndSaveDeferred = fileNameList.map { fileName ->
+                        async {
+                            val bitmapFile = File("${versionDirPath}${File.separator}${fileName}")
+                            if (!bitmapFile.exists()) {
+                                val spriteInputStream = spriteService.getSpriteFile(version.name, fileName)
+                                bitmapFile.outputStream().write(spriteInputStream.readBytes())
+                                spriteInputStream.close()
+                            }
+                        }
+                    }
 
-                versionDao.insertVersion(tempVersion.asEntity())
+                    downloadAndSaveDeferred.awaitAll()
+
+                    val tempVersion = when (spriteType) {
+                        SpriteType.Champion -> version.copy(isDownLoadChampionIconSprite = true)
+                        SpriteType.Item -> version.copy(isDownLoadItemIconSprite = true)
+                        SpriteType.Spell -> version.copy(isDownLoadSpellIconSprite = true)
+                    }
+
+                    versionDao.insertVersion(tempVersion.asEntity())
+                }
             }
         }
 

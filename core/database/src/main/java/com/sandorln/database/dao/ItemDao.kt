@@ -19,4 +19,11 @@ interface ItemDao {
 
     @Query("SELECT id, name, image, tags, maps FROM ItemEntity WHERE version == :version AND inStore == 1")
     fun getAllSummaryItemData(version: String): Flow<List<SummaryItemEntity>>
+
+    @Query(
+        "SELECT * FROM itementity WHERE version == :currentVersion\n" +
+                "AND id NOT IN (SELECT id FROM itementity WHERE version == :preVersion)\n" +
+                "AND name NOT IN (SELECT name FROM itementity WHERE version == :preVersion);"
+    )
+    suspend fun getNewItemListByCurrentVersion(currentVersion: String, preVersion: String): List<ItemEntity>
 }

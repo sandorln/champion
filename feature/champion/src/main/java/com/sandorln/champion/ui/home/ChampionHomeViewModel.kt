@@ -2,14 +2,13 @@ package com.sandorln.champion.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.data.repository.champion.ChampionRepository
-import com.sandorln.data.repository.sprite.SpriteRepository
-import com.sandorln.data.repository.version.VersionRepository
+import com.sandorln.domain.usecase.champion.GetSummaryChampionListByCurrentVersion
+import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
+import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.model.data.image.SpriteType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -28,29 +26,28 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChampionHomeViewModel @Inject constructor(
-    versionRepository: VersionRepository,
-    championRepository: ChampionRepository,
-    spriteRepository: SpriteRepository,
+    getSummaryChampionListByCurrentVersion: GetSummaryChampionListByCurrentVersion,
+    refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
+    getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion
 ) : ViewModel() {
-    private val _currentChampionList = championRepository.currentSummaryChampionList.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Champion).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
-    private val _championMutex = Mutex()
-
     private val _championUiState = MutableStateFlow(ChampionHomeUiState())
     val championUiState = _championUiState.asStateFlow()
 
-    private val _isInitChampionSpriteByCurrentVersion = versionRepository.currentVersion.distinctUntilChangedBy { it.isDownLoadChampionIconSprite }
     private val _searchKeyword = _championUiState.map { it.searchKeyword }.distinctUntilChanged()
-
-    val displayChampionList = combine(_searchKeyword, _currentChampionList) { searchKeyword, championList ->
-        championList.filter { champion -> champion.name.startsWith(searchKeyword) }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _championAction = MutableSharedFlow<ChampionHomeAction>()
     fun sendAction(championHomeAction: ChampionHomeAction) = viewModelScope.launch {
         _championAction.emit(championHomeAction)
     }
+
+    private val _championMutex = Mutex()
+    private val _currentChampionList = getSummaryChampionListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Champion).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    val displayChampionList = combine(_searchKeyword, _currentChampionList) { searchKeyword, championList ->
+        championList.filter { champion -> champion.name.startsWith(searchKeyword) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
         viewModelScope.launch {
@@ -60,9 +57,15 @@ class ChampionHomeViewModel @Inject constructor(
                         val currentUiState = _championUiState.value
                         when (action) {
                             is ChampionHomeAction.RefreshChampionData -> {
-                                /* TODO :: 챔피언 목록 / 아이콘 갱신 */
                                 _championUiState.emit(currentUiState.copy(isLoading = true))
-                                delay(2000)
+                                val spriteFileList = _currentChampionList.value.map { item -> item.image.sprite }.distinct()
+                                refreshDownloadSpriteBitmap
+                                    .invoke(
+                                        SpriteType.Champion,
+                                        spriteFileList
+                                    ).onFailure {
+                                        /* TODO :: 오류 발생 시 처리 */
+                                    }
                                 _championUiState.emit(currentUiState.copy(isLoading = false))
                             }
 
@@ -75,22 +78,20 @@ class ChampionHomeViewModel @Inject constructor(
             }
 
             launch(Dispatchers.IO) {
-                combine(_isInitChampionSpriteByCurrentVersion, _currentChampionList) { version, championList ->
+                combine(getCurrentVersionDistinctBySpriteType.invoke(SpriteType.Champion), _currentChampionList) { version, championList ->
                     if (version.isDownLoadChampionIconSprite || championList.isEmpty())
                         return@combine null
 
-                    Pair(version, championList)
+                    championList.map { item -> item.image.sprite }.distinct()
                 }.filterNotNull()
-                    .collectLatest {
-                        val (version, itemList) = it
-                        val spriteFileList = itemList.map { item -> item.image.sprite }.distinct()
-                        spriteRepository.refreshDownloadSpriteBitmap(
-                            version = version,
-                            spriteType = SpriteType.Champion,
-                            fileNameList = spriteFileList
-                        ).onFailure {
-                            /* TODO :: 오류 발생 시 처리 */
-                        }
+                    .collectLatest { spriteFileList ->
+                        refreshDownloadSpriteBitmap
+                            .invoke(
+                                SpriteType.Champion,
+                                spriteFileList
+                            ).onFailure {
+                                /* TODO :: 오류 발생 시 처리 */
+                            }
                     }
             }
         }
