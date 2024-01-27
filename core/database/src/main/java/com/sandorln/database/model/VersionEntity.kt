@@ -13,7 +13,10 @@ data class VersionEntity(
     val isDownLoadItemIconSprite: Boolean = false,
 
     val isCompleteSummonerSpell: Boolean = false,
-    val isDownLoadSpellIconSprite: Boolean = false
+    val isDownLoadSpellIconSprite: Boolean = false,
+
+    val newItemIdList : List<String>? = null,
+    val newChampionIdList : List<String>? = null
 ) {
     val isInitCompleteVersion
         get() = isCompleteChampions && isCompleteItems && isCompleteSummonerSpell

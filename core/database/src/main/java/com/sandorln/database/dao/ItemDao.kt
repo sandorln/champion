@@ -20,11 +20,12 @@ interface ItemDao {
     fun getAllSummaryItemData(version: String): Flow<List<SummaryItemEntity>>
 
     @Query(
-        "SELECT * FROM itementity WHERE version == :currentVersion " +
+        "SELECT id FROM itementity WHERE version == :currentVersion " +
                 "AND id NOT IN (SELECT id FROM itementity WHERE version == :preVersion) " +
-                "AND name NOT IN (SELECT name FROM itementity WHERE version == :preVersion);"
+                "AND name NOT IN (SELECT name FROM itementity WHERE version == :preVersion) " +
+                "AND inStore == 1;"
     )
-    suspend fun getNewItemDataList(currentVersion: String, preVersion: String): List<ItemEntity>
+    suspend fun getNewItemIdList(currentVersion: String, preVersion: String): List<String>
 
     @Query("SELECT count(*) FROM itementity WHERE version == :currentVersion " +
             "AND id NOT IN (SELECT id FROM itementity WHERE version == :preVersion) " +

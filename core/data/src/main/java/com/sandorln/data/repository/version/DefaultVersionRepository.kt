@@ -66,42 +66,19 @@ class DefaultVersionRepository @Inject constructor(
         }
     }
 
-    override suspend fun getNotInitCompleteVersionList(): List<Version> {
+    override suspend fun refreshVersionList(): Result<Any> = runCatching {
         val serverVersionList = versionService.getVersionList()
-        val localAllVersionList = versionDao.getAllVersion().firstOrNull() ?: emptyList()
-        val localAllVersionNameList = localAllVersionList.map { it.name }
+        val localAllVersionList = versionDao.getAllVersion().firstOrNull()?.map { it.name } ?: emptyList()
 
-        val newVersionList = serverVersionList
-            .filterNot { versionName ->
-                localAllVersionNameList.contains(versionName)
-            }.map { versionName ->
-                Version(name = versionName)
-            }.toMutableList()
-
-        val localNotInitCompleteVersionList = localAllVersionList
-            .filterNot {
-                it.isInitCompleteVersion
-            }.map {
-                it.asData()
+        serverVersionList.forEach { versionName ->
+            if (!localAllVersionList.contains(versionName)) {
+                versionDao.insertVersion(VersionEntity(name = versionName))
             }
-
-        newVersionList.addAll(localNotInitCompleteVersionList)
-
-        return newVersionList
+        }
     }
 
+    override suspend fun getNotInitCompleteVersionList(): List<Version> = versionDao.getNotInitVersionEntityList().map(VersionEntity::asData)
     override suspend fun updateVersionData(version: Version) {
         versionDao.insertVersion(version.asEntity())
-    }
-
-    override suspend fun getVersionNewCount(versionName: String, preVersionName: String): VersionNewCount {
-        val newChampionCount = championDao.getNewChampionCount(versionName, preVersionName)
-        val newItemCount = itemDao.getNewItemCount(versionName, preVersionName)
-
-        return VersionNewCount(
-            versionName = versionName,
-            newChampionCount = newChampionCount,
-            newItemCount = newItemCount
-        )
     }
 }

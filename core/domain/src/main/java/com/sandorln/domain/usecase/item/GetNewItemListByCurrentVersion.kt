@@ -28,8 +28,8 @@ class GetNewItemListByCurrentVersion @Inject constructor(
         val currentIndex = allVersionList.indexOfFirst { it.name == currentVersionName }
         val preVersionName = runCatching { allVersionList[currentIndex + 1] }.getOrNull()?.name ?: ""
 
-        val newItemList = itemRepository.getNewItemListByCurrentVersion(
-            currentVersionName = currentVersionName,
+        val newItemList = itemRepository.getNewItemIdList(
+            versionName = currentVersionName,
             preVersionName = preVersionName
         )
 

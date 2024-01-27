@@ -41,6 +41,6 @@ class DefaultItemRepository @Inject constructor(
     override suspend fun getItemListByVersion(version: String): List<ItemData> =
         itemDao.getAllItemData(version).firstOrNull()?.map(ItemEntity::asData) ?: emptyList()
 
-    override suspend fun getNewItemListByCurrentVersion(currentVersionName: String, preVersionName: String): List<ItemData> =
-        itemDao.getNewItemDataList(currentVersionName, preVersionName).map(ItemEntity::asData)
+    override suspend fun getNewItemIdList(versionName: String, preVersionName: String): List<String> =
+        itemDao.getNewItemIdList(versionName, preVersionName)
 }

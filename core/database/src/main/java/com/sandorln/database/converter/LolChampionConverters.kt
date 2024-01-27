@@ -27,7 +27,21 @@ class LolChampionConverters @Inject constructor(private val gson: Gson) {
     fun fromStringList(value: List<String>) = gson.toJson(value) ?: ""
 
     @TypeConverter
-    fun toStringList(value: String) = gson.fromJson(value, Array<String>::class.java).toList()
+    fun toStringList(value: String): List<String> = gson.fromJson(value, Array<String>::class.java).toList()
+
+    @TypeConverter
+    fun fromNullStringList(value: List<String>?) = if (value != null) {
+        gson.toJson(value)
+    } else {
+        null
+    }
+
+    @TypeConverter
+    fun toNullStringList(value: String?): List<String>? = if (value != null) {
+        gson.fromJson(value, Array<String>::class.java).toList()
+    } else {
+        null
+    }
 
     @TypeConverter
     fun fromChampionStats(value: ChampionStatsEntity) = gson.toJson(value) ?: ""

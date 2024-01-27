@@ -5,9 +5,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetVersionNewCount @Inject constructor(
+class RefreshVersionList @Inject constructor(
     private val versionRepository: VersionRepository
 ) {
-    suspend operator fun invoke(versionName: String, preVersionName: String) =
-        versionRepository.getVersionNewCount(versionName, preVersionName)
+    suspend operator fun invoke() = versionRepository.refreshVersionList()
 }
