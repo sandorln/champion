@@ -14,4 +14,9 @@ interface ChampionDao {
 
     @Insert(onConflict = REPLACE)
     suspend fun insertChampionList(championList: List<ChampionEntity>)
+
+    @Query("SELECT count(*) FROM ChampionEntity WHERE version == :currentVersion " +
+            "AND id NOT IN (SELECT id FROM ChampionEntity WHERE version == :preVersion) " +
+            "AND name NOT IN (SELECT name FROM ChampionEntity WHERE version == :preVersion)")
+    suspend fun getNewChampionCount(currentVersion: String, preVersion: String) : Int
 }

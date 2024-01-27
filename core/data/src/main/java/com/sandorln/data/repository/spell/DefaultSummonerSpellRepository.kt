@@ -7,6 +7,7 @@ import com.sandorln.database.model.SummonerSpellEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.spell.SummonerSpell
 import com.sandorln.network.service.SummonerSpellService
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -18,6 +19,8 @@ class DefaultSummonerSpellRepository @Inject constructor(
     private val summonerSpellDao: SummonerSpellDao,
     private val summonerSpellService: SummonerSpellService
 ) : SummonerSpellRepository {
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val currentItemList: Flow<List<SummonerSpell>> = versionDatasource
         .currentVersion
         .flatMapLatest { version ->

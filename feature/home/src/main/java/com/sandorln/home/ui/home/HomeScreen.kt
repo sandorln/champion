@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,8 +36,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.champion.ui.home.ChampionHomeScreen
+import com.sandorln.design.component.dialog.BaseBottomSheetDialog
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionTheme
@@ -70,9 +75,10 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
     val isInitComplete by homeViewModel.isInitComplete.collectAsState()
-    val hasNextVersion by homeViewModel.hasNextVersion.collectAsState()
-    val hasPreVersion by homeViewModel.hasPreVersion.collectAsState()
-    val currentVersionName by homeViewModel.currentVersionName.collectAsState()
+    val uiState by homeViewModel.homeUiState.collectAsState()
+    val hasNextVersion = uiState.nextVersionName.isNotEmpty()
+    val hasPreVersion = uiState.preVersionName.isNotEmpty()
+    val currentVersionName = uiState.currentVersionName
 
     Scaffold(
         bottomBar = {
@@ -103,6 +109,9 @@ fun HomeScreen(
                     currentVersionName = currentVersionName,
                     hasNextVersion = hasNextVersion,
                     hasPreVersion = hasPreVersion,
+                    onShowVersionChangeDialog = {
+                        homeViewModel.sendAction(HomeAction.ChangeVisibleVersionChangeDialog(true))
+                    },
                     onChangePreVersion = {
                         homeViewModel.sendAction(HomeAction.ChangePreVersion)
                     },
@@ -137,6 +146,45 @@ fun HomeScreen(
                                 .background(Color.Green)
                         ) {
 
+                        }
+                    }
+                }
+            }
+
+            if (uiState.isShowVersionChangeDialog) {
+                BaseBottomSheetDialog(
+                    onDismissRequest = {
+                        homeViewModel.sendAction(HomeAction.ChangeVisibleVersionChangeDialog(false))
+                    }
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.padding(
+                            horizontal = Spacings.Spacing03,
+                            vertical = Spacings.Spacing05
+                        )
+                    ) {
+                        items(count = uiState.versionNewCountList.size) {
+                            val versionNewCount = uiState.versionNewCountList[it]
+                            Row(modifier = Modifier
+                                .clickable {
+                                    homeViewModel.sendAction(HomeAction.ChangeVersion(versionNewCount.versionName))
+                                }
+                            ) {
+                                Text(
+                                    text = versionNewCount.versionName,
+                                    style = TextStyles.Body03
+                                )
+                                Text(
+                                    text = versionNewCount.newChampionCount.toString(),
+                                    style = TextStyles.Body03,
+                                    color = Color.Green
+                                )
+                                Text(
+                                    text = versionNewCount.newItemCount.toString(),
+                                    style = TextStyles.Body03,
+                                    color = Color.Magenta
+                                )
+                            }
                         }
                     }
                 }
@@ -190,6 +238,7 @@ fun HomeVersionChangeBar(
     currentVersionName: String = "14.2.1",
     hasNextVersion: Boolean = true,
     hasPreVersion: Boolean = true,
+    onShowVersionChangeDialog: () -> Unit = {},
     onChangePreVersion: () -> Unit = {},
     onChangeNextVersion: () -> Unit = {}
 ) {
@@ -208,15 +257,44 @@ fun HomeVersionChangeBar(
             title = "Prev",
             onClickListener = onChangePreVersion
         )
-        Text(
-            modifier = Modifier.weight(1f),
-            text = "$currentVersionName ver",
-            textAlign = TextAlign.Center,
-            style = TextStyles.SubTitle01,
-            color = Colors.Blue03,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        ConstraintLayout(
+            modifier = Modifier
+                .clickable { onShowVersionChangeDialog.invoke() }
+                .weight(1f),
+        ) {
+            val (versionRef, iconRef) = createRefs()
+            createHorizontalChain(versionRef, iconRef, chainStyle = ChainStyle.Packed)
+
+            Text(
+                modifier = Modifier.constrainAs(versionRef) {
+                    start.linkTo(parent.start)
+                    end.linkTo(iconRef.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    width = Dimension.preferredWrapContent
+                },
+                text = "$currentVersionName ver",
+                textAlign = TextAlign.Center,
+                style = TextStyles.SubTitle01,
+                color = Colors.Blue03,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Icon(
+                modifier = Modifier
+                    .padding(start = Spacings.Spacing01)
+                    .size(IconSize.LargeSize)
+                    .constrainAs(iconRef) {
+                        start.linkTo(versionRef.end)
+                        end.linkTo(parent.end)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                    },
+                painter = painterResource(id = com.sandorln.design.R.drawable.ic_chevron_down),
+                contentDescription = null,
+                tint = Colors.Blue03
+            )
+        }
         VersionButton(
             isEnable = hasNextVersion,
             title = "Next",

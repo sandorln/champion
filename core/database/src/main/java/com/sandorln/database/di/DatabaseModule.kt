@@ -4,13 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import com.google.gson.Gson
 import com.sandorln.database.AppDatabase
-import com.sandorln.database.converter.BitmapConverters
 import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
 import com.sandorln.database.converter.MapsConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
-import com.sandorln.database.dao.SpriteImageDao
 import com.sandorln.database.dao.SummonerSpellDao
 import com.sandorln.database.dao.VersionDao
 import dagger.Module
@@ -35,14 +33,12 @@ object DatabaseModule {
         @ApplicationContext context: Context,
         lolChampionConverters: LolChampionConverters,
         lolItemConverters: LolItemConverters,
-        bitmapConverters: BitmapConverters,
         mapsConverters: MapsConverters
     ): AppDatabase = Room
         .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
 //        .createFromAsset("database/lol_champion.db")
         .addTypeConverter(lolChampionConverters)
         .addTypeConverter(lolItemConverters)
-        .addTypeConverter(bitmapConverters)
         .addTypeConverter(mapsConverters)
         .fallbackToDestructiveMigration()
         .build()
@@ -62,8 +58,4 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun providesVersionDao(appDatabase: AppDatabase): VersionDao = appDatabase.versionDao()
-
-    @Provides
-    @Singleton
-    fun providesSpriteImageDao(appDatabase: AppDatabase): SpriteImageDao = appDatabase.spriteImageDao()
 }

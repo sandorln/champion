@@ -5,6 +5,8 @@ import com.sandorln.domain.usecase.version.GetAllVersionList
 import com.sandorln.domain.usecase.version.GetCurrentVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,7 +17,11 @@ class GetNewItemListByCurrentVersion @Inject constructor(
     private val getAllVersionList: GetAllVersionList,
     private val itemRepository: ItemRepository
 ) {
-    operator fun invoke() = combineTransform(getCurrentVersion.invoke(), getAllVersionList.invoke()) { currentVersion, allVersionList ->
+
+    operator fun invoke() = combineTransform(
+        getCurrentVersion.invoke().distinctUntilChangedBy { it.name },
+        getAllVersionList.invoke().distinctUntilChangedBy { it.size }
+    ) { currentVersion, allVersionList ->
         emit(emptyList())
 
         val currentVersionName = currentVersion.name
@@ -28,5 +34,5 @@ class GetNewItemListByCurrentVersion @Inject constructor(
         )
 
         emit(newItemList)
-    }.flowOn(Dispatchers.IO)
+    }.distinctUntilChanged().flowOn(Dispatchers.IO)
 }

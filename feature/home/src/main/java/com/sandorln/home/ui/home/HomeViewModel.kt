@@ -6,23 +6,38 @@ import com.sandorln.data.repository.champion.ChampionRepository
 import com.sandorln.data.repository.item.ItemRepository
 import com.sandorln.data.repository.spell.SummonerSpellRepository
 import com.sandorln.data.repository.version.VersionRepository
+import com.sandorln.domain.usecase.version.GetAllVersionList
+import com.sandorln.domain.usecase.version.GetCurrentVersion
+import com.sandorln.domain.usecase.version.GetVersionNewCount
 import com.sandorln.model.data.version.Version
+import com.sandorln.model.data.version.VersionNewCount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    getVersionNewCount: GetVersionNewCount,
+    getCurrentVersion: GetCurrentVersion,
+    getAllVersionList: GetAllVersionList,
     versionRepository: VersionRepository,
     championRepository: ChampionRepository,
     itemRepository: ItemRepository,
@@ -31,48 +46,82 @@ class HomeViewModel @Inject constructor(
     private val _isInitComplete: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInitComplete = _isInitComplete.asStateFlow()
 
+    private val _uiStateMutex = Mutex()
+    private val _homeUiState = MutableStateFlow(HomeUiState())
+    val homeUiState = _homeUiState.asStateFlow()
+
     private val _homeAction = MutableSharedFlow<HomeAction>()
     fun sendAction(homeAction: HomeAction) = viewModelScope.launch {
         _homeAction.emit(homeAction)
     }
 
-    val currentVersionName = versionRepository.currentVersion
+    private val _currentVersionName = getCurrentVersion
+        .invoke()
         .map { it.name }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
-    val hasNextVersion = combine(
-        versionRepository.currentVersion,
-        versionRepository.allVersionList
-    ) { currentVersion, allVersionList ->
-        allVersionList.indexOfFirst { it.name == currentVersion.name } - 1 >= 0
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-
-    val hasPreVersion = combine(
-        versionRepository.currentVersion,
-        versionRepository.allVersionList
-    ) { currentVersion, allVersionList ->
-        allVersionList.indexOfFirst { it.name == currentVersion.name } + 1 <= allVersionList.lastIndex
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-
-    private var _allVersionList: List<Version> = emptyList()
+        .distinctUntilChanged()
+    private val _allVersionList = getAllVersionList
+        .invoke()
+        .distinctUntilChangedBy { it.size }
 
     init {
         viewModelScope.launch {
+            launch {
+                _allVersionList
+                    .filter { it.isNotEmpty() }
+                    .map { it.map { version -> version.name } }
+                    .collectLatest { versionNameList ->
+                        val versionNewCountList = versionNameList.mapIndexed { index, versionName ->
+                            async {
+                                val preVersionName = versionNameList.getOrNull(index + 1) ?: ""
+                                getVersionNewCount.invoke(versionName, preVersionName)
+                            }
+                        }.awaitAll()
+
+                        _uiStateMutex.withLock {
+                            _homeUiState.update { it.copy(versionNewCountList = versionNewCountList) }
+                        }
+                    }
+            }
+            launch {
+                combine(_currentVersionName, _allVersionList) { currentVersionName, allVersionList ->
+                    val currentVersionIndex = allVersionList.indexOfFirst { it.name == currentVersionName }
+                    val nextVersionName = allVersionList.getOrNull(currentVersionIndex - 1)?.name ?: ""
+                    val preVersionName = allVersionList.getOrNull(currentVersionIndex + 1)?.name ?: ""
+
+                    _uiStateMutex.withLock {
+                        _homeUiState.update {
+                            it.copy(
+                                currentVersionName = currentVersionName,
+                                nextVersionName = nextVersionName,
+                                preVersionName = preVersionName
+                            )
+                        }
+                    }
+                }.collect()
+            }
             launch(Dispatchers.IO) {
                 _homeAction.collect { action ->
-                    if (_allVersionList.isEmpty()) {
-                        _allVersionList = versionRepository.allVersionList.firstOrNull() ?: emptyList()
-                    }
-                    val currentVersion = versionRepository.currentVersion.firstOrNull() ?: return@collect
-                    val currentVersionIndex = _allVersionList.indexOfFirst { it.name == currentVersion.name }
-                    when (action) {
-                        HomeAction.ChangeNextVersion -> {
-                            if (currentVersionIndex > 0)
-                                versionRepository.changeCurrentVersion(_allVersionList[currentVersionIndex - 1].name)
-                        }
+                    _uiStateMutex.withLock {
+                        val tempUiState = _homeUiState.value
 
-                        HomeAction.ChangePreVersion -> {
-                            if (currentVersionIndex < _allVersionList.lastIndex)
-                                versionRepository.changeCurrentVersion(_allVersionList[currentVersionIndex + 1].name)
+                        when (action) {
+                            HomeAction.ChangeNextVersion -> {
+                                if (tempUiState.nextVersionName.isNotEmpty())
+                                    versionRepository.changeCurrentVersion(tempUiState.nextVersionName)
+                            }
+
+                            HomeAction.ChangePreVersion -> {
+                                if (tempUiState.preVersionName.isNotEmpty())
+                                    versionRepository.changeCurrentVersion(tempUiState.preVersionName)
+                            }
+
+                            is HomeAction.ChangeVisibleVersionChangeDialog -> {
+                                _homeUiState.update { it.copy(isShowVersionChangeDialog = action.isVisible) }
+                            }
+
+                            is HomeAction.ChangeVersion -> {
+                                versionRepository.changeCurrentVersion(action.versionName)
+                            }
                         }
                     }
                 }
@@ -135,7 +184,18 @@ class HomeViewModel @Inject constructor(
     }
 }
 
+data class HomeUiState(
+    val currentVersionName: String = "",
+    val isShowVersionChangeDialog: Boolean = false,
+    val preVersionName: String = "",
+    val nextVersionName: String = "",
+    val versionNewCountList: List<VersionNewCount> = mutableListOf()
+)
+
 sealed interface HomeAction {
     data object ChangeNextVersion : HomeAction
     data object ChangePreVersion : HomeAction
+
+    data class ChangeVersion(val versionName: String) : HomeAction
+    data class ChangeVisibleVersionChangeDialog(val isVisible: Boolean) : HomeAction
 }

@@ -47,8 +47,12 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material)
 
+    implementation(libs.androidx.compose.constraintlayout)
+    implementation(libs.holix.bottomsheetdialog.compose)
+
     implementation(project(":core:design"))
     implementation(project(":core:data"))
+    implementation(project(":core:domain"))
     implementation(project(":core:model"))
     implementation(project(":feature:champion"))
     implementation(project(":feature:item"))

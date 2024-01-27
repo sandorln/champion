@@ -1,6 +1,7 @@
 package com.sandorln.data.repository.version
 
 import com.sandorln.model.data.version.Version
+import com.sandorln.model.data.version.VersionNewCount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -15,4 +16,6 @@ interface VersionRepository {
      */
     suspend fun getNotInitCompleteVersionList(): List<Version>
     suspend fun updateVersionData(version: Version)
+
+    suspend fun getVersionNewCount(versionName: String, preVersionName: String) : VersionNewCount
 }

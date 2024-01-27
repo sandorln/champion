@@ -2,13 +2,17 @@ package com.sandorln.data.repository.version
 
 import com.sandorln.data.util.asData
 import com.sandorln.data.util.asEntity
+import com.sandorln.database.dao.ChampionDao
+import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.VersionEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.version.Version
+import com.sandorln.model.data.version.VersionNewCount
 import com.sandorln.network.service.VersionService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,8 +27,12 @@ import javax.inject.Inject
 class DefaultVersionRepository @Inject constructor(
     private val versionService: VersionService,
     private val versionDatasource: VersionDatasource,
-    private val versionDao: VersionDao
+    private val versionDao: VersionDao,
+    private val championDao: ChampionDao,
+    private val itemDao: ItemDao
 ) : VersionRepository {
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val currentVersion: Flow<Version> = versionDatasource
         .currentVersion
         .flatMapLatest { version ->
@@ -84,5 +92,16 @@ class DefaultVersionRepository @Inject constructor(
 
     override suspend fun updateVersionData(version: Version) {
         versionDao.insertVersion(version.asEntity())
+    }
+
+    override suspend fun getVersionNewCount(versionName: String, preVersionName: String): VersionNewCount {
+        val newChampionCount = championDao.getNewChampionCount(versionName, preVersionName)
+        val newItemCount = itemDao.getNewItemCount(versionName, preVersionName)
+
+        return VersionNewCount(
+            versionName = versionName,
+            newChampionCount = newChampionCount,
+            newItemCount = newItemCount
+        )
     }
 }

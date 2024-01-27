@@ -24,17 +24,3 @@ interface VersionDao {
     @Update
     suspend fun updateVersion(versionEntity: VersionEntity)
 }
-
-suspend fun VersionDao.getAllVersionOrderByDesc() : List<VersionEntity> = getAllVersion().map { versionList ->
-    val versionComparator = Comparator<VersionEntity> { version1, version2 ->
-        val (major1, minor1, patch1) = version1.name.split('.').map { it.toInt() }
-        val (major2, minor2, patch2) = version2.name.split('.').map { it.toInt() }
-
-        when {
-            major1 != major2 -> major2 - major1
-            minor1 != minor2 -> minor2 - minor1
-            else -> patch2 - patch1
-        }
-    }
-    versionList.sortedWith(versionComparator)
-}.firstOrNull() ?: emptyList()
