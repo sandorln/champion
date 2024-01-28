@@ -9,15 +9,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -32,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -43,15 +43,19 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.champion.ui.home.ChampionHomeScreen
+import com.sandorln.design.component.BaseCircleIconImage
+import com.sandorln.design.component.CircleIconType
 import com.sandorln.design.component.dialog.BaseBottomSheetDialog
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionTheme
+import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
+import com.sandorln.model.data.version.Version
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
 
@@ -159,41 +163,155 @@ fun HomeScreen(
                         homeViewModel.sendAction(HomeAction.ChangeVisibleVersionChangeDialog(false))
                     }
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.padding(
-                            horizontal = Spacings.Spacing03,
-                            vertical = Spacings.Spacing05
-                        )
-                    ) {
+                    LazyColumn {
                         items(count = uiState.versionList.size) {
                             val version = uiState.versionList[it]
-                            val championNameList = uiState.newSummaryChampionMap[version.name]?.map { champion -> champion.name } ?: emptyList()
-                            Row(modifier = Modifier
-                                .clickable {
-                                    homeViewModel.sendAction(HomeAction.ChangeVersion(version.name))
+                            val versionName = version.name
+
+                            VersionItemBody(
+                                version = version,
+                                isSelectedVersion = versionName == uiState.currentVersionName,
+                                onClickListener = {
+                                    homeViewModel.sendAction(HomeAction.ChangeVersion(versionName))
                                 }
-                            ) {
-                                Text(
-                                    text = version.name,
-                                    style = TextStyles.Body03
-                                )
-                                Spacer(modifier = Modifier.width(Spacings.Spacing00))
-                                Text(
-                                    text = championNameList.toString(),
-                                    style = TextStyles.Body03,
-                                    color = Color.Green
-                                )
-                                Spacer(modifier = Modifier.width(Spacings.Spacing00))
-                                Text(
-                                    text = version.newItemIdList?.size?.toString() ?: "0",
-                                    style = TextStyles.Body03,
-                                    color = Color.Magenta
-                                )
-                            }
+                            )
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun VersionItemBody(
+    version: Version = Version(),
+    isSelectedVersion: Boolean = true,
+    onClickListener: () -> Unit = {}
+) {
+    val newChampionIdList = version.newChampionIdList ?: emptyList()
+    val newItemIdList = version.newItemIdList ?: emptyList()
+    val backgroundColor = if (isSelectedVersion) Colors.Blue05 else Colors.Gray08
+    Row(
+        modifier = Modifier
+            .background(backgroundColor)
+            .fillMaxWidth()
+            .clickable { onClickListener.invoke() }
+            .padding(
+                horizontal = Spacings.Spacing05,
+                vertical = Spacings.Spacing03
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+    ) {
+        ConstraintLayout(modifier = Modifier.weight(1f)) {
+            val (versionNameRef, iconSelectRef) = createRefs()
+            createHorizontalChain(
+                versionNameRef,
+                iconSelectRef,
+                chainStyle = ChainStyle.Packed
+            )
+
+            Text(
+                modifier = Modifier.constrainAs(versionNameRef) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    end.linkTo(iconSelectRef.start)
+                    horizontalBias = 0f
+                    width = Dimension.preferredWrapContent
+                },
+                text = version.name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = TextStyles.SubTitle01,
+                color = if (isSelectedVersion) Colors.BaseColor else Colors.Gray04
+            )
+
+            if (isSelectedVersion) {
+                Icon(
+                    modifier = Modifier
+                        .size(IconSize.MediumSize)
+                        .constrainAs(iconSelectRef) {
+                            start.linkTo(versionNameRef.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(parent.start)
+                        },
+                    painter = painterResource(id = com.sandorln.design.R.drawable.ic_check),
+                    contentDescription = null,
+                    tint = Colors.BaseColor
+                )
+            }
+        }
+
+        if (newChampionIdList.isNotEmpty())
+            NewChampionListBody(
+                circleIconType = CircleIconType.CHAMPION,
+                newIdList = newChampionIdList,
+                versionName = version.name
+            )
+
+        if (newItemIdList.isNotEmpty())
+            NewChampionListBody(
+                circleIconType = CircleIconType.ITEM,
+                newIdList = newItemIdList,
+                versionName = version.name
+            )
+    }
+}
+
+private const val MAX_COUNT = 3
+
+@Composable
+private fun NewChampionListBody(
+    circleIconType: CircleIconType = CircleIconType.CHAMPION,
+    newIdList: List<String> = emptyList(),
+    versionName: String = ""
+) {
+    val circleTypeIcon = when (circleIconType) {
+        CircleIconType.ITEM -> com.sandorln.design.R.drawable.ic_main_item
+        CircleIconType.CHAMPION -> com.sandorln.design.R.drawable.ic_main_champion
+    }
+
+    Row(
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Box {
+            newIdList
+                .take(MAX_COUNT)
+                .forEachIndexed { index, id ->
+                    val startPadding = ((IconSize.LargeSize / 2) * index) + IconSize.MediumSize
+                    BaseCircleIconImage(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(start = startPadding)
+                            .size(IconSize.LargeSize),
+                        versionName = versionName,
+                        id = id,
+                        circleIconType = circleIconType
+                    )
+                }
+
+            Icon(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .background(Colors.Gold05, CircleShape)
+                    .size(IconSize.MediumSize)
+                    .padding(2.5.dp)
+                    .clip(CircleShape),
+                painter = painterResource(id = circleTypeIcon),
+                contentDescription = null,
+                tint = Colors.Gray03
+            )
+        }
+
+        if (newIdList.size > MAX_COUNT) {
+            Text(
+                text = "외 ${newIdList.size - MAX_COUNT}",
+                style = TextStyles.Body04,
+                color = Colors.Gray04
+            )
         }
     }
 }
@@ -225,9 +343,7 @@ internal fun HomeBottomNavigation(
                 label = {
                     Text(
                         text = homeScreenType.title,
-                        style = TextStyles
-                            .Body03
-                            .copy(color = Color.Unspecified)
+                        style = TextStyles.Body03.copy(color = Color.Unspecified)
                     )
                 },
                 alwaysShowLabel = false,
@@ -353,5 +469,13 @@ internal fun HomeBottomNavigationPreview() {
         Surface {
             HomeBottomNavigation()
         }
+    }
+}
+
+@Preview
+@Composable
+fun VersionItemBodyPreview() {
+    LolChampionThemePreview {
+        VersionItemBody()
     }
 }

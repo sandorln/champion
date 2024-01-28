@@ -28,6 +28,7 @@ object Radius {
 }
 
 object IconSize {
+    val SmallSize = 12.dp
     val MediumSize = 16.dp
     val LargeSize = 24.dp
     val XLargeSize = 32.dp

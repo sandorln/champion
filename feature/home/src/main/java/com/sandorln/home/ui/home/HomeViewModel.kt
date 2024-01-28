@@ -113,6 +113,7 @@ class HomeViewModel @Inject constructor(
 
                             is HomeAction.ChangeVersion -> {
                                 versionRepository.changeCurrentVersion(action.versionName)
+                                _homeUiState.update { it.copy(isShowVersionChangeDialog = false) }
                             }
                         }
                     }

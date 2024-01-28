@@ -33,4 +33,5 @@ object TextStyles {
     val Body01 = TextStyle(fontFamily = warhavenFont, fontWeight = FontWeight.Medium, fontSize = 14.sp, color = Colors.BasicWhite)
     val Body02 = TextStyle(fontFamily = warhavenFont, fontWeight = FontWeight.Medium, fontSize = 12.sp, color = Colors.BasicWhite)
     val Body03 = TextStyle(fontFamily = warhavenFont, fontWeight = FontWeight.Medium, fontSize = 11.sp, color = Colors.BasicWhite)
+    val Body04 = TextStyle(fontFamily = warhavenFont, fontWeight = FontWeight.Medium, fontSize = 9.sp, color = Colors.BasicWhite)
 }

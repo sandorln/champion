@@ -32,4 +32,7 @@ object Colors {
     val Gold05 = Color(0xFF785A28)
     val Gold06 = Color(0xFF463714)
     val Gold07 = Color(0xFF32281E)
+
+    val Green00 = Color(0xFF4CAF50)
+    val Orange00 = Color(0xFFFF5722)
 }
