@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -185,8 +187,12 @@ fun HomeScreen(
 
 @Composable
 fun VersionItemBody(
-    version: Version = Version(),
-    isSelectedVersion: Boolean = true,
+    version: Version = Version(
+        name = "14.1.1",
+        newChampionIdList = listOf("champion00"),
+        newItemIdList = listOf("item00", "item01", "item02", "item03"),
+    ),
+    isSelectedVersion: Boolean = false,
     onClickListener: () -> Unit = {}
 ) {
     val newChampionIdList = version.newChampionIdList ?: emptyList()
@@ -245,15 +251,31 @@ fun VersionItemBody(
             }
         }
 
+        if (newChampionIdList.isNotEmpty() || newItemIdList.isNotEmpty())
+            Text(
+                modifier = Modifier
+                    .background(
+                        color = Colors.Gold04,
+                        shape = RoundedCornerShape(Radius.Radius04)
+                    )
+                    .padding(
+                        horizontal = Spacings.Spacing00,
+                        vertical = 1.dp
+                    ),
+                text = "NEW",
+                style = TextStyles.Body04,
+                color = Colors.Gray07
+            )
+
         if (newChampionIdList.isNotEmpty())
-            NewChampionListBody(
+            NewContentListBody(
                 circleIconType = CircleIconType.CHAMPION,
                 newIdList = newChampionIdList,
                 versionName = version.name
             )
 
         if (newItemIdList.isNotEmpty())
-            NewChampionListBody(
+            NewContentListBody(
                 circleIconType = CircleIconType.ITEM,
                 newIdList = newItemIdList,
                 versionName = version.name
@@ -264,7 +286,7 @@ fun VersionItemBody(
 private const val MAX_COUNT = 3
 
 @Composable
-private fun NewChampionListBody(
+private fun NewContentListBody(
     circleIconType: CircleIconType = CircleIconType.CHAMPION,
     newIdList: List<String> = emptyList(),
     versionName: String = ""
@@ -274,43 +296,62 @@ private fun NewChampionListBody(
         CircleIconType.CHAMPION -> com.sandorln.design.R.drawable.ic_main_champion
     }
 
-    Row(
-        verticalAlignment = Alignment.Bottom
-    ) {
-        Box {
-            newIdList
-                .take(MAX_COUNT)
-                .forEachIndexed { index, id ->
-                    val startPadding = ((IconSize.LargeSize / 2) * index) + IconSize.MediumSize
-                    BaseCircleIconImage(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(start = startPadding)
-                            .size(IconSize.LargeSize),
-                        versionName = versionName,
-                        id = id,
-                        circleIconType = circleIconType
-                    )
-                }
+    Box {
+        Icon(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .background(Colors.Gold05, CircleShape)
+                .size(IconSize.MediumSize)
+                .padding(2.5.dp)
+                .clip(CircleShape),
+            painter = painterResource(id = circleTypeIcon),
+            contentDescription = null,
+            tint = Colors.Gray03
+        )
 
-            Icon(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .background(Colors.Gold05, CircleShape)
-                    .size(IconSize.MediumSize)
-                    .padding(2.5.dp)
-                    .clip(CircleShape),
-                painter = painterResource(id = circleTypeIcon),
-                contentDescription = null,
-                tint = Colors.Gray03
-            )
-        }
+        newIdList
+            .take(MAX_COUNT)
+            .forEachIndexed { index, id ->
+                val startPadding = ((IconSize.LargeSize / 2) * index) + IconSize.MediumSize
+                BaseCircleIconImage(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = startPadding)
+                        .zIndex(index.toFloat() + 1)
+                        .size(IconSize.LargeSize),
+                    versionName = versionName,
+                    id = id,
+                    circleIconType = circleIconType
+                )
+            }
 
         if (newIdList.size > MAX_COUNT) {
+            val startPadding = ((IconSize.LargeSize / 2) * (MAX_COUNT + 1)) + IconSize.MediumSize / 2
+            val backgroundShape = RoundedCornerShape(
+                topEnd = Radius.Radius04,
+                bottomEnd = Radius.Radius04
+            )
             Text(
-                text = "외 ${newIdList.size - MAX_COUNT}",
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(start = startPadding)
+                    .background(
+                        color = Colors.Blue06,
+                        shape = backgroundShape
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = Colors.Gold05,
+                        shape = backgroundShape
+                    )
+                    .padding(
+                        start = 10.dp,
+                        end = Spacings.Spacing01
+                    )
+                    .zIndex(0f),
+                text = "+${(newIdList.size - MAX_COUNT).coerceAtMost(99)}",
                 style = TextStyles.Body04,
-                color = Colors.Gray04
+                color = Colors.Gold04
             )
         }
     }
