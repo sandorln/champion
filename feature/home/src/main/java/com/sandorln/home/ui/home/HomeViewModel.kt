@@ -2,16 +2,13 @@ package com.sandorln.home.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.data.repository.champion.ChampionRepository
-import com.sandorln.data.repository.item.ItemRepository
-import com.sandorln.data.repository.spell.SummonerSpellRepository
 import com.sandorln.data.repository.version.VersionRepository
 import com.sandorln.domain.usecase.RefreshAppStartData
+import com.sandorln.domain.usecase.champion.GetAllVersionNewSummaryChampionMap
 import com.sandorln.domain.usecase.version.GetAllVersionList
 import com.sandorln.domain.usecase.version.GetCurrentVersion
-import com.sandorln.domain.usecase.version.RefreshVersionList
+import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.version.Version
-import com.sandorln.model.data.version.VersionNewCount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,6 +35,7 @@ class HomeViewModel @Inject constructor(
     getAllVersionList: GetAllVersionList,
     refreshAppStartData: RefreshAppStartData,
     versionRepository: VersionRepository,
+    getAllVersionNewSummaryChampionMap: GetAllVersionNewSummaryChampionMap
 ) : ViewModel() {
     private val _isInitComplete: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInitComplete = _isInitComplete.asStateFlow()
@@ -64,20 +62,17 @@ class HomeViewModel @Inject constructor(
             launch {
                 _allVersionList
                     .filter { it.isNotEmpty() }
-                    .map { it.map { version -> version.name } }
-                    .collectLatest { versionNameList ->
-//                        val versionNewCountList = versionNameList.mapIndexed { index, versionName ->
-//                            async {
-//                                val preVersionName = versionNameList.getOrNull(index + 1) ?: ""
-//                                getVersionNewCount.invoke(versionName, preVersionName)
-//                            }
-//                        }.awaitAll()
-//
-//                        _uiStateMutex.withLock {
-//                            _homeUiState.update { it.copy(versionNewCountList = versionNewCountList) }
-//                        }
+                    .collectLatest { versionList ->
+                        _uiStateMutex.withLock {
+                            _homeUiState.update {
+                                it.copy(
+                                    versionList = versionList
+                                )
+                            }
+                        }
                     }
             }
+
             launch {
                 combine(_currentVersionName, _allVersionList) { currentVersionName, allVersionList ->
                     val currentVersionIndex = allVersionList.indexOfFirst { it.name == currentVersionName }
@@ -95,6 +90,7 @@ class HomeViewModel @Inject constructor(
                     }
                 }.collect()
             }
+
             launch(Dispatchers.IO) {
                 _homeAction.collect { action ->
                     _uiStateMutex.withLock {
@@ -141,6 +137,16 @@ class HomeViewModel @Inject constructor(
                         currentVersion.name.isNotEmpty()
                     }
             }
+
+            launch {
+                getAllVersionNewSummaryChampionMap
+                    .invoke()
+                    .collectLatest { allVersionNewSummaryChampionMap ->
+                        _uiStateMutex.withLock {
+                            _homeUiState.update { it.copy(newSummaryChampionMap = allVersionNewSummaryChampionMap) }
+                        }
+                    }
+            }
         }
     }
 }
@@ -150,7 +156,9 @@ data class HomeUiState(
     val isShowVersionChangeDialog: Boolean = false,
     val preVersionName: String = "",
     val nextVersionName: String = "",
-    val versionNewCountList: List<VersionNewCount> = mutableListOf()
+
+    val versionList: List<Version> = listOf(),
+    val newSummaryChampionMap: Map<String, List<SummaryChampion>> = mapOf()
 )
 
 sealed interface HomeAction {

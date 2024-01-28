@@ -2,7 +2,6 @@ package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -14,11 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -29,14 +26,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
@@ -183,8 +179,8 @@ fun ItemHomeScreen(
 }
 
 @Composable
-fun ItemIconBody(
-    item: ItemData? = null,
+fun ItemBody(
+    item: ItemData = ItemData(),
     currentSpriteMap: Map<String, Bitmap?> = emptyMap()
 ) {
     Column(
@@ -192,31 +188,16 @@ fun ItemIconBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        val bitmap = item?.image?.getImageBitmap(currentSpriteMap)
-        when {
-            bitmap != null -> {
-                Image(
-                    modifier = Modifier.size(IconSize.XXLargeSize),
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            item != null -> {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(IconSize.XXLargeSize)
-                        .padding(Spacings.Spacing00),
-                    color = Colors.BaseColor,
-                    strokeWidth = 3.dp
-                )
-            }
-        }
+        val bitmap = item.image.getImageBitmap(currentSpriteMap)
+        BaseBitmapImage(
+            bitmap = bitmap,
+            loadingDrawableId = com.sandorln.design.R.drawable.ic_main_item,
+            imageSize = IconSize.XXLargeSize
+        )
 
         Text(
             modifier = Modifier.padding(vertical = 1.dp),
-            text = item?.name ?: "",
+            text = item.name,
             style = TextStyles.Body03.copy(fontSize = 8.sp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -348,10 +329,14 @@ private fun LazyListScope.baseItemList(
                     itemChunkList[columnIndex][rowIndex]
                 }.getOrNull()
 
-                ItemIconBody(
-                    item = item,
-                    currentSpriteMap = spriteMap
-                )
+                if (item != null) {
+                    ItemBody(
+                        item = item,
+                        currentSpriteMap = spriteMap
+                    )
+                } else {
+                    Spacer(modifier = Modifier.width(IconSize.XXLargeSize))
+                }
             }
         }
     }
@@ -369,6 +354,6 @@ fun ItemFilerListPreview() {
 @Composable
 fun ItemIconBodyPreview() {
     LolChampionThemePreview {
-        ItemIconBody()
+        ItemBody()
     }
 }

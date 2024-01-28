@@ -39,6 +39,9 @@ class DefaultChampionRepository @Inject constructor(
     override suspend fun getSummaryChampionListByVersion(version: String): List<SummaryChampion> =
         championDao.getChampionList(version).firstOrNull()?.map(ChampionEntity::asData) ?: emptyList()
 
+    override suspend fun getSummaryChampionListByChampionIdList(version: String, championIdList: List<String>): List<SummaryChampion> =
+        championDao.getChampionListByChampionIdList(version, championIdList).map(ChampionEntity::asData)
+
     override suspend fun getNewChampionIdList(versionName: String, preVersionName: String): List<String> =
         championDao.getNewChampionIdList(versionName, preVersionName)
 }

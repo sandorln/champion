@@ -8,7 +8,6 @@ import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.VersionEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.version.Version
-import com.sandorln.model.data.version.VersionNewCount
 import com.sandorln.network.service.VersionService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

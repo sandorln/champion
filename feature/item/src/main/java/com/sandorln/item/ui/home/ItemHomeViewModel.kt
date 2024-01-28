@@ -1,9 +1,10 @@
 package com.sandorln.item.ui.home
 
+import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.item.GetItemListByCurrentVersion
-import com.sandorln.domain.usecase.item.GetNewItemListByCurrentVersion
+import com.sandorln.domain.usecase.item.GetNewItemIdListByCurrentVersion
 import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
@@ -16,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -30,7 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ItemHomeViewModel @Inject constructor(
     getItemListByCurrentVersion: GetItemListByCurrentVersion,
-    getNewItemListByCurrentVersion: GetNewItemListByCurrentVersion,
+    getNewItemIdListByCurrentVersion: GetNewItemIdListByCurrentVersion,
     refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType
@@ -43,10 +43,14 @@ class ItemHomeViewModel @Inject constructor(
         _itemAction.emit(itemHomeAction)
     }
 
-    private val _itemFilter: suspend (ItemHomeUiState, List<ItemData>, List<ItemData>) -> List<ItemData> = { uiState, itemList, newItemList ->
+    private val _itemFilter: suspend (ItemHomeUiState, List<ItemData>, List<String>) -> List<ItemData> = { uiState, itemList, newItemIdList ->
         val searchKeyword = uiState.searchKeyword
         val selectMapType = uiState.isSelectMapType
-        val filterItemList = if (uiState.isSelectNewItem) newItemList else itemList
+        val filterItemList = if (uiState.isSelectNewItem) {
+            itemList.fastFilter { newItemIdList.contains(it.id) }
+        } else {
+            itemList
+        }
 
         filterItemList.filter { item ->
             if (!item.inStore) return@filter false
@@ -70,11 +74,12 @@ class ItemHomeViewModel @Inject constructor(
     private val _itemMutex = Mutex()
 
     private val _currentItemList = getItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    private val _currentNewItemList = MutableStateFlow(emptyList<ItemData>())
-//        getNewItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _currentNewItemIdList = getNewItemIdListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    //        getNewItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemList, _itemFilter)
+    val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemIdList, _itemFilter)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {

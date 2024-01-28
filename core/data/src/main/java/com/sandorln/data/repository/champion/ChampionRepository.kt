@@ -7,7 +7,9 @@ interface ChampionRepository {
     val currentSummaryChampionList: Flow<List<SummaryChampion>>
 
     suspend fun refreshChampionList(version: String): Result<Any>
+
     suspend fun getSummaryChampionListByVersion(version: String): List<SummaryChampion>
+    suspend fun getSummaryChampionListByChampionIdList(version: String, championIdList: List<String>): List<SummaryChampion>
 
     suspend fun getNewChampionIdList(versionName: String, preVersionName: String): List<String>
 }

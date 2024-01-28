@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
@@ -128,10 +130,14 @@ fun ChampionHomeScreen(
                             chunkChampionList[columnIndex][rowIndex]
                         }.getOrNull()
 
-                        ChampionIconBody(
-                            champion = champion,
-                            currentSpriteMap = currentSpriteMap
-                        )
+                        if (champion != null) {
+                            ChampionBody(
+                                champion = champion,
+                                currentSpriteMap = currentSpriteMap
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.width(IconSize.XXLargeSize))
+                        }
                     }
                 }
             }
@@ -140,40 +146,30 @@ fun ChampionHomeScreen(
 }
 
 @Composable
-private fun ChampionIconBody(
-    champion: SummaryChampion? = null,
+private fun ChampionBody(
+    champion: SummaryChampion = SummaryChampion(),
     currentSpriteMap: Map<String, Bitmap?>
 ) {
     Column(
         modifier = Modifier.width(IconSize.XXLargeSize),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (champion != null) {
-            val bitmap = champion.image.getImageBitmap(currentSpriteMap)
-            if (bitmap != null) {
-                Image(
-                    modifier = Modifier.size(IconSize.XXLargeSize),
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                CircularProgressIndicator(
-                    color = Colors.BaseColor,
-                    strokeWidth = 3.dp
-                )
-            }
+        val bitmap = champion.image.getImageBitmap(currentSpriteMap)
+        BaseBitmapImage(
+            bitmap = bitmap,
+            loadingDrawableId = com.sandorln.design.R.drawable.ic_main_champion,
+            imageSize = IconSize.XXLargeSize
+        )
 
-            Text(
-                modifier = Modifier.padding(vertical = 1.dp),
-                text = champion.name,
-                style = TextStyles.Body03.copy(fontSize = 8.sp),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                color = Colors.Gold02
-            )
-        }
+        Text(
+            modifier = Modifier.padding(vertical = 1.dp),
+            text = champion.name,
+            style = TextStyles.Body03.copy(fontSize = 8.sp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            color = Colors.Gold02
+        )
     }
 }
 

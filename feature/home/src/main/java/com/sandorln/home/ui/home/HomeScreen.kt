@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -163,24 +165,27 @@ fun HomeScreen(
                             vertical = Spacings.Spacing05
                         )
                     ) {
-                        items(count = uiState.versionNewCountList.size) {
-                            val versionNewCount = uiState.versionNewCountList[it]
+                        items(count = uiState.versionList.size) {
+                            val version = uiState.versionList[it]
+                            val championNameList = uiState.newSummaryChampionMap[version.name]?.map { champion -> champion.name } ?: emptyList()
                             Row(modifier = Modifier
                                 .clickable {
-                                    homeViewModel.sendAction(HomeAction.ChangeVersion(versionNewCount.versionName))
+                                    homeViewModel.sendAction(HomeAction.ChangeVersion(version.name))
                                 }
                             ) {
                                 Text(
-                                    text = versionNewCount.versionName,
+                                    text = version.name,
                                     style = TextStyles.Body03
                                 )
+                                Spacer(modifier = Modifier.width(Spacings.Spacing00))
                                 Text(
-                                    text = versionNewCount.newChampionCount.toString(),
+                                    text = championNameList.toString(),
                                     style = TextStyles.Body03,
                                     color = Color.Green
                                 )
+                                Spacer(modifier = Modifier.width(Spacings.Spacing00))
                                 Text(
-                                    text = versionNewCount.newItemCount.toString(),
+                                    text = version.newItemIdList?.size?.toString() ?: "0",
                                     style = TextStyles.Body03,
                                     color = Color.Magenta
                                 )
