@@ -33,7 +33,7 @@ class ItemHomeViewModel @Inject constructor(
     getNewItemIdListByCurrentVersion: GetNewItemIdListByCurrentVersion,
     refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
-    getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType
+    getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
 ) : ViewModel() {
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
@@ -76,7 +76,6 @@ class ItemHomeViewModel @Inject constructor(
     private val _currentItemList = getItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     private val _currentNewItemIdList = getNewItemIdListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    //        getNewItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemIdList, _itemFilter)
@@ -125,6 +124,10 @@ class ItemHomeViewModel @Inject constructor(
                             is ItemHomeAction.ToggleSelectNewItem -> {
                                 _itemUiState.emit(currentUiState.copy(isSelectNewItem = !currentUiState.isSelectNewItem))
                             }
+
+                            is ItemHomeAction.SelectItemData -> {
+                                _itemUiState.emit(currentUiState.copy(selectedItemData = action.itemData))
+                            }
                         }
                     }
                 }
@@ -155,7 +158,8 @@ data class ItemHomeUiState(
     val searchKeyword: String = "",
     val isSelectMapType: MapType = MapType.ALL,
     val selectTag: Set<ItemTagType> = emptySet(),
-    val isSelectNewItem: Boolean = false
+    val isSelectNewItem: Boolean = false,
+    val selectedItemData: ItemData? = null
 )
 
 sealed interface ItemHomeAction {
@@ -165,4 +169,5 @@ sealed interface ItemHomeAction {
     data class ToggleItemTagType(val itemTagType: ItemTagType) : ItemHomeAction
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
+    data class SelectItemData(val itemData: ItemData?) : ItemHomeAction
 }

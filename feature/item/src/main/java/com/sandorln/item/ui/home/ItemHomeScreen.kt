@@ -3,6 +3,7 @@ package com.sandorln.item.ui.home
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
@@ -36,6 +38,7 @@ import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
+import com.sandorln.design.component.item.ItemDescriptionTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -58,6 +61,10 @@ fun ItemHomeScreen(
 
     val (bootItemList, notBootItemList) = currentItemList.partition { it.tags.contains(ItemTagType.Boots) }
     val (consumableItemList, normalItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) }
+
+    val onClickItem: (ItemData) -> Unit = {
+        itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it))
+    }
 
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PullHeight
@@ -154,7 +161,8 @@ fun ItemHomeScreen(
                     title = "장화",
                     spanCount = spanCount,
                     spriteMap = currentSpriteMap,
-                    itemChunkList = bootsItemListChunkList
+                    itemChunkList = bootsItemListChunkList,
+                    onClickItem = onClickItem
                 )
 
             /* 소모성 아이템 */
@@ -163,7 +171,8 @@ fun ItemHomeScreen(
                     title = "소모성 아이템",
                     spanCount = spanCount,
                     spriteMap = currentSpriteMap,
-                    itemChunkList = consumableItemChunkList
+                    itemChunkList = consumableItemChunkList,
+                    onClickItem = onClickItem
                 )
 
             /* 보통 아이템 */
@@ -172,19 +181,31 @@ fun ItemHomeScreen(
                     title = "일반 아이템",
                     spanCount = spanCount,
                     spriteMap = currentSpriteMap,
-                    itemChunkList = normalItemChunkList
+                    itemChunkList = normalItemChunkList,
+                    onClickItem = onClickItem
                 )
         }
+
+        ItemDescriptionTextView(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .heightIn(min = 150.dp),
+            itemDescription = uiState.selectedItemData?.description ?: ""
+        )
     }
 }
 
 @Composable
 fun ItemBody(
     item: ItemData = ItemData(),
-    currentSpriteMap: Map<String, Bitmap?> = emptyMap()
+    currentSpriteMap: Map<String, Bitmap?> = emptyMap(),
+    onClickItem: (ItemData) -> Unit = {}
 ) {
     Column(
-        modifier = Modifier.width(IconSize.XXLargeSize),
+        modifier = Modifier
+            .clickable { onClickItem.invoke(item) }
+            .width(IconSize.XXLargeSize),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -304,7 +325,8 @@ private fun LazyListScope.baseItemList(
     title: String = "제목",
     spanCount: Int = 5,
     spriteMap: Map<String, Bitmap?> = emptyMap(),
-    itemChunkList: List<List<ItemData>> = mutableListOf()
+    itemChunkList: List<List<ItemData>> = mutableListOf(),
+    onClickItem: (ItemData) -> Unit = {}
 ) {
     item {
         Text(
@@ -332,7 +354,8 @@ private fun LazyListScope.baseItemList(
                 if (item != null) {
                     ItemBody(
                         item = item,
-                        currentSpriteMap = spriteMap
+                        currentSpriteMap = spriteMap,
+                        onClickItem = onClickItem
                     )
                 } else {
                     Spacer(modifier = Modifier.width(IconSize.XXLargeSize))

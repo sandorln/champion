@@ -10,5 +10,7 @@ interface ItemRepository {
 
     suspend fun getItemListByVersion(version: String): List<ItemData>
 
-    suspend fun getNewItemIdList(versionName: String, preVersionName: String) : List<String>
+    suspend fun getNewItemIdList(versionName: String, preVersionName: String): List<String>
+
+    suspend fun getItemDataByIdAndVersion(id: String, versionName: String): ItemData?
 }

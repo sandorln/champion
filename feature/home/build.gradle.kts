@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.androidx.compose.constraintlayout)
     implementation(libs.holix.bottomsheetdialog.compose)
 
+    implementation(libs.jsoup.jsoup)
+
     implementation(project(":core:design"))
     implementation(project(":core:data"))
     implementation(project(":core:domain"))

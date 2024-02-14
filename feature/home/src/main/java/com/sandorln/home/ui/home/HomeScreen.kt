@@ -48,6 +48,7 @@ import com.sandorln.champion.ui.home.ChampionHomeScreen
 import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.CircleIconType
 import com.sandorln.design.component.dialog.BaseBottomSheetDialog
+import com.sandorln.design.component.item.ItemDescriptionTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionTheme
@@ -60,6 +61,7 @@ import com.sandorln.item.ui.home.ItemHomeScreen
 import com.sandorln.model.data.version.Version
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
+
 
 sealed class HomeScreenType(val title: String, @DrawableRes val svgId: Int) {
     data object Champion : HomeScreenType("챔피온", designR.drawable.ic_main_champion)
@@ -143,9 +145,15 @@ fun HomeScreen(
                         HomeScreenType.SummonerSpell -> Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color.Magenta)
                         ) {
+                            val dummyData =
+                                "<mainText><stats>공격 속도 <attention> 15%</attention></stats><br><li><passive>충전 상태:</passive> 이동하거나 공격하면 충전 상태로 공격할 수 있습니다.<li>" +
+                                        "<passive>충격:</passive> 충전 상태로 공격 시 <magicDamage>80의 마법 피해</magicDamage>를 추가로 입힙니다.</mainText><br>"
 
+                            ItemDescriptionTextView(
+                                modifier = Modifier.align(Alignment.Center),
+                                itemDescription = dummyData
+                            )
                         }
 
                         HomeScreenType.Setting -> Box(
@@ -210,46 +218,15 @@ fun VersionItemBody(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
     ) {
-        ConstraintLayout(modifier = Modifier.weight(1f)) {
-            val (versionNameRef, iconSelectRef) = createRefs()
-            createHorizontalChain(
-                versionNameRef,
-                iconSelectRef,
-                chainStyle = ChainStyle.Packed
-            )
 
-            Text(
-                modifier = Modifier.constrainAs(versionNameRef) {
-                    start.linkTo(parent.start)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    end.linkTo(iconSelectRef.start)
-                    horizontalBias = 0f
-                    width = Dimension.preferredWrapContent
-                },
-                text = version.name,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = TextStyles.SubTitle01,
-                color = if (isSelectedVersion) Colors.BaseColor else Colors.Gray04
-            )
-
-            if (isSelectedVersion) {
-                Icon(
-                    modifier = Modifier
-                        .size(IconSize.MediumSize)
-                        .constrainAs(iconSelectRef) {
-                            start.linkTo(versionNameRef.end)
-                            top.linkTo(parent.top)
-                            bottom.linkTo(parent.bottom)
-                            end.linkTo(parent.start)
-                        },
-                    painter = painterResource(id = com.sandorln.design.R.drawable.ic_check),
-                    contentDescription = null,
-                    tint = Colors.BaseColor
-                )
-            }
-        }
+        Text(
+            modifier = Modifier.weight(1f),
+            text = version.name,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = TextStyles.SubTitle01,
+            color = if (isSelectedVersion) Colors.BaseColor else Colors.Gray04
+        )
 
         if (newChampionIdList.isNotEmpty() || newItemIdList.isNotEmpty())
             Text(
