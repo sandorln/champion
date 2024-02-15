@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
@@ -38,7 +37,6 @@ import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
-import com.sandorln.design.component.item.ItemDescriptionTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -185,14 +183,6 @@ fun ItemHomeScreen(
                     onClickItem = onClickItem
                 )
         }
-
-        ItemDescriptionTextView(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth()
-                .heightIn(min = 150.dp),
-            itemDescription = uiState.selectedItemData?.description ?: ""
-        )
     }
 }
 

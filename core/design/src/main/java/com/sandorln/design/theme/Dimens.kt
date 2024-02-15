@@ -40,6 +40,8 @@ object Dimens {
 
     val PullHeight = 80.dp
     val PullIndicatorSize = 50.dp
+
+    val ItemCombinationLineMinSize = 30.dp
 }
 
 object AnimationConfig {

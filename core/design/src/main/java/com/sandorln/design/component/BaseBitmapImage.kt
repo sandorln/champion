@@ -32,7 +32,8 @@ import com.sandorln.design.theme.Spacings
 fun BaseBitmapImage(
     bitmap: Bitmap? = null,
     @DrawableRes loadingDrawableId: Int = R.drawable.ic_main_special,
-    imageSize: Dp = IconSize.XXLargeSize
+    imageSize: Dp = IconSize.XXLargeSize,
+    innerPadding : Dp = Spacings.Spacing02
 ) {
     val itemIconAlpha by animateFloatAsState(
         targetValue = if (bitmap != null) 1f else 0f,
@@ -59,7 +60,7 @@ fun BaseBitmapImage(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(imageSize)
-                    .padding(Spacings.Spacing02),
+                    .padding(innerPadding),
                 painter = painterResource(id = loadingDrawableId),
                 contentDescription = null,
                 tint = loadingIconColor

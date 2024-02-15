@@ -4,6 +4,7 @@ import com.sandorln.data.util.asData
 import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.model.ItemEntity
+import com.sandorln.database.model.SummaryItemEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.network.service.ItemService
@@ -25,8 +26,8 @@ class DefaultItemRepository @Inject constructor(
     override val currentItemList: Flow<List<ItemData>> = versionDatasource
         .currentVersion
         .flatMapLatest { version ->
-            itemDao.getAllItemData(version).map { entityList ->
-                entityList.map(ItemEntity::asData)
+            itemDao.getAllSummaryItemData(version).map { entityList ->
+                entityList.map(SummaryItemEntity::asData)
             }
         }.flowOn(Dispatchers.IO)
 
@@ -43,7 +44,6 @@ class DefaultItemRepository @Inject constructor(
     override suspend fun getNewItemIdList(versionName: String, preVersionName: String): List<String> =
         itemDao.getNewItemIdList(versionName, preVersionName)
 
-    override suspend fun getItemDataByIdAndVersion(id: String, versionName: String): ItemData? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getItemDataByIdAndVersion(id: String, versionName: String): ItemData? =
+        itemDao.getItemDataByIdAndVersion(versionName, id).firstOrNull()?.asData()
 }

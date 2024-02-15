@@ -27,9 +27,14 @@ interface ItemDao {
     )
     suspend fun getNewItemIdList(currentVersion: String, preVersion: String): List<String>
 
-    @Query("SELECT count(*) FROM itementity WHERE version == :currentVersion " +
-            "AND id NOT IN (SELECT id FROM itementity WHERE version == :preVersion) " +
-            "AND name NOT IN (SELECT name FROM itementity WHERE version == :preVersion) " +
-            "AND inStore == 1")
-    suspend fun getNewItemCount(currentVersion: String, preVersion: String) : Int
+    @Query(
+        "SELECT count(*) FROM itementity WHERE version == :currentVersion " +
+                "AND id NOT IN (SELECT id FROM itementity WHERE version == :preVersion) " +
+                "AND name NOT IN (SELECT name FROM itementity WHERE version == :preVersion) " +
+                "AND inStore == 1"
+    )
+    suspend fun getNewItemCount(currentVersion: String, preVersion: String): Int
+
+    @Query("SELECT * FROM ItemEntity WHERE version == :version AND id == :id")
+    fun getItemDataByIdAndVersion(version: String, id: String): List<ItemEntity>
 }

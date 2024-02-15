@@ -48,7 +48,6 @@ import com.sandorln.champion.ui.home.ChampionHomeScreen
 import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.CircleIconType
 import com.sandorln.design.component.dialog.BaseBottomSheetDialog
-import com.sandorln.design.component.item.ItemDescriptionTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionTheme
@@ -143,17 +142,8 @@ fun HomeScreen(
                         HomeScreenType.Item -> ItemHomeScreen()
 
                         HomeScreenType.SummonerSpell -> Box(
-                            modifier = Modifier
-                                .fillMaxSize()
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            val dummyData =
-                                "<mainText><stats>공격 속도 <attention> 15%</attention></stats><br><li><passive>충전 상태:</passive> 이동하거나 공격하면 충전 상태로 공격할 수 있습니다.<li>" +
-                                        "<passive>충격:</passive> 충전 상태로 공격 시 <magicDamage>80의 마법 피해</magicDamage>를 추가로 입힙니다.</mainText><br>"
-
-                            ItemDescriptionTextView(
-                                modifier = Modifier.align(Alignment.Center),
-                                itemDescription = dummyData
-                            )
                         }
 
                         HomeScreenType.Setting -> Box(
@@ -195,11 +185,7 @@ fun HomeScreen(
 
 @Composable
 fun VersionItemBody(
-    version: Version = Version(
-        name = "14.1.1",
-        newChampionIdList = listOf("champion00"),
-        newItemIdList = listOf("item00", "item01", "item02", "item03"),
-    ),
+    version: Version,
     isSelectedVersion: Boolean = false,
     onClickListener: () -> Unit = {}
 ) {
@@ -374,7 +360,7 @@ internal fun HomeBottomNavigation(
 
 @Composable
 fun HomeVersionChangeBar(
-    currentVersionName: String = "14.2.1",
+    currentVersionName: String = "",
     hasNextVersion: Boolean = true,
     hasPreVersion: Boolean = true,
     onShowVersionChangeDialog: () -> Unit = {},
@@ -494,6 +480,8 @@ internal fun HomeBottomNavigationPreview() {
 @Composable
 fun VersionItemBodyPreview() {
     LolChampionThemePreview {
-        VersionItemBody()
+        VersionItemBody(
+            version = Version()
+        )
     }
 }

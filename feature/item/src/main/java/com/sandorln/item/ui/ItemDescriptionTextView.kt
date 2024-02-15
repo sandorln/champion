@@ -1,4 +1,4 @@
-package com.sandorln.design.component.item
+package com.sandorln.item.ui
 
 import android.text.Editable
 import android.text.Html
@@ -12,6 +12,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import com.sandorln.design.R
 import com.sandorln.design.theme.Colors
+import com.sandorln.design.theme.TextStyles
 import org.xml.sax.XMLReader
 
 @Composable
@@ -19,28 +20,35 @@ fun ItemDescriptionTextView(
     modifier: Modifier = Modifier,
     itemDescription: String = ""
 ) {
+    val tempItemDescription = if (!itemDescription.startsWith("<mainText>")) {
+        "<mainText>$itemDescription</mainText>"
+    } else {
+        itemDescription
+    }
+
     AndroidView(
         modifier = modifier,
         factory = {
             TextView(it).apply {
-                setTextColor(Colors.Gray05.hashCode())
+                setTextColor(Colors.Gray04.hashCode())
+                textSize = TextStyles.Body04.fontSize.value
                 typeface = ResourcesCompat.getFont(context, R.font.warhaven_regular)
-                text = Html.fromHtml(itemDescription, HtmlCompat.FROM_HTML_MODE_LEGACY, null, ItemHtmlTagHandler())
+                text = Html.fromHtml(tempItemDescription, HtmlCompat.FROM_HTML_MODE_LEGACY, null, ItemHtmlTagHandler())
             }
         },
         update = {
-            it.text = Html.fromHtml(itemDescription, HtmlCompat.FROM_HTML_MODE_LEGACY, null, ItemHtmlTagHandler())
+            it.text = Html.fromHtml(tempItemDescription, HtmlCompat.FROM_HTML_MODE_LEGACY, null, ItemHtmlTagHandler())
         }
     )
 }
 
-enum class UniqueTag {
+private enum class UniqueTag {
     PASSIVE,
     UNIQUE,
     ACTIVE
 }
 
-enum class StatsTag {
+private enum class StatsTag {
     STATS,
     ATTENTION,
     SPEED,
@@ -50,7 +58,7 @@ enum class StatsTag {
 private val uniqueTagNameList = UniqueTag.entries.map { it.name.lowercase() }
 private val statsTagNameList = StatsTag.entries.map { it.name.lowercase() }
 
-class ItemHtmlTagHandler : Html.TagHandler {
+private class ItemHtmlTagHandler : Html.TagHandler {
     override fun handleTag(opening: Boolean, tag: String, output: Editable, xmlReader: XMLReader) {
         val lowerTag = tag.lowercase()
         when {
@@ -59,7 +67,7 @@ class ItemHtmlTagHandler : Html.TagHandler {
             }
 
             statsTagNameList.contains(lowerTag) -> {
-                processTag(opening, output, ForegroundColorSpan(Colors.Gray03.hashCode()))
+                processTag(opening, output, ForegroundColorSpan(Colors.Gray02.hashCode()))
             }
         }
     }

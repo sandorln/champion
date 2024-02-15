@@ -1,0 +1,486 @@
+package com.sandorln.item.ui.dialog
+
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import com.sandorln.design.R
+import com.sandorln.design.component.BaseBitmapImage
+import com.sandorln.design.component.BaseItemIconImage
+import com.sandorln.design.theme.Colors
+import com.sandorln.design.theme.Dimens
+import com.sandorln.design.theme.IconSize
+import com.sandorln.design.theme.LolChampionThemePreview
+import com.sandorln.design.theme.Radius
+import com.sandorln.design.theme.Spacings
+import com.sandorln.design.theme.TextStyles
+import com.sandorln.item.ui.ItemDescriptionTextView
+import com.sandorln.item.ui.ItemTag
+import com.sandorln.model.data.item.ItemCombination
+import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.type.ItemTagType
+
+val dummyItem = ItemData(
+    name = "드락사르의 암흑검",
+    tags = setOf(
+        ItemTagType.Mana,
+        ItemTagType.Damage,
+        ItemTagType.Armor,
+        ItemTagType.Boots
+    ),
+    description = "<mainText><stats>공격력 <ornnBonus>75</ornnBonus><br>물리 관통력 <ornnBonus>26</ornnBonus><br>스킬 가속 <ornnBonus>20</ornnBonus></stats><br><br><br><li><passive>밤의 " +
+            "추적자:</passive> 대상이 잃은 체력에 비례해 스킬 피해량이 최대 일정 비율까지 증가합니다. 자신이 피해를 입힌 챔피언이 3초 안에 죽으면 1.5초 동안 구조물이 아닌 대상으로부터 <keywordStealth>대상으로 지정할 수 없는 상태</keywordStealth>가 됩니다. (30(0초))<br><br><rarityMythic>신화급 기본 지속 효과:</rarityMythic> 다른 모든 <rarityLegendary>전설급</rarityLegendary> 아이템에 스킬 가속 및 이동 속도.<br></mainText>",
+    gold = ItemData.Gold(total = 1000, sell = 700),
+    into = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4"),
+    from = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4")
+)
+val dummyItemCombination = ItemCombination(
+    name = "아이템 이름",
+    fromItemList = listOf(
+        ItemCombination(
+            name = "다음 아이템 이름 1",
+            fromItemList = listOf(
+                ItemCombination(name = "마지막 아이템 이름 1"),
+                ItemCombination(name = "마지막 아이템 이름 2"),
+            )
+        ),
+        ItemCombination(
+            name = "다음 아이템 이름 2",
+            fromItemList = listOf(
+                ItemCombination(name = "마지막 아이템 이름")
+            )
+        )
+    )
+)
+
+@Composable
+fun ItemDetailDialog(
+    versionName: String,
+    selectedItemId: String,
+    onDismissRequest: () -> Unit = {}
+) {
+    val preDummyItem: ItemData? = ItemData(
+        name = "드락사르의 암흑검",
+        tags = setOf(
+            ItemTagType.Mana,
+            ItemTagType.Damage,
+            ItemTagType.Armor,
+            ItemTagType.Boots
+        ),
+        description = "<mainText><stats>공격력 <ornnBonus>75</ornnBonus><br>물리 관통력 <ornnBonus>26</ornnBonus><br>스킬 가속 <ornnBonus>25</ornnBonus></stats><br><li><passive>밤의 " +
+                "추적자:</passive> 챔피언에게 기본 공격 시 <physicalDamage>물리 피해(근접 챔피언의 경우 75+추가 공격력의 30%, 원거리 챔피언의 경우 55+추가 공격력의 25%)</physicalDamage>를 추가로 입힙니다. (재사용 대기시간 15초) 또한 근접 챔피언의 경우 대상을 0.25초 동안 99% <status>둔화</status>시킵니다. 피해를 입은 챔피언이 3초 내에 처치되면 재사용 대기시간이 초기화되며 1.5초 동안 <keywordStealth>투명</keywordStealth> 상태가 됩니다.<br><br><rarityMythic>신화급 기본 지속 효과:</rarityMythic> 다른 모든 <rarityLegendary>전설급</rarityLegendary> 아이템에 스킬 가속 <attention>5</attention> 및 이동 속도 <attention>5</attention>.<br></mainText><br>",
+        gold = ItemData.Gold(total = 900, sell = 700)
+    )
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Column(
+            modifier = Modifier
+                .background(
+                    color = Colors.Blue07,
+                    shape = RoundedCornerShape(Radius.Radius06)
+                )
+                .padding(top = Spacings.Spacing03)
+        ) {
+            ItemInfoBody(
+                name = dummyItem.name,
+                tags = dummyItem.tags
+            )
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                modifier = Modifier.padding(top = Spacings.Spacing02),
+                color = Colors.Gold07
+            )
+
+            Column(
+                modifier = Modifier
+                    .verticalScroll(state = rememberScrollState())
+                    .padding(vertical = Spacings.Spacing05)
+            ) {
+                if (dummyItem.into.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier.padding(
+                            start = Spacings.Spacing03,
+                            bottom = Spacings.Spacing00
+                        ),
+                        text = "다음 아이템",
+                        style = TextStyles.Body03,
+                        color = Colors.Gold03
+                    )
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        Spacer(modifier = Modifier.width(Spacings.Spacing03))
+                        dummyItem.into.forEach {
+                            BaseItemIconImage(
+                                versionName = dummyItem.version,
+                                itemId = it,
+                                iconSize = IconSize.XLargeSize,
+                                onClickIcon = {
+
+                                }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(Spacings.Spacing03))
+                    }
+
+                    Spacer(modifier = Modifier.height(Spacings.Spacing03))
+                }
+
+                PreItemCompareButton()
+
+                Spacer(modifier = Modifier.height(Spacings.Spacing04))
+
+                Row(
+                    modifier = Modifier.padding(horizontal = Spacings.Spacing03),
+                    horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+                ) {
+                    ItemStatusBody(
+                        modifier = Modifier.weight(1f),
+                        item = dummyItem
+                    )
+
+                    if (preDummyItem != null) {
+                        ItemStatusBody(
+                            modifier = Modifier.weight(1f),
+                            item = preDummyItem
+                        )
+                    }
+                }
+
+                if (dummyItem.from.isNotEmpty()) {
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = Spacings.Spacing04),
+                        color = Colors.Gold07
+                    )
+                    Text(
+                        modifier = Modifier.padding(
+                            start = Spacings.Spacing03,
+                            bottom = Spacings.Spacing00
+                        ),
+                        text = "조합식",
+                        style = TextStyles.Body03,
+                        color = Colors.Gold03
+                    )
+
+                    TotalItemCombinationBody(
+                        modifier = Modifier.padding(horizontal = Spacings.Spacing03),
+                        itemCombination = dummyItemCombination
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PreItemCompareButton() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = Spacings.Spacing02),
+        horizontalArrangement = Arrangement.spacedBy(
+            Spacings.Spacing00,
+            Alignment.End
+        ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "이전 버전(14.3.1) 비교",
+            style = TextStyles.SubTitle03,
+            color = Colors.Gray03
+        )
+        Image(
+            modifier = Modifier.size(IconSize.MediumSize),
+            painter = painterResource(id = R.drawable.ic_add),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(Colors.Gray03)
+        )
+    }
+}
+
+@Composable
+fun ItemStatusBody(
+    modifier: Modifier = Modifier,
+    item: ItemData
+) {
+    Column(
+        modifier = modifier
+            .border(
+                width = 0.5.dp,
+                color = Colors.Gold05
+            )
+            .padding(
+                top = Spacings.Spacing03,
+                start = Spacings.Spacing03,
+                end = Spacings.Spacing03,
+                bottom = Spacings.Spacing01
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${item.gold.total} $",
+                style = TextStyles.Body04,
+                color = Colors.Gold04
+            )
+
+            Spacer(modifier = Modifier.width(Spacings.Spacing00))
+
+            Text(
+                text = "( 판매 ${item.gold.sell} $ )",
+                style = TextStyles.Body04,
+                color = Colors.Gold05
+            )
+        }
+
+        HorizontalDivider()
+
+        ItemDescriptionTextView(
+            itemDescription = item.description
+        )
+    }
+}
+
+@Composable
+fun ItemInfoBody(
+    name: String = "",
+    bitmap: Bitmap? = null,
+    tags: Set<ItemTagType> = emptySet()
+) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = Spacings.Spacing02)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BaseBitmapImage(
+            bitmap = bitmap,
+            loadingDrawableId = R.drawable.ic_main_item
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = Spacings.Spacing00,
+                    vertical = Spacings.Spacing02
+                ),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+        ) {
+            Text(
+                text = name,
+                style = TextStyles.SubTitle03,
+                color = Colors.Gold04
+            )
+
+            if (tags.isNotEmpty()) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+                ) {
+                    tags.forEach {
+                        ItemTag(itemTagType = it)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TotalItemCombinationBody(
+    modifier: Modifier = Modifier,
+    itemCombination: ItemCombination = ItemCombination()
+) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacings.Spacing00)
+                .height(Dimens.ItemCombinationLineMinSize),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+        ) {
+            BaseBitmapImage(
+                loadingDrawableId = R.drawable.ic_main_item,
+                imageSize = IconSize.LargeSize,
+                innerPadding = 0.dp
+            )
+
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "${itemCombination.name} (${itemCombination.gold.total}$)",
+                style = TextStyles.Body03,
+                color = Colors.Gold03,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        itemCombination.fromItemList.forEachIndexed { index, fromItemCombination ->
+            ItemCombinationBody(
+                hasNextItem = itemCombination.fromItemList.lastIndex > index,
+                itemCombination = fromItemCombination
+            )
+        }
+    }
+}
+
+@Composable
+fun ItemCombinationBody(
+    hasNextItem: Boolean = true,
+    itemCombination: ItemCombination = ItemCombination()
+) {
+    val halfMinSize = Dimens.ItemCombinationLineMinSize / 2
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = Dimens.ItemCombinationLineMinSize)
+            .height(IntrinsicSize.Min)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(Dimens.ItemCombinationLineMinSize)
+        ) {
+            VerticalDivider(
+                thickness = 1.dp,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .then(if (!hasNextItem) Modifier.height(halfMinSize + 1.dp) else Modifier),
+                color = Colors.Blue03
+            )
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = halfMinSize)
+                    .width(halfMinSize),
+                color = Colors.Blue03
+            )
+        }
+
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacings.Spacing00)
+                    .height(Dimens.ItemCombinationLineMinSize),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+            ) {
+                BaseBitmapImage(
+                    loadingDrawableId = R.drawable.ic_main_item,
+                    imageSize = IconSize.LargeSize,
+                    innerPadding = 0.dp
+                )
+
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "${itemCombination.name} (${itemCombination.gold.total}$)",
+                    style = TextStyles.Body03,
+                    color = Colors.Gray04,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            itemCombination.fromItemList.forEachIndexed { index, fromItemCombination ->
+                ItemCombinationBody(
+                    hasNextItem = itemCombination.fromItemList.lastIndex > index,
+                    itemCombination = fromItemCombination
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun ItemDetailDialogPreView() {
+    LolChampionThemePreview {
+        ItemDetailDialog(
+            versionName = "",
+            selectedItemId = ""
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ItemInfoBodyPreView() {
+    LolChampionThemePreview {
+        ItemInfoBody(
+            "장화"
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ItemStatusBodyPreView() {
+    LolChampionThemePreview {
+        ItemStatusBody(item = dummyItem)
+    }
+}
+
+@Preview
+@Composable
+fun TotalItemCombinationPreview() {
+    LolChampionThemePreview {
+        TotalItemCombinationBody(
+            itemCombination = ItemCombination(
+                name = "아이템 이름",
+                fromItemList = listOf(
+                    ItemCombination(
+                        name = "다음 아이템 이름 1",
+                        fromItemList = listOf(
+                            ItemCombination(name = "마지막 아이템 이름 1"),
+                            ItemCombination(name = "마지막 아이템 이름 2"),
+                        )
+                    ),
+                    ItemCombination(
+                        name = "다음 아이템 이름 2",
+                        fromItemList = listOf(
+                            ItemCombination(name = "마지막 아이템 이름")
+                        )
+                    )
+                )
+            )
+        )
+    }
+}

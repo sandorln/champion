@@ -17,7 +17,8 @@ fun ItemEntity.asData(): ItemData = ItemData(
     into = into,
     tags = tags.asItemTagTypeSet(),
     image = image.asData(),
-    mapType = maps.asData()
+    mapType = maps.asData(),
+    gold = gold.asData()
 )
 
 fun SummaryItemEntity.asData(): ItemData = ItemData(
@@ -39,7 +40,8 @@ fun NetworkItem.asEntity(id: String, version: String): ItemEntity = ItemEntity(
     from = from.filterNotNull(),
     into = into.filterNotNull(),
     image = image.asEntity(),
-    maps = maps.asMapTypeEntity()
+    maps = maps.asMapTypeEntity(),
+    gold = gold.asEntity()
 )
 
 fun List<String>.asItemTagTypeSet(): Set<ItemTagType> {
@@ -67,3 +69,17 @@ fun List<String>.asItemTagTypeSet(): Set<ItemTagType> {
 
     return tagSet
 }
+
+fun ItemEntity.GoldEntity.asData() = ItemData.Gold(
+    base = base,
+    purchasable = purchasable,
+    sell = sell,
+    total = total
+)
+
+fun NetworkItem.NetworkGold.asEntity() = ItemEntity.GoldEntity(
+    base = base,
+    purchasable = purchasable,
+    sell = sell,
+    total = total
+)
