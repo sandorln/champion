@@ -45,3 +45,8 @@ data class SummaryItemEntity(
     val tags: List<String> = mutableListOf(),
     val maps: ItemEntity.MapTypeEntity = ItemEntity.MapTypeEntity.NONE,
 )
+
+data class SummaryItemImageEntity(
+    var id: String = "",
+    var image: LOLImageEntity = LOLImageEntity()
+)

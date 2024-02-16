@@ -9,6 +9,7 @@ import com.sandorln.database.model.SummaryItemEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.data.item.SummaryItemImage
 import com.sandorln.network.service.ItemService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -59,4 +60,7 @@ class DefaultItemRepository @Inject constructor(
             baseItemCombination.asCombinationData(itemCombinationList)
         }
     }
+
+    override suspend fun getSummaryItemImage(id: String, versionName: String): SummaryItemImage? =
+        itemDao.getSummaryItemImage(id, versionName).firstOrNull()?.asData()
 }

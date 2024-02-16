@@ -32,6 +32,7 @@ import com.sandorln.design.theme.Spacings
 
 @Composable
 fun BaseBitmapImage(
+    modifier: Modifier = Modifier,
     bitmap: Bitmap? = null,
     @DrawableRes loadingDrawableId: Int = R.drawable.ic_main_special,
     imageSize: Dp = IconSize.XXLargeSize,
@@ -45,7 +46,7 @@ fun BaseBitmapImage(
         )
     )
 
-    Box {
+    Box(modifier.size(imageSize)) {
         if (bitmap == null) {
             val loadingIconColor by rememberInfiniteTransition(label = "")
                 .animateColor(

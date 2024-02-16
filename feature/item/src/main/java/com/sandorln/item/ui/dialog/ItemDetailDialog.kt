@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -40,7 +41,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
-import com.sandorln.design.component.BaseItemIconImage
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -52,6 +52,7 @@ import com.sandorln.item.ui.ItemDescriptionTextView
 import com.sandorln.item.ui.ItemTag
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.data.item.SummaryItemImage
 import com.sandorln.model.type.ItemTagType
 
 @Composable
@@ -66,6 +67,7 @@ fun ItemDetailDialog(
     val uiState by itemDetailDialogViewModel.uiState.collectAsState()
     val baseItem by remember { derivedStateOf { uiState.itemData } }
     val itemCombination by remember { derivedStateOf { uiState.itemCombination } }
+    val intoItemImageList by remember { derivedStateOf { uiState.intoSummaryItemList } }
     val currentSpriteMap by itemDetailDialogViewModel.currentSpriteMap.collectAsState()
 
     val onSelectedItem: (itemId: String) -> Unit = { itemId ->
@@ -87,8 +89,9 @@ fun ItemDetailDialog(
                     color = Colors.Gold06,
                     shape = RoundedCornerShape(Radius.Radius04)
                 )
-                .padding(top = Spacings.Spacing03)
         ) {
+            Spacer(modifier = Modifier.height(Spacings.Spacing03))
+
             ItemInfoBody(
                 name = baseItem.name,
                 tags = baseItem.tags,
@@ -104,7 +107,7 @@ fun ItemDetailDialog(
             Column(
                 modifier = Modifier
                     .verticalScroll(state = rememberScrollState())
-                    .padding(vertical = Spacings.Spacing05)
+                    .padding(vertical = Spacings.Spacing03)
             ) {
                 PreItemCompareButton()
 
@@ -129,17 +132,17 @@ fun ItemDetailDialog(
 
                 HorizontalDivider(
                     thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = Spacings.Spacing04),
+                    modifier = Modifier.padding(vertical = Spacings.Spacing03),
                     color = Colors.Gold07
                 )
 
-                if (baseItem.into.isNotEmpty()) {
+                if (intoItemImageList.isNotEmpty()) {
                     TotalIntoItemListBody(
-                        baseItem = baseItem,
+                        intoItemImageList = intoItemImageList,
+                        spriteBitmapMap = currentSpriteMap,
                         onSelectedItem = onSelectedItem
                     )
-
-                    Spacer(modifier = Modifier.height(Spacings.Spacing04))
+                    Spacer(modifier = Modifier.height(Spacings.Spacing03))
                 }
 
                 if (itemCombination.fromItemList.isNotEmpty()) {
@@ -166,7 +169,11 @@ fun ItemDetailDialog(
 }
 
 @Composable
-private fun TotalIntoItemListBody(baseItem: ItemData, onSelectedItem: (itemId: String) -> Unit) {
+private fun TotalIntoItemListBody(
+    intoItemImageList: List<SummaryItemImage>,
+    spriteBitmapMap: Map<String, Bitmap?>,
+    onSelectedItem: (itemId: String) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -183,15 +190,16 @@ private fun TotalIntoItemListBody(baseItem: ItemData, onSelectedItem: (itemId: S
             modifier = Modifier.horizontalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.width(Spacings.Spacing03))
-            baseItem.into.forEach {
-                BaseItemIconImage(
-                    versionName = baseItem.version,
-                    itemId = it,
-                    iconSize = IconSize.XLargeSize,
-                    onClickIcon = {
-                        onSelectedItem.invoke(it)
-                    }
-                )
+            intoItemImageList.forEach { itemImage ->
+                Surface {
+                    BaseBitmapImage(
+                        modifier = Modifier.clickable { onSelectedItem.invoke(itemImage.id) },
+                        bitmap = itemImage.image.getImageBitmap(spriteBitmapMap),
+                        loadingDrawableId = R.drawable.ic_main_item,
+                        imageSize = IconSize.XLargeSize,
+                        innerPadding = Spacings.Spacing01
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(Spacings.Spacing03))
@@ -266,6 +274,7 @@ fun ItemStatusBody(
         HorizontalDivider()
 
         ItemDescriptionTextView(
+            modifier = Modifier.fillMaxWidth(),
             itemDescription = item.description
         )
     }

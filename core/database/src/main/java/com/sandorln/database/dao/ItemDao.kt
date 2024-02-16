@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.sandorln.database.model.ItemEntity
 import com.sandorln.database.model.SummaryItemEntity
+import com.sandorln.database.model.SummaryItemImageEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -37,4 +38,7 @@ interface ItemDao {
 
     @Query("SELECT * FROM ItemEntity WHERE version == :version AND id == :id")
     suspend fun getItemDataByIdAndVersion(version: String, id: String): List<ItemEntity>
+
+    @Query("SELECT id, image FROM ItemEntity WHERE version == :version AND id == :id")
+    suspend fun getSummaryItemImage(id : String, version: String) : List<SummaryItemImageEntity>
 }

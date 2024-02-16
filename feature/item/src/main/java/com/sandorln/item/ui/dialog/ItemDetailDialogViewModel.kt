@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.item.GetItemCombination
 import com.sandorln.domain.usecase.item.GetItemDataByItemId
+import com.sandorln.domain.usecase.item.GetSummaryItemImage
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.data.item.SummaryItemImage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +27,8 @@ import javax.inject.Inject
 class ItemDetailDialogViewModel @Inject constructor(
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
     private val getItemDataByItemId: GetItemDataByItemId,
-    private val getItemCombination: GetItemCombination
+    private val getItemCombination: GetItemCombination,
+    private val getSummaryItemImage: GetSummaryItemImage
 ) : ViewModel() {
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
     fun initSetIdAndVersion(id: String, version: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -47,13 +50,17 @@ class ItemDetailDialogViewModel @Inject constructor(
     ) {
         val itemData = getItemDataByItemId.invoke(id, version).getOrDefault(ItemData())
         val itemCombination = getItemCombination.invoke(id, version).getOrDefault(ItemCombination())
+        val intoSummaryItemList = itemData.into.mapNotNull { intoItemId ->
+            getSummaryItemImage.invoke(intoItemId, version)
+        }
 
         _uiState.update {
             it.copy(
                 selectedId = id,
                 version = version,
                 itemData = itemData,
-                itemCombination = itemCombination
+                itemCombination = itemCombination,
+                intoSummaryItemList = intoSummaryItemList
             )
         }
     }
@@ -92,4 +99,5 @@ data class ItemDetailUiState(
     val version: String = "",
     val itemData: ItemData = ItemData(),
     val itemCombination: ItemCombination = ItemCombination(),
+    val intoSummaryItemList: List<SummaryItemImage> = emptyList()
 )
