@@ -26,9 +26,7 @@ import javax.inject.Inject
 class DefaultVersionRepository @Inject constructor(
     private val versionService: VersionService,
     private val versionDatasource: VersionDatasource,
-    private val versionDao: VersionDao,
-    private val championDao: ChampionDao,
-    private val itemDao: ItemDao
+    private val versionDao: VersionDao
 ) : VersionRepository {
 
     @OptIn(ExperimentalCoroutinesApi::class)

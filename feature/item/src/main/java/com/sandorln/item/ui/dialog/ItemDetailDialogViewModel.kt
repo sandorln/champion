@@ -6,6 +6,7 @@ import com.sandorln.domain.usecase.item.GetItemCombination
 import com.sandorln.domain.usecase.item.GetItemDataByItemId
 import com.sandorln.domain.usecase.item.GetSummaryItemImage
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
+import com.sandorln.domain.usecase.version.GetPreviousVersion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
@@ -28,7 +29,8 @@ class ItemDetailDialogViewModel @Inject constructor(
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
     private val getItemDataByItemId: GetItemDataByItemId,
     private val getItemCombination: GetItemCombination,
-    private val getSummaryItemImage: GetSummaryItemImage
+    private val getSummaryItemImage: GetSummaryItemImage,
+    private val getPreviousVersion: GetPreviousVersion
 ) : ViewModel() {
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
     fun initSetIdAndVersion(id: String, version: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -54,13 +56,18 @@ class ItemDetailDialogViewModel @Inject constructor(
             getSummaryItemImage.invoke(intoItemId, version)
         }
 
+        val previousVersionName = getPreviousVersion.invoke(version)?.name ?: ""
+        val previousItemData = getItemDataByItemId.invoke(id, previousVersionName).getOrNull()
+
         _uiState.update {
             it.copy(
                 selectedId = id,
                 version = version,
                 itemData = itemData,
                 itemCombination = itemCombination,
-                intoSummaryItemList = intoSummaryItemList
+                intoSummaryItemList = intoSummaryItemList,
+                previousVersionName = previousVersionName,
+                previousVersionItem = previousItemData
             )
         }
     }
@@ -73,6 +80,12 @@ class ItemDetailDialogViewModel @Inject constructor(
                         when (action) {
                             ItemDetailAction.ClearData -> {
                                 _uiState.update { ItemDetailUiState() }
+                            }
+
+                            ItemDetailAction.ToggleShowPreviousItem -> {
+                                _uiState.update {
+                                    it.copy(isShowPreviousItem = !it.isShowPreviousItem)
+                                }
                             }
 
                             is ItemDetailAction.ChangeIdAndVersion -> {
@@ -90,6 +103,7 @@ class ItemDetailDialogViewModel @Inject constructor(
 
 sealed interface ItemDetailAction {
     data object ClearData : ItemDetailAction
+    data object ToggleShowPreviousItem : ItemDetailAction
 
     data class ChangeIdAndVersion(val selectedId: String, val version: String) : ItemDetailAction
 }
@@ -99,5 +113,9 @@ data class ItemDetailUiState(
     val version: String = "",
     val itemData: ItemData = ItemData(),
     val itemCombination: ItemCombination = ItemCombination(),
-    val intoSummaryItemList: List<SummaryItemImage> = emptyList()
+    val intoSummaryItemList: List<SummaryItemImage> = emptyList(),
+
+    val isShowPreviousItem: Boolean = false,
+    val previousVersionName: String = "",
+    val previousVersionItem: ItemData? = null
 )

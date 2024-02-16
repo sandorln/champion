@@ -22,7 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -66,6 +65,7 @@ fun ItemDetailDialog(
 
     val uiState by itemDetailDialogViewModel.uiState.collectAsState()
     val baseItem by remember { derivedStateOf { uiState.itemData } }
+    val previousVersionItem by remember { derivedStateOf { uiState.previousVersionItem } }
     val itemCombination by remember { derivedStateOf { uiState.itemCombination } }
     val intoItemImageList by remember { derivedStateOf { uiState.intoSummaryItemList } }
     val currentSpriteMap by itemDetailDialogViewModel.currentSpriteMap.collectAsState()
@@ -73,6 +73,7 @@ fun ItemDetailDialog(
     val onSelectedItem: (itemId: String) -> Unit = { itemId ->
         itemDetailDialogViewModel.sendAction(ItemDetailAction.ChangeIdAndVersion(itemId, versionName))
     }
+
 
     Dialog(onDismissRequest = {
         itemDetailDialogViewModel.sendAction(ItemDetailAction.ClearData)
@@ -109,9 +110,26 @@ fun ItemDetailDialog(
                     .verticalScroll(state = rememberScrollState())
                     .padding(vertical = Spacings.Spacing03)
             ) {
-                PreItemCompareButton()
+                PreItemCompareButton(
+                    previousVersion = uiState.previousVersionName,
+                    isShowPreviousBtn = uiState.isShowPreviousItem,
+                    hasPreviousItem = uiState.previousVersionItem != null,
+                    onToggleBtn = {
+                        itemDetailDialogViewModel.sendAction(ItemDetailAction.ToggleShowPreviousItem)
+                    }
+                )
 
-                Spacer(modifier = Modifier.height(Spacings.Spacing04))
+                Spacer(modifier = Modifier.height(Spacings.Spacing03))
+
+                Text(
+                    modifier = Modifier.padding(
+                        start = Spacings.Spacing03,
+                        bottom = Spacings.Spacing00
+                    ),
+                    text = "설명",
+                    style = TextStyles.Body03,
+                    color = Colors.Gold03
+                )
 
                 Row(
                     modifier = Modifier.padding(horizontal = Spacings.Spacing03),
@@ -122,12 +140,12 @@ fun ItemDetailDialog(
                         item = baseItem
                     )
 
-//                    if (preDummyItem != null) {
-//                        ItemStatusBody(
-//                            modifier = Modifier.weight(1f),
-//                            item = preDummyItem
-//                        )
-//                    }
+                    if (uiState.isShowPreviousItem) {
+                        ItemStatusBody(
+                            modifier = Modifier.weight(1f),
+                            item = previousVersionItem ?: ItemData()
+                        )
+                    }
                 }
 
                 HorizontalDivider(
@@ -191,15 +209,13 @@ private fun TotalIntoItemListBody(
         ) {
             Spacer(modifier = Modifier.width(Spacings.Spacing03))
             intoItemImageList.forEach { itemImage ->
-                Surface {
-                    BaseBitmapImage(
-                        modifier = Modifier.clickable { onSelectedItem.invoke(itemImage.id) },
-                        bitmap = itemImage.image.getImageBitmap(spriteBitmapMap),
-                        loadingDrawableId = R.drawable.ic_main_item,
-                        imageSize = IconSize.XLargeSize,
-                        innerPadding = Spacings.Spacing01
-                    )
-                }
+                BaseBitmapImage(
+                    modifier = Modifier.clickable { onSelectedItem.invoke(itemImage.id) },
+                    bitmap = itemImage.image.getImageBitmap(spriteBitmapMap),
+                    loadingDrawableId = R.drawable.ic_main_item,
+                    imageSize = IconSize.XLargeSize,
+                    innerPadding = Spacings.Spacing01
+                )
             }
 
             Spacer(modifier = Modifier.width(Spacings.Spacing03))
@@ -208,9 +224,25 @@ private fun TotalIntoItemListBody(
 }
 
 @Composable
-private fun PreItemCompareButton() {
+private fun PreItemCompareButton(
+    isShowPreviousBtn: Boolean,
+    hasPreviousItem: Boolean,
+    previousVersion: String,
+    onToggleBtn: () -> Unit
+) {
+    val iconId = if (!isShowPreviousBtn) R.drawable.ic_add else R.drawable.ic_cancel
+    val enableColor = if (hasPreviousItem) Colors.Gray03 else Colors.Gray06
+    val clickModifier = if (hasPreviousItem) {
+        Modifier.clickable {
+            onToggleBtn.invoke()
+        }
+    } else {
+        Modifier
+    }
+
     Row(
         modifier = Modifier
+            .then(clickModifier)
             .fillMaxWidth()
             .padding(end = Spacings.Spacing02),
         horizontalArrangement = Arrangement.spacedBy(
@@ -220,15 +252,15 @@ private fun PreItemCompareButton() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "이전 버전(14.3.1) 비교",
+            text = "이전 버전($previousVersion) 비교",
             style = TextStyles.SubTitle03,
-            color = Colors.Gray03
+            color = enableColor
         )
         Image(
             modifier = Modifier.size(IconSize.MediumSize),
-            painter = painterResource(id = R.drawable.ic_add),
+            painter = painterResource(id = iconId),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(Colors.Gray03)
+            colorFilter = ColorFilter.tint(enableColor)
         )
     }
 }
@@ -314,6 +346,7 @@ fun ItemInfoBody(
 
             if (tags.isNotEmpty()) {
                 Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
                 ) {
                     tags.forEach {
