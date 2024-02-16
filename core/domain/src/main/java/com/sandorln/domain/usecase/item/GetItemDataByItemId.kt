@@ -8,5 +8,7 @@ import javax.inject.Singleton
 class GetItemDataByItemId @Inject constructor(
     private val itemRepository: ItemRepository
 ) {
-
+    suspend operator fun invoke(id: String, version: String) = runCatching {
+        itemRepository.getItemDataByIdAndVersion(id, version)
+    }
 }

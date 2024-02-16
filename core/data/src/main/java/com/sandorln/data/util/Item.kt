@@ -2,6 +2,7 @@ package com.sandorln.data.util
 
 import com.sandorln.database.model.ItemEntity
 import com.sandorln.database.model.SummaryItemEntity
+import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
 import com.sandorln.network.model.NetworkItem
@@ -82,4 +83,13 @@ fun NetworkItem.NetworkGold.asEntity() = ItemEntity.GoldEntity(
     purchasable = purchasable,
     sell = sell,
     total = total
+)
+
+fun ItemEntity.asCombinationData(fromItemList: List<ItemCombination>) = ItemCombination(
+    id = id,
+    version = version,
+    name = name,
+    image = image.asData(),
+    gold = gold.asData(),
+    fromItemList = fromItemList
 )

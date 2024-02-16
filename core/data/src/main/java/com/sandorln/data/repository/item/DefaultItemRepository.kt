@@ -1,11 +1,13 @@
 package com.sandorln.data.repository.item
 
+import com.sandorln.data.util.asCombinationData
 import com.sandorln.data.util.asData
 import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.model.ItemEntity
 import com.sandorln.database.model.SummaryItemEntity
 import com.sandorln.datastore.version.VersionDatasource
+import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.network.service.ItemService
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +46,17 @@ class DefaultItemRepository @Inject constructor(
     override suspend fun getNewItemIdList(versionName: String, preVersionName: String): List<String> =
         itemDao.getNewItemIdList(versionName, preVersionName)
 
-    override suspend fun getItemDataByIdAndVersion(id: String, versionName: String): ItemData? =
-        itemDao.getItemDataByIdAndVersion(versionName, id).firstOrNull()?.asData()
+    override suspend fun getItemDataByIdAndVersion(id: String, versionName: String): ItemData =
+        itemDao.getItemDataByIdAndVersion(versionName, id).firstOrNull()?.asData() ?: throw Exception("")
+
+    override suspend fun getItemCombination(id: String, version: String): ItemCombination {
+        val baseItemCombination = itemDao.getItemDataByIdAndVersion(version, id).first()
+
+        return if (baseItemCombination.from.isEmpty()) {
+            baseItemCombination.asCombinationData(emptyList())
+        } else {
+            val itemCombinationList = baseItemCombination.from.map { getItemCombination(it, version) }
+            baseItemCombination.asCombinationData(itemCombinationList)
+        }
+    }
 }

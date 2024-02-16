@@ -43,6 +43,7 @@ import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.item.ui.dialog.ItemDetailDialog
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
 import com.sandorln.model.type.ItemTagType
@@ -59,9 +60,11 @@ fun ItemHomeScreen(
 
     val (bootItemList, notBootItemList) = currentItemList.partition { it.tags.contains(ItemTagType.Boots) }
     val (consumableItemList, normalItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) }
+    val selectedItemId = uiState.selectedItemId
+    val currentVersion = uiState.currentVersionName
 
     val onClickItem: (ItemData) -> Unit = {
-        itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it))
+        itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it.id))
     }
 
     val pullToRefreshState = rememberPullToRefreshState(
@@ -182,6 +185,16 @@ fun ItemHomeScreen(
                     itemChunkList = normalItemChunkList,
                     onClickItem = onClickItem
                 )
+        }
+
+        if (selectedItemId != null) {
+            ItemDetailDialog(
+                versionName = currentVersion,
+                selectedItemId = selectedItemId,
+                onDismissRequest = {
+                    itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(null))
+                }
+            )
         }
     }
 }

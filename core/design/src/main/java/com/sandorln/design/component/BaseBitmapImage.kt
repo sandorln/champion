@@ -9,6 +9,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.sandorln.design.R
 import com.sandorln.design.theme.AnimationConfig
 import com.sandorln.design.theme.Colors
@@ -33,7 +35,7 @@ fun BaseBitmapImage(
     bitmap: Bitmap? = null,
     @DrawableRes loadingDrawableId: Int = R.drawable.ic_main_special,
     imageSize: Dp = IconSize.XXLargeSize,
-    innerPadding : Dp = Spacings.Spacing02
+    innerPadding: Dp = Spacings.Spacing02
 ) {
     val itemIconAlpha by animateFloatAsState(
         targetValue = if (bitmap != null) 1f else 0f,
@@ -70,6 +72,10 @@ fun BaseBitmapImage(
                 modifier = Modifier
                     .alpha(itemIconAlpha)
                     .align(Alignment.Center)
+                    .border(
+                        width = 0.5.dp,
+                        color = Colors.Gold06
+                    )
                     .size(imageSize),
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = null,

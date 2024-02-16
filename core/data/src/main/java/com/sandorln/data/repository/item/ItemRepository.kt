@@ -1,5 +1,6 @@
 package com.sandorln.data.repository.item
 
+import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
 import kotlinx.coroutines.flow.Flow
 
@@ -12,5 +13,7 @@ interface ItemRepository {
 
     suspend fun getNewItemIdList(versionName: String, preVersionName: String): List<String>
 
-    suspend fun getItemDataByIdAndVersion(id: String, versionName: String): ItemData?
+    suspend fun getItemDataByIdAndVersion(id: String, versionName: String): ItemData
+
+    suspend fun getItemCombination(id: String, version: String): ItemCombination
 }

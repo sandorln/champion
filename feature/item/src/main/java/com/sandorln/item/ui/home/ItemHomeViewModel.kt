@@ -8,6 +8,7 @@ import com.sandorln.domain.usecase.item.GetNewItemIdListByCurrentVersion
 import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
+import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
@@ -20,8 +21,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -34,6 +38,7 @@ class ItemHomeViewModel @Inject constructor(
     refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
+    getCurrentVersion: GetCurrentVersion
 ) : ViewModel() {
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
@@ -84,6 +89,21 @@ class ItemHomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
+                getCurrentVersion
+                    .invoke()
+                    .map { it.name }
+                    .distinctUntilChanged()
+                    .collectLatest { version ->
+                        _itemMutex.withLock {
+                            _itemUiState.update {
+                                it.copy(
+                                    currentVersionName = version
+                                )
+                            }
+                        }
+                    }
+            }
+            launch {
                 _itemAction.collect { action ->
                     _itemMutex.withLock {
                         val currentUiState = _itemUiState.value
@@ -126,7 +146,7 @@ class ItemHomeViewModel @Inject constructor(
                             }
 
                             is ItemHomeAction.SelectItemData -> {
-                                _itemUiState.emit(currentUiState.copy(selectedItemData = action.itemData))
+                                _itemUiState.emit(currentUiState.copy(selectedItemId = action.itemDataId))
                             }
                         }
                     }
@@ -159,7 +179,8 @@ data class ItemHomeUiState(
     val isSelectMapType: MapType = MapType.ALL,
     val selectTag: Set<ItemTagType> = emptySet(),
     val isSelectNewItem: Boolean = false,
-    val selectedItemData: ItemData? = null
+    val selectedItemId: String? = null,
+    val currentVersionName: String = ""
 )
 
 sealed interface ItemHomeAction {
@@ -169,5 +190,5 @@ sealed interface ItemHomeAction {
     data class ToggleItemTagType(val itemTagType: ItemTagType) : ItemHomeAction
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
-    data class SelectItemData(val itemData: ItemData?) : ItemHomeAction
+    data class SelectItemData(val itemDataId: String?) : ItemHomeAction
 }

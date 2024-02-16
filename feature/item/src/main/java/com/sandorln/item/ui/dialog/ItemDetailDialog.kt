@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -32,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseItemIconImage
@@ -48,70 +54,45 @@ import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
 
-val dummyItem = ItemData(
-    name = "드락사르의 암흑검",
-    tags = setOf(
-        ItemTagType.Mana,
-        ItemTagType.Damage,
-        ItemTagType.Armor,
-        ItemTagType.Boots
-    ),
-    description = "<mainText><stats>공격력 <ornnBonus>75</ornnBonus><br>물리 관통력 <ornnBonus>26</ornnBonus><br>스킬 가속 <ornnBonus>20</ornnBonus></stats><br><br><br><li><passive>밤의 " +
-            "추적자:</passive> 대상이 잃은 체력에 비례해 스킬 피해량이 최대 일정 비율까지 증가합니다. 자신이 피해를 입힌 챔피언이 3초 안에 죽으면 1.5초 동안 구조물이 아닌 대상으로부터 <keywordStealth>대상으로 지정할 수 없는 상태</keywordStealth>가 됩니다. (30(0초))<br><br><rarityMythic>신화급 기본 지속 효과:</rarityMythic> 다른 모든 <rarityLegendary>전설급</rarityLegendary> 아이템에 스킬 가속 및 이동 속도.<br></mainText>",
-    gold = ItemData.Gold(total = 1000, sell = 700),
-    into = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4"),
-    from = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4")
-)
-val dummyItemCombination = ItemCombination(
-    name = "아이템 이름",
-    fromItemList = listOf(
-        ItemCombination(
-            name = "다음 아이템 이름 1",
-            fromItemList = listOf(
-                ItemCombination(name = "마지막 아이템 이름 1"),
-                ItemCombination(name = "마지막 아이템 이름 2"),
-            )
-        ),
-        ItemCombination(
-            name = "다음 아이템 이름 2",
-            fromItemList = listOf(
-                ItemCombination(name = "마지막 아이템 이름")
-            )
-        )
-    )
-)
-
 @Composable
 fun ItemDetailDialog(
     versionName: String,
     selectedItemId: String,
+    itemDetailDialogViewModel: ItemDetailDialogViewModel = hiltViewModel(),
     onDismissRequest: () -> Unit = {}
 ) {
-    val preDummyItem: ItemData? = ItemData(
-        name = "드락사르의 암흑검",
-        tags = setOf(
-            ItemTagType.Mana,
-            ItemTagType.Damage,
-            ItemTagType.Armor,
-            ItemTagType.Boots
-        ),
-        description = "<mainText><stats>공격력 <ornnBonus>75</ornnBonus><br>물리 관통력 <ornnBonus>26</ornnBonus><br>스킬 가속 <ornnBonus>25</ornnBonus></stats><br><li><passive>밤의 " +
-                "추적자:</passive> 챔피언에게 기본 공격 시 <physicalDamage>물리 피해(근접 챔피언의 경우 75+추가 공격력의 30%, 원거리 챔피언의 경우 55+추가 공격력의 25%)</physicalDamage>를 추가로 입힙니다. (재사용 대기시간 15초) 또한 근접 챔피언의 경우 대상을 0.25초 동안 99% <status>둔화</status>시킵니다. 피해를 입은 챔피언이 3초 내에 처치되면 재사용 대기시간이 초기화되며 1.5초 동안 <keywordStealth>투명</keywordStealth> 상태가 됩니다.<br><br><rarityMythic>신화급 기본 지속 효과:</rarityMythic> 다른 모든 <rarityLegendary>전설급</rarityLegendary> 아이템에 스킬 가속 <attention>5</attention> 및 이동 속도 <attention>5</attention>.<br></mainText><br>",
-        gold = ItemData.Gold(total = 900, sell = 700)
-    )
+    itemDetailDialogViewModel.initSetIdAndVersion(selectedItemId, versionName)
 
-    Dialog(onDismissRequest = onDismissRequest) {
+    val uiState by itemDetailDialogViewModel.uiState.collectAsState()
+    val baseItem by remember { derivedStateOf { uiState.itemData } }
+    val itemCombination by remember { derivedStateOf { uiState.itemCombination } }
+    val currentSpriteMap by itemDetailDialogViewModel.currentSpriteMap.collectAsState()
+
+    val onSelectedItem: (itemId: String) -> Unit = { itemId ->
+        itemDetailDialogViewModel.sendAction(ItemDetailAction.ChangeIdAndVersion(itemId, versionName))
+    }
+
+    Dialog(onDismissRequest = {
+        itemDetailDialogViewModel.sendAction(ItemDetailAction.ClearData)
+        onDismissRequest.invoke()
+    }) {
         Column(
             modifier = Modifier
                 .background(
                     color = Colors.Blue07,
-                    shape = RoundedCornerShape(Radius.Radius06)
+                    shape = RoundedCornerShape(Radius.Radius04)
+                )
+                .border(
+                    width = 1.dp,
+                    color = Colors.Gold06,
+                    shape = RoundedCornerShape(Radius.Radius04)
                 )
                 .padding(top = Spacings.Spacing03)
         ) {
             ItemInfoBody(
-                name = dummyItem.name,
-                tags = dummyItem.tags
+                name = baseItem.name,
+                tags = baseItem.tags,
+                bitmap = baseItem.image.getImageBitmap(currentSpriteMap)
             )
 
             HorizontalDivider(
@@ -125,37 +106,6 @@ fun ItemDetailDialog(
                     .verticalScroll(state = rememberScrollState())
                     .padding(vertical = Spacings.Spacing05)
             ) {
-                if (dummyItem.into.isNotEmpty()) {
-                    Text(
-                        modifier = Modifier.padding(
-                            start = Spacings.Spacing03,
-                            bottom = Spacings.Spacing00
-                        ),
-                        text = "다음 아이템",
-                        style = TextStyles.Body03,
-                        color = Colors.Gold03
-                    )
-                    Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState())
-                    ) {
-                        Spacer(modifier = Modifier.width(Spacings.Spacing03))
-                        dummyItem.into.forEach {
-                            BaseItemIconImage(
-                                versionName = dummyItem.version,
-                                itemId = it,
-                                iconSize = IconSize.XLargeSize,
-                                onClickIcon = {
-
-                                }
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(Spacings.Spacing03))
-                    }
-
-                    Spacer(modifier = Modifier.height(Spacings.Spacing03))
-                }
-
                 PreItemCompareButton()
 
                 Spacer(modifier = Modifier.height(Spacings.Spacing04))
@@ -166,23 +116,33 @@ fun ItemDetailDialog(
                 ) {
                     ItemStatusBody(
                         modifier = Modifier.weight(1f),
-                        item = dummyItem
+                        item = baseItem
                     )
 
-                    if (preDummyItem != null) {
-                        ItemStatusBody(
-                            modifier = Modifier.weight(1f),
-                            item = preDummyItem
-                        )
-                    }
+//                    if (preDummyItem != null) {
+//                        ItemStatusBody(
+//                            modifier = Modifier.weight(1f),
+//                            item = preDummyItem
+//                        )
+//                    }
                 }
 
-                if (dummyItem.from.isNotEmpty()) {
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(vertical = Spacings.Spacing04),
-                        color = Colors.Gold07
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = Spacings.Spacing04),
+                    color = Colors.Gold07
+                )
+
+                if (baseItem.into.isNotEmpty()) {
+                    TotalIntoItemListBody(
+                        baseItem = baseItem,
+                        onSelectedItem = onSelectedItem
                     )
+
+                    Spacer(modifier = Modifier.height(Spacings.Spacing04))
+                }
+
+                if (itemCombination.fromItemList.isNotEmpty()) {
                     Text(
                         modifier = Modifier.padding(
                             start = Spacings.Spacing03,
@@ -195,10 +155,46 @@ fun ItemDetailDialog(
 
                     TotalItemCombinationBody(
                         modifier = Modifier.padding(horizontal = Spacings.Spacing03),
-                        itemCombination = dummyItemCombination
+                        itemCombination = itemCombination,
+                        spriteBitmapMap = currentSpriteMap,
+                        onSelectItem = onSelectedItem
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TotalIntoItemListBody(baseItem: ItemData, onSelectedItem: (itemId: String) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            modifier = Modifier.padding(
+                start = Spacings.Spacing03,
+                bottom = Spacings.Spacing00
+            ),
+            text = "다음 아이템",
+            style = TextStyles.Body03,
+            color = Colors.Gold03
+        )
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.width(Spacings.Spacing03))
+            baseItem.into.forEach {
+                BaseItemIconImage(
+                    versionName = baseItem.version,
+                    itemId = it,
+                    iconSize = IconSize.XLargeSize,
+                    onClickIcon = {
+                        onSelectedItem.invoke(it)
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.width(Spacings.Spacing03))
         }
     }
 }
@@ -283,7 +279,7 @@ fun ItemInfoBody(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = Spacings.Spacing02)
+            .padding(horizontal = Spacings.Spacing03)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -323,7 +319,9 @@ fun ItemInfoBody(
 @Composable
 fun TotalItemCombinationBody(
     modifier: Modifier = Modifier,
-    itemCombination: ItemCombination = ItemCombination()
+    spriteBitmapMap: Map<String, Bitmap?> = mapOf(),
+    itemCombination: ItemCombination = ItemCombination(),
+    onSelectItem: (String) -> Unit = {}
 ) {
     Column(modifier = modifier) {
         Row(
@@ -335,6 +333,7 @@ fun TotalItemCombinationBody(
             horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
         ) {
             BaseBitmapImage(
+                bitmap = itemCombination.image.getImageBitmap(spriteBitmapMap),
                 loadingDrawableId = R.drawable.ic_main_item,
                 imageSize = IconSize.LargeSize,
                 innerPadding = 0.dp
@@ -353,7 +352,9 @@ fun TotalItemCombinationBody(
         itemCombination.fromItemList.forEachIndexed { index, fromItemCombination ->
             ItemCombinationBody(
                 hasNextItem = itemCombination.fromItemList.lastIndex > index,
-                itemCombination = fromItemCombination
+                itemCombination = fromItemCombination,
+                spriteBitmapMap = spriteBitmapMap,
+                onSelectItem = onSelectItem
             )
         }
     }
@@ -362,12 +363,15 @@ fun TotalItemCombinationBody(
 @Composable
 fun ItemCombinationBody(
     hasNextItem: Boolean = true,
-    itemCombination: ItemCombination = ItemCombination()
+    spriteBitmapMap: Map<String, Bitmap?> = mapOf(),
+    itemCombination: ItemCombination = ItemCombination(),
+    onSelectItem: (String) -> Unit
 ) {
     val halfMinSize = Dimens.ItemCombinationLineMinSize / 2
 
     Row(
         modifier = Modifier
+            .clickable { onSelectItem.invoke(itemCombination.id) }
             .fillMaxWidth()
             .heightIn(min = Dimens.ItemCombinationLineMinSize)
             .height(IntrinsicSize.Min)
@@ -404,6 +408,7 @@ fun ItemCombinationBody(
                 horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
             ) {
                 BaseBitmapImage(
+                    bitmap = itemCombination.image.getImageBitmap(spriteBitmapMap),
                     loadingDrawableId = R.drawable.ic_main_item,
                     imageSize = IconSize.LargeSize,
                     innerPadding = 0.dp
@@ -422,7 +427,9 @@ fun ItemCombinationBody(
             itemCombination.fromItemList.forEachIndexed { index, fromItemCombination ->
                 ItemCombinationBody(
                     hasNextItem = itemCombination.fromItemList.lastIndex > index,
-                    itemCombination = fromItemCombination
+                    itemCombination = fromItemCombination,
+                    spriteBitmapMap = spriteBitmapMap,
+                    onSelectItem = onSelectItem
                 )
             }
         }
@@ -453,6 +460,21 @@ fun ItemInfoBodyPreView() {
 @Preview
 @Composable
 fun ItemStatusBodyPreView() {
+    val dummyItem = ItemData(
+        name = "드락사르의 암흑검",
+        tags = setOf(
+            ItemTagType.Mana,
+            ItemTagType.Damage,
+            ItemTagType.Armor,
+            ItemTagType.Boots
+        ),
+        description = "<mainText><stats>공격력 <ornnBonus>75</ornnBonus><br>물리 관통력 <ornnBonus>26</ornnBonus><br>스킬 가속 <ornnBonus>20</ornnBonus></stats><br><br><br><li><passive>밤의 " +
+                "추적자:</passive> 대상이 잃은 체력에 비례해 스킬 피해량이 최대 일정 비율까지 증가합니다. 자신이 피해를 입힌 챔피언이 3초 안에 죽으면 1.5초 동안 구조물이 아닌 대상으로부터 <keywordStealth>대상으로 지정할 수 없는 상태</keywordStealth>가 됩니다. (30(0초))<br><br><rarityMythic>신화급 기본 지속 효과:</rarityMythic> 다른 모든 <rarityLegendary>전설급</rarityLegendary> 아이템에 스킬 가속 및 이동 속도.<br></mainText>",
+        gold = ItemData.Gold(total = 1000, sell = 700),
+        into = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4"),
+        from = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4")
+    )
+
     LolChampionThemePreview {
         ItemStatusBody(item = dummyItem)
     }

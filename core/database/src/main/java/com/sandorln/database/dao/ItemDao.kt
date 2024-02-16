@@ -36,5 +36,5 @@ interface ItemDao {
     suspend fun getNewItemCount(currentVersion: String, preVersion: String): Int
 
     @Query("SELECT * FROM ItemEntity WHERE version == :version AND id == :id")
-    fun getItemDataByIdAndVersion(version: String, id: String): List<ItemEntity>
+    suspend fun getItemDataByIdAndVersion(version: String, id: String): List<ItemEntity>
 }
