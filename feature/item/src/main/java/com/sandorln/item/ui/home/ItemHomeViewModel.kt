@@ -67,12 +67,13 @@ class ItemHomeViewModel @Inject constructor(
             }
 
             /* Map Type Filter */
-            when {
-                selectMapType == MapType.ALL && item.mapType != MapType.NONE -> {}
-                item.mapType == MapType.ALL && (selectMapType == MapType.SUMMONER_RIFT || selectMapType == MapType.ARAM) -> {}
-                selectMapType != item.mapType -> return@filter false
+            val isMatchMapType = item.mapType == selectMapType
+            val isItemAllType = item.mapType == MapType.ALL && (selectMapType == MapType.SUMMONER_RIFT || selectMapType == MapType.ARAM)
+
+            return@filter when {
+                isMatchMapType || isItemAllType -> item.name.contains(searchKeyword)
+                else -> false
             }
-            item.name.contains(searchKeyword)
         }
     }
 
@@ -176,7 +177,7 @@ class ItemHomeViewModel @Inject constructor(
 data class ItemHomeUiState(
     val isLoading: Boolean = false,
     val searchKeyword: String = "",
-    val isSelectMapType: MapType = MapType.ALL,
+    val isSelectMapType: MapType = MapType.SUMMONER_RIFT,
     val selectTag: Set<ItemTagType> = emptySet(),
     val isSelectNewItem: Boolean = false,
     val selectedItemId: String? = null,

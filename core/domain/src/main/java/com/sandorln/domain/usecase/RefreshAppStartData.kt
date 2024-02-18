@@ -1,6 +1,5 @@
 package com.sandorln.domain.usecase
 
-import android.util.Log
 import com.sandorln.data.repository.champion.ChampionRepository
 import com.sandorln.data.repository.item.ItemRepository
 import com.sandorln.data.repository.spell.SummonerSpellRepository
@@ -69,6 +68,9 @@ class RefreshAppStartData @Inject constructor(
 
                         var newItemIdList: List<String>? = version.newItemIdList
                         var newChampionIdList: List<String>? = version.newChampionIdList
+
+                        if (newItemIdList != null && newChampionIdList != null)
+                            return@async
 
                         if (newItemIdList == null) {
                             newItemIdList = itemRepository.getNewItemIdList(

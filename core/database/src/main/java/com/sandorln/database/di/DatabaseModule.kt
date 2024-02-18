@@ -36,7 +36,7 @@ object DatabaseModule {
         mapsConverters: MapsConverters
     ): AppDatabase = Room
         .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-//        .createFromAsset("database/lol_champion.db")
+        .createFromAsset("database/lol-champion.db")
         .addTypeConverter(lolChampionConverters)
         .addTypeConverter(lolItemConverters)
         .addTypeConverter(mapsConverters)

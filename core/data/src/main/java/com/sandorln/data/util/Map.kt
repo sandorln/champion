@@ -18,13 +18,25 @@ private val ARAM_NAME = listOf(
 )
 
 fun Map<String, Boolean>.asMapTypeEntity(): ItemEntity.MapTypeEntity {
-    val isNotSummonerRift = this.filterKeys { name -> SUMMONER_RIFT_NAME.contains(name) }.values.any { !it }
-    val isNotAram = this.filterKeys { name -> ARAM_NAME.contains(name) }.values.any { !it }
+    val summonerMapType = this.filterKeys { name -> SUMMONER_RIFT_NAME.contains(name) }
+    val aramMapType = this.filterKeys { name -> ARAM_NAME.contains(name) }
+
+    val isSummonerRift = if (summonerMapType.isNotEmpty()) {
+        summonerMapType.values.any { it }
+    } else {
+        true
+    }
+
+    val isAram = if (aramMapType.isNotEmpty()) {
+        aramMapType.values.any { it }
+    } else {
+        true
+    }
 
     return when {
-        !isNotSummonerRift && !isNotAram -> ItemEntity.MapTypeEntity.ALL
-        isNotSummonerRift && !isNotAram -> ItemEntity.MapTypeEntity.ARAM
-        !isNotSummonerRift && isNotAram -> ItemEntity.MapTypeEntity.SUMMONER_RIFT
+        isSummonerRift && isAram -> ItemEntity.MapTypeEntity.ALL
+        !isSummonerRift && isAram -> ItemEntity.MapTypeEntity.ARAM
+        isSummonerRift && !isAram -> ItemEntity.MapTypeEntity.SUMMONER_RIFT
         else -> ItemEntity.MapTypeEntity.NONE
     }
 }

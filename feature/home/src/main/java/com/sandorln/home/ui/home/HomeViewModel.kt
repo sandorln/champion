@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -53,9 +52,7 @@ class HomeViewModel @Inject constructor(
         .invoke()
         .map { it.name }
         .distinctUntilChanged()
-    private val _allVersionList = getAllVersionList
-        .invoke()
-        .distinctUntilChangedBy { it.size }
+    private val _allVersionList = getAllVersionList.invoke()
 
     init {
         viewModelScope.launch {
