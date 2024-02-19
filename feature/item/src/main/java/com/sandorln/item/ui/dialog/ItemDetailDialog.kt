@@ -148,11 +148,12 @@ fun ItemDetailDialog(
                     }
                 }
 
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = Spacings.Spacing03),
-                    color = Colors.Gold07
-                )
+                if (intoItemImageList.isNotEmpty() || itemCombination.fromItemList.isNotEmpty())
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = Spacings.Spacing03),
+                        color = Colors.Gold07
+                    )
 
                 if (intoItemImageList.isNotEmpty()) {
                     TotalIntoItemListBody(
