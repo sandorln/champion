@@ -2,40 +2,33 @@ package com.sandorln.champion.ui.home
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseBitmapImage
-import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
 import com.sandorln.design.theme.Colors
@@ -53,6 +45,7 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.champion.SummaryChampion
+import com.sandorln.model.type.ChampionTag
 import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -64,6 +57,7 @@ fun ChampionHomeScreen(
     val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by championHomeViewModel.championUiState.collectAsState()
+    val selectedTagSet by remember { derivedStateOf { uiState.selectChampionTagSet } }
 
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PullHeight
@@ -86,7 +80,14 @@ fun ChampionHomeScreen(
             pullToRefreshState = pullToRefreshState
         ) {
             item {
-                FavoriteChampionListBody()
+                ChampionTagFilterBody(
+                    modifier = Modifier
+                        .padding(top = Spacings.Spacing05)
+                        .fillMaxWidth(),
+                    selectedTagSet = selectedTagSet,
+                    onClickAction = {
+                        championHomeViewModel.sendAction(ChampionHomeAction.ToggleChampionTag(it))
+                    })
             }
 
             stickyHeader {
@@ -174,51 +175,69 @@ private fun ChampionBody(
 }
 
 @Composable
-private fun FavoriteChampionListBody() {
+fun ChampionTagFilterBody(
+    modifier: Modifier = Modifier,
+    selectedTagSet: Set<ChampionTag> = setOf(),
+    onClickAction: (ChampionTag) -> Unit
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(
-            Spacings.Spacing00,
+            Spacings.Spacing05,
             Alignment.CenterHorizontally
         )
     ) {
-        FavoriteChampionBody()
-        FavoriteChampionBody()
-    }
-}
+        ChampionTag.entries.forEach { championTag ->
+            val iconId = when (championTag) {
+                ChampionTag.Fighter -> com.sandorln.design.R.drawable.ic_tag_fighter
+                ChampionTag.Tank -> com.sandorln.design.R.drawable.ic_tag_tank
+                ChampionTag.Mage -> com.sandorln.design.R.drawable.ic_tag_mage
+                ChampionTag.Assassin -> com.sandorln.design.R.drawable.ic_tag_assassin
+                ChampionTag.Marksman -> com.sandorln.design.R.drawable.ic_tag_marksman
+                ChampionTag.Support -> com.sandorln.design.R.drawable.ic_tag_support
+            }
+            val isSelect = selectedTagSet.contains(championTag)
+            val contentColor = when {
+                isSelect -> Colors.Gold02
+                else -> Colors.Gray07
+            }
 
-@Composable
-private fun FavoriteChampionBody(
-    championId: String = "Aatrox",
-) {
-    Card(
-        modifier = Modifier
-            .widthIn(max = 80.dp)
-            .aspectRatio(0.55f),
-        shape = RoundedCornerShape(0),
-        colors = CardDefaults.cardColors(containerColor = Colors.Blue05)
-    ) {
-        Box {
-            BaseChampionSplashImage(championId = championId)
             Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(Spacings.Spacing01)
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
             ) {
+                Icon(
+                    modifier = Modifier
+                        .clickable {
+                            onClickAction.invoke(championTag)
+                        }
+                        .size(IconSize.LargeSize),
+                    painter = painterResource(id = iconId),
+                    contentDescription = null,
+                    tint = contentColor
+                )
+
                 Text(
-                    text = "아트록스",
-                    style = TextStyles.SubTitle03,
-                    color = Colors.Gold03,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    text = championTag.name,
+                    style = TextStyles.Body04,
+                    color = contentColor
                 )
             }
         }
     }
 }
 
+@Preview
+@Composable
+internal fun ChampionTagBodyPreview() {
+    LolChampionThemePreview {
+        ChampionTagFilterBody(
+            selectedTagSet = setOf(*ChampionTag.entries.toTypedArray())
+        ) {
+
+        }
+    }
+}
 
 @Preview
 @Composable

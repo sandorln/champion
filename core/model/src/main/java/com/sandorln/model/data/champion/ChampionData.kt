@@ -1,6 +1,7 @@
 package com.sandorln.model.data.champion
 
 import com.sandorln.model.data.image.LOLImage
+import com.sandorln.model.type.ChampionTag
 
 data class ChampionData(
     var version: String = "",
@@ -11,7 +12,7 @@ data class ChampionData(
     var blurb: String = "",
     var info: ChampionInfo = ChampionInfo(),
     var image: LOLImage = LOLImage(),
-    var tags: List<String> = mutableListOf(),
+    var tags: List<ChampionTag> = mutableListOf(),
     var partype: String = "",
     var stats: ChampionStats = ChampionStats(),
     var skins: List<ChampionSkin> = mutableListOf(),

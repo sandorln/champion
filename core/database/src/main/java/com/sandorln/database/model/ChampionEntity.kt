@@ -12,7 +12,7 @@ data class ChampionEntity(
     var title: String = "",
     var info: ChampionInfoEntity = ChampionInfoEntity(),
     var image: LOLImageEntity = LOLImageEntity(),
-    var tags: List<String> = mutableListOf(),
+    var tags: List<ChampionTagEntity> = mutableListOf(),
     var partype: String = "",
     var stats: ChampionStatsEntity = ChampionStatsEntity()
 ) {
@@ -46,4 +46,11 @@ data class ChampionEntity(
         var attackspeedoffset: Double = 0.0,
         var attackspeedperlevel: Double = 0.0
     )
+}
+
+/**
+ * @property Ranged Marksman 으로 대체된 값
+ */
+enum class ChampionTagEntity {
+    Fighter, Tank, Mage, Assassin, Marksman, Support, Ranged
 }

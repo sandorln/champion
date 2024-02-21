@@ -16,20 +16,18 @@ import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.type.ItemTagType
-import com.sandorln.model.type.armorTagTypeList
-import com.sandorln.model.type.attackTagTypeList
-import com.sandorln.model.type.manaTagTypeList
 
 @Composable
 fun ItemTag(
     itemTagType: ItemTagType
 ) {
-    val colorTint = when {
-        attackTagTypeList.contains(itemTagType) -> Colors.Orange00
-        manaTagTypeList.contains(itemTagType) -> Colors.Blue03
-        armorTagTypeList.contains(itemTagType) -> Colors.Green00
+    val colorTint = when (itemTagType.getStyleType()) {
+        ItemTagType.StyleType.ATTACK -> Colors.Orange00
+        ItemTagType.StyleType.MANA -> Colors.Blue03
+        ItemTagType.StyleType.ARMOR -> Colors.Green00
         else -> Colors.Gray04
     }
+
     Box(
         modifier = Modifier
             .border(

@@ -1,10 +1,5 @@
 package com.sandorln.model.type
 
-val attackTagTypeList = listOf(ItemTagType.Damage, ItemTagType.AttackSpeed, ItemTagType.CriticalStrike, ItemTagType.ArmorPenetration)
-val manaTagTypeList = listOf(ItemTagType.SpellDamage, ItemTagType.Mana, ItemTagType.ManaRegen, ItemTagType.MagicPenetration)
-val armorTagTypeList = listOf(ItemTagType.Armor, ItemTagType.SpellBlock, ItemTagType.Health, ItemTagType.HealthRegen)
-val etcTagTypeList = listOf(ItemTagType.CooldownReduction, ItemTagType.NonbootsMovement, ItemTagType.LifeSteal)
-
 enum class ItemTagType(val typeName: String) {
     Boots("장화"),
     Consumable("소모성"),
@@ -30,5 +25,24 @@ enum class ItemTagType(val typeName: String) {
     /* 그 외 */
     CooldownReduction("스킬가속"),
     NonbootsMovement("이동속도"),
-    LifeSteal("흡혈")
+    LifeSteal("흡혈");
+
+    enum class StyleType {
+        ATTACK, MANA, ARMOR, ETC
+    }
+
+    fun getStyleType(): StyleType? = when {
+        attackTagTypeList.contains(this) -> StyleType.ATTACK
+        manaTagTypeList.contains(this) -> StyleType.MANA
+        armorTagTypeList.contains(this) -> StyleType.ARMOR
+        etcTagTypeList.contains(this) -> StyleType.ETC
+        else -> null
+    }
+
+    companion object {
+        private val attackTagTypeList = listOf(Damage, AttackSpeed, CriticalStrike, ArmorPenetration)
+        private val manaTagTypeList = listOf(SpellDamage, Mana, ManaRegen, MagicPenetration)
+        private val armorTagTypeList = listOf(Armor, SpellBlock, Health, HealthRegen)
+        private val etcTagTypeList = listOf(CooldownReduction, NonbootsMovement, LifeSteal)
+    }
 }
