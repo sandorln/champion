@@ -56,6 +56,6 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:model"))
-    implementation(project(":feature:champion"))
-    implementation(project(":feature:item"))
+    api(project(":feature:champion"))
+    api(project(":feature:item"))
 }

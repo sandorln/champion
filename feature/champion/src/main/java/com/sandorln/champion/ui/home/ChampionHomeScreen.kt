@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -52,8 +53,9 @@ import kotlin.math.floor
 @Composable
 fun ChampionHomeScreen(
     championHomeViewModel: ChampionHomeViewModel = hiltViewModel(),
-    moveToChampionDetailScreen: (championId: String) -> Unit
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
 ) {
+    val currentVersion by championHomeViewModel.currentVersion.collectAsState()
     val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by championHomeViewModel.championUiState.collectAsState()
@@ -134,7 +136,10 @@ fun ChampionHomeScreen(
                         if (champion != null) {
                             ChampionBody(
                                 champion = champion,
-                                currentSpriteMap = currentSpriteMap
+                                currentSpriteMap = currentSpriteMap,
+                                moveToChampionDetailScreen = {
+                                    moveToChampionDetailScreen.invoke(champion.id, currentVersion)
+                                }
                             )
                         } else {
                             Spacer(modifier = Modifier.width(IconSize.XXLargeSize))
@@ -148,11 +153,16 @@ fun ChampionHomeScreen(
 
 @Composable
 private fun ChampionBody(
+    modifier: Modifier = Modifier,
     champion: SummaryChampion = SummaryChampion(),
-    currentSpriteMap: Map<String, Bitmap?>
+    currentSpriteMap: Map<String, Bitmap?>,
+    moveToChampionDetailScreen: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.width(IconSize.XXLargeSize),
+        modifier = modifier
+            .clickable { moveToChampionDetailScreen.invoke() }
+            .fillMaxHeight()
+            .width(IconSize.XXLargeSize),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val bitmap = champion.image.getImageBitmap(currentSpriteMap)
@@ -243,6 +253,6 @@ internal fun ChampionTagBodyPreview() {
 @Composable
 internal fun ChampionHomeScreenPreview() {
     LolChampionThemePreview {
-        ChampionHomeScreen {}
+        ChampionHomeScreen { _, _ -> }
     }
 }

@@ -33,6 +33,7 @@ object IconSize {
     val LargeSize = 24.dp
     val XLargeSize = 32.dp
     val XXLargeSize = 48.dp
+    val XXXLargeSize = 72.dp
 }
 
 object Dimens {
@@ -42,6 +43,8 @@ object Dimens {
     val PullIndicatorSize = 50.dp
 
     val ItemCombinationLineMinSize = 30.dp
+
+    val ChampionSplashRatio = "1:0.59012"
 }
 
 object AnimationConfig {

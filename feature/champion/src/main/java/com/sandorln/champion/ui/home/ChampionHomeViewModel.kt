@@ -6,6 +6,7 @@ import com.sandorln.domain.usecase.champion.GetSummaryChampionListByCurrentVersi
 import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
+import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.type.ChampionTag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,8 +31,13 @@ class ChampionHomeViewModel @Inject constructor(
     getSummaryChampionListByCurrentVersion: GetSummaryChampionListByCurrentVersion,
     refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
-    getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion
+    getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
+    getCurrentVersion: GetCurrentVersion
 ) : ViewModel() {
+    val currentVersion = getCurrentVersion
+        .invoke()
+        .map { it.name }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
     private val _championUiState = MutableStateFlow(ChampionHomeUiState())
     val championUiState = _championUiState.asStateFlow()
 

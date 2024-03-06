@@ -79,7 +79,8 @@ private val homeItems = listOf(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -137,7 +138,9 @@ fun HomeScreen(
                     beyondBoundsPageCount = homeItems.size
                 ) { page: Int ->
                     when (homeItems[page]) {
-                        HomeScreenType.Champion -> ChampionHomeScreen(moveToChampionDetailScreen = {})
+                        HomeScreenType.Champion -> ChampionHomeScreen(
+                            moveToChampionDetailScreen = moveToChampionDetailScreen
+                        )
 
                         HomeScreenType.Item -> ItemHomeScreen()
 

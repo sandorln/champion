@@ -14,7 +14,7 @@ fun BaseChampionSplashImage(
     modifier: Modifier = Modifier,
     championId: String,
 ) {
-    val url = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championId}_0.jpg"
+    val url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg"
 
     GlideImage(
         modifier = modifier,
