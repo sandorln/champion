@@ -146,7 +146,7 @@ fun ChampionDetailScreen(
                     .layoutId(MotionRefIdType.Icon)
             ) {
                 BaseCircleIconImage(
-                    versionName = championDetailData.version,
+                    versionName = uiState.version,
                     modifier = Modifier.matchParentSize(),
                     id = championDetailData.id
                 )

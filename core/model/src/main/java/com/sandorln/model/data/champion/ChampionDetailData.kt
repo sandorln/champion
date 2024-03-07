@@ -4,12 +4,11 @@ import com.sandorln.model.data.image.LOLImage
 import com.sandorln.model.type.ChampionTag
 
 data class ChampionDetailData(
-    var version: String = "",
     var id: String = "",
     var key: Int = 0,
     var name: String = "",
     var title: String = "",
-    var blurb: String = "",
+    var lore: String = "",
     var info: ChampionInfo = ChampionInfo(),
     var image: LOLImage = LOLImage(),
     var tags: List<ChampionTag> = mutableListOf(),

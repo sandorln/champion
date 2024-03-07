@@ -1,6 +1,7 @@
 package com.sandorln.data.repository.champion
 
 import com.sandorln.data.util.asData
+import com.sandorln.data.util.asDetailData
 import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.model.ChampionEntity
@@ -49,11 +50,17 @@ class DefaultChampionRepository @Inject constructor(
 
     override suspend fun getChampionDetail(championId: String, version: String): ChampionDetailData =
         withContext(Dispatchers.IO) {
+            var championDetailData = ChampionDetailData()
             runCatching {
-                val localChampion = championDao.getChampionDetail(version, championId)
+                championDetailData = championDao
+                    .getChampionDetail(version, championId)
+                    .firstOrNull()
+                    ?.asDetailData() ?: throw Exception()
+
                 val serverChampion = championService.getChampionDetail(championName = championId, version = version)
+                championDetailData = serverChampion.asData(championDetailData)
             }
 
-            ChampionDetailData()
+            championDetailData
         }
 }

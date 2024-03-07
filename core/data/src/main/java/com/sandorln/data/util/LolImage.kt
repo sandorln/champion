@@ -19,3 +19,12 @@ fun NetworkLOLImage.asEntity(): LOLImageEntity = LOLImageEntity(
     w = w,
     h = h
 )
+
+fun NetworkLOLImage.asData(): LOLImage = LOLImage(
+    full = full,
+    sprite = sprite,
+    x = x,
+    y = y,
+    w = w,
+    h = h
+)

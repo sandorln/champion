@@ -2,11 +2,18 @@ package com.sandorln.data.util
 
 import com.sandorln.database.model.ChampionEntity
 import com.sandorln.database.model.ChampionTagEntity
+import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionInfo
+import com.sandorln.model.data.champion.ChampionSkin
+import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
 import com.sandorln.network.model.champion.NetworkChampion
+import com.sandorln.network.model.champion.NetworkChampionDetail
+import com.sandorln.network.model.champion.NetworkChampionPassive
+import com.sandorln.network.model.champion.NetworkChampionSkin
+import com.sandorln.network.model.champion.NetworkChampionSpell
 
 fun ChampionEntity.asData(): SummaryChampion = SummaryChampion(
     id = id,
@@ -94,3 +101,48 @@ fun NetworkChampion.NetworkChampionStats.asEntity(): ChampionEntity.ChampionStat
 fun List<String>.asChampionTagEntity(): List<ChampionTagEntity> = mapNotNull {
     runCatching { ChampionTagEntity.valueOf(it) }.getOrNull()
 }
+
+fun ChampionEntity.asDetailData(): ChampionDetailData = ChampionDetailData(
+    id = id,
+    key = key,
+    name = name,
+    title = title,
+    image = image.asData(),
+    info = info.asData(),
+    tags = tags.asData(),
+    partype = partype,
+    stats = stats.asData()
+)
+
+fun NetworkChampionDetail.asData(otherChampionDetail: ChampionDetailData = ChampionDetailData()): ChampionDetailData =
+    otherChampionDetail.copy(
+        lore = lore,
+        skins = skins.map(NetworkChampionSkin::asData),
+        allytips = allyTips,
+        enemytips = enemyTips,
+        spells = spells.map(NetworkChampionSpell::asData),
+        passive = passive.asData()
+    )
+
+fun NetworkChampionSkin.asData(): ChampionSkin = ChampionSkin(
+    id = id,
+    name = name,
+    chromas = chromas
+)
+
+fun NetworkChampionSpell.asData(): ChampionSpell = ChampionSpell(
+    id = id,
+    name = name,
+    description = description,
+    image = image.asData(),
+    tooltip = tooltip,
+    cooldownBurn = cooldownBurn,
+    costBurn = costBurn,
+    levelTip = levelTip.label
+)
+
+fun NetworkChampionPassive.asData(): ChampionSpell = ChampionSpell(
+    name = name,
+    description = description,
+    image = image.asData()
+)

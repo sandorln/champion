@@ -33,7 +33,7 @@ class ChampionDetailViewModel @Inject constructor(
             .onSuccess { championDetailData ->
                 _uiMutex.withLock {
                     _uiState.update {
-                        it.copy(championDetailData = ChampionDetailData(version = _version, id = _championId))
+                        it.copy(championDetailData = championDetailData)
                     }
                 }
             }
@@ -42,6 +42,14 @@ class ChampionDetailViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
+                _uiMutex.withLock {
+                    _uiState.update {
+                        it.copy(version = _version)
+                    }
+                }
+            }
+
+            launch {
                 refreshChampionDetail()
             }
         }
@@ -49,7 +57,8 @@ class ChampionDetailViewModel @Inject constructor(
 }
 
 data class ChampionDetailUiState(
-    val championDetailData: ChampionDetailData = ChampionDetailData()
+    val championDetailData: ChampionDetailData = ChampionDetailData(),
+    val version: String = ""
 )
 
 
