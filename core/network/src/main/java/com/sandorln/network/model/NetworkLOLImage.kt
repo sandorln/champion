@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NetworkLOLImage(
+    val full: String = "",
     var sprite: String = "",
     /* 이미지 좌표 */
     var x: Int = 0,

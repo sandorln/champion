@@ -31,4 +31,7 @@ interface ChampionDao {
                 "AND name NOT IN (SELECT name FROM ChampionEntity WHERE version == :preVersion)"
     )
     suspend fun getNewChampionCount(currentVersion: String, preVersion: String): Int
+
+    @Query("SELECT * FROM ChampionEntity WHERE version == :version AND id == :championId")
+    suspend fun getChampionDetail(version: String, championId: String): List<ChampionEntity>
 }

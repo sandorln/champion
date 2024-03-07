@@ -17,6 +17,10 @@ import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.lerp
 import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseCircleIconImage
@@ -35,6 +40,7 @@ import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.design.theme.addShadow
 
 private enum class MotionRefIdType {
     Splash, Icon, Name, Title, Back
@@ -42,7 +48,16 @@ private enum class MotionRefIdType {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChampionDetailScreen() {
+fun ChampionDetailScreen(
+    championDetailViewModel: ChampionDetailViewModel = hiltViewModel()
+) {
+    val uiState by championDetailViewModel.uiState.collectAsState()
+    val championDetailData by remember {
+        derivedStateOf {
+            uiState.championDetailData
+        }
+    }
+
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.ChampionSplashRatio,
         headerMinHeight = Dimens.BaseToolbarHeight,
@@ -120,7 +135,7 @@ fun ChampionDetailScreen() {
             ) {
                 BaseChampionSplashImage(
                     modifier = Modifier.matchParentSize(),
-                    championId = "Aatrox"
+                    championId = uiState.championDetailData.id
                 )
             }
 
@@ -131,18 +146,18 @@ fun ChampionDetailScreen() {
                     .layoutId(MotionRefIdType.Icon)
             ) {
                 BaseCircleIconImage(
-                    versionName = "14.5.1",
+                    versionName = championDetailData.version,
                     modifier = Modifier.matchParentSize(),
-                    id = "Aatrox"
+                    id = championDetailData.id
                 )
             }
 
             Box(modifier = Modifier.layoutId(MotionRefIdType.Title)) {
                 Text(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    text = "title",
-                    style = TextStyles.Title01,
-                    fontSize = titleSize,
+                    text = championDetailData.title,
+                    style = TextStyles.Title01.addShadow(),
+                    fontSize = titleSize
                 )
             }
 
@@ -151,8 +166,8 @@ fun ChampionDetailScreen() {
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = "name",
-                    style = TextStyles.Title01,
+                    text = championDetailData.name,
+                    style = TextStyles.Title01.addShadow(),
                     fontSize = nameSize
                 )
             }

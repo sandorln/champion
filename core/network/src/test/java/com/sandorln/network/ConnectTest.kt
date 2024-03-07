@@ -183,4 +183,17 @@ class ConnectTest {
             }
         }
     }
+
+    @Test
+    fun 챔피언디테일정보_가져오기() {
+        runBlocking {
+            runCatching {
+                _championService.getChampionDetail("14.5.1", "Hwei")
+            }.onSuccess {
+                println("Champion Detail : $it")
+            }.onFailure {
+                println("failure : $it")
+            }
+        }
+    }
 }

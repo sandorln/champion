@@ -6,7 +6,7 @@ import com.sandorln.model.data.champion.ChampionInfo
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
-import com.sandorln.network.model.NetworkChampion
+import com.sandorln.network.model.champion.NetworkChampion
 
 fun ChampionEntity.asData(): SummaryChampion = SummaryChampion(
     id = id,

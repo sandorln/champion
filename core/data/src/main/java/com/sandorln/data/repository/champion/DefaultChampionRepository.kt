@@ -5,6 +5,7 @@ import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.model.ChampionEntity
 import com.sandorln.datastore.version.VersionDatasource
+import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.network.service.ChampionService
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DefaultChampionRepository @Inject constructor(
@@ -44,4 +46,14 @@ class DefaultChampionRepository @Inject constructor(
 
     override suspend fun getNewChampionIdList(versionName: String, preVersionName: String): List<String> =
         championDao.getNewChampionIdList(versionName, preVersionName)
+
+    override suspend fun getChampionDetail(championId: String, version: String): ChampionDetailData =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val localChampion = championDao.getChampionDetail(version, championId)
+                val serverChampion = championService.getChampionDetail(championName = championId, version = version)
+            }
+
+            ChampionDetailData()
+        }
 }

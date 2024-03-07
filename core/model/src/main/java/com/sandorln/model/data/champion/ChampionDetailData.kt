@@ -3,7 +3,7 @@ package com.sandorln.model.data.champion
 import com.sandorln.model.data.image.LOLImage
 import com.sandorln.model.type.ChampionTag
 
-data class ChampionData(
+data class ChampionDetailData(
     var version: String = "",
     var id: String = "",
     var key: Int = 0,

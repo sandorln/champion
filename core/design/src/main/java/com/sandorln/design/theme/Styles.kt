@@ -1,10 +1,14 @@
 package com.sandorln.design.theme
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sandorln.design.R
 
@@ -35,3 +39,11 @@ object TextStyles {
     val Body03 = TextStyle(fontFamily = warhavenFont, fontWeight = FontWeight.Medium, fontSize = 11.sp, color = Colors.BasicWhite)
     val Body04 = TextStyle(fontFamily = warhavenFont, fontWeight = FontWeight.Medium, fontSize = 9.sp, color = Colors.BasicWhite)
 }
+
+fun TextStyle.addShadow(color: Color = Color.Black): TextStyle = this.copy(
+    shadow = Shadow(
+        color = color,
+        offset = Offset(2.dp.value, 2.dp.value),
+        blurRadius = 1.dp.value,
+    )
+)

@@ -1,14 +1,12 @@
 package com.sandorln.network.service
 
 import com.sandorln.network.BuildConfig
-import com.sandorln.network.model.NetworkChampion
+import com.sandorln.network.model.champion.NetworkChampion
+import com.sandorln.network.model.champion.NetworkChampionDetail
 import com.sandorln.network.model.response.BaseLolResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.utils.io.jvm.javaio.toInputStream
-import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,11 +26,11 @@ class ChampionService @Inject constructor(
         return response.data ?: throw Exception("")
     }
 
-    suspend fun getChampionDetail(version: String, championName: String): NetworkChampion {
+    suspend fun getChampionDetail(version: String, championName: String): NetworkChampionDetail {
         val response = ktorClient
-            .get("/cdn/${version}/data/ko_KR/${championName}.json")
-            .body<BaseLolResponse<NetworkChampion>>()
+            .get(BuildConfig.BASE_URL + "/cdn/${version}/data/ko_KR/champion/${championName}.json")
+            .body<BaseLolResponse<Map<String, NetworkChampionDetail>>>()
 
-        return response.data ?: throw Exception("")
+        return response.data?.get(championName) ?: throw Exception("")
     }
 }

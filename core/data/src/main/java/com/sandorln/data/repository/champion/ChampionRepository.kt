@@ -1,5 +1,6 @@
 package com.sandorln.data.repository.champion
 
+import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.SummaryChampion
 import kotlinx.coroutines.flow.Flow
 
@@ -12,4 +13,6 @@ interface ChampionRepository {
     suspend fun getSummaryChampionListByChampionIdList(version: String, championIdList: List<String>): List<SummaryChampion>
 
     suspend fun getNewChampionIdList(versionName: String, preVersionName: String): List<String>
+
+    suspend fun getChampionDetail(championId: String, version: String): ChampionDetailData
 }
