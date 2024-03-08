@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.util.fastJoinToString
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
@@ -350,13 +351,41 @@ fun ChampionSkillListBody(
             }
         }
 
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = selectedSkill.name,
-            style = TextStyles.SubTitle01,
-            textAlign = TextAlign.Center,
-            color = Colors.BaseColor
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = selectedSkill.name,
+                style = TextStyles.SubTitle01,
+                textAlign = TextAlign.Center,
+                color = Colors.BaseColor
+            )
+            if (selectedSkill.cooldownBurn.isNotEmpty()) {
+                Text(
+                    text = "쿨타임 : ${selectedSkill.cooldownBurn} 초",
+                    style = TextStyles.Body04,
+                    textAlign = TextAlign.Center,
+                    color = Colors.Gray04
+                )
+            }
+            if (selectedSkill.costBurn.isNotEmpty() && selectedSkill.costBurn != "0") {
+                Text(
+                    text = "소모 : ${selectedSkill.costBurn}",
+                    style = TextStyles.Body04,
+                    textAlign = TextAlign.Center,
+                    color = Colors.Gray04
+                )
+            }
+
+            if (selectedSkill.levelTip.isNotEmpty()) {
+                Text(
+                    text = "스킬 레벨업 : ${selectedSkill.levelTip.fastJoinToString("/")}",
+                    style = TextStyles.Body04,
+                    textAlign = TextAlign.Center,
+                    color = Colors.Gray04
+                )
+            }
+        }
 
         Column(
             modifier = Modifier.padding(horizontal = Spacings.Spacing05),
@@ -395,7 +424,7 @@ fun ChampionSkillImage(
         targetValue = if (isSelect) {
             Colors.BaseColor
         } else {
-            Color.Transparent
+            Colors.Gray07
         },
         label = ""
     )
@@ -460,7 +489,14 @@ internal fun ChampionSkillImagePreview() {
 internal fun ChampionSkillBodyListPreview() {
     LolChampionThemePreview {
         ChampionSkillListBody(
-            selectedSkill = ChampionSpell(name = "테스트")
+            selectedSkill = ChampionSpell(
+                name = "테스트",
+                tooltip = "툴팁",
+                description = "상세 설명",
+                cooldownBurn = "10/9/8/7/6",
+                costBurn = "100/90/80/60/50",
+                levelTip = listOf("피해량","만월총 추가 효과: 표식 피해량")
+            )
         )
     }
 }
