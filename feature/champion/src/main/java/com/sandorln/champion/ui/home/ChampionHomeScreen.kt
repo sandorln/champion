@@ -62,7 +62,7 @@ fun ChampionHomeScreen(
     val selectedTagSet by remember { derivedStateOf { uiState.selectChampionTagSet } }
 
     val pullToRefreshState = rememberPullToRefreshState(
-        positionalThreshold = Dimens.PullHeight
+        positionalThreshold = Dimens.PULL_HEIGHT
     )
 
     LaunchedEffect(uiState.isLoading) {

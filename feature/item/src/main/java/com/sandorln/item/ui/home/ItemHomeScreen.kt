@@ -68,7 +68,7 @@ fun ItemHomeScreen(
     }
 
     val pullToRefreshState = rememberPullToRefreshState(
-        positionalThreshold = Dimens.PullHeight
+        positionalThreshold = Dimens.PULL_HEIGHT
     )
 
     LaunchedEffect(uiState.isLoading) {

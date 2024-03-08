@@ -40,5 +40,5 @@ dependencies {
     implementation(libs.holix.bottomsheetdialog.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    implementation(libs.glide)
+    api(libs.glide)
 }

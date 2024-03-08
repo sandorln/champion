@@ -42,7 +42,7 @@ fun BaseBitmapImage(
         targetValue = if (bitmap != null) 1f else 0f,
         label = "",
         animationSpec = tween(
-            durationMillis = AnimationConfig.Normal
+            durationMillis = AnimationConfig.NORMAL
         )
     )
 
@@ -53,7 +53,7 @@ fun BaseBitmapImage(
                     initialValue = Colors.Gray07,
                     targetValue = Colors.Gray09,
                     animationSpec = infiniteRepeatable(
-                        tween(AnimationConfig.Normal),
+                        tween(AnimationConfig.NORMAL),
                         RepeatMode.Reverse
                     ),
                     label = ""

@@ -10,7 +10,7 @@ import com.sandorln.design.theme.Dimens
 @OptIn(ExperimentalMaterial3Api::class)
 fun PullToRefreshState.getDynamicHeight(): Dp =
     if (isRefreshing) {
-        Dimens.PullHeight
+        Dimens.PULL_HEIGHT
     } else {
-        lerp(0.dp, Dimens.PullHeight, progress)
+        lerp(0.dp, Dimens.PULL_HEIGHT, progress)
     }

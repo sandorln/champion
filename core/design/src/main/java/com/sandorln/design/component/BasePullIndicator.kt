@@ -7,7 +7,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -35,7 +34,7 @@ fun BasePullIndicator(
         initialValue = Colors.Blue05,
         targetValue = Colors.BaseColor,
         animationSpec = infiniteRepeatable(
-            tween(AnimationConfig.Normal),
+            tween(AnimationConfig.NORMAL),
             RepeatMode.Reverse
         ), label = ""
     )
@@ -49,7 +48,7 @@ fun BasePullIndicator(
         val colorTint = if (pullToRefreshState.isRefreshing) animationColors else Colors.BaseColor
 
         Image(
-            modifier = Modifier.size(Dimens.PullIndicatorSize),
+            modifier = Modifier.size(Dimens.PULL_INDICATOR_SIZE),
             painter = painterResource(id = R.drawable.ic_lol_flat_gold),
             contentDescription = null,
             colorFilter = ColorFilter.tint(colorTint)

@@ -37,17 +37,18 @@ object IconSize {
 }
 
 object Dimens {
-    val BaseToolbarHeight = 56.dp
+    val BASE_TOOLBAR_HEIGHT = 56.dp
 
-    val PullHeight = 80.dp
-    val PullIndicatorSize = 50.dp
+    val PULL_HEIGHT = 80.dp
+    val PULL_INDICATOR_SIZE = 50.dp
 
-    val ItemCombinationLineMinSize = 30.dp
+    val ITEM_COMBINATION_LINE_MIN_SIZE = 30.dp
+    val CHAMPION_SKILL_SIZE = 40.dp
 
-    val ChampionSplashRatio = "1:0.59012"
+    const val CHAMPION_SPLASH_RATIO = "1:0.59012"
 }
 
 object AnimationConfig {
-    const val Fast = 500
-    const val Normal = 750
+    const val FAST = 500
+    const val NORMAL = 750
 }

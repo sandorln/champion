@@ -371,7 +371,7 @@ fun TotalItemCombinationBody(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Spacings.Spacing00)
-                .height(Dimens.ItemCombinationLineMinSize),
+                .height(Dimens.ITEM_COMBINATION_LINE_MIN_SIZE),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
         ) {
@@ -410,18 +410,18 @@ fun ItemCombinationBody(
     itemCombination: ItemCombination = ItemCombination(),
     onSelectItem: (String) -> Unit
 ) {
-    val halfMinSize = Dimens.ItemCombinationLineMinSize / 2
+    val halfMinSize = Dimens.ITEM_COMBINATION_LINE_MIN_SIZE / 2
 
     Row(
         modifier = Modifier
             .clickable { onSelectItem.invoke(itemCombination.id) }
             .fillMaxWidth()
-            .heightIn(min = Dimens.ItemCombinationLineMinSize)
+            .heightIn(min = Dimens.ITEM_COMBINATION_LINE_MIN_SIZE)
             .height(IntrinsicSize.Min)
     ) {
         Box(
             modifier = Modifier
-                .width(Dimens.ItemCombinationLineMinSize)
+                .width(Dimens.ITEM_COMBINATION_LINE_MIN_SIZE)
         ) {
             VerticalDivider(
                 thickness = 1.dp,
@@ -446,7 +446,7 @@ fun ItemCombinationBody(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = Spacings.Spacing00)
-                    .height(Dimens.ItemCombinationLineMinSize),
+                    .height(Dimens.ITEM_COMBINATION_LINE_MIN_SIZE),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
             ) {

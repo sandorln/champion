@@ -41,7 +41,7 @@ private enum class MotionRefIds {
 fun BaseContentWithMotionToolbar(
     headerRatio: String = "",
     headerMaxHeight: Dp = 300.dp,
-    headerMinHeight: Dp = Dimens.BaseToolbarHeight,
+    headerMinHeight: Dp = Dimens.BASE_TOOLBAR_HEIGHT,
     startConstraintSet: ConstraintSetScope.(
         headerRef: ConstrainedLayoutReference,
         bodyRef: ConstrainedLayoutReference

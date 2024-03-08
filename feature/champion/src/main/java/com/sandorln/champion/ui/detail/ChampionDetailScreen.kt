@@ -1,12 +1,21 @@
 package com.sandorln.champion.ui.detail
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -19,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -26,11 +36,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +52,7 @@ import com.sandorln.design.R
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.BaseContentWithMotionToolbar
+import com.sandorln.design.component.BaseSkillImage
 import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
@@ -46,6 +61,7 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
+import com.sandorln.model.data.champion.ChampionSpell
 
 private enum class MotionRefIdType {
     Splash, Icon, Name, Title, Back, BottomDivider
@@ -60,8 +76,8 @@ fun ChampionDetailScreen(
     val championDetailData = uiState.championDetailData
 
     BaseContentWithMotionToolbar(
-        headerRatio = Dimens.ChampionSplashRatio,
-        headerMinHeight = Dimens.BaseToolbarHeight,
+        headerRatio = Dimens.CHAMPION_SPLASH_RATIO,
+        headerMinHeight = Dimens.BASE_TOOLBAR_HEIGHT,
         startConstraintSet = { headerRef, _ ->
             val splashImgRef = createRefFor(MotionRefIdType.Splash)
             val iconRef = createRefFor(MotionRefIdType.Icon)
@@ -196,7 +212,7 @@ fun ChampionDetailScreen(
             Box(
                 modifier = Modifier
                     .layoutId(MotionRefIdType.Back)
-                    .height(Dimens.BaseToolbarHeight)
+                    .height(Dimens.BASE_TOOLBAR_HEIGHT)
             ) {
                 CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                     IconButton(
@@ -241,26 +257,19 @@ fun ChampionDetailScreen(
 
             ChampionDetailInfoTitle(title = "스킬")
 
-            championDetailData.spells.forEach {
-                LolHtmlTagTextView(
-                    modifier = Modifier.padding(horizontal = Spacings.Spacing04),
-                    lolDescription = it.tooltip,
-                    textSize = TextStyles.Body01.fontSize.value,
-                    textColor = Colors.Gray03
-                )
-            }
-
+            ChampionSkillListBody(
+                version = uiState.version,
+                selectedSkill = uiState.selectedSkill,
+                passiveSkill = championDetailData.passive,
+                skillList = championDetailData.spells,
+                onClickSkillIcon = { skill ->
+                    val action = ChampionDetailAction.ChangeSelectSkill(skill)
+                    championDetailViewModel.sendAction(action)
+                }
+            )
 
             Spacer(modifier = Modifier.height(Spacings.Spacing02))
         }
-    }
-}
-
-@Preview
-@Composable
-fun ChampionDetailScreenPreview() {
-    LolChampionThemePreview {
-        ChampionDetailScreen()
     }
 }
 
@@ -289,10 +298,169 @@ internal fun ChampionDetailInfoTitle(
     }
 }
 
+@Composable
+fun ChampionSkillListBody(
+    modifier: Modifier = Modifier,
+    version: String = "",
+    selectedSkill: ChampionSpell = ChampionSpell(),
+    onClickSkillIcon: (championSpell: ChampionSpell) -> Unit = {},
+    passiveSkill: ChampionSpell = ChampionSpell(),
+    skillList: List<ChampionSpell> = List(4) { ChampionSpell() }
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        /* TODO :: 동영상 입력 */
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(
+                Spacings.Spacing02,
+                Alignment.CenterHorizontally
+            )
+        ) {
+            ChampionSkillImage(
+                isSelect = selectedSkill.id == passiveSkill.id,
+                isPassive = true,
+                version = version,
+                name = passiveSkill.image.full,
+                onClickSkillIcon = {
+                    onClickSkillIcon.invoke(passiveSkill)
+                }
+            )
+
+            VerticalDivider(
+                modifier = Modifier.padding(horizontal = Spacings.Spacing02)
+            )
+
+            skillList.forEach { championSpell ->
+                ChampionSkillImage(
+                    isSelect = selectedSkill.id == championSpell.id,
+                    version = version,
+                    name = championSpell.image.full,
+                    onClickSkillIcon = {
+                        onClickSkillIcon.invoke(championSpell)
+                    }
+                )
+            }
+        }
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = selectedSkill.name,
+            style = TextStyles.SubTitle01,
+            textAlign = TextAlign.Center,
+            color = Colors.BaseColor
+        )
+
+        Column(
+            modifier = Modifier.padding(horizontal = Spacings.Spacing05),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01),
+        ) {
+            LolHtmlTagTextView(
+                textColor = Colors.Gray03,
+                lolDescription = selectedSkill.description,
+                textSize = TextStyles.Body02.fontSize.value
+            )
+            LolHtmlTagTextView(
+                lolDescription = selectedSkill.tooltip,
+                textSize = TextStyles.Body02.fontSize.value
+            )
+        }
+    }
+}
+
+@Composable
+fun ChampionSkillImage(
+    version: String = "",
+    isPassive: Boolean = false,
+    isSelect: Boolean = false,
+    name: String = "",
+    onClickSkillIcon: () -> Unit = {}
+) {
+    val iconOffset by animateDpAsState(
+        targetValue = if (isSelect) {
+            Spacings.Spacing00
+        } else {
+            0.dp
+        }, label = ""
+    )
+
+    val borderColor by animateColorAsState(
+        targetValue = if (isSelect) {
+            Colors.BaseColor
+        } else {
+            Color.Transparent
+        },
+        label = ""
+    )
+    val colorFilter = if (isSelect) {
+        null
+    } else {
+        ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+    }
+
+    Box(
+        modifier = Modifier
+            .offset(y = -iconOffset)
+            .size(Dimens.CHAMPION_SKILL_SIZE)
+            .border(
+                width = 1.dp,
+                color = borderColor
+            )
+            .clickable {
+                onClickSkillIcon.invoke()
+            }
+    ) {
+        BaseSkillImage(
+            modifier = Modifier.matchParentSize(),
+            version = version,
+            isPassive = isPassive,
+            fullName = name,
+            colorFilter = colorFilter
+        )
+    }
+}
+
 @Preview
 @Composable
-fun ChampionDetailInfoTitlePreview() {
+internal fun ChampionDetailScreenPreview() {
+    LolChampionThemePreview {
+        ChampionDetailScreen()
+    }
+}
+
+@Preview
+@Composable
+internal fun ChampionDetailInfoTitlePreview() {
     LolChampionThemePreview {
         ChampionDetailInfoTitle(title = "title")
+    }
+}
+
+@Preview
+@Composable
+internal fun ChampionSkillImagePreview() {
+    LolChampionThemePreview {
+        ChampionSkillImage(
+            isPassive = false,
+            isSelect = true,
+            name = ""
+        )
+    }
+}
+
+@Preview
+@Composable
+internal fun ChampionSkillBodyListPreview() {
+    LolChampionThemePreview {
+        ChampionSkillListBody(
+            selectedSkill = ChampionSpell(name = "테스트")
+        )
     }
 }
