@@ -33,7 +33,7 @@ class ChampionDetailViewModel @Inject constructor(
             .onSuccess { championDetailData ->
                 _uiMutex.withLock {
                     _uiState.update {
-                        it.copy(championDetailData = championDetailData)
+                        it.copy(championDetailData = championDetailData.copy())
                     }
                 }
             }

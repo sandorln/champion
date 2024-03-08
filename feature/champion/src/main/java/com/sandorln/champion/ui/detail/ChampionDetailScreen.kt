@@ -1,16 +1,20 @@
 package com.sandorln.champion.ui.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
@@ -18,14 +22,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.lerp
 import androidx.constraintlayout.compose.Dimension
@@ -34,6 +38,7 @@ import com.sandorln.design.R
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.BaseContentWithMotionToolbar
+import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -43,7 +48,7 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
 
 private enum class MotionRefIdType {
-    Splash, Icon, Name, Title, Back
+    Splash, Icon, Name, Title, Back, BottomDivider
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,11 +57,7 @@ fun ChampionDetailScreen(
     championDetailViewModel: ChampionDetailViewModel = hiltViewModel()
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
-    val championDetailData by remember {
-        derivedStateOf {
-            uiState.championDetailData
-        }
-    }
+    val championDetailData = uiState.championDetailData
 
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.ChampionSplashRatio,
@@ -66,6 +67,7 @@ fun ChampionDetailScreen(
             val iconRef = createRefFor(MotionRefIdType.Icon)
             val nameRef = createRefFor(MotionRefIdType.Name)
             val titleRef = createRefFor(MotionRefIdType.Title)
+            val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
 
             constrain(splashImgRef) {
                 width = Dimension.matchParent
@@ -82,14 +84,20 @@ fun ChampionDetailScreen(
                 alpha = 0f
             }
             constrain(titleRef) {
+                width = Dimension.fillToConstraints
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(nameRef.top)
             }
             constrain(nameRef) {
+                width = Dimension.fillToConstraints
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
+                bottom.linkTo(headerRef.bottom, Spacings.Spacing01)
+            }
+            constrain(bottomDividerRef) {
                 bottom.linkTo(headerRef.bottom)
+                alpha = 0f
             }
         },
         endConstraintSet = { headerRef, _ ->
@@ -98,6 +106,7 @@ fun ChampionDetailScreen(
             val nameRef = createRefFor(MotionRefIdType.Name)
             val titleRef = createRefFor(MotionRefIdType.Title)
             val backRef = createRefFor(MotionRefIdType.Back)
+            val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
 
             constrain(splashImgRef) {
                 width = Dimension.matchParent
@@ -124,18 +133,24 @@ fun ChampionDetailScreen(
                 top.linkTo(titleRef.bottom)
                 bottom.linkTo(headerRef.bottom)
             }
+            constrain(bottomDividerRef) {
+                bottom.linkTo(headerRef.bottom)
+                alpha = 1f
+            }
         },
         headerContent = { progress ->
             val iconSize = lerp(IconSize.XXXLargeSize, IconSize.XLargeSize, progress)
-            val nameSize = lerp(TextStyles.Title02.fontSize, TextStyles.Body03.fontSize, progress)
-            val titleSize = lerp(TextStyles.Title01.fontSize, TextStyles.SubTitle01.fontSize, progress)
+            val titleSize = lerp(TextStyles.Title01.fontSize, TextStyles.Body02.fontSize, progress)
+            val nameSize = lerp(TextStyles.Title02.fontSize, TextStyles.SubTitle01.fontSize, progress)
+            val titleColor = lerp(Colors.Gold02, Colors.BasicWhite, progress)
+            val nameColor = lerp(Colors.BasicWhite, Colors.Gold02, progress)
 
             Box(
                 modifier = Modifier.layoutId(MotionRefIdType.Splash)
             ) {
                 BaseChampionSplashImage(
                     modifier = Modifier.matchParentSize(),
-                    championId = uiState.championDetailData.id
+                    championId = championDetailData.id
                 )
             }
 
@@ -157,7 +172,10 @@ fun ChampionDetailScreen(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     text = championDetailData.title,
                     style = TextStyles.Title01.addShadow(),
-                    fontSize = titleSize
+                    fontSize = titleSize,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = titleColor
                 )
             }
 
@@ -165,10 +183,13 @@ fun ChampionDetailScreen(
                 modifier = Modifier.layoutId(MotionRefIdType.Name)
             ) {
                 Text(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier.align(Alignment.TopCenter),
                     text = championDetailData.name,
-                    style = TextStyles.Title01.addShadow(),
-                    fontSize = nameSize
+                    style = TextStyles.Body01.addShadow(),
+                    fontSize = nameSize,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = nameColor
                 )
             }
 
@@ -195,19 +216,42 @@ fun ChampionDetailScreen(
                     }
                 }
             }
+
+            HorizontalDivider(
+                modifier = Modifier.layoutId(MotionRefIdType.BottomDivider)
+            )
         }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
         ) {
-            for (index in 0..200) {
-                Text(
-                    text = "index $index",
-                    style = TextStyles.SubTitle01
+            Spacer(modifier = Modifier.height(Spacings.Spacing02))
+
+            ChampionDetailInfoTitle(title = "스토리")
+
+            LolHtmlTagTextView(
+                modifier = Modifier.padding(horizontal = Spacings.Spacing04),
+                lolDescription = championDetailData.lore,
+                textSize = TextStyles.Body01.fontSize.value,
+                textColor = Colors.Gray03
+            )
+
+            ChampionDetailInfoTitle(title = "스킬")
+
+            championDetailData.spells.forEach {
+                LolHtmlTagTextView(
+                    modifier = Modifier.padding(horizontal = Spacings.Spacing04),
+                    lolDescription = it.tooltip,
+                    textSize = TextStyles.Body01.fontSize.value,
+                    textColor = Colors.Gray03
                 )
             }
+
+
+            Spacer(modifier = Modifier.height(Spacings.Spacing02))
         }
     }
 }
@@ -217,5 +261,38 @@ fun ChampionDetailScreen(
 fun ChampionDetailScreenPreview() {
     LolChampionThemePreview {
         ChampionDetailScreen()
+    }
+}
+
+@Composable
+internal fun ChampionDetailInfoTitle(
+    modifier: Modifier = Modifier,
+    title: String = ""
+) {
+    Column(
+        modifier = modifier
+            .wrapContentWidth()
+            .padding(
+                horizontal = Spacings.Spacing04,
+                vertical = Spacings.Spacing01
+            ),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+    ) {
+        Text(
+            modifier = Modifier,
+            text = title,
+            style = TextStyles.Title03,
+            color = Colors.Gold02
+        )
+
+        HorizontalDivider()
+    }
+}
+
+@Preview
+@Composable
+fun ChampionDetailInfoTitlePreview() {
+    LolChampionThemePreview {
+        ChampionDetailInfoTitle(title = "title")
     }
 }

@@ -188,7 +188,7 @@ class ConnectTest {
     fun 챔피언디테일정보_가져오기() {
         runBlocking {
             runCatching {
-                _championService.getChampionDetail("14.5.1", "Hwei")
+                _championService.getChampionDetail("4.17.1", "Garen")
             }.onSuccess {
                 println("Champion Detail : $it")
             }.onFailure {

@@ -47,7 +47,7 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
-import com.sandorln.item.ui.ItemDescriptionTextView
+import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.item.ui.ItemTag
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
@@ -306,9 +306,9 @@ fun ItemStatusBody(
 
         HorizontalDivider()
 
-        ItemDescriptionTextView(
+        LolHtmlTagTextView(
             modifier = Modifier.fillMaxWidth(),
-            itemDescription = item.description
+            lolDescription = item.description
         )
     }
 }
