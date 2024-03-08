@@ -430,7 +430,7 @@ fun ChampionSkillImage(
 ) {
     val iconOffset by animateDpAsState(
         targetValue = if (isSelect) {
-            Spacings.Spacing00
+            Spacings.Spacing01
         } else {
             0.dp
         }, label = ""

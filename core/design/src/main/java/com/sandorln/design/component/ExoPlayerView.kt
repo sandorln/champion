@@ -49,13 +49,17 @@ fun ExoPlayerView(
                 it.player?.release()
                 it.player = null
                 it.player = exoPlayer
+            },
+            onRelease = {
+                it.player?.release()
+                it.player = null
             }
         )
+    }
 
-        DisposableEffect(Unit) {
-            onDispose {
-                exoPlayer.release()
-            }
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
         }
     }
 }
