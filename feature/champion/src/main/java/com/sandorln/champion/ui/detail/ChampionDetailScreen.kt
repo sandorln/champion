@@ -65,6 +65,7 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
 import com.sandorln.model.data.champion.ChampionSpell
+import com.sandorln.model.type.SpellType
 
 private enum class MotionRefIdType {
     Splash, Icon, Name, Title, Back, BottomDivider
@@ -319,7 +320,8 @@ fun ChampionSkillListBody(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val spellKeyName = selectedSkill.spellType.name
-        val url = "https://d28xe8vt774jo5.cloudfront.net/champion-abilities/$championKey/ability_${championKey}_${spellKeyName}1.mp4"
+        val suffix = if (selectedSkill.spellType == SpellType.P) "mp4" else "webm"
+        val url = "https://d28xe8vt774jo5.cloudfront.net/champion-abilities/$championKey/ability_${championKey}_${spellKeyName}1.$suffix"
 
         ExoPlayerView(
             modifier = Modifier
@@ -452,7 +454,7 @@ fun ChampionSkillImage(
 
     Box(
         modifier = Modifier
-            .background(Colors.Gray08)
+            .background(Colors.Gray09)
             .offset(y = -iconOffset)
             .size(Dimens.CHAMPION_SKILL_SIZE)
             .border(
