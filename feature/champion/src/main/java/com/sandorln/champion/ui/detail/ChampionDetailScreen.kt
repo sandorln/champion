@@ -352,6 +352,7 @@ fun ChampionSkillListBody(
         }
 
         Column(
+            modifier = Modifier.padding(horizontal = Spacings.Spacing05),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -378,11 +379,8 @@ fun ChampionSkillListBody(
             }
 
             if (selectedSkill.levelTip.isNotEmpty()) {
-                Text(
-                    text = "스킬 레벨업 : ${selectedSkill.levelTip.fastJoinToString("/")}",
-                    style = TextStyles.Body04,
-                    textAlign = TextAlign.Center,
-                    color = Colors.Gray04
+                LolHtmlTagTextView(
+                    lolDescription = "스킬 레벨업 : ${selectedSkill.levelTip.fastJoinToString(" / ")}"
                 )
             }
         }
@@ -495,7 +493,7 @@ internal fun ChampionSkillBodyListPreview() {
                 description = "상세 설명",
                 cooldownBurn = "10/9/8/7/6",
                 costBurn = "100/90/80/60/50",
-                levelTip = listOf("피해량","만월총 추가 효과: 표식 피해량")
+                levelTip = listOf("피해량", "만월총 추가 효과: 표식 피해량")
             )
         )
     }

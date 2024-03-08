@@ -36,6 +36,7 @@ fun LolHtmlTagTextView(
         .replace("{", "")
         .replace("}", "")
         .replace(Regex("\\(%(.*?)%\\)"), "")
+        .replace(Regex("@.*?@"), "")
 
     AndroidView(
         modifier = modifier,
