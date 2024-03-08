@@ -9,6 +9,7 @@ import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
+import com.sandorln.model.type.SpellType
 import com.sandorln.network.model.champion.NetworkChampion
 import com.sandorln.network.model.champion.NetworkChampionDetail
 import com.sandorln.network.model.champion.NetworkChampionPassive
@@ -120,7 +121,9 @@ fun NetworkChampionDetail.asData(otherChampionDetail: ChampionDetailData = Champ
         skins = skins.map(NetworkChampionSkin::asData),
         allytips = allyTips,
         enemytips = enemyTips,
-        spells = spells.map(NetworkChampionSpell::asData),
+        spells = spells.mapIndexed { index, networkChampionSpell ->
+            networkChampionSpell.asData(index + 1)
+        },
         passive = passive.asData()
     )
 
@@ -130,18 +133,28 @@ fun NetworkChampionSkin.asData(): ChampionSkin = ChampionSkin(
     chromas = chromas
 )
 
-fun NetworkChampionSpell.asData(): ChampionSpell = ChampionSpell(
-    id = id,
-    name = name,
-    description = description,
-    image = image.asData(),
-    tooltip = tooltip,
-    cooldownBurn = cooldownBurn,
-    costBurn = costBurn,
-    levelTip = levelTip.label
-)
+fun NetworkChampionSpell.asData(index: Int): ChampionSpell {
+    val spellType = runCatching {
+        SpellType.entries[index]
+    }.fold(
+        onSuccess = { it },
+        onFailure = { SpellType.Q }
+    )
+
+    return ChampionSpell(
+        spellType = spellType,
+        name = name,
+        description = description,
+        image = image.asData(),
+        tooltip = tooltip,
+        cooldownBurn = cooldownBurn,
+        costBurn = costBurn,
+        levelTip = levelTip.label
+    )
+}
 
 fun NetworkChampionPassive.asData(): ChampionSpell = ChampionSpell(
+    spellType = SpellType.P,
     name = name,
     description = description,
     image = image.asData()

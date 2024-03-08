@@ -27,6 +27,7 @@ crashlytics = "2.9.9"
 ksp = "1.9.0-1.0.13"
 glide = "1.0.0-beta01"
 jsoup = "1.17.2"
+exoplayer = "1.2.0"
 
 complieSdk = "34"
 material = "1.10.0"
@@ -78,6 +79,9 @@ ktor-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation",
 ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+
+androidx-media-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "exoplayer" }
+androidx-media-ui = { module = "androidx.media3:media3-ui", version.ref = "exoplayer" }
 
 firebase-bom = "com.google.firebase:firebase-bom:32.6.0"
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }

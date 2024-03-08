@@ -41,4 +41,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     api(libs.glide)
+    api(libs.androidx.media.exoplayer)
+    api(libs.androidx.media.ui)
 }

@@ -46,6 +46,7 @@ object Dimens {
     val CHAMPION_SKILL_SIZE = 40.dp
 
     const val CHAMPION_SPLASH_RATIO = "1:0.59012"
+    const val CHAMPION_SKILL_VIDEO_RATIO = 1.48f
 }
 
 object AnimationConfig {

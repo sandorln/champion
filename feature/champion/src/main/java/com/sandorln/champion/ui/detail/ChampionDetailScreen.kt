@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,6 +55,7 @@ import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.BaseContentWithMotionToolbar
 import com.sandorln.design.component.BaseSkillImage
+import com.sandorln.design.component.ExoPlayerView
 import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
@@ -75,6 +77,7 @@ fun ChampionDetailScreen(
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
+    val championKey = String.format("%04d", championDetailData.key)
 
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.CHAMPION_SPLASH_RATIO,
@@ -259,6 +262,7 @@ fun ChampionDetailScreen(
             ChampionDetailInfoTitle(title = "스킬")
 
             ChampionSkillListBody(
+                championKey = championKey,
                 version = uiState.version,
                 selectedSkill = uiState.selectedSkill,
                 passiveSkill = championDetailData.passive,
@@ -302,6 +306,7 @@ internal fun ChampionDetailInfoTitle(
 @Composable
 fun ChampionSkillListBody(
     modifier: Modifier = Modifier,
+    championKey: String = "",
     version: String = "",
     selectedSkill: ChampionSpell = ChampionSpell(),
     onClickSkillIcon: (championSpell: ChampionSpell) -> Unit = {},
@@ -313,7 +318,20 @@ fun ChampionSkillListBody(
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        /* TODO :: 동영상 입력 */
+        val spellKeyName = selectedSkill.spellType.name
+        val url = "https://d28xe8vt774jo5.cloudfront.net/champion-abilities/$championKey/ability_${championKey}_${spellKeyName}1.mp4"
+
+        ExoPlayerView(
+            modifier = Modifier
+                .padding(horizontal = Spacings.Spacing04)
+                .fillMaxWidth()
+                .aspectRatio(Dimens.CHAMPION_SKILL_VIDEO_RATIO)
+                .border(
+                    width = 0.5.dp,
+                    color = Colors.Gold02
+                ),
+            url = url
+        )
 
         Row(
             modifier = Modifier
@@ -326,7 +344,7 @@ fun ChampionSkillListBody(
             )
         ) {
             ChampionSkillImage(
-                isSelect = selectedSkill.id == passiveSkill.id,
+                isSelect = selectedSkill.spellType == passiveSkill.spellType,
                 isPassive = true,
                 version = version,
                 name = passiveSkill.image.full,
@@ -341,7 +359,7 @@ fun ChampionSkillListBody(
 
             skillList.forEach { championSpell ->
                 ChampionSkillImage(
-                    isSelect = selectedSkill.id == championSpell.id,
+                    isSelect = selectedSkill.spellType == championSpell.spellType,
                     version = version,
                     name = championSpell.image.full,
                     onClickSkillIcon = {
@@ -434,6 +452,7 @@ fun ChampionSkillImage(
 
     Box(
         modifier = Modifier
+            .background(Colors.Gray08)
             .offset(y = -iconOffset)
             .size(Dimens.CHAMPION_SKILL_SIZE)
             .border(

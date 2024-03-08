@@ -1,9 +1,10 @@
 package com.sandorln.model.data.champion
 
 import com.sandorln.model.data.image.LOLImage
+import com.sandorln.model.type.SpellType
 
 data class ChampionSpell(
-    var id: String = "P",
+    var spellType: SpellType = SpellType.P,
     var name: String = "",
 
     val tooltip: String = "",
