@@ -9,6 +9,7 @@ import com.sandorln.domain.usecase.version.GetAllVersionList
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.keys.BundleKeys
+import com.sandorln.model.type.SpellType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,8 +60,10 @@ class ChampionDetailViewModel @Inject constructor(
                     .collectLatest { versionList ->
                         _uiMutex.withLock {
                             _uiState.update {
+                                val latestVersion = versionList.firstOrNull() ?: ""
                                 it.copy(
-                                    versionNameList = versionList,
+                                    isLatestVersion = latestVersion == it.selectedVersion,
+                                    versionNameList = versionList
                                 )
                             }
                         }
@@ -68,11 +71,15 @@ class ChampionDetailViewModel @Inject constructor(
             }
             launch {
                 _version.collectLatest { version ->
+                    val preSelectedSkillType = _uiState.value.selectedSkill.spellType
+
                     _uiMutex.withLock {
                         _uiState.update {
+                            val latestVersion = it.versionNameList.firstOrNull() ?: ""
                             it.copy(
+                                isLatestVersion = latestVersion == version,
                                 isShowVersionListDialog = false,
-                                selectedVersion = version,
+                                selectedVersion = version
                             )
                         }
                     }
@@ -82,12 +89,14 @@ class ChampionDetailViewModel @Inject constructor(
                         .onSuccess { championDetailData ->
                             _uiMutex.withLock {
                                 _uiState.update {
-                                    it.copy(
-                                        championDetailData = championDetailData,
-                                        selectedSkill = championDetailData.passive
-                                    )
+                                    it.copy(championDetailData = championDetailData)
                                 }
                             }
+                            val selectedSkill = when (preSelectedSkillType) {
+                                SpellType.P -> championDetailData.passive
+                                else -> championDetailData.spells.first { it.spellType == preSelectedSkillType }
+                            }
+                            sendAction(ChampionDetailAction.ChangeSelectSkill(selectedSkill))
                         }.onFailure {
                             _sideEffect.emit(ChampionDetailSideEffect.ShowToastMessage(it.message ?: "Error"))
                         }
@@ -100,7 +109,17 @@ class ChampionDetailViewModel @Inject constructor(
                         is ChampionDetailAction.ChangeSelectSkill -> {
                             _uiMutex.withLock {
                                 _uiState.update {
-                                    it.copy(selectedSkill = action.skill)
+                                    val championKey = String.format("%04d", it.championDetailData.key)
+                                    val selectedSkill = action.skill
+                                    val spellKeyName = selectedSkill.spellType.name
+                                    val suffix = if (selectedSkill.spellType == SpellType.P) "mp4" else "webm"
+                                    val url = "https://d28xe8vt774jo5.cloudfront.net/champion-abilities" +
+                                            "/${championKey}/ability_${championKey}_${spellKeyName}1.$suffix"
+
+                                    it.copy(
+                                        selectedSkill = selectedSkill,
+                                        selectedSkillUrl = url
+                                    )
                                 }
                             }
                         }
@@ -144,8 +163,10 @@ class ChampionDetailViewModel @Inject constructor(
 data class ChampionDetailUiState(
     val championDetailData: ChampionDetailData = ChampionDetailData(),
     val selectedVersion: String = "",
-    val selectedSkill: ChampionSpell = ChampionSpell(),
     val versionNameList: List<String> = listOf(),
+    val selectedSkill: ChampionSpell = ChampionSpell(),
+    val selectedSkillUrl: String = "",
+    val isLatestVersion: Boolean = false,
     val isShowVersionListDialog: Boolean = false
 )
 

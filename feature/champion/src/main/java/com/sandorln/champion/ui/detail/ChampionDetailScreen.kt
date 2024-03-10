@@ -71,7 +71,6 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
 import com.sandorln.model.data.champion.ChampionSpell
-import com.sandorln.model.type.SpellType
 
 private enum class MotionRefIdType {
     Splash, Icon, Name, Title, Back, BottomDivider, Version, HeaderBrush
@@ -85,7 +84,6 @@ fun ChampionDetailScreen(
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
-    val championKey = String.format("%04d", championDetailData.key)
 
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.CHAMPION_SPLASH_RATIO,
@@ -368,6 +366,21 @@ fun ChampionDetailScreen(
 
             ChampionStatusBody()
 
+            ChampionDetailInfoTitle(title = "스킬")
+
+            ChampionSkillListBody(
+                isLatestVersion = uiState.isLatestVersion,
+                version = uiState.selectedVersion,
+                selectedSkill = uiState.selectedSkill,
+                selectedSkillUrl = uiState.selectedSkillUrl,
+                passiveSkill = championDetailData.passive,
+                skillList = championDetailData.spells,
+                onClickSkillIcon = { skill ->
+                    val action = ChampionDetailAction.ChangeSelectSkill(skill)
+                    championDetailViewModel.sendAction(action)
+                }
+            )
+
             ChampionDetailInfoTitle(title = "스토리")
 
             LolHtmlTagTextView(
@@ -375,20 +388,6 @@ fun ChampionDetailScreen(
                 lolDescription = championDetailData.lore,
                 textSize = TextStyles.Body01.fontSize.value,
                 textColor = Colors.Gray03
-            )
-
-            ChampionDetailInfoTitle(title = "스킬")
-
-            ChampionSkillListBody(
-                championKey = championKey,
-                version = uiState.selectedVersion,
-                selectedSkill = uiState.selectedSkill,
-                passiveSkill = championDetailData.passive,
-                skillList = championDetailData.spells,
-                onClickSkillIcon = { skill ->
-                    val action = ChampionDetailAction.ChangeSelectSkill(skill)
-                    championDetailViewModel.sendAction(action)
-                }
             )
 
             Spacer(modifier = Modifier.height(Spacings.Spacing02))
@@ -481,9 +480,10 @@ internal fun ChampionDetailInfoTitle(
 @Composable
 fun ChampionSkillListBody(
     modifier: Modifier = Modifier,
-    championKey: String = "",
     version: String = "",
+    isLatestVersion: Boolean = false,
     selectedSkill: ChampionSpell = ChampionSpell(),
+    selectedSkillUrl: String = "",
     onClickSkillIcon: (championSpell: ChampionSpell) -> Unit = {},
     passiveSkill: ChampionSpell = ChampionSpell(),
     skillList: List<ChampionSpell> = List(4) { ChampionSpell() }
@@ -493,10 +493,7 @@ fun ChampionSkillListBody(
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val spellKeyName = selectedSkill.spellType.name
-        val suffix = if (selectedSkill.spellType == SpellType.P) "mp4" else "webm"
-        val url = "https://d28xe8vt774jo5.cloudfront.net/champion-abilities/$championKey/ability_${championKey}_${spellKeyName}1.$suffix"
-        Box {
+        if (isLatestVersion)
             ExoPlayerView(
                 modifier = Modifier
                     .padding(horizontal = Spacings.Spacing04)
@@ -506,18 +503,16 @@ fun ChampionSkillListBody(
                         width = 0.5.dp,
                         color = Colors.Gold02
                     ),
-                url = url
+                url = selectedSkillUrl
             )
 
+        if (!isLatestVersion)
             Text(
-                text = "※ 동영상은 최신 버전의 스킬이 재생 됩니다 ※",
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(vertical = Spacings.Spacing00),
+                text = "※ 동영상은 최신 버전일 때 재생 됩니다 ※",
+                modifier = Modifier.padding(vertical = Spacings.Spacing00),
                 style = TextStyles.Body04.addShadow(),
                 color = Colors.Gray03
             )
-        }
 
         Row(
             modifier = Modifier

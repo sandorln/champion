@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -20,20 +19,17 @@ fun ExoPlayerView(
     url: String = ""
 ) {
     val context = LocalContext.current
-    val mediaSource = remember(url) {
-        MediaItem.fromUri(Uri.parse(url))
-    }
+    val mediaSource = MediaItem.fromUri(Uri.parse(url))
 
-    val exoPlayer = remember(mediaSource) {
-        ExoPlayer
-            .Builder(context)
-            .build()
-            .apply {
-                setMediaItem(mediaSource)
-                prepare()
-                playWhenReady = true
-            }
-    }
+    val exoPlayer = ExoPlayer
+        .Builder(context)
+        .build()
+        .apply {
+            setMediaItem(mediaSource)
+            prepare()
+            playWhenReady = true
+        }
+
 
     Box(
         modifier = modifier.background(color = Colors.Gray08)
