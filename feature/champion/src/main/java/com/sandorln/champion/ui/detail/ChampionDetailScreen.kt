@@ -74,7 +74,7 @@ import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.type.SpellType
 
 private enum class MotionRefIdType {
-    Splash, Icon, Name, Title, Back, BottomDivider, Version, BottomBrush
+    Splash, Icon, Name, Title, Back, BottomDivider, Version, HeaderBrush
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,7 +97,7 @@ fun ChampionDetailScreen(
             val titleRef = createRefFor(MotionRefIdType.Title)
             val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
             val versionRef = createRefFor(MotionRefIdType.Version)
-            val bottomBrushRef = createRefFor(MotionRefIdType.BottomBrush)
+            val headerBrushRef = createRefFor(MotionRefIdType.HeaderBrush)
 
             constrain(splashImgRef) {
                 width = Dimension.matchParent
@@ -137,7 +137,9 @@ fun ChampionDetailScreen(
                 bottom.linkTo(titleRef.top)
             }
 
-            constrain(bottomBrushRef) {
+            constrain(headerBrushRef) {
+                height = Dimension.fillToConstraints
+                top.linkTo(headerRef.top)
                 bottom.linkTo(headerRef.bottom)
             }
         },
@@ -149,7 +151,7 @@ fun ChampionDetailScreen(
             val backRef = createRefFor(MotionRefIdType.Back)
             val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
             val versionRef = createRefFor(MotionRefIdType.Version)
-            val bottomBrushRef = createRefFor(MotionRefIdType.BottomBrush)
+            val headerBrushRef = createRefFor(MotionRefIdType.HeaderBrush)
 
             constrain(splashImgRef) {
                 width = Dimension.matchParent
@@ -187,7 +189,9 @@ fun ChampionDetailScreen(
                 top.linkTo(headerRef.top)
                 bottom.linkTo(headerRef.bottom)
             }
-            constrain(bottomBrushRef) {
+            constrain(headerBrushRef) {
+                height = Dimension.fillToConstraints
+                top.linkTo(headerRef.top)
                 bottom.linkTo(headerRef.bottom)
             }
         },
@@ -209,19 +213,37 @@ fun ChampionDetailScreen(
             }
 
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Spacings.Spacing05)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Colors.Blue06.copy(alpha = 0.0f),
-                                Colors.Blue06.copy(alpha = 1.0f)
+                modifier = Modifier.layoutId(MotionRefIdType.HeaderBrush)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                        .height(Spacings.Spacing05)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Colors.Blue06.copy(alpha = 1.0f),
+                                    Colors.Blue06.copy(alpha = 0.0f)
+                                )
                             )
                         )
-                    )
-                    .layoutId(MotionRefIdType.BottomBrush)
-            )
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .height(Spacings.Spacing05)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Colors.Blue06.copy(alpha = 0.0f),
+                                    Colors.Blue06.copy(alpha = 1.0f)
+                                )
+                            )
+                        )
+                )
+            }
 
             Box(
                 modifier = Modifier
