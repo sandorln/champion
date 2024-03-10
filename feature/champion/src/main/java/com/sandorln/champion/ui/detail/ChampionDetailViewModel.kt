@@ -79,7 +79,8 @@ class ChampionDetailViewModel @Inject constructor(
                             it.copy(
                                 isLatestVersion = latestVersion == version,
                                 isShowVersionListDialog = false,
-                                selectedVersion = version
+                                selectedVersion = version,
+                                selectedSkillUrl = ""
                             )
                         }
                     }
