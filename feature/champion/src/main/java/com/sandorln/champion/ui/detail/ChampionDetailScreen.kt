@@ -19,9 +19,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
@@ -56,11 +60,13 @@ import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.BaseContentWithMotionToolbar
 import com.sandorln.design.component.BaseSkillImage
 import com.sandorln.design.component.ExoPlayerView
+import com.sandorln.design.component.dialog.BaseBottomSheetDialog
 import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
+import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
@@ -68,13 +74,14 @@ import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.type.SpellType
 
 private enum class MotionRefIdType {
-    Splash, Icon, Name, Title, Back, BottomDivider
+    Splash, Icon, Name, Title, Back, BottomDivider, Version, BottomBrush
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChampionDetailScreen(
-    championDetailViewModel: ChampionDetailViewModel = hiltViewModel()
+    championDetailViewModel: ChampionDetailViewModel = hiltViewModel(),
+    onBackStack: () -> Unit = {}
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
@@ -89,6 +96,8 @@ fun ChampionDetailScreen(
             val nameRef = createRefFor(MotionRefIdType.Name)
             val titleRef = createRefFor(MotionRefIdType.Title)
             val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
+            val versionRef = createRefFor(MotionRefIdType.Version)
+            val bottomBrushRef = createRefFor(MotionRefIdType.BottomBrush)
 
             constrain(splashImgRef) {
                 width = Dimension.matchParent
@@ -120,6 +129,17 @@ fun ChampionDetailScreen(
                 bottom.linkTo(headerRef.bottom)
                 alpha = 0f
             }
+
+            constrain(versionRef) {
+                width = Dimension.fillToConstraints
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(titleRef.top)
+            }
+
+            constrain(bottomBrushRef) {
+                bottom.linkTo(headerRef.bottom)
+            }
         },
         endConstraintSet = { headerRef, _ ->
             val splashImgRef = createRefFor(MotionRefIdType.Splash)
@@ -128,6 +148,8 @@ fun ChampionDetailScreen(
             val titleRef = createRefFor(MotionRefIdType.Title)
             val backRef = createRefFor(MotionRefIdType.Back)
             val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
+            val versionRef = createRefFor(MotionRefIdType.Version)
+            val bottomBrushRef = createRefFor(MotionRefIdType.BottomBrush)
 
             constrain(splashImgRef) {
                 width = Dimension.matchParent
@@ -158,6 +180,16 @@ fun ChampionDetailScreen(
                 bottom.linkTo(headerRef.bottom)
                 alpha = 1f
             }
+
+            constrain(versionRef) {
+                width = Dimension.fillToConstraints
+                end.linkTo(parent.end, Spacings.Spacing04)
+                top.linkTo(headerRef.top)
+                bottom.linkTo(headerRef.bottom)
+            }
+            constrain(bottomBrushRef) {
+                bottom.linkTo(headerRef.bottom)
+            }
         },
         headerContent = { progress ->
             val iconSize = lerp(IconSize.XXXLargeSize, IconSize.XLargeSize, progress)
@@ -165,6 +197,7 @@ fun ChampionDetailScreen(
             val nameSize = lerp(TextStyles.Title02.fontSize, TextStyles.SubTitle01.fontSize, progress)
             val titleColor = lerp(Colors.Gold02, Colors.BasicWhite, progress)
             val nameColor = lerp(Colors.BasicWhite, Colors.Gold02, progress)
+            val versionBorderWidth = lerp((-0.1).dp, 1.dp, progress)
 
             Box(
                 modifier = Modifier.layoutId(MotionRefIdType.Splash)
@@ -177,12 +210,27 @@ fun ChampionDetailScreen(
 
             Box(
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Spacings.Spacing05)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Colors.Blue06.copy(alpha = 0.0f),
+                                Colors.Blue06.copy(alpha = 1.0f)
+                            )
+                        )
+                    )
+                    .layoutId(MotionRefIdType.BottomBrush)
+            )
+
+            Box(
+                modifier = Modifier
                     .size(iconSize)
                     .background(Colors.BaseColor, CircleShape)
                     .layoutId(MotionRefIdType.Icon)
             ) {
                 BaseCircleIconImage(
-                    versionName = uiState.version,
+                    versionName = uiState.selectedVersion,
                     modifier = Modifier.matchParentSize(),
                     id = championDetailData.id
                 )
@@ -226,7 +274,7 @@ fun ChampionDetailScreen(
                             .size(IconSize.XLargeSize)
                             .align(alignment = Alignment.Center),
                         onClick = {
-
+                            onBackStack.invoke()
                         }) {
                         Icon(
                             modifier = Modifier.size(IconSize.XLargeSize),
@@ -241,6 +289,49 @@ fun ChampionDetailScreen(
             HorizontalDivider(
                 modifier = Modifier.layoutId(MotionRefIdType.BottomDivider)
             )
+
+            Box(
+                modifier = Modifier.layoutId(MotionRefIdType.Version)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .background(
+                            color = Colors.Blue06,
+                            shape = RoundedCornerShape(Radius.Radius04)
+                        )
+                        .border(
+                            width = versionBorderWidth,
+                            color = Colors.BaseColor,
+                            shape = RoundedCornerShape(Radius.Radius04)
+                        )
+                        .padding(
+                            horizontal = Spacings.Spacing01,
+                            vertical = Spacings.Spacing00
+                        )
+                        .align(Alignment.Center)
+                        .clickable {
+                            championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersionListDialog(true))
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = uiState.selectedVersion,
+                        style = TextStyles.SubTitle03,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Icon(
+                        modifier = Modifier.size(IconSize.SmallSize),
+                        painter = painterResource(id = R.drawable.ic_chevron_down),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+                }
+            }
         }
     ) {
         Column(
@@ -249,7 +340,11 @@ fun ChampionDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
         ) {
-            Spacer(modifier = Modifier.height(Spacings.Spacing02))
+            Spacer(modifier = Modifier.height(Spacings.Spacing00))
+
+            ChampionDetailInfoTitle(title = "능력치")
+
+            ChampionStatusBody()
 
             ChampionDetailInfoTitle(title = "스토리")
 
@@ -264,7 +359,7 @@ fun ChampionDetailScreen(
 
             ChampionSkillListBody(
                 championKey = championKey,
-                version = uiState.version,
+                version = uiState.selectedVersion,
                 selectedSkill = uiState.selectedSkill,
                 passiveSkill = championDetailData.passive,
                 skillList = championDetailData.spells,
@@ -276,6 +371,63 @@ fun ChampionDetailScreen(
 
             Spacer(modifier = Modifier.height(Spacings.Spacing02))
         }
+
+        if (uiState.isShowVersionListDialog) {
+            BaseBottomSheetDialog(
+                onDismissRequest = {
+                    championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersionListDialog(false))
+                }
+            ) {
+                LazyColumn {
+                    items(count = uiState.versionNameList.size) {
+                        val versionName = uiState.versionNameList[it]
+
+                        VersionItemBody(
+                            versionName = versionName,
+                            isSelectedVersion = versionName == uiState.selectedVersion,
+                            onClickListener = {
+                                championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersion(versionName))
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChampionStatusBody() {
+
+}
+
+@Composable
+fun VersionItemBody(
+    versionName: String,
+    isSelectedVersion: Boolean = false,
+    onClickListener: () -> Unit = {}
+) {
+    val backgroundColor = if (isSelectedVersion) Colors.Blue05 else Colors.Gray08
+    Row(
+        modifier = Modifier
+            .background(backgroundColor)
+            .fillMaxWidth()
+            .clickable { onClickListener.invoke() }
+            .padding(
+                horizontal = Spacings.Spacing05,
+                vertical = Spacings.Spacing03
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = versionName,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = TextStyles.SubTitle01,
+            color = if (isSelectedVersion) Colors.BaseColor else Colors.Gray04
+        )
     }
 }
 
@@ -322,18 +474,28 @@ fun ChampionSkillListBody(
         val spellKeyName = selectedSkill.spellType.name
         val suffix = if (selectedSkill.spellType == SpellType.P) "mp4" else "webm"
         val url = "https://d28xe8vt774jo5.cloudfront.net/champion-abilities/$championKey/ability_${championKey}_${spellKeyName}1.$suffix"
+        Box {
+            ExoPlayerView(
+                modifier = Modifier
+                    .padding(horizontal = Spacings.Spacing04)
+                    .fillMaxWidth()
+                    .aspectRatio(Dimens.CHAMPION_SKILL_VIDEO_RATIO)
+                    .border(
+                        width = 0.5.dp,
+                        color = Colors.Gold02
+                    ),
+                url = url
+            )
 
-        ExoPlayerView(
-            modifier = Modifier
-                .padding(horizontal = Spacings.Spacing04)
-                .fillMaxWidth()
-                .aspectRatio(Dimens.CHAMPION_SKILL_VIDEO_RATIO)
-                .border(
-                    width = 0.5.dp,
-                    color = Colors.Gold02
-                ),
-            url = url
-        )
+            Text(
+                text = "※ 동영상은 최신 버전의 스킬이 재생 됩니다 ※",
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(vertical = Spacings.Spacing00),
+                style = TextStyles.Body04.addShadow(),
+                color = Colors.Gray03
+            )
+        }
 
         Row(
             modifier = Modifier

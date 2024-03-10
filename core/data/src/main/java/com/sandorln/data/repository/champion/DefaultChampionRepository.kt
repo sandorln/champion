@@ -63,4 +63,8 @@ class DefaultChampionRepository @Inject constructor(
 
             championDetailData
         }
+
+    override suspend fun hasChampionDetailData(championId: String, version: String): Boolean = withContext(Dispatchers.IO) {
+        championDao.hasChampionDetailData(version = version, championId = championId) > 0
+    }
 }

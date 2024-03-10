@@ -37,7 +37,7 @@ dependencies {
     implementation(libs.androidx.compose.material)
     api(libs.androidx.compose.constraintlayout)
 
-    implementation(libs.holix.bottomsheetdialog.compose)
+    api(libs.holix.bottomsheetdialog.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     api(libs.glide)

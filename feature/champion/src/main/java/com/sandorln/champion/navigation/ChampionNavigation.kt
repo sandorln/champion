@@ -17,13 +17,17 @@ fun NavController.moveToChampionDetail(
     navigate(route = "$ChampionDetailRoute/${championId}/${version}")
 }
 
-fun NavGraphBuilder.championScreens() {
+fun NavGraphBuilder.championScreens(
+    onBackStack: () -> Unit
+) {
     composable(route = "$ChampionDetailRoute/{${BundleKeys.CHAMPION_ID}}/{${BundleKeys.CHAMPION_VERSION}}",
         arguments = listOf(
             navArgument(BundleKeys.CHAMPION_ID) { type = NavType.StringType },
             navArgument(BundleKeys.CHAMPION_VERSION) { type = NavType.StringType }
         )
     ) {
-        ChampionDetailScreen()
+        ChampionDetailScreen(
+            onBackStack = onBackStack
+        )
     }
 }

@@ -48,7 +48,6 @@ dependencies {
     implementation(libs.androidx.compose.material)
 
     implementation(libs.androidx.compose.constraintlayout)
-    implementation(libs.holix.bottomsheetdialog.compose)
 
     implementation(libs.jsoup.jsoup)
 

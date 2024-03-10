@@ -31,7 +31,9 @@ class MainActivity : ComponentActivity() {
                         homeScreens(
                             moveToChampionDetailScreen = navController::moveToChampionDetail
                         )
-                        championScreens()
+                        championScreens(
+                            onBackStack = navController::popBackStack
+                        )
                     }
                 }
             }
