@@ -865,9 +865,13 @@ fun SimilarChampionListBody(
                         id = it.id
                     )
                     Text(
+                        modifier = modifier.width(IconSize.XLargeSize),
                         text = it.name,
                         style = TextStyles.Body04,
-                        color = Colors.Gold02
+                        color = Colors.Gold02,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
