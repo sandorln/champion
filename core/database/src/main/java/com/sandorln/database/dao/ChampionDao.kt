@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import com.sandorln.database.model.ChampionEntity
+import com.sandorln.database.model.ChampionTagEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -37,4 +38,7 @@ interface ChampionDao {
 
     @Query("SELECT count(*) FROM ChampionEntity WHERE version == :version AND id == :championId")
     suspend fun hasChampionDetailData(version: String, championId: String): Int
+
+    @Query("SELECT * FROM ChampionEntity WHERE version == :version AND tags == :tags")
+    suspend fun getSimilarChampionList(version: String, tags: List<ChampionTagEntity>): List<ChampionEntity>
 }

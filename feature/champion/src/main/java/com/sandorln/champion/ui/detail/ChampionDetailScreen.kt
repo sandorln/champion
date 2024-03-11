@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.fastJoinToString
 import androidx.constraintlayout.compose.ConstraintSetScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.champion.util.getResourceId
+import com.sandorln.champion.util.statusCompareColor
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseCircleIconImage
@@ -77,12 +79,15 @@ import com.sandorln.design.theme.addShadow
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
+import com.sandorln.model.data.champion.SummaryChampion
+import com.sandorln.model.type.ChampionTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChampionDetailScreen(
     championDetailViewModel: ChampionDetailViewModel = hiltViewModel(),
-    onBackStack: () -> Unit = {}
+    onBackStack: () -> Unit = {},
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
@@ -257,7 +262,7 @@ fun ChampionDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
         ) {
             Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
@@ -283,6 +288,15 @@ fun ChampionDetailScreen(
                     val action = ChampionDetailAction.ChangeSelectSkill(skill)
                     championDetailViewModel.sendAction(action)
                 }
+            )
+
+            ChampionDetailInfoTitle(title = "비슷한 역할 챔피언")
+
+            SimilarChampionListBody(
+                version = uiState.selectedVersion,
+                tags = championDetailData.tags,
+                similarChampionList = uiState.similarChampionList,
+                moveToChampionDetailScreen = moveToChampionDetailScreen
             )
 
             ChampionDetailInfoTitle(title = "스토리")
@@ -805,6 +819,61 @@ fun StatusBody(
     }
 }
 
+@Composable
+fun SimilarChampionListBody(
+    modifier: Modifier = Modifier,
+    version: String = "",
+    tags: List<ChampionTag> = listOf(),
+    similarChampionList: List<SummaryChampion> = listOf(),
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = Spacings.Spacing04),
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
+        ) {
+            tags.forEach {
+                Icon(
+                    modifier = Modifier.size(IconSize.MediumSize),
+                    painter = painterResource(id = it.getResourceId()),
+                    contentDescription = null,
+                    tint = Colors.Gold02
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+        ) {
+            Spacer(modifier = Modifier.width(Spacings.Spacing02))
+            similarChampionList.forEach {
+                Column(
+                    modifier = Modifier.clickable {
+                        moveToChampionDetailScreen.invoke(it.id, version)
+                    },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    BaseCircleIconImage(
+                        versionName = version,
+                        modifier = Modifier.size(IconSize.XLargeSize),
+                        id = it.id
+                    )
+                    Text(
+                        text = it.name,
+                        style = TextStyles.Body04,
+                        color = Colors.Gold02
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(Spacings.Spacing02))
+        }
+    }
+}
+
 @Preview
 @Composable
 internal fun ChampionDetailInfoTitlePreview() {
@@ -858,8 +927,16 @@ internal fun ChampionStatusBodyPreview() {
     }
 }
 
-private fun Double?.statusCompareColor(otherFloat: Double?) = when (this?.compareTo(otherFloat ?: this)) {
-    -1 -> Colors.Blue03
-    1 -> Colors.Orange00
-    else -> Colors.BasicWhite
+@Preview
+@Composable
+internal fun SimilarChampionListBodyPreview() {
+    LolChampionThemePreview {
+        SimilarChampionListBody(
+            tags = listOf(ChampionTag.Assassin, ChampionTag.Fighter),
+            similarChampionList = List(5) { SummaryChampion(name = "$it") },
+            moveToChampionDetailScreen = { _, _ ->
+
+            }
+        )
+    }
 }

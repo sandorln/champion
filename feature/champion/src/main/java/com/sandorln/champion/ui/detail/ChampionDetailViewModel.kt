@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.champion.GetChampionDetail
+import com.sandorln.domain.usecase.champion.GetSimilarChampionList
 import com.sandorln.domain.usecase.champion.GetSummaryChampion
 import com.sandorln.domain.usecase.champion.HasChampionDetail
 import com.sandorln.domain.usecase.version.GetAllVersionList
@@ -34,7 +35,8 @@ class ChampionDetailViewModel @Inject constructor(
     private val getChampionDetail: GetChampionDetail,
     private val hasChampionDetail: HasChampionDetail,
     private val getAllVersionList: GetAllVersionList,
-    private val getPreviousVersion: GetPreviousVersion
+    private val getPreviousVersion: GetPreviousVersion,
+    private val getSimilarChampionList: GetSimilarChampionList
 ) : ViewModel() {
     private val _championId = savedStateHandle.get<String>(BundleKeys.CHAMPION_ID) ?: ""
     private val _version = savedStateHandle.getStateFlow(BundleKeys.CHAMPION_VERSION, "")
@@ -74,22 +76,10 @@ class ChampionDetailViewModel @Inject constructor(
                         }
                     }
             }
+
             launch {
                 _version.collectLatest { version ->
                     val preSelectedSkillType = _uiState.value.selectedSkill.spellType
-
-                    _uiMutex.withLock {
-                        _uiState.update {
-                            val latestVersion = it.versionNameList.firstOrNull() ?: ""
-                            it.copy(
-                                isLatestVersion = latestVersion == version,
-                                isShowVersionListDialog = false,
-                                selectedVersion = version,
-                                selectedSkillUrl = ""
-                            )
-                        }
-                    }
-
                     val previousVersion = getPreviousVersion.invoke(version)
                     val preChampionData = if (previousVersion == null) {
                         null
@@ -99,15 +89,33 @@ class ChampionDetailViewModel @Inject constructor(
                             .getOrNull()
                     }
 
+                    _uiMutex.withLock {
+                        _uiState.update {
+                            val latestVersion = it.versionNameList.firstOrNull() ?: ""
+                            it.copy(
+                                isLatestVersion = latestVersion == version,
+                                selectedVersion = version,
+                                preVersionName = previousVersion?.name ?: "",
+                                isShowVersionListDialog = false,
+                                selectedSkillUrl = "",
+                                preChampion = preChampionData
+                            )
+                        }
+                    }
+
                     getChampionDetail
                         .invoke(_championId, version)
                         .onSuccess { championDetailData ->
+                            val similarChampionList = getSimilarChampionList.invoke(
+                                version,
+                                championDetailData.tags
+                            ).filterNot { it.id == _championId }
+
                             _uiMutex.withLock {
                                 _uiState.update {
                                     it.copy(
                                         championDetailData = championDetailData,
-                                        preVersionName = previousVersion?.name ?: "",
-                                        preChampion = preChampionData
+                                        similarChampionList = similarChampionList
                                     )
                                 }
                             }
@@ -190,7 +198,8 @@ data class ChampionDetailUiState(
     val isLatestVersion: Boolean = false,
     val isShowVersionListDialog: Boolean = false,
     val preVersionName: String = "",
-    val preChampion: SummaryChampion? = null
+    val preChampion: SummaryChampion? = null,
+    val similarChampionList: List<SummaryChampion> = listOf()
 )
 
 sealed interface ChampionDetailAction {

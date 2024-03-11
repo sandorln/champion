@@ -18,7 +18,8 @@ fun NavController.moveToChampionDetail(
 }
 
 fun NavGraphBuilder.championScreens(
-    onBackStack: () -> Unit
+    onBackStack: () -> Unit,
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
 ) {
     composable(route = "$ChampionDetailRoute/{${BundleKeys.CHAMPION_ID}}/{${BundleKeys.CHAMPION_VERSION}}",
         arguments = listOf(
@@ -27,7 +28,8 @@ fun NavGraphBuilder.championScreens(
         )
     ) {
         ChampionDetailScreen(
-            onBackStack = onBackStack
+            onBackStack = onBackStack,
+            moveToChampionDetailScreen = moveToChampionDetailScreen
         )
     }
 }

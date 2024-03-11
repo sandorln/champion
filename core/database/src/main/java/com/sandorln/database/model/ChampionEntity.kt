@@ -52,5 +52,5 @@ data class ChampionEntity(
  * @property Ranged Marksman 으로 대체된 값
  */
 enum class ChampionTagEntity {
-    Fighter, Tank, Mage, Assassin, Marksman, Support, Ranged
+    Fighter, Tank, Mage, Assassin, Marksman, Support
 }

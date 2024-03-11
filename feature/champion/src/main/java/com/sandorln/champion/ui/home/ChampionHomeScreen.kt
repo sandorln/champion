@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.champion.util.getResourceId
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
@@ -198,14 +199,7 @@ fun ChampionTagFilterBody(
         )
     ) {
         ChampionTag.entries.forEach { championTag ->
-            val iconId = when (championTag) {
-                ChampionTag.Fighter -> com.sandorln.design.R.drawable.ic_tag_fighter
-                ChampionTag.Tank -> com.sandorln.design.R.drawable.ic_tag_tank
-                ChampionTag.Mage -> com.sandorln.design.R.drawable.ic_tag_mage
-                ChampionTag.Assassin -> com.sandorln.design.R.drawable.ic_tag_assassin
-                ChampionTag.Marksman -> com.sandorln.design.R.drawable.ic_tag_marksman
-                ChampionTag.Support -> com.sandorln.design.R.drawable.ic_tag_support
-            }
+            val iconId = championTag.getResourceId()
             val isSelect = selectedTagSet.contains(championTag)
             val contentColor = when {
                 isSelect -> Colors.Gold02

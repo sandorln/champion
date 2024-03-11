@@ -8,6 +8,7 @@ import com.sandorln.database.model.ChampionEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.SummaryChampion
+import com.sandorln.model.type.ChampionTag
 import com.sandorln.network.service.ChampionService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,20 +36,37 @@ class DefaultChampionRepository @Inject constructor(
 
     override suspend fun refreshChampionList(version: String): Result<Any> = runCatching {
         val response = championService.getAllChampionDataMap(version)
-        val championEntityList = response.values.map { it.asEntity(version = version) }
+        val championEntityList = response.values.map {
+            it.asEntity(version = version)
+        }
         championDao.insertChampionList(championEntityList)
     }
 
     override suspend fun getSummaryChampionListByVersion(version: String): List<SummaryChampion> =
         championDao.getChampionList(version).firstOrNull()?.map(ChampionEntity::asData) ?: emptyList()
 
-    override suspend fun getSummaryChampionListByChampionIdList(version: String, championIdList: List<String>): List<SummaryChampion> =
-        championDao.getChampionListByChampionIdList(version, championIdList).map(ChampionEntity::asData)
+    override suspend fun getSummaryChampionListByChampionIdList(
+        version: String,
+        championIdList: List<String>
+    ): List<SummaryChampion> =
+        championDao.getChampionListByChampionIdList(
+            version,
+            championIdList
+        ).map(ChampionEntity::asData)
 
-    override suspend fun getNewChampionIdList(versionName: String, preVersionName: String): List<String> =
-        championDao.getNewChampionIdList(versionName, preVersionName)
+    override suspend fun getNewChampionIdList(
+        versionName: String,
+        preVersionName: String
+    ): List<String> =
+        championDao.getNewChampionIdList(
+            versionName,
+            preVersionName
+        )
 
-    override suspend fun getChampionDetail(championId: String, version: String): ChampionDetailData =
+    override suspend fun getChampionDetail(
+        championId: String,
+        version: String
+    ): ChampionDetailData =
         withContext(Dispatchers.IO) {
             var championDetailData = ChampionDetailData()
             runCatching {
@@ -64,11 +82,34 @@ class DefaultChampionRepository @Inject constructor(
             championDetailData
         }
 
-    override suspend fun hasChampionDetailData(championId: String, version: String): Boolean = withContext(Dispatchers.IO) {
-        championDao.hasChampionDetailData(version = version, championId = championId) > 0
+    override suspend fun hasChampionDetailData(
+        championId: String,
+        version: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        championDao.hasChampionDetailData(
+            version = version,
+            championId = championId
+        ) > 0
     }
 
-    override suspend fun getSummaryChampion(championId: String, version: String): SummaryChampion? = withContext(Dispatchers.IO) {
-        championDao.getChampionEntity(version, championId).firstOrNull()?.asData()
+    override suspend fun getSummaryChampion(
+        championId: String,
+        version: String
+    ): SummaryChampion? = withContext(Dispatchers.IO) {
+        championDao.getChampionEntity(
+            version,
+            championId
+        ).firstOrNull()?.asData()
+    }
+
+    override suspend fun getSimilarChampionList(
+        version: String,
+        tags: List<ChampionTag>
+    ): List<SummaryChampion> = withContext(Dispatchers.IO) {
+        championDao
+            .getSimilarChampionList(
+                version,
+                tags.asEntity()
+            ).map(ChampionEntity::asData)
     }
 }

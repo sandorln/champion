@@ -2,6 +2,7 @@ package com.sandorln.data.repository.champion
 
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.SummaryChampion
+import com.sandorln.model.type.ChampionTag
 import kotlinx.coroutines.flow.Flow
 
 interface ChampionRepository {
@@ -17,4 +18,5 @@ interface ChampionRepository {
     suspend fun getSummaryChampion(championId: String, version: String): SummaryChampion?
     suspend fun getChampionDetail(championId: String, version: String): ChampionDetailData
     suspend fun hasChampionDetailData(championId: String, version: String): Boolean
+    suspend fun getSimilarChampionList(version: String, tags: List<ChampionTag>): List<SummaryChampion>
 }

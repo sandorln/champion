@@ -65,8 +65,19 @@ fun List<ChampionTagEntity>.asData(): List<ChampionTag> = map {
         ChampionTagEntity.Tank -> ChampionTag.Tank
         ChampionTagEntity.Mage -> ChampionTag.Mage
         ChampionTagEntity.Assassin -> ChampionTag.Assassin
-        ChampionTagEntity.Ranged, ChampionTagEntity.Marksman -> ChampionTag.Marksman
+        ChampionTagEntity.Marksman -> ChampionTag.Marksman
         ChampionTagEntity.Support -> ChampionTag.Support
+    }
+}
+
+fun List<ChampionTag>.asEntity(): List<ChampionTagEntity> = map {
+    when (it) {
+        ChampionTag.Fighter -> ChampionTagEntity.Fighter
+        ChampionTag.Tank -> ChampionTagEntity.Tank
+        ChampionTag.Mage -> ChampionTagEntity.Mage
+        ChampionTag.Assassin -> ChampionTagEntity.Assassin
+        ChampionTag.Marksman -> ChampionTagEntity.Marksman
+        ChampionTag.Support -> ChampionTagEntity.Support
     }
 }
 
@@ -114,9 +125,16 @@ fun NetworkChampion.NetworkChampionStats.asEntity(): ChampionEntity.ChampionStat
     spellblockperlevel = spellblockperlevel
 )
 
-fun List<String>.asChampionTagEntity(): List<ChampionTagEntity> = mapNotNull {
-    runCatching { ChampionTagEntity.valueOf(it) }.getOrNull()
-}
+fun List<String>.asChampionTagEntity(): List<ChampionTagEntity> = this
+    .sorted()
+    .mapNotNull { tag ->
+        runCatching {
+            when {
+                tag == "Ranged" -> ChampionTagEntity.Marksman
+                else -> ChampionTagEntity.valueOf(tag)
+            }
+        }.getOrNull()
+    }
 
 fun ChampionEntity.asDetailData(): ChampionDetailData = ChampionDetailData(
     id = id,
