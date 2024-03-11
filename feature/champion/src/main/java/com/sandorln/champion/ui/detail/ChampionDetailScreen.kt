@@ -1,5 +1,7 @@
 package com.sandorln.champion.ui.detail
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -45,14 +47,16 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.fastJoinToString
-import androidx.constraintlayout.compose.Dimension
+import androidx.constraintlayout.compose.ConstraintSetScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseChampionSplashImage
@@ -70,11 +74,8 @@ import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
+import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionSpell
-
-private enum class MotionRefIdType {
-    Splash, Icon, Name, Title, Back, BottomDivider, Version, HeaderBrush
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,115 +85,13 @@ fun ChampionDetailScreen(
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
+    val context = LocalContext.current
 
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.CHAMPION_SPLASH_RATIO,
         headerMinHeight = Dimens.BASE_TOOLBAR_HEIGHT,
-        startConstraintSet = { headerRef, _ ->
-            val splashImgRef = createRefFor(MotionRefIdType.Splash)
-            val iconRef = createRefFor(MotionRefIdType.Icon)
-            val nameRef = createRefFor(MotionRefIdType.Name)
-            val titleRef = createRefFor(MotionRefIdType.Title)
-            val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
-            val versionRef = createRefFor(MotionRefIdType.Version)
-            val headerBrushRef = createRefFor(MotionRefIdType.HeaderBrush)
-
-            constrain(splashImgRef) {
-                width = Dimension.matchParent
-                height = Dimension.fillToConstraints
-                top.linkTo(headerRef.top)
-                bottom.linkTo(headerRef.bottom)
-                alpha = 1f
-            }
-            constrain(iconRef) {
-                start.linkTo(headerRef.start)
-                end.linkTo(headerRef.end)
-                top.linkTo(headerRef.top)
-                bottom.linkTo(headerRef.bottom)
-                alpha = 0f
-            }
-            constrain(titleRef) {
-                width = Dimension.fillToConstraints
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(nameRef.top)
-            }
-            constrain(nameRef) {
-                width = Dimension.fillToConstraints
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(headerRef.bottom, Spacings.Spacing01)
-            }
-            constrain(bottomDividerRef) {
-                bottom.linkTo(headerRef.bottom)
-                alpha = 0f
-            }
-
-            constrain(versionRef) {
-                width = Dimension.fillToConstraints
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(titleRef.top)
-            }
-
-            constrain(headerBrushRef) {
-                height = Dimension.fillToConstraints
-                top.linkTo(headerRef.top)
-                bottom.linkTo(headerRef.bottom)
-            }
-        },
-        endConstraintSet = { headerRef, _ ->
-            val splashImgRef = createRefFor(MotionRefIdType.Splash)
-            val iconRef = createRefFor(MotionRefIdType.Icon)
-            val nameRef = createRefFor(MotionRefIdType.Name)
-            val titleRef = createRefFor(MotionRefIdType.Title)
-            val backRef = createRefFor(MotionRefIdType.Back)
-            val bottomDividerRef = createRefFor(MotionRefIdType.BottomDivider)
-            val versionRef = createRefFor(MotionRefIdType.Version)
-            val headerBrushRef = createRefFor(MotionRefIdType.HeaderBrush)
-
-            constrain(splashImgRef) {
-                width = Dimension.matchParent
-                height = Dimension.fillToConstraints
-                top.linkTo(headerRef.top)
-                bottom.linkTo(headerRef.bottom)
-                alpha = 0f
-            }
-            constrain(iconRef) {
-                start.linkTo(backRef.end, Spacings.Spacing02)
-                top.linkTo(headerRef.top)
-                bottom.linkTo(headerRef.bottom)
-                alpha = 1f
-            }
-            constrain(titleRef) {
-                height = Dimension.fillToConstraints
-                start.linkTo(iconRef.end, Spacings.Spacing02)
-                top.linkTo(headerRef.top)
-                bottom.linkTo(nameRef.top)
-            }
-            constrain(nameRef) {
-                height = Dimension.fillToConstraints
-                start.linkTo(iconRef.end, Spacings.Spacing02)
-                top.linkTo(titleRef.bottom)
-                bottom.linkTo(headerRef.bottom)
-            }
-            constrain(bottomDividerRef) {
-                bottom.linkTo(headerRef.bottom)
-                alpha = 1f
-            }
-
-            constrain(versionRef) {
-                width = Dimension.fillToConstraints
-                end.linkTo(parent.end, Spacings.Spacing04)
-                top.linkTo(headerRef.top)
-                bottom.linkTo(headerRef.bottom)
-            }
-            constrain(headerBrushRef) {
-                height = Dimension.fillToConstraints
-                top.linkTo(headerRef.top)
-                bottom.linkTo(headerRef.bottom)
-            }
-        },
+        startConstraintSet = ConstraintSetScope::championDetailStart,
+        endConstraintSet = ConstraintSetScope::championDetailEnd,
         headerContent = { progress ->
             val iconSize = lerp(IconSize.XXXLargeSize, IconSize.XLargeSize, progress)
             val titleSize = lerp(TextStyles.Title01.fontSize, TextStyles.Body02.fontSize, progress)
@@ -390,6 +289,10 @@ fun ChampionDetailScreen(
                 textColor = Colors.Gray03
             )
 
+            Spacer(modifier = Modifier.height(Spacings.Spacing05))
+
+            ChampionLinkListBody(championDetailData = championDetailData)
+
             Spacer(modifier = Modifier.height(Spacings.Spacing02))
         }
 
@@ -413,6 +316,45 @@ fun ChampionDetailScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ChampionLinkListBody(
+    championDetailData: ChampionDetailData = ChampionDetailData()
+) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+    ) {
+        Text(
+            text = "공략 사이트로 이동",
+            style = TextStyles.Body03,
+            color = Colors.Gray05,
+            textDecoration = TextDecoration.Underline
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(
+                Spacings.Spacing02,
+                Alignment.CenterHorizontally
+            )
+        ) {
+            ChampionLinkBody(
+                title = "OP.GG",
+                onClickListener = {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.op.gg/champions/${championDetailData.id}/build")))
+                }
+            )
+            ChampionLinkBody(
+                title = "LOL.PS",
+                onClickListener = {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://lol.ps/champ/${championDetailData.key}")))
+                }
+            )
         }
     }
 }
@@ -654,11 +596,32 @@ fun ChampionSkillImage(
     }
 }
 
-@Preview
 @Composable
-internal fun ChampionDetailScreenPreview() {
-    LolChampionThemePreview {
-        ChampionDetailScreen()
+fun ChampionLinkBody(
+    title: String = "OP.GG",
+    onClickListener: () -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .clickable { onClickListener.invoke() }
+            .border(1.dp, Colors.Blue03, RoundedCornerShape(Radius.Radius04))
+            .padding(vertical = Spacings.Spacing00, horizontal = Spacings.Spacing02),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Text(
+            text = title,
+            color = Colors.Blue03,
+            style = TextStyles.Body04,
+            textDecoration = TextDecoration.Underline
+        )
+
+        Icon(
+            modifier = Modifier.size(IconSize.SmallSize),
+            painter = painterResource(id = R.drawable.ic_open_in_new),
+            contentDescription = null,
+            tint = Colors.Blue03
+        )
     }
 }
 
@@ -696,5 +659,13 @@ internal fun ChampionSkillBodyListPreview() {
                 levelTip = listOf("피해량", "만월총 추가 효과: 표식 피해량")
             )
         )
+    }
+}
+
+@Preview
+@Composable
+internal fun ChampionLinkBodyPreview() {
+    LolChampionThemePreview {
+        ChampionLinkListBody()
     }
 }

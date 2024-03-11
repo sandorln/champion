@@ -36,13 +36,20 @@ fun ChampionEntity.ChampionStatsEntity.asData(): ChampionStats = ChampionStats(
     movespeed = movespeed,
     armor = armor,
     armorperlevel = armorperlevel,
-    spellblock = spellblock,
-    spellblockperlevel = spellblockperlevel,
+    attackdamage = attackdamage,
+    attackdamageperlevel = attackdamageperlevel,
+    attackspeedoffset = attackspeedoffset,
+    attackspeed = attackspeed,
+    attackspeedperlevel = attackspeedperlevel,
     attackrange = attackrange,
+    crit = crit,
+    critperlevel = critperlevel,
     hpregen = hpregen,
     hpregenperlevel = hpregenperlevel,
     mpregen = mpregen,
-    mpregenperlevel = mpregenperlevel
+    mpregenperlevel = mpregenperlevel,
+    spellblock = spellblock,
+    spellblockperlevel = spellblockperlevel,
 )
 
 fun ChampionEntity.ChampionInfoEntity.asData(): ChampionInfo = ChampionInfo(
@@ -91,12 +98,20 @@ fun NetworkChampion.NetworkChampionStats.asEntity(): ChampionEntity.ChampionStat
     movespeed = movespeed,
     armor = armor,
     armorperlevel = armorperlevel,
-    spellblock = spellblock,
-    spellblockperlevel = spellblockperlevel,
+    attackdamage = attackdamage,
+    attackdamageperlevel = attackdamageperlevel,
+    attackspeedoffset = attackspeedoffset,
+    attackspeed = attackspeed,
+    attackspeedperlevel = attackspeedperlevel,
     attackrange = attackrange,
+    crit = crit,
+    critperlevel = critperlevel,
     hpregen = hpregen,
     hpregenperlevel = hpregenperlevel,
-    mpregen = mpregen
+    mpregen = mpregen,
+    mpregenperlevel = mpregenperlevel,
+    spellblock = spellblock,
+    spellblockperlevel = spellblockperlevel
 )
 
 fun List<String>.asChampionTagEntity(): List<ChampionTagEntity> = mapNotNull {
