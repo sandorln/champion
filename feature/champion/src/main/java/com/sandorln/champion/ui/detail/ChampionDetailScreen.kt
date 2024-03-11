@@ -290,14 +290,16 @@ fun ChampionDetailScreen(
                 }
             )
 
-            ChampionDetailInfoTitle(title = "비슷한 역할 챔피언")
+            if (uiState.similarChampionList.isNotEmpty()) {
+                ChampionDetailInfoTitle(title = "비슷한 역할 챔피언")
 
-            SimilarChampionListBody(
-                version = uiState.selectedVersion,
-                tags = championDetailData.tags,
-                similarChampionList = uiState.similarChampionList,
-                moveToChampionDetailScreen = moveToChampionDetailScreen
-            )
+                SimilarChampionListBody(
+                    version = uiState.selectedVersion,
+                    tags = championDetailData.tags,
+                    similarChampionList = uiState.similarChampionList,
+                    moveToChampionDetailScreen = moveToChampionDetailScreen
+                )
+            }
 
             ChampionDetailInfoTitle(title = "스토리")
 
