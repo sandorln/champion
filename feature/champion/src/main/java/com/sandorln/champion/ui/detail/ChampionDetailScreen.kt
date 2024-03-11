@@ -76,6 +76,7 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionSpell
+import com.sandorln.model.data.champion.ChampionStats
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +86,6 @@ fun ChampionDetailScreen(
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
-    val context = LocalContext.current
 
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.CHAMPION_SPLASH_RATIO,
@@ -263,7 +263,12 @@ fun ChampionDetailScreen(
 
             ChampionDetailInfoTitle(title = "능력치")
 
-            ChampionStatusBody()
+            ChampionStatusBody(
+                currentVersion = uiState.selectedVersion,
+                preVersion = uiState.preVersionName,
+                championStats = championDetailData.stats,
+                preChampionStats = uiState.preChampion?.stats
+            )
 
             ChampionDetailInfoTitle(title = "스킬")
 
@@ -357,11 +362,6 @@ private fun ChampionLinkListBody(
             )
         }
     }
-}
-
-@Composable
-fun ChampionStatusBody() {
-
 }
 
 @Composable
@@ -625,6 +625,186 @@ fun ChampionLinkBody(
     }
 }
 
+@Composable
+fun ChampionStatusBody(
+    championStats: ChampionStats = ChampionStats(),
+    preChampionStats: ChampionStats? = null,
+    currentVersion: String = "",
+    preVersion: String = ""
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Row {
+            Box(modifier = Modifier.weight(1f))
+
+            Text(
+                modifier = Modifier.weight(1f),
+                text = currentVersion,
+                style = TextStyles.SubTitle03,
+                textAlign = TextAlign.Center,
+                color = Colors.Gray04
+            )
+
+            if (preChampionStats != null) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = preVersion,
+                    style = TextStyles.SubTitle03,
+                    textAlign = TextAlign.Center,
+                    color = Colors.Gray04
+                )
+            }
+        }
+
+        StatusCompareBody(
+            title = "공격력",
+            originalValue = championStats.attackdamage,
+            originalLvValue = championStats.attackdamageperlevel,
+            compareValue = preChampionStats?.attackdamage,
+            compareLvValue = preChampionStats?.attackdamageperlevel
+        )
+
+        StatusCompareBody(
+            title = "공격속도",
+            originalValue = championStats.attackspeed,
+            originalLvValue = championStats.attackspeedperlevel,
+            compareValue = preChampionStats?.attackspeed,
+            compareLvValue = preChampionStats?.attackspeedperlevel
+        )
+
+        StatusCompareBody(
+            title = "사정거리",
+            originalValue = championStats.attackrange,
+            compareValue = preChampionStats?.attackrange,
+        )
+
+        StatusCompareBody(
+            title = "방어력",
+            originalValue = championStats.armor,
+            originalLvValue = championStats.armorperlevel,
+            compareValue = preChampionStats?.armor,
+            compareLvValue = preChampionStats?.armorperlevel
+        )
+
+        StatusCompareBody(
+            title = "마법방어력",
+            originalValue = championStats.spellblock,
+            originalLvValue = championStats.spellblockperlevel,
+            compareValue = preChampionStats?.spellblock,
+            compareLvValue = preChampionStats?.spellblockperlevel
+        )
+
+        StatusCompareBody(
+            title = "체력재생",
+            originalValue = championStats.hpregen,
+            originalLvValue = championStats.hpregenperlevel,
+            compareValue = preChampionStats?.hpregen,
+            compareLvValue = preChampionStats?.hpregenperlevel
+        )
+
+        StatusCompareBody(
+            title = "마나재생",
+            originalValue = championStats.mpregen,
+            originalLvValue = championStats.mpregenperlevel,
+            compareValue = preChampionStats?.mpregen,
+            compareLvValue = preChampionStats?.mpregenperlevel
+        )
+
+        StatusCompareBody(
+            title = "이동속도",
+            originalValue = championStats.movespeed,
+            compareValue = preChampionStats?.movespeed,
+        )
+    }
+}
+
+@Composable
+fun StatusCompareBody(
+    title: String = "공격력",
+    originalValue: Double = 0.0,
+    originalLvValue: Double? = null,
+    compareValue: Double? = null,
+    compareLvValue: Double? = null,
+) {
+    val titleSuffix = if (originalLvValue != null) " (+Lv)" else ""
+    val originalValueColor: Color = originalValue.statusCompareColor(compareValue)
+    val originalLvValueColor: Color = originalLvValue.statusCompareColor(compareLvValue)
+    val compareValueColor: Color = compareValue.statusCompareColor(originalValue)
+    val compareLvValueColor: Color = compareLvValue.statusCompareColor(originalLvValue)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = "$title$titleSuffix",
+            style = TextStyles.Body04,
+            color = Colors.Gray04,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        StatusBody(
+            modifier = Modifier.weight(1f),
+            value = originalValue,
+            valueColor = originalValueColor,
+            lvValue = originalLvValue,
+            lvValueColor = originalLvValueColor
+        )
+
+        if (compareValue != null) {
+            StatusBody(
+                modifier = Modifier.weight(1f),
+                value = compareValue,
+                valueColor = compareValueColor,
+                lvValue = compareLvValue,
+                lvValueColor = compareLvValueColor
+            )
+        }
+    }
+}
+
+@Composable
+fun StatusBody(
+    modifier: Modifier = Modifier,
+    value: Double = 0.0,
+    valueColor: Color = Colors.BasicWhite,
+    lvValue: Double? = null,
+    lvValueColor: Color = Colors.BasicWhite,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(
+            Spacings.Spacing00,
+            Alignment.CenterHorizontally
+        )
+    ) {
+        Text(
+            modifier = Modifier,
+            text = value.toString(),
+            style = TextStyles.Body04,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis,
+            color = valueColor
+        )
+        if (lvValue != null) {
+            Text(
+                modifier = Modifier,
+                text = "(+$lvValue)",
+                style = TextStyles.Body04,
+                maxLines = 1,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                color = lvValueColor
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 internal fun ChampionDetailInfoTitlePreview() {
@@ -668,4 +848,18 @@ internal fun ChampionLinkBodyPreview() {
     LolChampionThemePreview {
         ChampionLinkListBody()
     }
+}
+
+@Preview
+@Composable
+internal fun ChampionStatusBodyPreview() {
+    LolChampionThemePreview {
+        ChampionStatusBody()
+    }
+}
+
+private fun Double?.statusCompareColor(otherFloat: Double?) = when (this?.compareTo(otherFloat ?: this)) {
+    -1 -> Colors.Blue03
+    1 -> Colors.Orange00
+    else -> Colors.BasicWhite
 }

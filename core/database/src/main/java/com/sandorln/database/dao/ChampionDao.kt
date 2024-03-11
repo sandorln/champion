@@ -33,7 +33,7 @@ interface ChampionDao {
     suspend fun getNewChampionCount(currentVersion: String, preVersion: String): Int
 
     @Query("SELECT * FROM ChampionEntity WHERE version == :version AND id == :championId")
-    suspend fun getChampionDetail(version: String, championId: String): List<ChampionEntity>
+    suspend fun getChampionEntity(version: String, championId: String): List<ChampionEntity>
 
     @Query("SELECT count(*) FROM ChampionEntity WHERE version == :version AND id == :championId")
     suspend fun hasChampionDetailData(version: String, championId: String): Int

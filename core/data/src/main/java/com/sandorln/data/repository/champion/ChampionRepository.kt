@@ -14,6 +14,7 @@ interface ChampionRepository {
 
     suspend fun getNewChampionIdList(versionName: String, preVersionName: String): List<String>
 
+    suspend fun getSummaryChampion(championId: String, version: String): SummaryChampion?
     suspend fun getChampionDetail(championId: String, version: String): ChampionDetailData
     suspend fun hasChampionDetailData(championId: String, version: String): Boolean
 }

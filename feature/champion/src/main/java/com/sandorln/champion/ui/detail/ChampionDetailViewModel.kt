@@ -4,10 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.champion.GetChampionDetail
+import com.sandorln.domain.usecase.champion.GetSummaryChampion
 import com.sandorln.domain.usecase.champion.HasChampionDetail
 import com.sandorln.domain.usecase.version.GetAllVersionList
+import com.sandorln.domain.usecase.version.GetPreviousVersion
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionSpell
+import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.keys.BundleKeys
 import com.sandorln.model.type.SpellType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,9 +30,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ChampionDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val getSummaryChampion: GetSummaryChampion,
     private val getChampionDetail: GetChampionDetail,
     private val hasChampionDetail: HasChampionDetail,
-    private val getAllVersionList: GetAllVersionList
+    private val getAllVersionList: GetAllVersionList,
+    private val getPreviousVersion: GetPreviousVersion
 ) : ViewModel() {
     private val _championId = savedStateHandle.get<String>(BundleKeys.CHAMPION_ID) ?: ""
     private val _version = savedStateHandle.getStateFlow(BundleKeys.CHAMPION_VERSION, "")
@@ -85,18 +90,33 @@ class ChampionDetailViewModel @Inject constructor(
                         }
                     }
 
+                    val previousVersion = getPreviousVersion.invoke(version)
+                    val preChampionData = if (previousVersion == null) {
+                        null
+                    } else {
+                        getSummaryChampion
+                            .invoke(_championId, previousVersion.name)
+                            .getOrNull()
+                    }
+
                     getChampionDetail
                         .invoke(_championId, version)
                         .onSuccess { championDetailData ->
                             _uiMutex.withLock {
                                 _uiState.update {
-                                    it.copy(championDetailData = championDetailData)
+                                    it.copy(
+                                        championDetailData = championDetailData,
+                                        preVersionName = previousVersion?.name ?: "",
+                                        preChampion = preChampionData
+                                    )
                                 }
                             }
+
                             val selectedSkill = when (preSelectedSkillType) {
                                 SpellType.P -> championDetailData.passive
                                 else -> championDetailData.spells.first { it.spellType == preSelectedSkillType }
                             }
+
                             sendAction(ChampionDetailAction.ChangeSelectSkill(selectedSkill))
                         }.onFailure {
                             _sideEffect.emit(ChampionDetailSideEffect.ShowToastMessage(it.message ?: "Error"))
@@ -168,7 +188,9 @@ data class ChampionDetailUiState(
     val selectedSkill: ChampionSpell = ChampionSpell(),
     val selectedSkillUrl: String = "",
     val isLatestVersion: Boolean = false,
-    val isShowVersionListDialog: Boolean = false
+    val isShowVersionListDialog: Boolean = false,
+    val preVersionName: String = "",
+    val preChampion: SummaryChampion? = null
 )
 
 sealed interface ChampionDetailAction {

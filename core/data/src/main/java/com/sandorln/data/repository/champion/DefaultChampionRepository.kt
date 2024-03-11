@@ -53,7 +53,7 @@ class DefaultChampionRepository @Inject constructor(
             var championDetailData = ChampionDetailData()
             runCatching {
                 championDetailData = championDao
-                    .getChampionDetail(version, championId)
+                    .getChampionEntity(version, championId)
                     .firstOrNull()
                     ?.asDetailData() ?: throw Exception()
 
@@ -66,5 +66,9 @@ class DefaultChampionRepository @Inject constructor(
 
     override suspend fun hasChampionDetailData(championId: String, version: String): Boolean = withContext(Dispatchers.IO) {
         championDao.hasChampionDetailData(version = version, championId = championId) > 0
+    }
+
+    override suspend fun getSummaryChampion(championId: String, version: String): SummaryChampion? = withContext(Dispatchers.IO) {
+        championDao.getChampionEntity(version, championId).firstOrNull()?.asData()
     }
 }
