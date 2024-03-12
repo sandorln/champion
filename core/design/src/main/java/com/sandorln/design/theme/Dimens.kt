@@ -46,6 +46,8 @@ object Dimens {
     val ITEM_COMBINATION_LINE_MIN_SIZE = 30.dp
     val CHAMPION_SKILL_SIZE = 40.dp
 
+    val SELECT_SPELL_HEIGHT_MIN = 200.dp
+
     const val CHAMPION_SPLASH_RATIO_STRING = "1:0.59012"
     const val CHAMPION_SPLASH_RATIO = 1.694f
     const val CHAMPION_SKILL_VIDEO_RATIO = 1.48f

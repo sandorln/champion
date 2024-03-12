@@ -58,6 +58,7 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
 import com.sandorln.model.data.version.Version
+import com.sandorln.spell.ui.SpellHomeScreen
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
 
@@ -144,10 +145,7 @@ fun HomeScreen(
 
                         HomeScreenType.Item -> ItemHomeScreen()
 
-                        HomeScreenType.SummonerSpell -> Box(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                        }
+                        HomeScreenType.SummonerSpell -> SpellHomeScreen()
 
                         HomeScreenType.Setting -> Box(
                             modifier = Modifier

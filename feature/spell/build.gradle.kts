@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.sandorln.home"
+    namespace = "com.sandorln.spell"
     compileSdk = libs.versions.complieSdk.get().toInt()
 
     defaultConfig {
@@ -45,17 +45,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material)
-
     implementation(libs.androidx.compose.constraintlayout)
 
-    implementation(libs.jsoup.jsoup)
-
     implementation(project(":core:design"))
-    implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:model"))
-    api(project(":feature:champion"))
-    api(project(":feature:item"))
-    api(project(":feature:spell"))
 }
