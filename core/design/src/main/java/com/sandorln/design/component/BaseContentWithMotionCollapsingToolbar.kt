@@ -54,7 +54,7 @@ fun BaseContentWithMotionToolbar(
     bodyContent: @Composable BoxScope.(progress: Float) -> Unit = {}
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val heightInPx = with(LocalDensity.current) { maxHeight.toPx() }
+        val heightInPx = with(LocalDensity.current) { headerMaxHeight.toPx() }
 
         val swipingState = rememberSwipeableState(initialValue = SwipingStates.EXPANDED)
         val nestedScrollConnection = createNestScrollConnection(swipingState)
