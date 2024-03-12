@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import com.sandorln.champion.model.ChampionData
+import com.sandorln.model.data.champion.ChampionData
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
