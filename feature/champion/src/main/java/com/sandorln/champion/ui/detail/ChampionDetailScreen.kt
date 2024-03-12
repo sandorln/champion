@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +25,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +42,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -77,6 +82,7 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
 import com.sandorln.model.data.champion.ChampionDetailData
+import com.sandorln.model.data.champion.ChampionSkin
 import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
@@ -94,7 +100,7 @@ fun ChampionDetailScreen(
     val changedStatsVersion = uiState.changedStatsVersion
 
     BaseContentWithMotionToolbar(
-        headerRatio = Dimens.CHAMPION_SPLASH_RATIO,
+        headerRatio = Dimens.CHAMPION_SPLASH_RATIO_STRING,
         headerMinHeight = Dimens.BASE_TOOLBAR_HEIGHT,
         startConstraintSet = ConstraintSetScope::championDetailStart,
         endConstraintSet = ConstraintSetScope::championDetailEnd,
@@ -303,6 +309,11 @@ fun ChampionDetailScreen(
             }
 
             ChampionDetailInfoTitle(title = "스킨")
+
+            ChampionSkins(
+                championId = championDetailData.id,
+                skinList = championDetailData.skins
+            )
 
             ChampionDetailInfoTitle(title = "스토리")
 
@@ -919,9 +930,77 @@ fun SimilarChampionListBody(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChampionSkins() {
+fun ChampionSkins(
+    championId: String,
+    skinList: List<ChampionSkin>
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(initialPage = 0) {
+        skinList.size
+    }
 
+    val skinName = remember(pagerState.currentPage) {
+        val currentPage = pagerState.currentPage
+        if (currentPage == 0) {
+            "기본 스킨"
+        } else {
+            skinList[currentPage].name
+        }
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(Dimens.CHAMPION_SPLASH_RATIO)
+        ) {
+            HorizontalPager(
+                modifier = Modifier.matchParentSize(),
+                state = pagerState,
+            ) { count ->
+                val skinNum = skinList[count].num.takeIf {
+                    !it.isNullOrEmpty()
+                } ?: count.toString()
+
+                BaseChampionSplashImage(
+                    modifier = Modifier.matchParentSize(),
+                    championId = championId,
+                    skinNum = skinNum
+                )
+            }
+        }
+
+        Text(
+            text = skinName,
+            style = TextStyles.SubTitle03,
+            color = Colors.Gold04
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(
+                space = Spacings.Spacing01,
+                alignment = Alignment.CenterHorizontally
+            ),
+        ) {
+            repeat(skinList.size) { iteration ->
+                val color = if (pagerState.currentPage == iteration)
+                    Colors.Gold04
+                else
+                    Colors.Gray07
+
+                Box(
+                    modifier = Modifier
+                        .background(color, CircleShape)
+                        .size(IconSize.TinySize)
+                )
+            }
+        }
+    }
 }
 
 @Preview
@@ -998,6 +1077,17 @@ internal fun VersionBodyPreview() {
         VersionItemBody(
             "14.5.1",
             isChangedStatsDiff = true
+        )
+    }
+}
+
+@Preview
+@Composable
+internal fun ChampionSkinsPreview() {
+    LolChampionThemePreview {
+        ChampionSkins(
+            "14.5.1",
+            List(5) { ChampionSkin(name = it.toString()) }
         )
     }
 }

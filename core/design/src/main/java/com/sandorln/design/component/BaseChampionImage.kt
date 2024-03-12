@@ -12,9 +12,10 @@ import com.sandorln.design.theme.LolChampionThemePreview
 @Composable
 fun BaseChampionSplashImage(
     modifier: Modifier = Modifier,
+    skinNum: String = "0",
     championId: String,
 ) {
-    val url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg"
+    val url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_$skinNum.jpg"
 
     GlideImage(
         modifier = modifier,

@@ -163,6 +163,7 @@ fun NetworkChampionDetail.asData(otherChampionDetail: ChampionDetailData = Champ
 fun NetworkChampionSkin.asData(): ChampionSkin = ChampionSkin(
     id = id,
     name = name,
+    num = num,
     chromas = chromas
 )
 

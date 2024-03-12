@@ -28,6 +28,7 @@ object Radius {
 }
 
 object IconSize {
+    val TinySize = 8.dp
     val SmallSize = 12.dp
     val MediumSize = 16.dp
     val LargeSize = 24.dp
@@ -45,7 +46,8 @@ object Dimens {
     val ITEM_COMBINATION_LINE_MIN_SIZE = 30.dp
     val CHAMPION_SKILL_SIZE = 40.dp
 
-    const val CHAMPION_SPLASH_RATIO = "1:0.59012"
+    const val CHAMPION_SPLASH_RATIO_STRING = "1:0.59012"
+    const val CHAMPION_SPLASH_RATIO = 1.694f
     const val CHAMPION_SKILL_VIDEO_RATIO = 1.48f
 }
 
