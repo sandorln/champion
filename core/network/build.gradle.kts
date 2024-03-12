@@ -43,7 +43,6 @@ dependencies {
     implementation(libs.coroutine.android)
 
     implementation(libs.ktor.android)
-    implementation(libs.ktor.cio)
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.logging)

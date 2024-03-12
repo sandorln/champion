@@ -8,3 +8,9 @@ plugins {
     alias(libs.plugins.firebase.crashlytices) apply false
     alias(libs.plugins.ksp) apply false
 }
+
+buildscript {
+    dependencies {
+        classpath(libs.android.licenses.plugin)
+    }
+}

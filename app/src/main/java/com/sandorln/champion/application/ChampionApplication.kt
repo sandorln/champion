@@ -5,12 +5,4 @@ import android.widget.Toast
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class ChampionApplication : Application() {
-    lateinit var toast: Toast
-    fun showToast(message: String) {
-        if (::toast.isInitialized)
-            toast.cancel()
-        toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
-        toast.show()
-    }
-}
+class ChampionApplication : Application()

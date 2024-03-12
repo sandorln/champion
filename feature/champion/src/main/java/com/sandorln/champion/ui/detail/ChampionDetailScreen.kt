@@ -936,7 +936,6 @@ fun ChampionSkins(
     championId: String,
     skinList: List<ChampionSkin>
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) {
         skinList.size
     }

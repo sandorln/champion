@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.firebase.crashlytices)
     alias(libs.plugins.ksp)
     kotlin("kapt")
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
@@ -72,7 +73,6 @@ dependencies {
     androidTestImplementation(libs.test.androidx.junit)
     androidTestImplementation(libs.test.androidx.espresso.core)
 
-    androidTestImplementation(libs.androidx.compose.ui.test)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+
+    implementation(libs.android.licenses)
 
     implementation(project(":core:design"))
     implementation(project(":feature:home"))
