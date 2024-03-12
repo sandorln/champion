@@ -115,8 +115,16 @@ class ChampionDetailViewModel @Inject constructor(
                             }
 
                             val selectedSkill = when (preSelectedSkillType) {
-                                SpellType.P -> championDetailData.passive
-                                else -> championDetailData.spells.first { it.spellType == preSelectedSkillType }
+                                SpellType.P -> {
+                                    championDetailData.passive
+                                }
+                                else -> {
+                                    championDetailData
+                                        .spells
+                                        .firstOrNull {
+                                            it.spellType == preSelectedSkillType
+                                        } ?: ChampionSpell()
+                                }
                             }
 
                             sendAction(ChampionDetailAction.ChangeSelectSkill(selectedSkill))

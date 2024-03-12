@@ -370,6 +370,11 @@ fun HomeVersionChangeBar(
     onChangePreVersion: () -> Unit = {},
     onChangeNextVersion: () -> Unit = {}
 ) {
+    val versionColor by animateColorAsState(
+        targetValue = if (hasNextVersion) Colors.Gray02 else Colors.BaseColor,
+        label = ""
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -404,14 +409,14 @@ fun HomeVersionChangeBar(
                 text = "$currentVersionName ver",
                 textAlign = TextAlign.Center,
                 style = TextStyles.SubTitle01,
-                color = Colors.Blue03,
+                color = versionColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Icon(
                 modifier = Modifier
                     .padding(start = Spacings.Spacing01)
-                    .size(IconSize.LargeSize)
+                    .size(IconSize.MediumSize)
                     .constrainAs(iconRef) {
                         start.linkTo(versionRef.end)
                         end.linkTo(parent.end)
@@ -420,7 +425,7 @@ fun HomeVersionChangeBar(
                     },
                 painter = painterResource(id = com.sandorln.design.R.drawable.ic_chevron_down),
                 contentDescription = null,
-                tint = Colors.Blue03
+                tint = versionColor
             )
         }
         VersionButton(
@@ -438,13 +443,15 @@ internal fun VersionButton(
     onClickListener: () -> Unit = {}
 ) {
     val buttonColor by animateColorAsState(
-        targetValue = if (isEnable) Colors.Blue03 else Colors.Gray05,
+        targetValue = if (isEnable) Colors.BaseColor else Colors.Gray05,
         label = ""
     )
+
     Text(
         modifier = Modifier
             .clickable { onClickListener.invoke() }
-            .background(
+            .border(
+                width = 1.dp,
                 color = buttonColor,
                 shape = RoundedCornerShape(Radius.Radius06)
             )
@@ -454,7 +461,7 @@ internal fun VersionButton(
             ),
         text = title,
         style = TextStyles.SubTitle02,
-        color = Colors.BasicBlack
+        color = buttonColor
     )
 }
 
