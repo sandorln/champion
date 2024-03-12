@@ -19,4 +19,7 @@ interface ChampionRepository {
     suspend fun getChampionDetail(championId: String, version: String): ChampionDetailData
     suspend fun hasChampionDetailData(championId: String, version: String): Boolean
     suspend fun getSimilarChampionList(version: String, tags: List<ChampionTag>): List<SummaryChampion>
+
+    suspend fun getChampionVersionList(championId: String): List<String>
+    suspend fun getChampionDiffStatusVersion(championId: String): Map<String, Boolean>
 }

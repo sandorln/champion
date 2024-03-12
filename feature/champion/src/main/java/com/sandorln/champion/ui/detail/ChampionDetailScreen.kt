@@ -91,6 +91,7 @@ fun ChampionDetailScreen(
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
+    val changedStatsVersion = uiState.changedStatsVersion
 
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.CHAMPION_SPLASH_RATIO,
@@ -301,6 +302,8 @@ fun ChampionDetailScreen(
                 )
             }
 
+            ChampionDetailInfoTitle(title = "스킨")
+
             ChampionDetailInfoTitle(title = "스토리")
 
             LolHtmlTagTextView(
@@ -330,6 +333,7 @@ fun ChampionDetailScreen(
                         VersionItemBody(
                             versionName = versionName,
                             isSelectedVersion = versionName == uiState.selectedVersion,
+                            isChangedStatsDiff = changedStatsVersion[versionName] == true,
                             onClickListener = {
                                 championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersion(versionName))
                             }
@@ -384,6 +388,7 @@ private fun ChampionLinkListBody(
 fun VersionItemBody(
     versionName: String,
     isSelectedVersion: Boolean = false,
+    isChangedStatsDiff: Boolean = false,
     onClickListener: () -> Unit = {}
 ) {
     val backgroundColor = if (isSelectedVersion) Colors.Blue05 else Colors.Gray08
@@ -407,6 +412,24 @@ fun VersionItemBody(
             style = TextStyles.SubTitle01,
             color = if (isSelectedVersion) Colors.BaseColor else Colors.Gray04
         )
+
+        if (isChangedStatsDiff) {
+            Text(
+                modifier = Modifier
+                    .border(
+                        width = 1.dp,
+                        color = Colors.Gold02,
+                        shape = RoundedCornerShape(Radius.Radius03)
+                    )
+                    .padding(
+                        horizontal = Spacings.Spacing01,
+                        vertical = Spacings.Spacing00
+                    ),
+                text = "능력치 변경",
+                style = TextStyles.Body04,
+                color = Colors.Gold02
+            )
+        }
     }
 }
 
@@ -697,6 +720,38 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
+            title = "체력",
+            originalValue = championStats.hp,
+            originalLvValue = championStats.hpperlevel,
+            compareValue = preChampionStats?.hp,
+            compareLvValue = preChampionStats?.hpperlevel
+        )
+
+        StatusCompareBody(
+            title = "체력재생",
+            originalValue = championStats.hpregen,
+            originalLvValue = championStats.hpregenperlevel,
+            compareValue = preChampionStats?.hpregen,
+            compareLvValue = preChampionStats?.hpregenperlevel
+        )
+
+        StatusCompareBody(
+            title = "마나",
+            originalValue = championStats.mp,
+            originalLvValue = championStats.mpperlevel,
+            compareValue = preChampionStats?.mp,
+            compareLvValue = preChampionStats?.mpperlevel
+        )
+
+        StatusCompareBody(
+            title = "마나재생",
+            originalValue = championStats.mpregen,
+            originalLvValue = championStats.mpregenperlevel,
+            compareValue = preChampionStats?.mpregen,
+            compareLvValue = preChampionStats?.mpregenperlevel
+        )
+
+        StatusCompareBody(
             title = "방어력",
             originalValue = championStats.armor,
             originalLvValue = championStats.armorperlevel,
@@ -710,22 +765,6 @@ fun ChampionStatusBody(
             originalLvValue = championStats.spellblockperlevel,
             compareValue = preChampionStats?.spellblock,
             compareLvValue = preChampionStats?.spellblockperlevel
-        )
-
-        StatusCompareBody(
-            title = "체력재생",
-            originalValue = championStats.hpregen,
-            originalLvValue = championStats.hpregenperlevel,
-            compareValue = preChampionStats?.hpregen,
-            compareLvValue = preChampionStats?.hpregenperlevel
-        )
-
-        StatusCompareBody(
-            title = "마나재생",
-            originalValue = championStats.mpregen,
-            originalLvValue = championStats.mpregenperlevel,
-            compareValue = preChampionStats?.mpregen,
-            compareLvValue = preChampionStats?.mpregenperlevel
         )
 
         StatusCompareBody(
@@ -880,6 +919,11 @@ fun SimilarChampionListBody(
     }
 }
 
+@Composable
+fun ChampionSkins() {
+
+}
+
 @Preview
 @Composable
 internal fun ChampionDetailInfoTitlePreview() {
@@ -943,6 +987,17 @@ internal fun SimilarChampionListBodyPreview() {
             moveToChampionDetailScreen = { _, _ ->
 
             }
+        )
+    }
+}
+
+@Preview
+@Composable
+internal fun VersionBodyPreview() {
+    LolChampionThemePreview {
+        VersionItemBody(
+            "14.5.1",
+            isChangedStatsDiff = true
         )
     }
 }

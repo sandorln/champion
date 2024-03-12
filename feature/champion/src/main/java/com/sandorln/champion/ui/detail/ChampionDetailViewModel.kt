@@ -4,10 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.champion.GetChampionDetail
+import com.sandorln.domain.usecase.champion.GetChampionDiffStatusVersion
+import com.sandorln.domain.usecase.champion.GetChampionVersionList
 import com.sandorln.domain.usecase.champion.GetSimilarChampionList
 import com.sandorln.domain.usecase.champion.GetSummaryChampion
 import com.sandorln.domain.usecase.champion.HasChampionDetail
-import com.sandorln.domain.usecase.version.GetAllVersionList
 import com.sandorln.domain.usecase.version.GetPreviousVersion
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionSpell
@@ -20,8 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -34,9 +33,10 @@ class ChampionDetailViewModel @Inject constructor(
     private val getSummaryChampion: GetSummaryChampion,
     private val getChampionDetail: GetChampionDetail,
     private val hasChampionDetail: HasChampionDetail,
-    private val getAllVersionList: GetAllVersionList,
     private val getPreviousVersion: GetPreviousVersion,
-    private val getSimilarChampionList: GetSimilarChampionList
+    private val getSimilarChampionList: GetSimilarChampionList,
+    private val getChampionVersionList: GetChampionVersionList,
+    private val getChampionDiffStatusVersion: GetChampionDiffStatusVersion
 ) : ViewModel() {
     private val _championId = savedStateHandle.get<String>(BundleKeys.CHAMPION_ID) ?: ""
     private val _version = savedStateHandle.getStateFlow(BundleKeys.CHAMPION_VERSION, "")
@@ -56,25 +56,19 @@ class ChampionDetailViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                getAllVersionList
-                    .invoke()
-                    .map { versionList ->
-                        versionList.map { version ->
-                            version.name
-                        }
+                val championVersionList = getChampionVersionList.invoke(_championId)
+                val changedStatsVersion = getChampionDiffStatusVersion.invoke(_championId)
+
+                _uiMutex.withLock {
+                    _uiState.update {
+                        val latestVersion = championVersionList.firstOrNull() ?: ""
+                        it.copy(
+                            isLatestVersion = latestVersion == it.selectedVersion,
+                            versionNameList = championVersionList,
+                            changedStatsVersion = changedStatsVersion
+                        )
                     }
-                    .distinctUntilChanged()
-                    .collectLatest { versionList ->
-                        _uiMutex.withLock {
-                            _uiState.update {
-                                val latestVersion = versionList.firstOrNull() ?: ""
-                                it.copy(
-                                    isLatestVersion = latestVersion == it.selectedVersion,
-                                    versionNameList = versionList
-                                )
-                            }
-                        }
-                    }
+                }
             }
 
             launch {
@@ -199,7 +193,8 @@ data class ChampionDetailUiState(
     val isShowVersionListDialog: Boolean = false,
     val preVersionName: String = "",
     val preChampion: SummaryChampion? = null,
-    val similarChampionList: List<SummaryChampion> = listOf()
+    val similarChampionList: List<SummaryChampion> = listOf(),
+    val changedStatsVersion: Map<String, Boolean> = mapOf()
 )
 
 sealed interface ChampionDetailAction {

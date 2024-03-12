@@ -5,6 +5,7 @@ import com.sandorln.data.util.asDetailData
 import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.model.ChampionEntity
+import com.sandorln.database.model.VersionEntity
 import com.sandorln.datastore.version.VersionDatasource
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.SummaryChampion
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.min
 
 class DefaultChampionRepository @Inject constructor(
     versionDatasource: VersionDatasource,
@@ -111,5 +113,38 @@ class DefaultChampionRepository @Inject constructor(
                 version,
                 tags.asEntity()
             ).map(ChampionEntity::asData)
+    }
+
+    override suspend fun getChampionVersionList(championId: String): List<String> = withContext(Dispatchers.IO) {
+        val versionComparator = Comparator<String> { version1, version2 ->
+            val (major1, minor1, patch1) = version1.split('.').map { it.toInt() }
+            val (major2, minor2, patch2) = version2.split('.').map { it.toInt() }
+
+            when {
+                major1 != major2 -> major2 - major1
+                minor1 != minor2 -> minor2 - minor1
+                else -> patch2 - patch1
+            }
+        }
+
+        championDao.getChampionVersionList(championId).sortedWith(versionComparator)
+    }
+
+    override suspend fun getChampionDiffStatusVersion(championId: String): Map<String, Boolean> = withContext(Dispatchers.IO) {
+        val championVersionList = getChampionVersionList(championId)
+
+        championVersionList
+            .mapIndexed { index, version ->
+                val oldVersionIndex = min(index + 1, championVersionList.lastIndex)
+                val oldVersion = championVersionList[oldVersionIndex]
+
+                championDao.getChangedStatsVersionList(
+                    id = championId,
+                    newVersion = version,
+                    oldVersion = oldVersion
+                ).firstOrNull()
+            }
+            .filterNotNull()
+            .associateWith { true }
     }
 }
