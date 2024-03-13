@@ -22,6 +22,14 @@ class BaseToast(
     baseToastType: BaseToastType,
     messageText: String
 ) : Toast(context) {
+    companion object {
+        fun createDefaultErrorToast(context: Context): BaseToast = BaseToast(
+            context = context,
+            baseToastType = BaseToastType.WARNING,
+            messageText = context.resources.getString(R.string.default_error_message)
+        )
+    }
+
     init {
         val iconId: Int?
         val iconColor: Color?
@@ -59,7 +67,7 @@ class BaseToast(
             0,
             0
         )
-        this.duration = LENGTH_SHORT
+        this.duration = Toast.LENGTH_SHORT
         this.view = binding.root
     }
 }

@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,6 +41,7 @@ import com.sandorln.champion.util.getResourceId
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
+import com.sandorln.design.component.toast.BaseToast
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -56,6 +58,7 @@ fun ChampionHomeScreen(
     championHomeViewModel: ChampionHomeViewModel = hiltViewModel(),
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit
 ) {
+    val context = LocalContext.current
     val currentVersion by championHomeViewModel.currentVersion.collectAsState()
     val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
@@ -65,6 +68,20 @@ fun ChampionHomeScreen(
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PULL_HEIGHT
     )
+
+    LaunchedEffect(true) {
+        championHomeViewModel
+            .sideEffect
+            .collect {
+                when (it) {
+                    is ChampionHomeSideEffect.ShowErrorMessage -> {
+                        BaseToast
+                            .createDefaultErrorToast(context)
+                            .show()
+                    }
+                }
+            }
+    }
 
     LaunchedEffect(uiState.isLoading) {
         if (!uiState.isLoading)

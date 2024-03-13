@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -40,6 +41,9 @@ class SpellHomeViewModel @Inject constructor(
         _action.emit(action)
     }
 
+    private val _sideEffect = MutableSharedFlow<SpellHomeSideEffect>()
+    val sideEffect = _sideEffect.asSharedFlow()
+
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Spell).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
     val currentSpellList = getSpellListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -64,7 +68,7 @@ class SpellHomeViewModel @Inject constructor(
                                     SpriteType.Spell,
                                     spriteFileList
                                 ).onFailure {
-                                    /* TODO :: 오류 발생 시 처리 */
+                                    _sideEffect.emit(SpellHomeSideEffect.ShowErrorMessage(it as Exception))
                                 }
                             _uiState.update { it.copy(isLoading = false) }
                         }
@@ -92,7 +96,7 @@ class SpellHomeViewModel @Inject constructor(
                                 SpriteType.Spell,
                                 spriteFileList
                             ).onFailure {
-                                /* TODO :: 오류 발생 시 처리 */
+                                _sideEffect.emit(SpellHomeSideEffect.ShowErrorMessage(it as Exception))
                             }
                     }
             }
@@ -108,4 +112,8 @@ data class SpellHomeUiState(
 sealed interface SpellHomeAction {
     data object RefreshSpellData : SpellHomeAction
     data class SelectSpell(val spell: SummonerSpell) : SpellHomeAction
+}
+
+sealed interface SpellHomeSideEffect {
+    data class ShowErrorMessage(val exception: Exception) : SpellHomeSideEffect
 }

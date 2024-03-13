@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -26,9 +25,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
+import com.sandorln.design.component.toast.BaseToast
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -41,6 +42,7 @@ import kotlin.math.floor
 fun SpellHomeScreen(
     spellHomeViewModel: SpellHomeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val uiState by spellHomeViewModel.uiState.collectAsState()
     val spellList by spellHomeViewModel.currentSpellList.collectAsState()
     val spellSpriteBitmap by spellHomeViewModel.currentSpriteMap.collectAsState()
@@ -49,6 +51,20 @@ fun SpellHomeScreen(
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PULL_HEIGHT
     )
+
+    LaunchedEffect(true) {
+        spellHomeViewModel
+            .sideEffect
+            .collect {
+                when (it) {
+                    is SpellHomeSideEffect.ShowErrorMessage -> {
+                        BaseToast
+                            .createDefaultErrorToast(context)
+                            .show()
+                    }
+                }
+            }
+    }
 
     LaunchedEffect(uiState.isLoading) {
         if (!uiState.isLoading)

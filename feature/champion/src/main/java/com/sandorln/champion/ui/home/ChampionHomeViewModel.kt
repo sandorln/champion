@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -45,6 +46,9 @@ class ChampionHomeViewModel @Inject constructor(
     fun sendAction(championHomeAction: ChampionHomeAction) = viewModelScope.launch {
         _championAction.emit(championHomeAction)
     }
+
+    private val _sideEffect = MutableSharedFlow<ChampionHomeSideEffect>()
+    val sideEffect = _sideEffect.asSharedFlow()
 
     private val _championMutex = Mutex()
     private val _currentChampionList = getSummaryChampionListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
@@ -85,7 +89,7 @@ class ChampionHomeViewModel @Inject constructor(
                                         SpriteType.Champion,
                                         spriteFileList
                                     ).onFailure {
-                                        /* TODO :: 오류 발생 시 처리 */
+                                        _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
                                     }
                                 _championUiState.emit(currentUiState.copy(isLoading = false))
                             }
@@ -131,7 +135,7 @@ class ChampionHomeViewModel @Inject constructor(
                                 SpriteType.Champion,
                                 spriteFileList
                             ).onFailure {
-                                /* TODO :: 오류 발생 시 처리 */
+                                _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
                             }
                     }
             }
@@ -150,4 +154,8 @@ sealed interface ChampionHomeAction {
 
     data class ChangeChampionSearchKeyword(val searchKeyword: String) : ChampionHomeAction
     data class ToggleChampionTag(val championTag: ChampionTag) : ChampionHomeAction
+}
+
+sealed interface ChampionHomeSideEffect {
+    data class ShowErrorMessage(val exception: Exception) : ChampionHomeSideEffect
 }
