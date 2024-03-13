@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,7 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
 import kotlin.math.floor
+import com.sandorln.champion.R as championR
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -132,7 +134,7 @@ fun ChampionHomeScreen(
                                 vertical = Spacings.Spacing03
                             ),
                         text = uiState.searchKeyword,
-                        hint = "챔피언 검색",
+                        hint = stringResource(id = championR.string.search_champion),
                         onChangeTextListener = { search ->
                             val action = ChampionHomeAction.ChangeChampionSearchKeyword(search)
                             championHomeViewModel.sendAction(action)
