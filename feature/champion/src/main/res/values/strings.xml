@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="champion_detail_title_stats">능력치</string>
+    <string name="champion_detail_title_skill">스킬</string>
+    <string name="champion_detail_title_similar_champion">비슷한 역할 챔피언</string>
+    <string name="champion_detail_title_skin">스킨</string>
+    <string name="champion_detail_title_story">스토리</string>
+
+    <string name="move_to_guide_site">공략 사이트로 이동</string>
+    <string name="site_name_op_gg" translatable="false">OP.GG</string>
+    <string name="site_name_lol_ps" translatable="false">LOL.PS</string>
+    <string name="op_gg_site_url" translatable="false">https://www.op.gg/champions/%1$s/build</string>
+    <string name="lol_ps_site_url" translatable="false">https://lol.ps/champ/%1$s</string>
+
+    <string name="changed_stats">능력치 변경</string>
+
+    <string name="skill_video_play_when_latest_version">※ 동영상은 최신 버전일 때 재생 됩니다 ※</string>
+    <string name="skill_cool_time">쿨타임 : %1$s 초</string>
+    <string name="skill_cost">소모 : %1$s</string>
+    <string name="skill_lv_tip">스킬 레벨업 : %1$s</string>
+
+    <string name="stats_attack">공격력</string>
+    <string name="stats_attack_speed">공격속도</string>
+    <string name="stats_attack_range">사정거리</string>
+    <string name="stats_hp">체력</string>
+    <string name="stats_hp_regen">체력재생</string>
+    <string name="stats_mp">마나</string>
+    <string name="stats_mp_regen">마나재생</string>
+    <string name="stats_armor">방어력</string>
+    <string name="stats_spell_armor">마법방어력</string>
+    <string name="stats_move">이동속도</string>
+
+    <string name="stats_add_lv">%1$s (+lv)</string>
+    <string name="stats_lv_stats">(+%1$s)</string>
+
+    <string name="default_skin_name">기본 스킨</string>
+</resources>

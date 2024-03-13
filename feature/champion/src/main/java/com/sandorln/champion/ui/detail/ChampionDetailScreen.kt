@@ -43,7 +43,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -54,6 +53,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -87,6 +87,7 @@ import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
+import com.sandorln.champion.R as championR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,6 +99,12 @@ fun ChampionDetailScreen(
     val uiState by championDetailViewModel.uiState.collectAsState()
     val championDetailData = uiState.championDetailData
     val changedStatsVersion = uiState.changedStatsVersion
+
+    val statsTitle = stringResource(id = championR.string.champion_detail_title_stats)
+    val skillTitle = stringResource(id = championR.string.champion_detail_title_skill)
+    val similarChampionTitle = stringResource(id = championR.string.champion_detail_title_similar_champion)
+    val skinTitle = stringResource(id = championR.string.champion_detail_title_skin)
+    val storyTitle = stringResource(id = championR.string.champion_detail_title_story)
 
     BaseContentWithMotionToolbar(
         headerRatio = Dimens.CHAMPION_SPLASH_RATIO_STRING,
@@ -273,7 +280,7 @@ fun ChampionDetailScreen(
         ) {
             Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
-            ChampionDetailInfoTitle(title = "능력치")
+            ChampionDetailInfoTitle(title = statsTitle)
 
             ChampionStatusBody(
                 currentVersion = uiState.selectedVersion,
@@ -282,7 +289,7 @@ fun ChampionDetailScreen(
                 preChampionStats = uiState.preChampion?.stats
             )
 
-            ChampionDetailInfoTitle(title = "스킬")
+            ChampionDetailInfoTitle(title = skillTitle)
 
             ChampionSkillListBody(
                 isLatestVersion = uiState.isLatestVersion,
@@ -298,7 +305,7 @@ fun ChampionDetailScreen(
             )
 
             if (uiState.similarChampionList.isNotEmpty()) {
-                ChampionDetailInfoTitle(title = "비슷한 역할 챔피언")
+                ChampionDetailInfoTitle(title = similarChampionTitle)
 
                 SimilarChampionListBody(
                     version = uiState.selectedVersion,
@@ -308,14 +315,14 @@ fun ChampionDetailScreen(
                 )
             }
 
-            ChampionDetailInfoTitle(title = "스킨")
+            ChampionDetailInfoTitle(title = skinTitle)
 
             ChampionSkins(
                 championId = championDetailData.id,
                 skinList = championDetailData.skins
             )
 
-            ChampionDetailInfoTitle(title = "스토리")
+            ChampionDetailInfoTitle(title = storyTitle)
 
             LolHtmlTagTextView(
                 modifier = Modifier.padding(horizontal = Spacings.Spacing04),
@@ -361,13 +368,22 @@ private fun ChampionLinkListBody(
     championDetailData: ChampionDetailData = ChampionDetailData()
 ) {
     val context = LocalContext.current
+    val opggUrl = stringResource(
+        id = championR.string.op_gg_site_url,
+        championDetailData.id
+    )
+    val lolpsUrl = stringResource(
+        id = championR.string.lol_ps_site_url,
+        championDetailData.key
+    )
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
     ) {
         Text(
-            text = "공략 사이트로 이동",
+            text = stringResource(id = championR.string.move_to_guide_site),
             style = TextStyles.Body03,
             color = Colors.Gray05,
             textDecoration = TextDecoration.Underline
@@ -380,15 +396,15 @@ private fun ChampionLinkListBody(
             )
         ) {
             ChampionLinkBody(
-                title = "OP.GG",
+                title = stringResource(id = championR.string.site_name_op_gg),
                 onClickListener = {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.op.gg/champions/${championDetailData.id}/build")))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(opggUrl)))
                 }
             )
             ChampionLinkBody(
-                title = "LOL.PS",
+                title = stringResource(id = championR.string.site_name_lol_ps),
                 onClickListener = {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://lol.ps/champ/${championDetailData.key}")))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(lolpsUrl)))
                 }
             )
         }
@@ -436,7 +452,7 @@ fun VersionItemBody(
                         horizontal = Spacings.Spacing01,
                         vertical = Spacings.Spacing00
                     ),
-                text = "능력치 변경",
+                text = stringResource(id = championR.string.changed_stats),
                 style = TextStyles.Body04,
                 color = Colors.Gold02
             )
@@ -500,7 +516,7 @@ fun ChampionSkillListBody(
 
         if (!isLatestVersion)
             Text(
-                text = "※ 동영상은 최신 버전일 때 재생 됩니다 ※",
+                text = stringResource(id = championR.string.skill_video_play_when_latest_version),
                 modifier = Modifier.padding(vertical = Spacings.Spacing00),
                 style = TextStyles.Body04.addShadow(),
                 color = Colors.Gray03
@@ -552,17 +568,29 @@ fun ChampionSkillListBody(
                 textAlign = TextAlign.Center,
                 color = Colors.BaseColor
             )
+
             if (selectedSkill.cooldownBurn.isNotEmpty()) {
+                val coolTimeText = stringResource(
+                    id = championR.string.skill_cool_time,
+                    selectedSkill.cooldownBurn
+                )
+
                 Text(
-                    text = "쿨타임 : ${selectedSkill.cooldownBurn} 초",
+                    text = coolTimeText,
                     style = TextStyles.Body04,
                     textAlign = TextAlign.Center,
                     color = Colors.Gray04
                 )
             }
+
             if (selectedSkill.costBurn.isNotEmpty() && selectedSkill.costBurn != "0") {
+                val costText = stringResource(
+                    id = championR.string.skill_cost,
+                    selectedSkill.costBurn
+                )
+
                 Text(
-                    text = "소모 : ${selectedSkill.costBurn}",
+                    text = costText,
                     style = TextStyles.Body04,
                     textAlign = TextAlign.Center,
                     color = Colors.Gray04
@@ -570,9 +598,12 @@ fun ChampionSkillListBody(
             }
 
             if (selectedSkill.levelTip.isNotEmpty()) {
-                LolHtmlTagTextView(
-                    lolDescription = "스킬 레벨업 : ${selectedSkill.levelTip.fastJoinToString(" / ")}"
+                val lvTipText = stringResource(
+                    id = championR.string.skill_lv_tip,
+                    selectedSkill.levelTip.fastJoinToString(" / ")
                 )
+
+                LolHtmlTagTextView(lolDescription = lvTipText)
             }
         }
 
@@ -709,7 +740,7 @@ fun ChampionStatusBody(
         }
 
         StatusCompareBody(
-            title = "공격력",
+            title = stringResource(id = championR.string.stats_attack),
             originalValue = championStats.attackdamage,
             originalLvValue = championStats.attackdamageperlevel,
             compareValue = preChampionStats?.attackdamage,
@@ -717,7 +748,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "공격속도",
+            title = stringResource(id = championR.string.stats_attack_speed),
             originalValue = championStats.attackspeed,
             originalLvValue = championStats.attackspeedperlevel,
             compareValue = preChampionStats?.attackspeed,
@@ -725,13 +756,13 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "사정거리",
+            title = stringResource(id = championR.string.stats_attack_range),
             originalValue = championStats.attackrange,
             compareValue = preChampionStats?.attackrange,
         )
 
         StatusCompareBody(
-            title = "체력",
+            title = stringResource(id = championR.string.stats_hp),
             originalValue = championStats.hp,
             originalLvValue = championStats.hpperlevel,
             compareValue = preChampionStats?.hp,
@@ -739,7 +770,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "체력재생",
+            title = stringResource(id = championR.string.stats_hp_regen),
             originalValue = championStats.hpregen,
             originalLvValue = championStats.hpregenperlevel,
             compareValue = preChampionStats?.hpregen,
@@ -747,7 +778,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "마나",
+            title = stringResource(id = championR.string.stats_mp),
             originalValue = championStats.mp,
             originalLvValue = championStats.mpperlevel,
             compareValue = preChampionStats?.mp,
@@ -755,7 +786,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "마나재생",
+            title = stringResource(id = championR.string.stats_mp_regen),
             originalValue = championStats.mpregen,
             originalLvValue = championStats.mpregenperlevel,
             compareValue = preChampionStats?.mpregen,
@@ -763,7 +794,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "방어력",
+            title = stringResource(id = championR.string.stats_armor),
             originalValue = championStats.armor,
             originalLvValue = championStats.armorperlevel,
             compareValue = preChampionStats?.armor,
@@ -771,7 +802,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "마법방어력",
+            title = stringResource(id = championR.string.stats_spell_armor),
             originalValue = championStats.spellblock,
             originalLvValue = championStats.spellblockperlevel,
             compareValue = preChampionStats?.spellblock,
@@ -779,7 +810,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = "이동속도",
+            title = stringResource(id = championR.string.stats_move),
             originalValue = championStats.movespeed,
             compareValue = preChampionStats?.movespeed,
         )
@@ -794,7 +825,12 @@ fun StatusCompareBody(
     compareValue: Double? = null,
     compareLvValue: Double? = null,
 ) {
-    val titleSuffix = if (originalLvValue != null) " (+Lv)" else ""
+    val titleWithSuffix = if (originalLvValue != null) {
+        stringResource(id = championR.string.stats_add_lv, title)
+    } else {
+        title
+    }
+
     val originalValueColor: Color = originalValue.statusCompareColor(compareValue)
     val originalLvValueColor: Color = originalLvValue.statusCompareColor(compareLvValue)
     val compareValueColor: Color = compareValue.statusCompareColor(originalValue)
@@ -805,7 +841,7 @@ fun StatusCompareBody(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = "$title$titleSuffix",
+            text = titleWithSuffix,
             style = TextStyles.Body04,
             color = Colors.Gray04,
             maxLines = 1,
@@ -858,9 +894,13 @@ fun StatusBody(
             color = valueColor
         )
         if (lvValue != null) {
+            val statsText = stringResource(
+                id = championR.string.stats_lv_stats,
+                lvValue.toString()
+            )
             Text(
                 modifier = Modifier,
-                text = "(+$lvValue)",
+                text = statsText,
                 style = TextStyles.Body04,
                 maxLines = 1,
                 textAlign = TextAlign.Center,
@@ -940,10 +980,11 @@ fun ChampionSkins(
         skinList.size
     }
 
+    val defaultSkinName = stringResource(id = championR.string.default_skin_name)
     val skinName = remember(pagerState.currentPage) {
         val currentPage = pagerState.currentPage
         if (currentPage == 0) {
-            "기본 스킨"
+            defaultSkinName
         } else {
             skinList[currentPage].name
         }
