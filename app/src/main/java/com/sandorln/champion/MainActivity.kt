@@ -16,6 +16,8 @@ import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.home.navigation.HomeScreenRoute
 import com.sandorln.home.navigation.homeScreens
+import com.sandorln.setting.navigation.moveToLolPatchNoteScreen
+import com.sandorln.setting.navigation.settingScreens
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,11 +39,15 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = HomeScreenRoute) {
                         homeScreens(
                             moveToChampionDetailScreen = navController::moveToChampionDetail,
-                            moveToLicensesScreen = moveToLicensesScreen
+                            moveToLicensesScreen = moveToLicensesScreen,
+                            moveToLolPatchNoteScreen = navController::moveToLolPatchNoteScreen
                         )
                         championScreens(
                             onBackStack = navController::popBackStack,
                             moveToChampionDetailScreen = navController::moveToChampionDetail
+                        )
+                        settingScreens(
+                            onBackStack = navController::popBackStack
                         )
                     }
                 }

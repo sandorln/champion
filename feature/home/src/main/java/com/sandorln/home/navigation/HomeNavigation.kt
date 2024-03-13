@@ -8,7 +8,8 @@ const val HomeScreenRoute = "HomeScreenRoute"
 
 fun NavGraphBuilder.homeScreens(
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
-    moveToLicensesScreen: () -> Unit
+    moveToLicensesScreen: () -> Unit,
+    moveToLolPatchNoteScreen: () -> Unit
 ) {
     composable(
         route = HomeScreenRoute
@@ -16,6 +17,7 @@ fun NavGraphBuilder.homeScreens(
         HomeScreen(
             moveToChampionDetailScreen = moveToChampionDetailScreen,
             moveToLicensesScreen = moveToLicensesScreen,
+            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen
         )
     }
 }

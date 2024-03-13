@@ -27,7 +27,8 @@ import com.sandorln.setting.R
 
 @Composable
 fun SettingHomeScreen(
-    moveToLicensesScreen: () -> Unit
+    moveToLicensesScreen: () -> Unit,
+    moveToLolPatchNoteScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val packageName = context.packageName
@@ -40,10 +41,9 @@ fun SettingHomeScreen(
     ) {
         SettingMenuBody(
             title = stringResource(id = R.string.menu_lol_patch_notes),
-            onClick = {
-
-            }
+            onClick = moveToLolPatchNoteScreen
         )
+
         SettingMenuBody(
             title = stringResource(id = R.string.menu_open_licenses),
             onClick = moveToLicensesScreen
@@ -95,8 +95,9 @@ fun SettingMenuBody(
 @Composable
 fun SettingHomeScreenPreview() {
     LolChampionThemePreview {
-        SettingHomeScreen {
-
-        }
+        SettingHomeScreen(
+            moveToLicensesScreen = {},
+            moveToLolPatchNoteScreen = {}
+        )
     }
 }

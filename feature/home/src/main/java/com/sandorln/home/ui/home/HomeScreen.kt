@@ -84,7 +84,8 @@ private val homeItems = listOf(
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
-    moveToLicensesScreen: () -> Unit
+    moveToLicensesScreen: () -> Unit,
+    moveToLolPatchNoteScreen: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -151,7 +152,8 @@ fun HomeScreen(
                         HomeScreenType.SummonerSpell -> SpellHomeScreen()
 
                         HomeScreenType.Setting -> SettingHomeScreen(
-                            moveToLicensesScreen = moveToLicensesScreen
+                            moveToLicensesScreen = moveToLicensesScreen,
+                            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen
                         )
                     }
                 }

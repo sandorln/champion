@@ -32,7 +32,7 @@ import com.sandorln.design.theme.TextStyles
 fun BaseToolbar(
     modifier: Modifier = Modifier,
     onClickStartIcon: () -> Unit = {},
-    title: String = "제목",
+    title: String = "",
     @DrawableRes startIconResId: Int = R.drawable.ic_chevron_left,
 ) {
     Box(modifier = modifier) {
@@ -40,7 +40,7 @@ fun BaseToolbar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(Dimens.BASE_TOOLBAR_HEIGHT)
-                .background(Colors.Gray09)
+                .background(Colors.Blue07)
                 .padding(
                     top = Spacings.Spacing02,
                     bottom = Spacings.Spacing02,
