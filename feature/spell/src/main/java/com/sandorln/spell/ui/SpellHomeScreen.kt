@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
@@ -35,6 +36,7 @@ import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.spell.R
 import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,7 +110,7 @@ fun SpellHomeScreen(
                         )
 
                         Text(
-                            text = "쿨타임 ${selectedSpell.cooldownBurn} 초",
+                            text = stringResource(id = R.string.spell_cool_time, selectedSpell.cooldownBurn),
                             style = TextStyles.Body03,
                             color = Colors.Gray02
                         )
@@ -126,7 +128,7 @@ fun SpellHomeScreen(
                         ) {
                             Text(
                                 modifier = Modifier.align(Alignment.Center),
-                                text = "보고 싶은 주문을 선택해주세요",
+                                text = stringResource(id = R.string.hint_selected_spell),
                                 style = TextStyles.SubTitle02,
                                 color = Colors.Gold02
                             )
