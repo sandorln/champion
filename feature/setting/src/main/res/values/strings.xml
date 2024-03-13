@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_lol_patch_notes">롤 패치 노트 목록보기</string>
+    <string name="menu_open_licenses">오픈 라이선스 목록보기</string>
+    <string name="app_version" translatable="false">App Version %1$s</string>
+    <string name="lol_patch_notes_url">https://www.leagueoflegends.com/ko&#8211;kr/news/game&#8211;updates/patch&#8211;%1$d&#8211;%2$d&#8211;notes/</string>
+</resources>

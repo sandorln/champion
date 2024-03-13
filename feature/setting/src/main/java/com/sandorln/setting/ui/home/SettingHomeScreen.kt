@@ -1,4 +1,4 @@
-package com.sandorln.setting.ui
+package com.sandorln.setting.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.sandorln.design.theme.Colors
@@ -22,6 +23,7 @@ import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.setting.R
 
 @Composable
 fun SettingHomeScreen(
@@ -37,7 +39,13 @@ fun SettingHomeScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         SettingMenuBody(
-            title = "오픈 라이선스 목록보기",
+            title = stringResource(id = R.string.menu_lol_patch_notes),
+            onClick = {
+
+            }
+        )
+        SettingMenuBody(
+            title = stringResource(id = R.string.menu_open_licenses),
             onClick = moveToLicensesScreen
         )
 
@@ -46,7 +54,10 @@ fun SettingHomeScreen(
                 .padding(top = Spacings.Spacing03)
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
-            text = "App Version $versionName",
+            text = stringResource(
+                id = R.string.app_version,
+                versionName
+            ),
             style = TextStyles.Body03,
             color = Colors.Gray04
         )
@@ -71,7 +82,7 @@ fun SettingMenuBody(
             modifier = Modifier.align(Alignment.Center),
             textAlign = TextAlign.Center,
             text = title,
-            style = TextStyles.SubTitle03,
+            style = TextStyles.SubTitle02,
             color = Colors.Gray03
         )
         HorizontalDivider(

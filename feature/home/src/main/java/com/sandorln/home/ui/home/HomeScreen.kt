@@ -59,7 +59,7 @@ import com.sandorln.home.R
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
 import com.sandorln.model.data.version.Version
-import com.sandorln.setting.ui.SettingHomeScreen
+import com.sandorln.setting.ui.home.SettingHomeScreen
 import com.sandorln.spell.ui.SpellHomeScreen
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
