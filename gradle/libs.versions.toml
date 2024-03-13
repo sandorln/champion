@@ -30,7 +30,7 @@ licensesPlugin = "0.10.6"
 
 complieSdk = "34"
 minSdk = "24"
-versionCode = "49"
+versionCode = "50"
 versionName = "2.0.00"
 composeCompiler = "1.5.2"
 
