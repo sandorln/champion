@@ -1,45 +1,4 @@
 <resources>
     <string name="app_name">LOL Library</string>
     <string name="app_name_dev">LOL Library DEV</string>
-    <string name="not_find_data" translatable="false">Not Find Data</string>
-    <string name="unknown" translatable="false">UNKNOWN</string>
-    <string name="champion_info_title" translatable="false">&lt; %s &gt;</string>
-    <string name="app_setting_newest_lol_version">Ask if I want to change to the latest version every time I run the app</string>
-    <string name="app_setting_video_wifi_mode_only_play">Automatically play movies only when in WIFI mode</string>
-    <string name="version" translatable="false">VERSION</string>
-    <string name="search_champion">Champion Search</string>
-    <string name="search_item">Item Search</string>
-    <string name="retry">Retry</string>
-    <string name="pause" translatable="false">pause</string>
-    <string name="play" translatable="false">play</string>
-    <string name="volume" translatable="false">volume</string>
-    <string name="name">Name</string>
-    <string name="price">Price</string>
-    <string name="next_depth_item">NEXT DEPTH ITEM</string>
-    <string name="pre_depth_item">PRE DEPTH ITEM</string>
-    <string name="not_showing_skill_video">Not Showing Skill Video</string>
-    <string name="description">Description</string>
-    <string name="hp" translatable="false">체력</string>
-    <string name="hpperlevel" translatable="false">체력증가</string>
-    <string name="mp" translatable="false">마나</string>
-    <string name="mpperlevel" translatable="false">마나증가</string>
-    <string name="movespeed" translatable="false">이동속도</string>
-    <string name="armor" translatable="false">물리방어</string>
-    <string name="armorperlevel" translatable="false">물리방어증가</string>
-    <string name="spellblock" translatable="false">마법방어</string>
-    <string name="spellblockperlevel" translatable="false">마법방어증가</string>
-    <string name="attackrange" translatable="false">공격사거리</string>
-    <string name="hpregen" translatable="false">체력재생</string>
-    <string name="hpregenperlevel" translatable="false">체력재생증가</string>
-    <string name="mpregen" translatable="false">마나재생</string>
-    <string name="mpregenperlevel" translatable="false">마나재생증가</string>
-    <string name="crit" translatable="false">치명타확률</string>
-    <string name="critperlevel" translatable="false">치명타확률증가</string>
-    <string name="attackdamage" translatable="false">공격력</string>
-    <string name="attackdamageperlevel" translatable="false">공격력증가</string>
-    <string name="attackspeedperlevel" translatable="false">공격속도증가</string>
-    <string name="attackspeed" translatable="false">공격속도</string>
-    <string name="attackspeedoffset" translatable="false">공격속도 (옛날)</string>
-    <string name="error" translatable="false">ERROR</string>
-    <string name="version_title" translatable="false">Ver &lt;font color="#CAAB67">%1$s&lt;/font></string>
 </resources>
