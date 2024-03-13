@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -47,6 +48,9 @@ class ItemHomeViewModel @Inject constructor(
     fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
         _itemAction.emit(itemHomeAction)
     }
+
+    private val _sideEffect = MutableSharedFlow<ItemHomeSideEffect>()
+    val sideEffect = _sideEffect.asSharedFlow()
 
     private val _itemFilter: suspend (ItemHomeUiState, List<ItemData>, List<String>) -> List<ItemData> = { uiState, itemList, newItemIdList ->
         val searchKeyword = uiState.searchKeyword
@@ -117,7 +121,7 @@ class ItemHomeViewModel @Inject constructor(
                                     spriteType = SpriteType.Item,
                                     fileNameList = spriteFileList
                                 ).onFailure {
-                                    /* TODO :: 에러 처리 필요 */
+                                    _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
                                 }
 
                                 _itemUiState.emit(currentUiState.copy(isLoading = false))
@@ -166,7 +170,7 @@ class ItemHomeViewModel @Inject constructor(
                             spriteType = SpriteType.Item,
                             fileNameList = spriteFileList
                         ).onFailure {
-                            /* TODO :: 오류 발생 시 처리 */
+                            _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
                         }
                     }
             }
@@ -192,4 +196,8 @@ sealed interface ItemHomeAction {
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
+}
+
+sealed interface ItemHomeSideEffect {
+    data class ShowErrorMessage(val exception: Exception) : ItemHomeSideEffect
 }

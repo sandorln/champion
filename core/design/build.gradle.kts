@@ -17,6 +17,9 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    dataBinding {
+        enable = true
+    }
     buildFeatures {
         compose = true
     }
@@ -26,6 +29,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.card)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
 

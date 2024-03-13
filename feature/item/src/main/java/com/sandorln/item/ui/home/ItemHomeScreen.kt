@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +38,7 @@ import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
+import com.sandorln.design.component.toast.BaseToast
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -54,6 +56,7 @@ import kotlin.math.floor
 fun ItemHomeScreen(
     itemHomeViewModel: ItemHomeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val currentItemList by itemHomeViewModel.displayItemList.collectAsState()
     val currentSpriteMap by itemHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by itemHomeViewModel.itemUiState.collectAsState()
@@ -70,6 +73,18 @@ fun ItemHomeScreen(
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PULL_HEIGHT
     )
+
+    LaunchedEffect(true) {
+        itemHomeViewModel
+            .sideEffect
+            .collect {
+                when(it){
+                    is ItemHomeSideEffect.ShowErrorMessage -> {
+                        BaseToast.createDefaultErrorToast(context).show()
+                    }
+                }
+            }
+    }
 
     LaunchedEffect(uiState.isLoading) {
         if (!uiState.isLoading)
