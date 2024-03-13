@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -58,6 +57,7 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
 import com.sandorln.model.data.version.Version
+import com.sandorln.setting.ui.SettingHomeScreen
 import com.sandorln.spell.ui.SpellHomeScreen
 import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
@@ -81,7 +81,8 @@ private val homeItems = listOf(
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
-    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
+    moveToLicensesScreen: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -147,13 +148,9 @@ fun HomeScreen(
 
                         HomeScreenType.SummonerSpell -> SpellHomeScreen()
 
-                        HomeScreenType.Setting -> Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Green)
-                        ) {
-
-                        }
+                        HomeScreenType.Setting -> SettingHomeScreen(
+                            moveToLicensesScreen = moveToLicensesScreen
+                        )
                     }
                 }
             }

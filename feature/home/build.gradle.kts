@@ -58,4 +58,5 @@ dependencies {
     api(project(":feature:champion"))
     api(project(":feature:item"))
     api(project(":feature:spell"))
+    api(project(":feature:setting"))
 }

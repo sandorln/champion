@@ -1,5 +1,6 @@
 package com.sandorln.champion
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.sandorln.champion.navigation.championScreens
 import com.sandorln.champion.navigation.moveToChampionDetail
 import com.sandorln.design.theme.Colors
@@ -20,6 +22,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val moveToLicensesScreen = {
+            startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+        }
+
         setContent {
             LolChampionTheme {
                 Surface(
@@ -29,7 +36,8 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = HomeScreenRoute) {
                         homeScreens(
-                            moveToChampionDetailScreen = navController::moveToChampionDetail
+                            moveToChampionDetailScreen = navController::moveToChampionDetail,
+                            moveToLicensesScreen = moveToLicensesScreen
                         )
                         championScreens(
                             onBackStack = navController::popBackStack,

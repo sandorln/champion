@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -111,7 +112,7 @@ fun SpellHomeScreen(
                                 modifier = Modifier.align(Alignment.Center),
                                 text = "보고 싶은 주문을 선택해주세요",
                                 style = TextStyles.SubTitle02,
-                                color = Colors.Gray02
+                                color = Colors.Gold02
                             )
                         }
                     }

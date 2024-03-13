@@ -7,13 +7,15 @@ import com.sandorln.home.ui.home.HomeScreen
 const val HomeScreenRoute = "HomeScreenRoute"
 
 fun NavGraphBuilder.homeScreens(
-    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
+    moveToLicensesScreen: () -> Unit
 ) {
     composable(
         route = HomeScreenRoute
     ) {
         HomeScreen(
-            moveToChampionDetailScreen = moveToChampionDetailScreen
+            moveToChampionDetailScreen = moveToChampionDetailScreen,
+            moveToLicensesScreen = moveToLicensesScreen,
         )
     }
 }

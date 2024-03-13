@@ -48,6 +48,8 @@ object Dimens {
 
     val SELECT_SPELL_HEIGHT_MIN = 200.dp
 
+    val SETTING_MENU_HEIGHT_MIN = 40.dp
+
     const val CHAMPION_SPLASH_RATIO_STRING = "1:0.59012"
     const val CHAMPION_SPLASH_RATIO = 1.694f
     const val CHAMPION_SKILL_VIDEO_RATIO = 1.48f
