@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +55,7 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.home.R
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
 import com.sandorln.model.data.version.Version
@@ -63,11 +65,11 @@ import kotlinx.coroutines.launch
 import com.sandorln.design.R as designR
 
 
-sealed class HomeScreenType(val title: String, @DrawableRes val svgId: Int) {
-    data object Champion : HomeScreenType("챔피온", designR.drawable.ic_main_champion)
-    data object Item : HomeScreenType("아이템", designR.drawable.ic_main_item)
-    data object SummonerSpell : HomeScreenType("스펠", designR.drawable.ic_main_spell)
-    data object Setting : HomeScreenType("설정", designR.drawable.ic_main_special)
+sealed class HomeScreenType(@DrawableRes val svgId: Int) {
+    data object Champion : HomeScreenType(designR.drawable.ic_main_champion)
+    data object Item : HomeScreenType(designR.drawable.ic_main_item)
+    data object SummonerSpell : HomeScreenType(designR.drawable.ic_main_spell)
+    data object Setting : HomeScreenType(designR.drawable.ic_main_special)
 }
 
 private val homeItems = listOf(
@@ -343,8 +345,14 @@ internal fun HomeBottomNavigation(
                     )
                 },
                 label = {
+                    val titleId = when (homeScreenType) {
+                        HomeScreenType.Champion -> R.string.menu_champion
+                        HomeScreenType.Item -> R.string.menu_item
+                        HomeScreenType.Setting -> R.string.menu_setting
+                        HomeScreenType.SummonerSpell -> R.string.menu_spell
+                    }
                     Text(
-                        text = homeScreenType.title,
+                        text = stringResource(id = titleId),
                         style = TextStyles.Body03.copy(color = Color.Unspecified)
                     )
                 },
@@ -382,7 +390,7 @@ fun HomeVersionChangeBar(
     ) {
         VersionButton(
             isEnable = hasPreVersion,
-            title = "Prev",
+            title = stringResource(id = R.string.version_previous_btn),
             onClickListener = onChangePreVersion
         )
         ConstraintLayout(
@@ -425,7 +433,7 @@ fun HomeVersionChangeBar(
         }
         VersionButton(
             isEnable = hasNextVersion,
-            title = "Next",
+            title = stringResource(id = R.string.version_next_btn),
             onClickListener = onChangeNextVersion
         )
     }
