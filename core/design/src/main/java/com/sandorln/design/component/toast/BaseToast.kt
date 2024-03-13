@@ -67,7 +67,7 @@ class BaseToast(
             0,
             0
         )
-        this.duration = Toast.LENGTH_SHORT
+        this.duration = LENGTH_SHORT
         this.view = binding.root
     }
 }

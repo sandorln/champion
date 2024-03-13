@@ -38,6 +38,7 @@ object IconSize {
 }
 
 object Dimens {
+    val INTRO_SPLASH_HEIGHT_MAX = 80.dp
     val BASE_TOOLBAR_HEIGHT = 56.dp
 
     val PULL_HEIGHT = 80.dp

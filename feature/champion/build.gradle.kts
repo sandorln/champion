@@ -29,9 +29,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.navigation.hilt)
 
     testImplementation(libs.test.junit)
     androidTestImplementation(libs.test.androidx.junit)
@@ -40,9 +37,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.glide)
-
     implementation(project(":core:design"))
     implementation(project(":core:domain"))
-    implementation(project(":core:model"))
 }

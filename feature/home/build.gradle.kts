@@ -29,9 +29,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.navigation.hilt)
 
     testImplementation(libs.test.junit)
     androidTestImplementation(libs.test.androidx.junit)
@@ -40,21 +37,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.preview)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material)
-
-    implementation(libs.androidx.compose.constraintlayout)
-
-    implementation(libs.jsoup.jsoup)
-
     implementation(project(":core:design"))
-    implementation(project(":core:data"))
     implementation(project(":core:domain"))
-    implementation(project(":core:model"))
     api(project(":feature:champion"))
     api(project(":feature:item"))
     api(project(":feature:spell"))

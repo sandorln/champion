@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sandorln.design.theme.Colors
+import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.R as designR
@@ -40,7 +41,7 @@ fun IntroScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             modifier = Modifier
-                .heightIn(max = 120.dp)
+                .heightIn(max = Dimens.INTRO_SPLASH_HEIGHT_MAX)
                 .scale(1f)
                 .align(Alignment.Center),
             painter = painterResource(id = designR.drawable.ic_logo_black),
@@ -48,7 +49,7 @@ fun IntroScreen() {
         )
         Image(
             modifier = Modifier
-                .heightIn(max = 120.dp)
+                .heightIn(max = Dimens.INTRO_SPLASH_HEIGHT_MAX)
                 .align(Alignment.Center)
                 .offset(y = -Spacings.Spacing04),
             painter = painterResource(id = designR.drawable.ic_logo_black),

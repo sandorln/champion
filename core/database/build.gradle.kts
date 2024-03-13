@@ -24,9 +24,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.appcompat)
-
     implementation(libs.google.gson)
 
     implementation(libs.androidx.room.ktx)

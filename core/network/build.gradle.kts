@@ -33,9 +33,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.appcompat)
     testImplementation(libs.test.junit)
-    androidTestImplementation(libs.test.androidx.junit)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

@@ -49,7 +49,6 @@ fun BaseTextEditor(
     onChangeTextListener: (String) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
-    val keyboardManager = LocalSoftwareKeyboardController.current
     var textFocus by remember {
         mutableStateOf(false)
     }

@@ -24,13 +24,10 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.appcompat)
-
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.coroutine.android)
+    api(libs.coroutine.android)
 
     implementation(project(":core:network"))
     implementation(project(":core:database"))

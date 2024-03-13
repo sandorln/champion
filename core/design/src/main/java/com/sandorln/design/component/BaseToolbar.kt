@@ -68,7 +68,7 @@ fun BaseToolbar(
 
         }
 
-        Divider(modifier = Modifier.align(Alignment.BottomCenter))
+        HorizontalDivider(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 

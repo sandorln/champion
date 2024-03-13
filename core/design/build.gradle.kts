@@ -31,14 +31,16 @@ android {
 dependencies {
     implementation(libs.androidx.card)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
+    api(libs.androidx.activity.compose)
+    api(libs.androidx.navigation.compose)
+    api(libs.androidx.navigation.hilt)
 
     api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.ui)
     api(libs.androidx.compose.ui.graphics)
     api(libs.androidx.compose.ui.preview)
     api(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material)
+    api(libs.androidx.compose.material)
     api(libs.androidx.compose.constraintlayout)
 
     api(libs.holix.bottomsheetdialog.compose)

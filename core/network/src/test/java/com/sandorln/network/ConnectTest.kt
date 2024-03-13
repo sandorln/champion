@@ -6,7 +6,6 @@ import com.sandorln.network.service.SpriteService
 import com.sandorln.network.service.SummonerSpellService
 import com.sandorln.network.service.VersionService
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -32,7 +31,7 @@ class ConnectTest {
 
     @Before
     fun before() {
-        val ktorClient = HttpClient(CIO) {
+        val ktorClient = HttpClient {
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true

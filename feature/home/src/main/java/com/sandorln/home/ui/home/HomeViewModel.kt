@@ -2,9 +2,9 @@ package com.sandorln.home.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.data.repository.version.VersionRepository
 import com.sandorln.domain.usecase.RefreshAppStartData
 import com.sandorln.domain.usecase.champion.GetAllVersionNewSummaryChampionMap
+import com.sandorln.domain.usecase.version.ChangeCurrentVersion
 import com.sandorln.domain.usecase.version.GetAllVersionList
 import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.champion.SummaryChampion
@@ -33,8 +33,8 @@ class HomeViewModel @Inject constructor(
     getCurrentVersion: GetCurrentVersion,
     getAllVersionList: GetAllVersionList,
     refreshAppStartData: RefreshAppStartData,
-    versionRepository: VersionRepository,
-    getAllVersionNewSummaryChampionMap: GetAllVersionNewSummaryChampionMap
+    changeCurrentVersion: ChangeCurrentVersion,
+    getAllVersionNewSummaryChampionMap: GetAllVersionNewSummaryChampionMap,
 ) : ViewModel() {
     private val _isInitComplete: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInitComplete = _isInitComplete.asStateFlow()
@@ -96,12 +96,12 @@ class HomeViewModel @Inject constructor(
                         when (action) {
                             HomeAction.ChangeNextVersion -> {
                                 if (tempUiState.nextVersionName.isNotEmpty())
-                                    versionRepository.changeCurrentVersion(tempUiState.nextVersionName)
+                                    changeCurrentVersion.invoke(tempUiState.nextVersionName)
                             }
 
                             HomeAction.ChangePreVersion -> {
                                 if (tempUiState.preVersionName.isNotEmpty())
-                                    versionRepository.changeCurrentVersion(tempUiState.preVersionName)
+                                    changeCurrentVersion.invoke(tempUiState.preVersionName)
                             }
 
                             is HomeAction.ChangeVisibleVersionChangeDialog -> {
@@ -109,7 +109,7 @@ class HomeViewModel @Inject constructor(
                             }
 
                             is HomeAction.ChangeVersion -> {
-                                versionRepository.changeCurrentVersion(action.versionName)
+                                changeCurrentVersion.invoke(action.versionName)
                                 _homeUiState.update { it.copy(isShowVersionChangeDialog = false) }
                             }
                         }
@@ -123,13 +123,13 @@ class HomeViewModel @Inject constructor(
             }
 
             launch {
-                versionRepository
-                    .allVersionList
+                getAllVersionList
+                    .invoke()
                     .first { versionList ->
-                        val currentVersion = versionRepository.currentVersion.firstOrNull() ?: Version()
+                        val currentVersion = getCurrentVersion.invoke().firstOrNull() ?: Version()
                         if (currentVersion.name.isEmpty()) {
                             val latestVersion = versionList.firstOrNull() ?: return@first false
-                            versionRepository.changeCurrentVersion(latestVersion.name)
+                            changeCurrentVersion.invoke(latestVersion.name)
                         }
 
                         currentVersion.name.isNotEmpty()
