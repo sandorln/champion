@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
+import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -47,12 +49,12 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
-import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.item.ui.ItemTag
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.item.SummaryItemImage
 import com.sandorln.model.type.ItemTagType
+import com.sandorln.item.R as itemR
 
 @Composable
 fun ItemDetailDialog(
@@ -126,7 +128,7 @@ fun ItemDetailDialog(
                         start = Spacings.Spacing03,
                         bottom = Spacings.Spacing00
                     ),
-                    text = "설명",
+                    text = stringResource(id = itemR.string.item_description),
                     style = TextStyles.Body03,
                     color = Colors.Gold03
                 )
@@ -170,7 +172,7 @@ fun ItemDetailDialog(
                             start = Spacings.Spacing03,
                             bottom = Spacings.Spacing00
                         ),
-                        text = "조합식",
+                        text = stringResource(id = itemR.string.item_combination),
                         style = TextStyles.Body03,
                         color = Colors.Gold03
                     )
@@ -201,7 +203,7 @@ private fun TotalIntoItemListBody(
                 start = Spacings.Spacing03,
                 bottom = Spacings.Spacing00
             ),
-            text = "다음 아이템",
+            text = stringResource(id = itemR.string.item_combination_next),
             style = TextStyles.Body03,
             color = Colors.Gold03
         )
@@ -252,8 +254,12 @@ private fun PreItemCompareButton(
         ),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val comparePreVersionTitle = stringResource(
+            id = itemR.string.item_compare_previous_version,
+            previousVersion
+        )
         Text(
-            text = "이전 버전($previousVersion) 비교",
+            text = comparePreVersionTitle,
             style = TextStyles.SubTitle03,
             color = enableColor
         )
@@ -289,8 +295,16 @@ fun ItemStatusBody(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val totalGoldText = stringResource(
+                id = itemR.string.item_total_gold,
+                item.gold.total
+            )
+            val sellGoldText = stringResource(
+                id = itemR.string.item_sell_gold,
+                item.gold.sell
+            )
             Text(
-                text = "${item.gold.total} $",
+                text = totalGoldText,
                 style = TextStyles.Body04,
                 color = Colors.Gold04
             )
@@ -298,7 +312,7 @@ fun ItemStatusBody(
             Spacer(modifier = Modifier.width(Spacings.Spacing00))
 
             Text(
-                text = "( 판매 ${item.gold.sell} $ )",
+                text = sellGoldText,
                 style = TextStyles.Body04,
                 color = Colors.Gold05
             )
@@ -381,10 +395,14 @@ fun TotalItemCombinationBody(
                 imageSize = IconSize.LargeSize,
                 innerPadding = 0.dp
             )
-
+            val combinationItemText = stringResource(
+                id = itemR.string.item_combination_gold,
+                itemCombination.name,
+                itemCombination.gold.total
+            )
             Text(
                 modifier = Modifier.weight(1f),
-                text = "${itemCombination.name} (${itemCombination.gold.total}$)",
+                text = combinationItemText,
                 style = TextStyles.Body03,
                 color = Colors.Gold03,
                 maxLines = 1,
@@ -424,7 +442,6 @@ fun ItemCombinationBody(
                 .width(Dimens.ITEM_COMBINATION_LINE_MIN_SIZE)
         ) {
             VerticalDivider(
-                thickness = 1.dp,
                 modifier = Modifier
                     .align(Alignment.Center)
                     .then(if (!hasNextItem) Modifier.height(halfMinSize + 1.dp) else Modifier),
@@ -432,7 +449,6 @@ fun ItemCombinationBody(
             )
 
             HorizontalDivider(
-                thickness = 1.dp,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(top = halfMinSize)
@@ -456,10 +472,14 @@ fun ItemCombinationBody(
                     imageSize = IconSize.LargeSize,
                     innerPadding = 0.dp
                 )
-
+                val combinationItemText = stringResource(
+                    id = itemR.string.item_combination_gold,
+                    itemCombination.name,
+                    itemCombination.gold.total
+                )
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "${itemCombination.name} (${itemCombination.gold.total}$)",
+                    text = combinationItemText,
                     style = TextStyles.Body03,
                     color = Colors.Gray04,
                     maxLines = 1,

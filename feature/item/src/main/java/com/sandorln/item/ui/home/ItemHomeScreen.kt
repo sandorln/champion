@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,10 +47,12 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.item.ui.dialog.ItemDetailDialog
+import com.sandorln.item.util.getTitleStringId
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
 import com.sandorln.model.type.ItemTagType
 import kotlin.math.floor
+import com.sandorln.item.R as itemR
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -78,7 +81,7 @@ fun ItemHomeScreen(
         itemHomeViewModel
             .sideEffect
             .collect {
-                when(it){
+                when (it) {
                     is ItemHomeSideEffect.ShowErrorMessage -> {
                         BaseToast.createDefaultErrorToast(context).show()
                     }
@@ -101,6 +104,10 @@ fun ItemHomeScreen(
         val bootsItemListChunkList = bootItemList.chunked(spanCount)
         val consumableItemChunkList = consumableItemList.chunked(spanCount)
         val normalItemChunkList = normalItemList.chunked(spanCount)
+
+        val bootsTitle = stringResource(id = itemR.string.item_boots)
+        val consumableTitle = stringResource(id = itemR.string.item_consumable)
+        val normalTitle = stringResource(id = itemR.string.item_normal)
 
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
@@ -162,7 +169,7 @@ fun ItemHomeScreen(
                                 vertical = Spacings.Spacing03
                             ),
                         text = uiState.searchKeyword,
-                        hint = "아이템 검색",
+                        hint = stringResource(id = itemR.string.search_item),
                         onChangeTextListener = { search ->
                             val action = ItemHomeAction.ChangeItemSearchKeyword(search)
                             itemHomeViewModel.sendAction(action)
@@ -171,30 +178,27 @@ fun ItemHomeScreen(
                 }
             }
 
-            /* 장화 아이템 */
             if (bootsItemListChunkList.isNotEmpty())
                 baseItemList(
-                    title = "장화",
+                    title = bootsTitle,
                     spanCount = spanCount,
                     spriteMap = currentSpriteMap,
                     itemChunkList = bootsItemListChunkList,
                     onClickItem = onClickItem
                 )
 
-            /* 소모성 아이템 */
             if (consumableItemChunkList.isNotEmpty())
                 baseItemList(
-                    title = "소모성 아이템",
+                    title = consumableTitle,
                     spanCount = spanCount,
                     spriteMap = currentSpriteMap,
                     itemChunkList = consumableItemChunkList,
                     onClickItem = onClickItem
                 )
 
-            /* 보통 아이템 */
             if (normalItemChunkList.isNotEmpty())
                 baseItemList(
-                    title = "일반 아이템",
+                    title = normalTitle,
                     spanCount = spanCount,
                     spriteMap = currentSpriteMap,
                     itemChunkList = normalItemChunkList,
@@ -254,7 +258,7 @@ fun ItemNewFilerList(
 ) {
     Column {
         Text(
-            text = "아이템 목록",
+            text = stringResource(id = itemR.string.item_list_title),
             style = TextStyles.SubTitle02,
             color = Colors.Gold02
         )
@@ -264,13 +268,13 @@ fun ItemNewFilerList(
             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
         ) {
             BaseFilterTag(
-                !isNewItemSelect,
-                title = "모든 아이템",
+                isCheck = !isNewItemSelect,
+                title = stringResource(id = itemR.string.item_filter_all),
                 onClickTag = onToggleNewItemFilter
             )
             BaseFilterTag(
-                isNewItemSelect,
-                title = "새로운 아이템",
+                isCheck = isNewItemSelect,
+                title = stringResource(id = itemR.string.item_filter_new),
                 onClickTag = onToggleNewItemFilter
             )
         }
@@ -285,7 +289,7 @@ fun ItemMapFilerList(
 ) {
     Column {
         Text(
-            text = "등장 맵",
+            text = stringResource(id = itemR.string.item_filter_map_title),
             style = TextStyles.SubTitle02,
             color = Colors.Gold02
         )
@@ -297,7 +301,7 @@ fun ItemMapFilerList(
             MapType.entries.filter { it != MapType.ALL }.forEach { mapType ->
                 BaseFilterTag(
                     isCheck = isSelectMapType == mapType,
-                    title = mapType.mapName,
+                    title = stringResource(id = mapType.getTitleStringId()),
                     onClickTag = {
                         onClickMapFilterTag.invoke(mapType)
                     }
@@ -315,7 +319,7 @@ fun ItemTagTypeFilerList(
 ) {
     Column {
         Text(
-            text = "아이템 능력",
+            text = stringResource(id = itemR.string.item_filter_stats_title),
             style = TextStyles.SubTitle02,
             color = Colors.Gold02
         )
@@ -326,10 +330,9 @@ fun ItemTagTypeFilerList(
         ) {
             ItemTagType.entries.forEach { itemTagType ->
                 if (itemTagType == ItemTagType.Boots || itemTagType == ItemTagType.Consumable) return@forEach
-
                 BaseFilterTag(
                     isCheck = selectItemTag.contains(itemTagType),
-                    title = itemTagType.typeName,
+                    title = stringResource(id = itemTagType.getTitleStringId()),
                     onClickTag = {
                         onToggleItemTagTypeFilter.invoke(itemTagType)
                     }
