@@ -14,12 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-
         <activity
-            android:name="com.sandorln.champion.view.activity.SplashLoadingActivity"
+            android:name="com.sandorln.champion.MainActivity"
             android:exported="true"
-            android:noHistory="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,14 +26,10 @@
         </activity>
 
         <activity
-            android:name="com.sandorln.champion.view.activity.MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-            </intent-filter>
-        </activity>
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
     </application>
-
 </manifest>

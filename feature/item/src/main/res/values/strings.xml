@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="item_description">설명</string>
+    <string name="item_combination">조합식</string>
+    <string name="item_combination_next">다음 아이템</string>
+
+    <string name="item_compare_previous_version">이전 버전(%1$s) 비교</string>
+    <string name="item_total_gold">%1$d $</string>
+    <string name="item_sell_gold">( 판매 %1$d $ )</string>
+    <string name="item_combination_gold">%1$s (%2$d$)</string>
+
+    <string name="search_item">아이템 검색</string>
+
+    <string name="item_boots">장화</string>
+    <string name="item_consumable">소모성 아이템</string>
+    <string name="item_normal">일반 아이템</string>
+
+    <string name="item_list_title">아이템 목록</string>
+    <string name="item_filter_all">모든 아이템</string>
+    <string name="item_filter_new">새로운 아이템</string>
+
+    <string name="item_filter_map_title">등장 맵</string>
+    <string name="map_type_all">모두</string>
+    <string name="map_type_summoner_rift">소환사의 협곡</string>
+    <string name="map_type_aram">칼바람 협곡</string>
+    <string name="map_type_none">그 외</string>
+
+    <string name="item_filter_stats_title">아이템 능력</string>
+    <string name="item_stats_damage">공격력</string>
+    <string name="item_stats_attackspeed">공격속도</string>
+    <string name="item_stats_criticalstrike">치명타확률</string>
+    <string name="item_stats_armorpenetration">물리관통력</string>
+
+    <string name="item_stats_spelldamage">주문력</string>
+    <string name="item_stats_manaregen">마나재생</string>
+    <string name="item_stats_mana">마나</string>
+    <string name="item_stats_magicpenetration">마법관통력</string>
+
+    <string name="item_stats_armor">방어력</string>
+    <string name="item_stats_spellblock">마법저항력</string>
+    <string name="item_stats_health">체력</string>
+    <string name="item_stats_healthregen">체력재생</string>
+
+    <string name="item_stats_cooldownreduction">스킬가속</string>
+    <string name="item_stats_nonbootsmovement">이동속도</string>
+    <string name="item_stats_lifesteal">흡혈</string>
+
+    <string name="item_stats_boots">장화</string>
+    <string name="item_stats_consumable">소모성</string>
+</resources>

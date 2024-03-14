@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_champion">챔피온</string>
+    <string name="menu_item">아이템</string>
+    <string name="menu_spell">스펠</string>
+    <string name="menu_setting">설정</string>
+
+    <string name="version_previous_btn">Prev</string>
+    <string name="version_next_btn">Next</string>
+</resources>

@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.sandorln.Champion",
+  "applicationId": "com.sandorln.champion",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 38,
-      "versionName": "1.0.008",
+      "versionCode": 49,
+      "versionName": "2.0.00",
       "outputFile": "app-release.apk"
     }
   ],
