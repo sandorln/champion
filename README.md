@@ -14,9 +14,9 @@ https://play.google.com/store/apps/details?id=com.sandorln.champion
 
 ## 스크린 샷
 
-<img src="https://github.com/sandorln/champion/assets/25873584/ba5e33cb-79c1-4666-8ab8-d507135918b0" width="200" height="445">
-<img src="https://github.com/sandorln/champion/assets/25873584/cac27008-4b9f-480b-bc9d-30e249aa6818" width="200" height="445">
-<img src="https://github.com/sandorln/champion/assets/25873584/2380ba84-455f-44ae-be07-cccdefb447e2" width="200" height="445">
-<img src="https://github.com/sandorln/champion/assets/25873584/fd22a57c-38cf-4ebf-b500-5e546ce2b5f8" width="200" height="445">
-<img src="https://github.com/sandorln/champion/assets/25873584/9a001195-b926-4151-bd8a-4fce3cd03356" width="200" height="445">
-<img src="https://github.com/sandorln/champion/assets/25873584/478cc486-9b56-4931-ba9d-9cf0c67ff6e1" width="200" height="445">
+<img src="https://github.com/sandorln/champion/assets/25873584/85a11107-a734-46c0-b9ab-1a026566eff2" width="200" height="445">
+<img src="https://github.com/sandorln/champion/assets/25873584/176ddca1-11c4-4942-a0b7-edcb3f3cb14b" width="200" height="445">
+<img src="https://github.com/sandorln/champion/assets/25873584/c5f3a8cf-bbfa-4025-8919-fb2178674d76" width="200" height="445">
+<img src="https://github.com/sandorln/champion/assets/25873584/44cc477e-ffaa-4047-b81f-e4108a20a111" width="200" height="445">
+<img src="https://github.com/sandorln/champion/assets/25873584/014b0da1-6e1a-4d93-a89e-be6b34aaaf89" width="200" height="445">
+<img src="https://github.com/sandorln/champion/assets/25873584/b2535f6d-98b3-4af9-8849-a3e02a0edc16" width="200" height="445">
