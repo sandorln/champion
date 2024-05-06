@@ -1,5 +1,6 @@
 package com.sandorln.network
 
+import com.sandorln.network.model.champion.NetworkChampionPatchNote
 import com.sandorln.network.service.ChampionService
 import com.sandorln.network.service.ItemService
 import com.sandorln.network.service.SpriteService
@@ -17,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import org.jsoup.Jsoup
 import org.junit.Before
 import org.junit.Test
 import kotlin.system.measureTimeMillis
@@ -192,6 +194,35 @@ class ConnectTest {
                 println("Champion Detail : $it")
             }.onFailure {
                 println("failure : $it")
+            }
+        }
+    }
+
+    @Test
+    fun 패치노트_가져오기() {
+        runBlocking {
+            runCatching {
+                /* 새로운 챔피언 패치 정보 가져오기 */
+                val doc = Jsoup.connect("https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-13-20-notes/").get()
+                val elements = doc.getElementsByClass("patch-change-block white-stone accent-before")
+                elements
+                    .filter { element -> element.getElementsByClass("reference-link").attr("href").contains("champions") }
+                    .map { element ->
+                        val title = element.getElementsByClass("change-title").first()?.text() ?: ""
+                        val summary = element.getElementsByClass("summary").first()?.text() ?: ""
+                        val image = element.getElementsByClass("reference-link").first()?.firstElementChild()?.getElementsByTag("img")?.attr("src") ?: ""
+                        val detailPathStory = element.getElementsByClass("blockquote context").text() ?: ""
+                        NetworkChampionPatchNote(
+                            title = title,
+                            image = image,
+                            summary = summary,
+                            detailPathStory = detailPathStory
+                        )
+                    }.forEach {
+                        println(it)
+                    }
+            }.onFailure {
+                println("error : $it")
             }
         }
     }
