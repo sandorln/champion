@@ -9,6 +9,6 @@ class GetChampionPatchNoteList @Inject constructor(
     private val championRepository: ChampionRepository
 ) {
     suspend operator fun invoke(version: String) = runCatching {
-        championRepository.getChampionPatchNoteList(version)
+        championRepository.getChampionPatchNoteList(version).sortedBy { it.title }
     }
 }

@@ -19,16 +19,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -41,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.sandorln.champion.util.getResourceId
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
@@ -50,8 +53,10 @@ import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
+import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
 import kotlin.math.floor
@@ -68,7 +73,6 @@ fun ChampionHomeScreen(
     val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by championHomeViewModel.championUiState.collectAsState()
-    val selectedTagSet by remember { derivedStateOf { uiState.selectChampionTagSet } }
     val championPatchNoteList = uiState.championPatchNoteList
 
     val pullToRefreshState = rememberPullToRefreshState(
@@ -107,29 +111,34 @@ fun ChampionHomeScreen(
         ) {
             item {
                 Column(
-                    modifier = Modifier.animateContentSize()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = Spacings.Spacing02)
+                        .animateContentSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
                 ) {
-                    ChampionTagFilterBody(
-                        modifier = Modifier
-                            .padding(top = Spacings.Spacing05)
-                            .fillMaxWidth(),
-                        selectedTagSet = selectedTagSet,
-                        onClickAction = {
-                            championHomeViewModel.sendAction(ChampionHomeAction.ToggleChampionTag(it))
-                        })
+                    when {
+                        championPatchNoteList == null -> {
+                            CircularProgressIndicator(
+                                color = Colors.Gold03,
+                                modifier = Modifier.size(IconSize.XLargeSize),
+                                strokeWidth = 2.dp
+                            )
 
-                    if (!championPatchNoteList.isNullOrEmpty())
-                        HorizontalPager(state = rememberPagerState {
-                            championPatchNoteList.size
-                        }) {
-                            val championPatchNote = championPatchNoteList.get(index = it)
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Text(text = championPatchNote.title, style = TextStyles.Body03)
-                                Text(text = championPatchNote.image, style = TextStyles.Body03)
-                                Text(text = championPatchNote.summary, style = TextStyles.Body03)
-                                Text(text = championPatchNote.detailPathStory, style = TextStyles.Body03)
-                            }
+                            Text(
+                                text = stringResource(id = championR.string.champion_patch_note_loading_title),
+                                style = TextStyles.SubTitle02,
+                                color = Colors.Gold03
+                            )
                         }
+
+                        championPatchNoteList.isNotEmpty() -> {
+                            ChampionPatchNoteListBody(
+                                championPatchNoteList = championPatchNoteList
+                            )
+                        }
+                    }
                 }
             }
 
@@ -225,6 +234,7 @@ private fun ChampionBody(
     }
 }
 
+@Deprecated("필터가 불필요하다고 판단 : ver 2.0.01 삭제")
 @Composable
 fun ChampionTagFilterBody(
     modifier: Modifier = Modifier,
@@ -271,6 +281,73 @@ fun ChampionTagFilterBody(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
+@Composable
+fun ChampionPatchNoteListBody(
+    championPatchNoteList: List<ChampionPatchNote>
+) {
+    val pagerState = rememberPagerState { championPatchNoteList.size }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Text(
+            text = stringResource(id = championR.string.champion_patch_note_title),
+            style = TextStyles.SubTitle02,
+            color = Colors.Gold02
+        )
+
+        HorizontalPager(state = pagerState) { index ->
+            val championPatchNote = runCatching { championPatchNoteList[index] }.getOrNull() ?: return@HorizontalPager
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacings.Spacing05),
+                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+                ) {
+                    GlideImage(
+                        modifier = Modifier.size(IconSize.XXLargeSize),
+                        model = championPatchNote.image,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = championPatchNote.title,
+                        style = TextStyles.Title02
+                    )
+                }
+
+                HorizontalDivider()
+
+                Text(
+                    text = championPatchNote.summary,
+                    style = TextStyles.Body03,
+                    color = Colors.Gray03
+                )
+            }
+        }
+
+        Text(
+            modifier = Modifier
+                .padding(Spacings.Spacing00)
+                .background(
+                    color = Colors.Gray07,
+                    shape = RoundedCornerShape(Radius.Radius03)
+                )
+                .padding(
+                    horizontal = Spacings.Spacing02,
+                    vertical = Spacings.Spacing00
+                ),
+            text = "${pagerState.currentPage + 1} / ${championPatchNoteList.size}",
+            style = TextStyles.Body04
+        )
+    }
+}
+
 @Preview
 @Composable
 internal fun ChampionTagBodyPreview() {
@@ -288,5 +365,22 @@ internal fun ChampionTagBodyPreview() {
 internal fun ChampionHomeScreenPreview() {
     LolChampionThemePreview {
         ChampionHomeScreen { _, _ -> }
+    }
+}
+
+@Preview
+@Composable
+internal fun ChampionPatchNoteListPreview() {
+    LolChampionThemePreview {
+        ChampionPatchNoteListBody(
+            championPatchNoteList = List<ChampionPatchNote>(10) {
+                ChampionPatchNote(
+                    title = "title_$it",
+                    summary = "summary_$it",
+                    image = "image_$it",
+                    detailPathStory = "detailPathStory_it"
+                )
+            }
+        )
     }
 }

@@ -199,6 +199,6 @@ fun NetworkChampionPassive.asData(): ChampionSpell = ChampionSpell(
 fun NetworkChampionPatchNote.asData(): ChampionPatchNote = ChampionPatchNote(
     title = title,
     image = image,
-    summary = summary,
+    summary = summary.dropLast(1).replace(". ", "\n"),
     detailPathStory = detailPathStory
 )

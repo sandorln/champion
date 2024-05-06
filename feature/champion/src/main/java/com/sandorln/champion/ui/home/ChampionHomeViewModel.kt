@@ -43,14 +43,6 @@ class ChampionHomeViewModel @Inject constructor(
     val currentVersion = getCurrentVersion
         .invoke()
         .map { it.name }
-        .distinctUntilChanged()
-        .onEach { version ->
-            _championMutex.withLock {
-                _championUiState.update { it.copy(championPatchNoteList = null) }
-                val championPatchNoteList = getChampionPatchNoteList.invoke(version).getOrNull() ?: emptyList()
-                _championUiState.update { it.copy(championPatchNoteList = championPatchNoteList) }
-            }
-        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
 
     private val _championUiState = MutableStateFlow(ChampionHomeUiState())
@@ -162,6 +154,17 @@ class ChampionHomeViewModel @Inject constructor(
                             }
                     }
             }
+
+            launch {
+                currentVersion
+                    .collectLatest {version->
+                        _championMutex.withLock {
+                            _championUiState.update { it.copy(championPatchNoteList = null) }
+                            val championPatchNoteList = getChampionPatchNoteList.invoke(version).getOrNull() ?: emptyList()
+                            _championUiState.update { it.copy(championPatchNoteList = championPatchNoteList) }
+                        }
+                    }
+            }
         }
     }
 }
@@ -177,6 +180,7 @@ sealed interface ChampionHomeAction {
     data object RefreshChampionData : ChampionHomeAction
 
     data class ChangeChampionSearchKeyword(val searchKeyword: String) : ChampionHomeAction
+    @Deprecated("필터가 불필요하다고 판단 : ver 2.0.01 삭제")
     data class ToggleChampionTag(val championTag: ChampionTag) : ChampionHomeAction
 }
 
