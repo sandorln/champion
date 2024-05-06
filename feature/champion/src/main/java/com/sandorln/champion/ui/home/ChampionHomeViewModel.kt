@@ -2,11 +2,13 @@ package com.sandorln.champion.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sandorln.domain.usecase.champion.GetChampionPatchNoteList
 import com.sandorln.domain.usecase.champion.GetSummaryChampionListByCurrentVersion
 import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
+import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.type.ChampionTag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +20,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,12 +37,22 @@ class ChampionHomeViewModel @Inject constructor(
     refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
-    getCurrentVersion: GetCurrentVersion
+    getCurrentVersion: GetCurrentVersion,
+    getChampionPatchNoteList: GetChampionPatchNoteList
 ) : ViewModel() {
     val currentVersion = getCurrentVersion
         .invoke()
         .map { it.name }
+        .distinctUntilChanged()
+        .onEach { version ->
+            _championMutex.withLock {
+                _championUiState.update { it.copy(championPatchNoteList = null) }
+                val championPatchNoteList = getChampionPatchNoteList.invoke(version).getOrNull() ?: emptyList()
+                _championUiState.update { it.copy(championPatchNoteList = championPatchNoteList) }
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
+
     private val _championUiState = MutableStateFlow(ChampionHomeUiState())
     val championUiState = _championUiState.asStateFlow()
 
@@ -82,7 +96,13 @@ class ChampionHomeViewModel @Inject constructor(
                         val currentUiState = _championUiState.value
                         when (action) {
                             is ChampionHomeAction.RefreshChampionData -> {
-                                _championUiState.emit(currentUiState.copy(isLoading = true))
+                                _championUiState.update {
+                                    it.copy(
+                                        isLoading = true,
+                                        championPatchNoteList = null
+                                    )
+                                }
+
                                 val spriteFileList = _currentChampionList.value.map { item -> item.image.sprite }.distinct()
                                 refreshDownloadSpriteBitmap
                                     .invoke(
@@ -91,11 +111,18 @@ class ChampionHomeViewModel @Inject constructor(
                                     ).onFailure {
                                         _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
                                     }
-                                _championUiState.emit(currentUiState.copy(isLoading = false))
+
+                                val championPatchNoteList = getChampionPatchNoteList.invoke(currentVersion.value).getOrNull() ?: emptyList()
+                                _championUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        championPatchNoteList = championPatchNoteList
+                                    )
+                                }
                             }
 
                             is ChampionHomeAction.ChangeChampionSearchKeyword -> {
-                                _championUiState.emit(currentUiState.copy(searchKeyword = action.searchKeyword))
+                                _championUiState.update { it.copy(searchKeyword = action.searchKeyword) }
                             }
 
                             is ChampionHomeAction.ToggleChampionTag -> {
@@ -111,11 +138,7 @@ class ChampionHomeViewModel @Inject constructor(
                                         }
                                     }
 
-                                _championUiState.update {
-                                    it.copy(
-                                        selectChampionTagSet = tempChampionTagSet
-                                    )
-                                }
+                                _championUiState.update { it.copy(selectChampionTagSet = tempChampionTagSet) }
                             }
                         }
                     }
@@ -146,7 +169,8 @@ class ChampionHomeViewModel @Inject constructor(
 data class ChampionHomeUiState(
     val isLoading: Boolean = false,
     val searchKeyword: String = "",
-    val selectChampionTagSet: Set<ChampionTag> = setOf()
+    val selectChampionTagSet: Set<ChampionTag> = setOf(),
+    val championPatchNoteList: List<ChampionPatchNote>? = null
 )
 
 sealed interface ChampionHomeAction {

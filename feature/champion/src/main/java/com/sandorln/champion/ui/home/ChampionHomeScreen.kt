@@ -1,6 +1,7 @@
 package com.sandorln.champion.ui.home
 
 import android.graphics.Bitmap
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -66,6 +69,7 @@ fun ChampionHomeScreen(
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by championHomeViewModel.championUiState.collectAsState()
     val selectedTagSet by remember { derivedStateOf { uiState.selectChampionTagSet } }
+    val championPatchNoteList = uiState.championPatchNoteList
 
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PULL_HEIGHT
@@ -102,14 +106,31 @@ fun ChampionHomeScreen(
             pullToRefreshState = pullToRefreshState
         ) {
             item {
-                ChampionTagFilterBody(
-                    modifier = Modifier
-                        .padding(top = Spacings.Spacing05)
-                        .fillMaxWidth(),
-                    selectedTagSet = selectedTagSet,
-                    onClickAction = {
-                        championHomeViewModel.sendAction(ChampionHomeAction.ToggleChampionTag(it))
-                    })
+                Column(
+                    modifier = Modifier.animateContentSize()
+                ) {
+                    ChampionTagFilterBody(
+                        modifier = Modifier
+                            .padding(top = Spacings.Spacing05)
+                            .fillMaxWidth(),
+                        selectedTagSet = selectedTagSet,
+                        onClickAction = {
+                            championHomeViewModel.sendAction(ChampionHomeAction.ToggleChampionTag(it))
+                        })
+
+                    if (!championPatchNoteList.isNullOrEmpty())
+                        HorizontalPager(state = rememberPagerState {
+                            championPatchNoteList.size
+                        }) {
+                            val championPatchNote = championPatchNoteList.get(index = it)
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(text = championPatchNote.title, style = TextStyles.Body03)
+                                Text(text = championPatchNote.image, style = TextStyles.Body03)
+                                Text(text = championPatchNote.summary, style = TextStyles.Body03)
+                                Text(text = championPatchNote.detailPathStory, style = TextStyles.Body03)
+                            }
+                        }
+                }
             }
 
             stickyHeader {

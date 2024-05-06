@@ -8,6 +8,7 @@ import javax.inject.Singleton
 class GetChampionPatchNoteList @Inject constructor(
     private val championRepository: ChampionRepository
 ) {
-    suspend operator fun invoke(version: String) =
+    suspend operator fun invoke(version: String) = runCatching {
         championRepository.getChampionPatchNoteList(version)
+    }
 }
