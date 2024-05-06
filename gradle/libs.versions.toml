@@ -27,11 +27,12 @@ exoplayer = "1.2.0"
 card = "1.0.0"
 licenses = "17.0.1"
 licensesPlugin = "0.10.6"
+jsoup = "1.17.2"
 
 complieSdk = "34"
 minSdk = "24"
-versionCode = "51"
-versionName = "2.0.00"
+versionCode = "52"
+versionName = "2.01.00"
 composeCompiler = "1.5.2"
 
 [libraries]
@@ -82,6 +83,8 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 
 android-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "licenses" }
 android-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "licensesPlugin" }
+
+org-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "gradle" }

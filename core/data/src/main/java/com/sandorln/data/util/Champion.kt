@@ -4,6 +4,7 @@ import com.sandorln.database.model.ChampionEntity
 import com.sandorln.database.model.ChampionTagEntity
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionInfo
+import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.champion.ChampionSkin
 import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
@@ -13,6 +14,7 @@ import com.sandorln.model.type.SpellType
 import com.sandorln.network.model.champion.NetworkChampion
 import com.sandorln.network.model.champion.NetworkChampionDetail
 import com.sandorln.network.model.champion.NetworkChampionPassive
+import com.sandorln.network.model.champion.NetworkChampionPatchNote
 import com.sandorln.network.model.champion.NetworkChampionSkin
 import com.sandorln.network.model.champion.NetworkChampionSpell
 
@@ -192,4 +194,11 @@ fun NetworkChampionPassive.asData(): ChampionSpell = ChampionSpell(
     name = name,
     description = description,
     image = image.asData()
+)
+
+fun NetworkChampionPatchNote.asData(): ChampionPatchNote = ChampionPatchNote(
+    title = title,
+    image = image,
+    summary = summary.dropLast(1).replace(". ", "\n"),
+    detailPathStory = detailPathStory
 )

@@ -1,5 +1,6 @@
 package com.sandorln.network
 
+import com.sandorln.network.model.champion.NetworkChampionPatchNote
 import com.sandorln.network.service.ChampionService
 import com.sandorln.network.service.ItemService
 import com.sandorln.network.service.SpriteService
@@ -17,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import org.jsoup.Jsoup
 import org.junit.Before
 import org.junit.Test
 import kotlin.system.measureTimeMillis
@@ -192,6 +194,18 @@ class ConnectTest {
                 println("Champion Detail : $it")
             }.onFailure {
                 println("failure : $it")
+            }
+        }
+    }
+
+    @Test
+    fun 패치노트_가져오기() {
+        runBlocking {
+            runCatching {
+                _championService.getChampionPathNoteList("14.1.1").forEach { println(it) }
+                _championService.getChampionPathNoteList("9.1.1").forEach { println(it) }
+            }.onFailure {
+                println("error : $it")
             }
         }
     }

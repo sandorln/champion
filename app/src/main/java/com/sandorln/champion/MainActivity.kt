@@ -43,11 +43,11 @@ class MainActivity : ComponentActivity() {
                             moveToLolPatchNoteScreen = navController::moveToLolPatchNoteScreen
                         )
                         championScreens(
-                            onBackStack = navController::popBackStack,
+                            onBackStack = navController::navigateUp,
                             moveToChampionDetailScreen = navController::moveToChampionDetail
                         )
                         settingScreens(
-                            onBackStack = navController::popBackStack
+                            onBackStack = navController::navigateUp
                         )
                     }
                 }

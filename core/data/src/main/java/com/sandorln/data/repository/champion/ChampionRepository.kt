@@ -1,6 +1,7 @@
 package com.sandorln.data.repository.champion
 
 import com.sandorln.model.data.champion.ChampionDetailData
+import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
 import kotlinx.coroutines.flow.Flow
@@ -22,4 +23,5 @@ interface ChampionRepository {
 
     suspend fun getChampionVersionList(championId: String): List<String>
     suspend fun getChampionDiffStatusVersion(championId: String): Map<String, Boolean>
+    suspend fun getChampionPatchNoteList(version: String): List<ChampionPatchNote>
 }

@@ -38,24 +38,28 @@ class DefaultSpriteRepository @Inject constructor(
 
                     val downloadAndSaveDeferred = fileNameList.map { fileName ->
                         async {
-                            val bitmapFile = File("${versionDirPath}${File.separator}${fileName}")
-                            if (!bitmapFile.exists()) {
-                                val spriteInputStream = spriteService.getSpriteFile(version.name, fileName)
-                                bitmapFile.outputStream().write(spriteInputStream.readBytes())
-                                spriteInputStream.close()
+                            runCatching {
+                                val bitmapFile = File("${versionDirPath}${File.separator}${fileName}")
+                                if (!bitmapFile.exists()) {
+                                    val spriteInputStream = spriteService.getSpriteFile(version.name, fileName)
+                                    bitmapFile.outputStream().write(spriteInputStream.readBytes())
+                                    spriteInputStream.close()
+                                }
                             }
                         }
                     }
 
-                    downloadAndSaveDeferred.awaitAll()
+                    if (downloadAndSaveDeferred.awaitAll().all { it.isSuccess }) {
+                        val tempVersion = when (spriteType) {
+                            SpriteType.Champion -> version.copy(isDownLoadChampionIconSprite = true)
+                            SpriteType.Item -> version.copy(isDownLoadItemIconSprite = true)
+                            SpriteType.Spell -> version.copy(isDownLoadSpellIconSprite = true)
+                        }
 
-                    val tempVersion = when (spriteType) {
-                        SpriteType.Champion -> version.copy(isDownLoadChampionIconSprite = true)
-                        SpriteType.Item -> version.copy(isDownLoadItemIconSprite = true)
-                        SpriteType.Spell -> version.copy(isDownLoadSpellIconSprite = true)
+                        versionDao.insertVersion(tempVersion.asEntity())
+                    } else {
+                        throw Exception("Not Complete Download")
                     }
-
-                    versionDao.insertVersion(tempVersion.asEntity())
                 }
             }
         }
