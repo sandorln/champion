@@ -180,7 +180,7 @@ sealed interface ChampionHomeAction {
     data object RefreshChampionData : ChampionHomeAction
 
     data class ChangeChampionSearchKeyword(val searchKeyword: String) : ChampionHomeAction
-    @Deprecated("필터가 불필요하다고 판단 : ver 2.0.01 삭제")
+    @Deprecated("필터가 불필요하다고 판단 : ver 2.01.00 삭제")
     data class ToggleChampionTag(val championTag: ChampionTag) : ChampionHomeAction
 }
 

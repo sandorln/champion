@@ -234,7 +234,7 @@ private fun ChampionBody(
     }
 }
 
-@Deprecated("필터가 불필요하다고 판단 : ver 2.0.01 삭제")
+@Deprecated("필터가 불필요하다고 판단 : ver 2.01.00 삭제")
 @Composable
 fun ChampionTagFilterBody(
     modifier: Modifier = Modifier,
