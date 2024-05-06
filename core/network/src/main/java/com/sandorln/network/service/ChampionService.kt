@@ -3,12 +3,15 @@ package com.sandorln.network.service
 import com.sandorln.network.BuildConfig
 import com.sandorln.network.model.champion.NetworkChampion
 import com.sandorln.network.model.champion.NetworkChampionDetail
+import com.sandorln.network.model.champion.NetworkChampionPatchNote
 import com.sandorln.network.model.response.BaseLolResponse
+import com.sandorln.network.util.toNetworkChampionPatchNoteList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,5 +37,17 @@ class ChampionService @Inject constructor(
             .body<BaseLolResponse<Map<String, NetworkChampionDetail>>>()
 
         response.data?.get(championName) ?: throw Exception("")
+    }
+
+    suspend fun getChampionPathNoteList(version: String): List<NetworkChampionPatchNote> = withContext(Dispatchers.IO) {
+        val (major1, minor1, _) = version
+            .split('.')
+            .map { it.toInt() }
+
+        /* Version 이 10보다 낮을 시 패치노트가 존재하지 않음 */
+        if (major1 < 10) return@withContext emptyList()
+
+        val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
+        return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
     }
 }
