@@ -3,6 +3,7 @@ package com.sandorln.champion.ui.home
 import android.graphics.Bitmap
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,9 +31,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.sandorln.champion.util.getResourceId
+import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseTextEditor
@@ -59,6 +65,7 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
+import kotlinx.coroutines.launch
 import kotlin.math.floor
 import com.sandorln.champion.R as championR
 
@@ -287,6 +294,17 @@ fun ChampionPatchNoteListBody(
     championPatchNoteList: List<ChampionPatchNote>
 ) {
     val pagerState = rememberPagerState { championPatchNoteList.size }
+    val coroutineScope = rememberCoroutineScope()
+    val hasNextChampionPatch by remember(key1 = pagerState.currentPage) {
+        mutableStateOf(pagerState.currentPage < pagerState.pageCount - 1)
+    }
+    val hasPreviousChampionPatch by remember(key1 = pagerState.currentPage) {
+        mutableStateOf(pagerState.currentPage > 0)
+    }
+    val moveToPage: (page: Int) -> Unit = { page ->
+        coroutineScope.launch { pagerState.scrollToPage(page) }
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -331,20 +349,43 @@ fun ChampionPatchNoteListBody(
             }
         }
 
-        Text(
-            modifier = Modifier
-                .padding(Spacings.Spacing00)
-                .background(
-                    color = Colors.Gray07,
-                    shape = RoundedCornerShape(Radius.Radius03)
-                )
-                .padding(
-                    horizontal = Spacings.Spacing02,
-                    vertical = Spacings.Spacing00
-                ),
-            text = "${pagerState.currentPage + 1} / ${championPatchNoteList.size}",
-            style = TextStyles.Body04
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+        ) {
+            Image(
+                modifier = Modifier.clickable(enabled = hasPreviousChampionPatch) {
+                    moveToPage.invoke(pagerState.currentPage - 1)
+                },
+                painter = painterResource(id = R.drawable.ic_chevron_left),
+                contentDescription = null,
+                colorFilter = if (hasPreviousChampionPatch) null else ColorFilter.tint(Colors.Gray05)
+            )
+
+            Text(
+                modifier = Modifier
+                    .padding(Spacings.Spacing00)
+                    .background(
+                        color = Colors.Gray07,
+                        shape = RoundedCornerShape(Radius.Radius03)
+                    )
+                    .padding(
+                        horizontal = Spacings.Spacing02,
+                        vertical = Spacings.Spacing00
+                    ),
+                text = "${pagerState.currentPage + 1} / ${championPatchNoteList.size}",
+                style = TextStyles.Body04
+            )
+
+            Image(
+                modifier = Modifier.clickable(enabled = hasNextChampionPatch) {
+                    moveToPage.invoke(pagerState.currentPage + 1)
+                },
+                painter = painterResource(id = R.drawable.ic_chevron_right),
+                contentDescription = null,
+                colorFilter = if (hasNextChampionPatch) null else ColorFilter.tint(Colors.Gray05)
+            )
+        }
     }
 }
 
