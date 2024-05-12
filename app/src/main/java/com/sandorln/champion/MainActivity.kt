@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.sandorln.champion.navigation.championScreens
 import com.sandorln.champion.navigation.moveToChampionDetail
+import com.sandorln.champion.navigation.moveToChampionPatchNoteList
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.home.navigation.HomeScreenRoute
@@ -40,7 +41,8 @@ class MainActivity : ComponentActivity() {
                         homeScreens(
                             moveToChampionDetailScreen = navController::moveToChampionDetail,
                             moveToLicensesScreen = moveToLicensesScreen,
-                            moveToLolPatchNoteScreen = navController::moveToLolPatchNoteScreen
+                            moveToLolPatchNoteScreen = navController::moveToLolPatchNoteScreen,
+                            moveToChampionPatchNoteListScreen = navController::moveToChampionPatchNoteList
                         )
                         championScreens(
                             onBackStack = navController::navigateUp,
