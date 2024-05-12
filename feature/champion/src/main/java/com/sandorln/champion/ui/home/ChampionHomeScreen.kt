@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -74,7 +75,8 @@ import com.sandorln.champion.R as championR
 @Composable
 fun ChampionHomeScreen(
     championHomeViewModel: ChampionHomeViewModel = hiltViewModel(),
-    moveToChampionDetailScreen: (championId: String, version: String) -> Unit
+    moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
+    moveToChampionPatchNoteListScreen: (version: String) -> Unit
 ) {
     val context = LocalContext.current
     val currentVersion by championHomeViewModel.currentVersion.collectAsState()
@@ -143,6 +145,7 @@ fun ChampionHomeScreen(
 
                         championPatchNoteList.isNotEmpty() -> {
                             ChampionPatchNoteListBody(
+                                moveToChampionPatchNoteListScreen = { moveToChampionPatchNoteListScreen.invoke(currentVersion) },
                                 championPatchNoteList = championPatchNoteList
                             )
                         }
@@ -226,7 +229,7 @@ private fun ChampionBody(
         val bitmap = champion.image.getImageBitmap(currentSpriteMap)
         BaseBitmapImage(
             bitmap = bitmap,
-            loadingDrawableId = com.sandorln.design.R.drawable.ic_main_champion,
+            loadingDrawableId = R.drawable.ic_main_champion,
             imageSize = IconSize.XXLargeSize
         )
 
@@ -292,7 +295,8 @@ fun ChampionTagFilterBody(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun ChampionPatchNoteListBody(
-    championPatchNoteList: List<ChampionPatchNote>
+    championPatchNoteList: List<ChampionPatchNote>,
+    moveToChampionPatchNoteListScreen: () -> Unit
 ) {
     val pagerState = rememberPagerState { championPatchNoteList.size }
     val coroutineScope = rememberCoroutineScope()
@@ -311,44 +315,41 @@ fun ChampionPatchNoteListBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
     ) {
-        Text(
-            text = stringResource(id = championR.string.champion_patch_note_title),
-            style = TextStyles.SubTitle02,
-            color = Colors.Gold02
-        )
+        ConstraintLayout(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val (titleRef, listBtnRef) = createRefs()
+            Text(
+                modifier = Modifier.constrainAs(titleRef) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+                text = stringResource(id = championR.string.champion_patch_note_title),
+                style = TextStyles.SubTitle02,
+                color = Colors.Gold02
+            )
+
+            Text(
+                modifier = Modifier
+                    .constrainAs(listBtnRef) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, Spacings.Spacing05)
+                    }
+                    .clickable {
+                        moveToChampionPatchNoteListScreen.invoke()
+                    },
+                text = stringResource(id = championR.string.champion_patch_note_list),
+                style = TextStyles.Body04,
+                color = Colors.Gray03
+            )
+        }
 
         HorizontalPager(state = pagerState) { index ->
             val championPatchNote = runCatching { championPatchNoteList[index] }.getOrNull() ?: return@HorizontalPager
-            Column(
-                modifier = Modifier
-                    .heightIn(min = Dimens.CHAMPION_PATCH_MIN_HEIGHT)
-                    .fillMaxWidth()
-                    .padding(horizontal = Spacings.Spacing05),
-                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
-                ) {
-                    GlideImage(
-                        modifier = Modifier.size(IconSize.XXLargeSize),
-                        model = championPatchNote.image,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = championPatchNote.title,
-                        style = TextStyles.Title02
-                    )
-                }
-
-                HorizontalDivider()
-
-                Text(
-                    text = championPatchNote.summary,
-                    style = TextStyles.Body03,
-                    color = Colors.Gray03
-                )
-            }
+            ChampionPatchNoteBody(championPatchNote)
         }
 
         Row(
@@ -391,6 +392,41 @@ fun ChampionPatchNoteListBody(
     }
 }
 
+@Composable
+@OptIn(ExperimentalGlideComposeApi::class)
+fun ChampionPatchNoteBody(championPatchNote: ChampionPatchNote) {
+    Column(
+        modifier = Modifier
+            .heightIn(min = Dimens.CHAMPION_PATCH_MIN_HEIGHT)
+            .fillMaxWidth()
+            .padding(horizontal = Spacings.Spacing05),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+        ) {
+            GlideImage(
+                modifier = Modifier.size(IconSize.XXLargeSize),
+                model = championPatchNote.image,
+                contentDescription = null
+            )
+            Text(
+                text = championPatchNote.title,
+                style = TextStyles.Title02
+            )
+        }
+
+        HorizontalDivider()
+
+        Text(
+            text = championPatchNote.summary,
+            style = TextStyles.Body03,
+            color = Colors.Gray03
+        )
+    }
+}
+
 @Preview
 @Composable
 internal fun ChampionTagBodyPreview() {
@@ -407,7 +443,10 @@ internal fun ChampionTagBodyPreview() {
 @Composable
 internal fun ChampionHomeScreenPreview() {
     LolChampionThemePreview {
-        ChampionHomeScreen { _, _ -> }
+        ChampionHomeScreen(
+            moveToChampionDetailScreen = { _, _ -> },
+            moveToChampionPatchNoteListScreen = {}
+        )
     }
 }
 
@@ -416,6 +455,7 @@ internal fun ChampionHomeScreenPreview() {
 internal fun ChampionPatchNoteListPreview() {
     LolChampionThemePreview {
         ChampionPatchNoteListBody(
+            moveToChampionPatchNoteListScreen = {},
             championPatchNoteList = List<ChampionPatchNote>(10) {
                 ChampionPatchNote(
                     title = "title_$it",

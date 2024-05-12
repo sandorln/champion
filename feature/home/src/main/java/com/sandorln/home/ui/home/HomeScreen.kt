@@ -85,7 +85,8 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
     moveToLicensesScreen: () -> Unit,
-    moveToLolPatchNoteScreen: () -> Unit
+    moveToLolPatchNoteScreen: () -> Unit,
+    moveToChampionPatchNoteListScreen: (version: String) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -144,7 +145,8 @@ fun HomeScreen(
                 ) { page: Int ->
                     when (homeItems[page]) {
                         HomeScreenType.Champion -> ChampionHomeScreen(
-                            moveToChampionDetailScreen = moveToChampionDetailScreen
+                            moveToChampionDetailScreen = moveToChampionDetailScreen,
+                            moveToChampionPatchNoteListScreen = moveToChampionPatchNoteListScreen
                         )
 
                         HomeScreenType.Item -> ItemHomeScreen()

@@ -8,6 +8,7 @@ const val HomeScreenRoute = "HomeScreenRoute"
 
 fun NavGraphBuilder.homeScreens(
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
+    moveToChampionPatchNoteListScreen: (version: String) -> Unit,
     moveToLicensesScreen: () -> Unit,
     moveToLolPatchNoteScreen: () -> Unit
 ) {
@@ -17,7 +18,8 @@ fun NavGraphBuilder.homeScreens(
         HomeScreen(
             moveToChampionDetailScreen = moveToChampionDetailScreen,
             moveToLicensesScreen = moveToLicensesScreen,
-            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen
+            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen,
+            moveToChampionPatchNoteListScreen = moveToChampionPatchNoteListScreen
         )
     }
 }

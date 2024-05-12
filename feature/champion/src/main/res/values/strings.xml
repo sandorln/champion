@@ -36,5 +36,6 @@
     <string name="default_skin_name">기본 스킨</string>
     <string name="search_champion">챔피언 검색</string>
     <string name="champion_patch_note_title">챔피언 패치노트</string>
+    <string name="champion_patch_note_list">패치노트 목록 ></string>
     <string name="champion_patch_note_loading_title">챔피언 패치노트 불러오는 중</string>
 </resources>
