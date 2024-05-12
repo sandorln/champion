@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -320,6 +321,7 @@ fun ChampionPatchNoteListBody(
             val championPatchNote = runCatching { championPatchNoteList[index] }.getOrNull() ?: return@HorizontalPager
             Column(
                 modifier = Modifier
+                    .heightIn(min = Dimens.CHAMPION_PATCH_MIN_HEIGHT)
                     .fillMaxWidth()
                     .padding(horizontal = Spacings.Spacing05),
                 verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
