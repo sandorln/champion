@@ -8,15 +8,23 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.sandorln.champion.ui.detail.ChampionDetailScreen
+import com.sandorln.champion.ui.patchlist.ChampionPatchNoteListScreen
 import com.sandorln.model.keys.BundleKeys
 
 private const val ChampionDetailRoute = "ChampionDetailRoute"
+private const val ChampionPatchNoteListRoute = "ChampionPatchNoteListRoute"
 
 fun NavController.moveToChampionDetail(
     championId: String,
     version: String
 ) {
     navigate(route = "$ChampionDetailRoute/${championId}/${version}")
+}
+
+fun NavController.moveToChampionPatchNoteList(
+    version: String
+) {
+    navigate(route = "$ChampionPatchNoteListRoute/${version}")
 }
 
 fun NavGraphBuilder.championScreens(
@@ -56,6 +64,17 @@ fun NavGraphBuilder.championScreens(
         ChampionDetailScreen(
             onBackStack = onBackStack,
             moveToChampionDetailScreen = moveToChampionDetailScreen
+        )
+    }
+
+    composable(
+        route = "$ChampionPatchNoteListRoute/{${BundleKeys.VERSION}}",
+        arguments = listOf(
+            navArgument(BundleKeys.VERSION) { type = NavType.StringType }
+        )
+    ){
+        ChampionPatchNoteListScreen(
+            onBackStack = onBackStack
         )
     }
 }
