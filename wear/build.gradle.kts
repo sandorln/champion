@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    kotlin("kapt")
 }
 
 android {
@@ -33,5 +36,8 @@ android {
 
 dependencies {
     implementation(libs.play.services.wearable)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
+    implementation(project(":core:data"))
 }
