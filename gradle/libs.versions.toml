@@ -33,7 +33,14 @@ complieSdk = "34"
 minSdk = "24"
 versionCode = "53"
 versionName = "2.01.01"
+
+wearComplieSdk = "34"
+wearMinSdk = "26"
+wearVersionCode = "1"
+wearVersionName = "1.00.00"
+
 composeCompiler = "1.5.2"
+playServicesWearable = "18.1.0"
 
 [libraries]
 androidx-card = { module = "androidx.cardview:cardview", version.ref = "card" }
@@ -85,6 +92,7 @@ android-licenses = { module = "com.google.android.gms:play-services-oss-licenses
 android-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "licensesPlugin" }
 
 org-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "gradle" }
