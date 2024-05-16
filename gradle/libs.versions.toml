@@ -1,5 +1,6 @@
 [versions]
 activityCompose = "1.8.0"
+activityKtx = "1.9.0"
 constraintlayoutVersion = "2.2.0-alpha13"
 coreKtx = "1.12.0"
 espressoCore = "3.5.1"
@@ -9,6 +10,7 @@ junitVersion = "1.1.5"
 kotlin = "1.9.0"
 composeMaterial = "1.5.4"
 composeMaterial3 = "1.2.0-rc01"
+lifecycleViewmodelKtx = "2.7.0"
 naviVersion = "2.7.5"
 googleGson = "2.10.1"
 coroutine = "1.7.3"
@@ -45,10 +47,12 @@ composeCompiler = "1.5.2"
 playServicesWearable = "18.1.0"
 
 [libraries]
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-card = { module = "androidx.cardview:cardview", version.ref = "card" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayoutVersion" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "naviVersion" }
 androidx-navigation-hilt = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCompose" }
 
