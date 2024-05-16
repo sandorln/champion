@@ -1,5 +1,6 @@
 [versions]
 activityCompose = "1.8.0"
+constraintlayoutVersion = "2.2.0-alpha13"
 coreKtx = "1.12.0"
 espressoCore = "3.5.1"
 gradle = "8.2.0"
@@ -34,6 +35,7 @@ minSdk = "24"
 versionCode = "53"
 versionName = "2.01.01"
 
+wear = "1.2.0"
 wearComplieSdk = "34"
 wearMinSdk = "26"
 wearVersionCode = "1"
@@ -44,6 +46,7 @@ playServicesWearable = "18.1.0"
 
 [libraries]
 androidx-card = { module = "androidx.cardview:cardview", version.ref = "card" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayoutVersion" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "naviVersion" }
@@ -63,6 +66,7 @@ androidx-datastore = { module = "androidx.datastore:datastore-preferences", vers
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-wear = { module = "androidx.wear:wear", version.ref = "wear" }
 holix-bottomsheetdialog-compose = { module = "com.holix.android:bottomsheetdialog-compose", version.ref = "holixBottomSheetDialog" }
 
 test-androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }

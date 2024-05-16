@@ -25,6 +25,9 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    dataBinding {
+        enable = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -35,9 +38,17 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.wear)
+
     implementation(libs.play.services.wearable)
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    api(libs.coroutine.android)
 
     implementation(project(":core:data"))
 }
