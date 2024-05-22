@@ -6,26 +6,17 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="15dp"
         tools:deviceIds="wear">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="5dp"
             app:boxedEdges="all">
 
-            <TextView
-                android:text="hi"
-                android:id="@+id/tv_test"
+            <ImageView
+                android:id="@+id/img_icon"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
+                android:layout_height="match_parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.wear.widget.BoxInsetLayout>
 </layout>

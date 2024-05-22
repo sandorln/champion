@@ -26,6 +26,7 @@ datastore = "1.0.0"
 crashlytics = "2.9.9"
 ksp = "1.9.0-1.0.13"
 glide = "1.0.0-beta01"
+glideXml = "4.16.0"
 exoplayer = "1.2.0"
 card = "1.0.0"
 licenses = "17.0.1"
@@ -81,6 +82,7 @@ coroutine-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 glide = { module = "com.github.bumptech.glide:compose", version.ref = "glide" }
+glide-xml = { module = "com.github.bumptech.glide:glide", version.ref = "glideXml" }
 
 ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }

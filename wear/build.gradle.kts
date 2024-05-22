@@ -51,5 +51,7 @@ dependencies {
 
     api(libs.coroutine.android)
 
-    implementation(project(":core:data"))
+    implementation(libs.glide.xml)
+
+    implementation(project(":core:domain"))
 }
