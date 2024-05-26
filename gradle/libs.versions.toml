@@ -32,6 +32,7 @@ card = "1.0.0"
 licenses = "17.0.1"
 licensesPlugin = "0.10.6"
 jsoup = "1.17.2"
+horologist = "0.5.27"
 
 complieSdk = "34"
 minSdk = "24"
@@ -103,6 +104,7 @@ android-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin
 
 org-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
+horologist-tiles = { module = "com.google.android.horologist:horologist-tiles", version.ref = "horologist" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "gradle" }

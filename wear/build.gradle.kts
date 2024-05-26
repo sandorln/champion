@@ -52,6 +52,7 @@ dependencies {
     api(libs.coroutine.android)
 
     implementation(libs.glide.xml)
+    implementation(libs.horologist.tiles)
 
     implementation(project(":core:domain"))
 }
