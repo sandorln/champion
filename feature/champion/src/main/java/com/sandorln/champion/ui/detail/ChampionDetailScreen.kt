@@ -986,7 +986,7 @@ fun ChampionSkins(
         if (currentPage == 0) {
             defaultSkinName
         } else {
-            skinList[currentPage].name
+            skinList.getOrNull(currentPage)?.name ?: ""
         }
     }
 
