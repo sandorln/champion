@@ -9,6 +9,7 @@ import com.sandorln.domain.usecase.champion.GetChampionVersionList
 import com.sandorln.domain.usecase.champion.GetSimilarChampionList
 import com.sandorln.domain.usecase.champion.GetSummaryChampion
 import com.sandorln.domain.usecase.champion.HasChampionDetail
+import com.sandorln.domain.usecase.champion.SetChampionRating
 import com.sandorln.domain.usecase.version.GetPreviousVersion
 import com.sandorln.model.data.champion.ChampionDetailData
 import com.sandorln.model.data.champion.ChampionSpell
@@ -36,7 +37,8 @@ class ChampionDetailViewModel @Inject constructor(
     private val getPreviousVersion: GetPreviousVersion,
     private val getSimilarChampionList: GetSimilarChampionList,
     private val getChampionVersionList: GetChampionVersionList,
-    private val getChampionDiffStatusVersion: GetChampionDiffStatusVersion
+    private val getChampionDiffStatusVersion: GetChampionDiffStatusVersion,
+    private val setChampionRating: SetChampionRating
 ) : ViewModel() {
     private val _championId = savedStateHandle.get<String>(BundleKeys.CHAMPION_ID) ?: ""
     private val _version = savedStateHandle.getStateFlow(BundleKeys.CHAMPION_VERSION, "")
@@ -118,6 +120,7 @@ class ChampionDetailViewModel @Inject constructor(
                                 SpellType.P -> {
                                     championDetailData.passive
                                 }
+
                                 else -> {
                                     championDetailData
                                         .spells
@@ -176,13 +179,34 @@ class ChampionDetailViewModel @Inject constructor(
                         }
 
                         is ChampionDetailAction.ChangeVersionListDialog -> {
-                            _uiMutex.withLock {
-                                _uiState.update {
-                                    it.copy(
-                                        isShowVersionListDialog = action.visible
-                                    )
-                                }
+                            _uiState.update {
+                                it.copy(isShowVersionListDialog = action.visible)
                             }
+                        }
+
+                        is ChampionDetailAction.ChangeRatingEditorDialog -> {
+                            _uiState.update {
+                                it.copy(isShowRatingEditorDialog = action.visible)
+                            }
+                        }
+
+                        is ChampionDetailAction.SetChampionRating -> {
+                            val tempChampion = _uiState.value.championDetailData
+                            _uiState.update {
+                                it.copy(isShowRatingEditorDialog = false)
+                            }
+                            setChampionRating
+                                .invoke(_championId, action.rating)
+                                .onSuccess { (totalRating, writingRating) ->
+                                    _uiState.update {
+                                        it.copy(
+                                            championDetailData = tempChampion.copy(
+                                                rating = totalRating,
+                                                writingRating = writingRating
+                                            )
+                                        )
+                                    }
+                                }
                         }
                     }
                 }
@@ -199,6 +223,7 @@ data class ChampionDetailUiState(
     val selectedSkillUrl: String = "",
     val isLatestVersion: Boolean = false,
     val isShowVersionListDialog: Boolean = false,
+    val isShowRatingEditorDialog: Boolean = false,
     val preVersionName: String = "",
     val preChampion: SummaryChampion? = null,
     val similarChampionList: List<SummaryChampion> = listOf(),
@@ -209,6 +234,8 @@ sealed interface ChampionDetailAction {
     data class ChangeVersion(val versionName: String) : ChampionDetailAction
     data class ChangeSelectSkill(val skill: ChampionSpell) : ChampionDetailAction
     data class ChangeVersionListDialog(val visible: Boolean) : ChampionDetailAction
+    data class ChangeRatingEditorDialog(val visible: Boolean) : ChampionDetailAction
+    data class SetChampionRating(val rating: Int) : ChampionDetailAction
 }
 
 sealed interface ChampionDetailSideEffect {

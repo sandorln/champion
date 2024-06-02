@@ -31,8 +31,8 @@ jsoup = "1.17.2"
 
 complieSdk = "34"
 minSdk = "24"
-versionCode = "53"
-versionName = "2.01.01"
+versionCode = "54"
+versionName = "2.02.01"
 composeCompiler = "1.5.2"
 
 [libraries]
@@ -80,6 +80,7 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-installations = { module = "com.google.firebase:firebase-installations" }
 
 android-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "licenses" }
 android-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "licensesPlugin" }

@@ -151,4 +151,12 @@ class DefaultChampionRepository @Inject constructor(
 
     override suspend fun getChampionPatchNoteList(version: String): List<ChampionPatchNote> =
         championService.getChampionPathNoteList(version).map(NetworkChampionPatchNote::asData)
+
+    override suspend fun setChampionRating(
+        championName: String,
+        rating: Int
+    ): Pair<Float, Int> {
+        championService.setChampionRating(championName, rating)
+        return championService.getChampionRating(championName)
+    }
 }
