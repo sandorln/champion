@@ -1,11 +1,15 @@
 package com.sandorln.network.service
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.installations.FirebaseInstallations
 import com.sandorln.network.BuildConfig
+import com.sandorln.network.model.FireStoreDocument
 import com.sandorln.network.model.champion.NetworkChampion
 import com.sandorln.network.model.champion.NetworkChampionDetail
 import com.sandorln.network.model.champion.NetworkChampionPatchNote
 import com.sandorln.network.model.response.BaseLolResponse
+import com.sandorln.network.util.getLolDocument
+import com.sandorln.network.util.getUserId
 import com.sandorln.network.util.toNetworkChampionPatchNoteList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -56,10 +60,9 @@ class ChampionService @Inject constructor(
         return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
     }
 
-    private suspend fun getChampionRating(championName: String): Float {
+    suspend fun getChampionRating(championName: String): Float {
         val ratingList = fireDB
-            .collection(if (BuildConfig.DEBUG) "dev" else "release")
-            .document("rating")
+            .getLolDocument(FireStoreDocument.RATING)
             .collection(championName.lowercase())
             .get()
             .await()
@@ -75,5 +78,17 @@ class ChampionService @Inject constructor(
             runCatching { totalRating / totalCount }.getOrNull() ?: 0f
         else
             0f
+    }
+
+    suspend fun setChampionRating(championName: String, rating: Int) {
+        val id = FirebaseInstallations.getInstance().getUserId()
+        val data = mapOf("rating" to rating)
+
+        fireDB
+            .getLolDocument(FireStoreDocument.RATING)
+            .collection(championName.lowercase())
+            .document(id)
+            .set(data)
+            .await()
     }
 }

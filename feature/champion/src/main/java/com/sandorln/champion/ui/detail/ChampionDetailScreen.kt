@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,7 +44,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -64,6 +68,7 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.fastJoinToString
 import androidx.constraintlayout.compose.ConstraintSetScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.sandorln.champion.util.getResourceId
 import com.sandorln.champion.util.statusCompareColor
 import com.sandorln.design.R
@@ -283,7 +288,7 @@ fun ChampionDetailScreen(
             Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
             ChampionRating(rating = championDetailData.rating) {
-
+                championDetailViewModel.sendAction(ChampionDetailAction.ChangeRatingEditorDialog(true))
             }
 
             ChampionDetailInfoTitle(title = statsTitle)
@@ -365,6 +370,18 @@ fun ChampionDetailScreen(
                     }
                 }
             }
+        }
+
+        if (uiState.isShowRatingEditorDialog) {
+            ChampionRatingEditor(
+                initRating = 0,
+                onDismissListener = {
+                    championDetailViewModel.sendAction(ChampionDetailAction.ChangeRatingEditorDialog(false))
+                },
+                onSubmitListener = {
+                    championDetailViewModel.sendAction(ChampionDetailAction.SetChampionRating(it))
+                }
+            )
         }
     }
 }
@@ -1117,6 +1134,67 @@ fun ChampionRating(
                     contentDescription = null
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ChampionRatingEditor(
+    initRating: Int = 0,
+    onDismissListener: () -> Unit,
+    onSubmitListener: (Int) -> Unit
+) {
+    var rating by remember { mutableIntStateOf(initRating) }
+    val enable by remember(rating) { mutableStateOf(rating > 0) }
+
+    BottomSheetDialog(onDismissRequest = onDismissListener) {
+        Column(
+            modifier = Modifier
+                .background(
+                    Colors.Blue07,
+                    RoundedCornerShape(
+                        topStart = Radius.Radius04,
+                        topEnd = Radius.Radius04
+                    )
+                )
+                .fillMaxWidth()
+                .heightIn(min = Dimens.CHAMPION_RATING_BOTTOM_DIALOG_MIN_HEIGHT)
+                .padding(
+                    top = Spacings.Spacing02,
+                    bottom = Spacings.Spacing04
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(Colors.Gray09, RoundedCornerShape(Radius.Radius04))
+                    .width(Spacings.Spacing08)
+                    .height(Spacings.Spacing00)
+            )
+
+            Row {
+                repeat(5) { index ->
+                    val startIndex = index + 1
+                    val isSelectArea = startIndex <= rating
+                    val colorTint = if (isSelectArea) Colors.Gold02 else Colors.BasicBlack
+                    Image(
+                        modifier = Modifier
+                            .size(IconSize.XXLargeSize)
+                            .clickable { rating = startIndex },
+                        painter = painterResource(id = R.drawable.ic_star),
+                        colorFilter = ColorFilter.tint(colorTint),
+                        contentDescription = null
+                    )
+                }
+            }
+
+            Text(
+                text = "선택",
+                style = TextStyles.SubTitle01,
+                color = if (enable) Colors.Gold02 else Colors.Gray07,
+                modifier = Modifier.clickable(enabled = enable) { onSubmitListener.invoke(rating) }
+            )
         }
     }
 }
