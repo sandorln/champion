@@ -56,6 +56,7 @@ object Dimens {
     const val CHAMPION_SKILL_VIDEO_RATIO = 1.48f
 
     val CHAMPION_PATCH_MIN_HEIGHT = 120.dp
+    val CHAMPION_RATING_BOTTOM_DIALOG_MIN_HEIGHT = 120.dp
 }
 
 object AnimationConfig {

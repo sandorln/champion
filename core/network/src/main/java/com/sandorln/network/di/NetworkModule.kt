@@ -1,6 +1,9 @@
 package com.sandorln.network.di
 
 import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.sandorln.network.BuildConfig
 import dagger.Module
 import dagger.Provides
@@ -56,4 +59,8 @@ object NetworkModule {
             }
         }
     }
+
+    @Singleton
+    @Provides
+    fun providesFirebaseDatabase(): FirebaseFirestore = Firebase.firestore
 }
