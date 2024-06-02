@@ -58,9 +58,9 @@ class ChampionService @Inject constructor(
 
     private suspend fun getChampionRating(championName: String): Float {
         val ratingList = fireDB
-            .collection("champion")
-            .document(championName.lowercase())
-            .collection("rating")
+            .collection(if (BuildConfig.DEBUG) "dev" else "release")
+            .document("rating")
+            .collection(championName.lowercase())
             .get()
             .await()
             .documents
