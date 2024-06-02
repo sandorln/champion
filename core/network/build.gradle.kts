@@ -38,6 +38,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+
     implementation(libs.coroutine.android)
 
     implementation(libs.ktor.android)
