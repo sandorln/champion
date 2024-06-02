@@ -197,11 +197,15 @@ class ChampionDetailViewModel @Inject constructor(
                             }
                             setChampionRating
                                 .invoke(_championId, action.rating)
-                                .onSuccess { refreshRating ->
+                                .onSuccess { (totalRating, writingRating) ->
                                     _uiState.update {
-                                        it.copy(championDetailData = tempChampion.copy(rating = refreshRating))
+                                        it.copy(
+                                            championDetailData = tempChampion.copy(
+                                                rating = totalRating,
+                                                writingRating = writingRating
+                                            )
+                                        )
                                     }
-                                    _sideEffect.emit(ChampionDetailSideEffect.ShowToastMessage("감사합니다!"))
                                 }
                         }
                     }

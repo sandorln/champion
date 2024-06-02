@@ -155,7 +155,7 @@ class DefaultChampionRepository @Inject constructor(
     override suspend fun setChampionRating(
         championName: String,
         rating: Int
-    ): Float {
+    ): Pair<Float, Int> {
         championService.setChampionRating(championName, rating)
         return championService.getChampionRating(championName)
     }

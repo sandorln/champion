@@ -374,7 +374,7 @@ fun ChampionDetailScreen(
 
         if (uiState.isShowRatingEditorDialog) {
             ChampionRatingEditor(
-                initRating = 0,
+                initRating = uiState.championDetailData.writingRating,
                 onDismissListener = {
                     championDetailViewModel.sendAction(ChampionDetailAction.ChangeRatingEditorDialog(false))
                 },

@@ -43,9 +43,9 @@ class ChampionService @Inject constructor(
             .get(BuildConfig.BASE_URL + "/cdn/${version}/data/ko_KR/champion/${championName}.json")
             .body<BaseLolResponse<Map<String, NetworkChampionDetail>>>()
 
-        val rating = getChampionRating(championName)
+        val (totalRating, writingRating) = getChampionRating(championName)
 
-        response.data?.get(championName)?.copy(rating = rating) ?: throw Exception("")
+        response.data?.get(championName)?.copy(rating = totalRating, writingRating = writingRating) ?: throw Exception("")
     }
 
     suspend fun getChampionPathNoteList(version: String): List<NetworkChampionPatchNote> = withContext(Dispatchers.IO) {
@@ -60,7 +60,12 @@ class ChampionService @Inject constructor(
         return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
     }
 
-    suspend fun getChampionRating(championName: String): Float {
+    /**
+     * @return Total Rating & User Writing Rating
+     */
+    suspend fun getChampionRating(championName: String): Pair<Float, Int> {
+        val id = FirebaseInstallations.getInstance().getUserId()
+        var writingRating = 0
         val ratingList = fireDB
             .getLolDocument(FireStoreDocument.RATING)
             .collection(championName.lowercase())
@@ -68,16 +73,18 @@ class ChampionService @Inject constructor(
             .await()
             .documents
             .mapNotNull {
-                runCatching { it.data?.get("rating") as Number }.getOrNull()
+                val rating = runCatching { it.data?.get("rating") as Number }.getOrNull()
+                if (it.id == id) writingRating = rating?.toInt() ?: 0
+                rating
             }
 
         val totalRating = ratingList.sumOf { it.toDouble() }.toFloat()
         val totalCount = ratingList.size
 
         return if (totalCount > 0)
-            runCatching { totalRating / totalCount }.getOrNull() ?: 0f
+            (runCatching { totalRating / totalCount }.getOrNull() ?: 0f) to writingRating
         else
-            0f
+            0f to writingRating
     }
 
     suspend fun setChampionRating(championName: String, rating: Int) {

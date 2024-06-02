@@ -160,7 +160,8 @@ fun NetworkChampionDetail.asData(otherChampionDetail: ChampionDetailData = Champ
             networkChampionSpell.asData(index + 1)
         },
         passive = passive.asData(),
-        rating = rating
+        rating = rating,
+        writingRating = writingRating
     )
 
 fun NetworkChampionSkin.asData(): ChampionSkin = ChampionSkin(

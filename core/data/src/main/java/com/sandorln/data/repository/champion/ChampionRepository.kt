@@ -26,7 +26,7 @@ interface ChampionRepository {
     suspend fun getChampionPatchNoteList(version: String): List<ChampionPatchNote>
 
     /**
-     * @return 변경 된 후 평점 값
+     * @return 변경 된 후 평점 값 (Total / UserRating)
      */
-    suspend fun setChampionRating(championName: String, rating : Int) : Float
+    suspend fun setChampionRating(championName: String, rating : Int) : Pair<Float,Int>
 }
