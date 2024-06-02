@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -87,6 +88,7 @@ import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
+import kotlin.math.floor
 import com.sandorln.champion.R as championR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -278,12 +280,11 @@ fun ChampionDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
         ) {
-            Text(
-                text = championDetailData.rating.toString(),
-                style = TextStyles.SubTitle01
-            )
-
             Spacer(modifier = Modifier.height(Spacings.Spacing00))
+
+            ChampionRating(rating = championDetailData.rating) {
+
+            }
 
             ChampionDetailInfoTitle(title = statsTitle)
 
@@ -1048,6 +1049,78 @@ fun ChampionSkins(
     }
 }
 
+@Composable
+fun ChampionRating(
+    rating: Float,
+    onClickListener: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = Spacings.Spacing04,
+                vertical = Spacings.Spacing01
+            ),
+        horizontalArrangement = Arrangement.Absolute.SpaceBetween
+    ) {
+        Text(
+            text = "챔피언 평가",
+            style = TextStyles.Title03,
+            color = Colors.Gold02
+        )
+
+        Row(
+            modifier = Modifier
+                .clickable(
+                    enabled = true,
+                    onClick = onClickListener
+                )
+                .background(
+                    color = Colors.Gray09,
+                    shape = RoundedCornerShape(Radius.Radius04)
+                )
+                .border(
+                    width = 1.dp,
+                    color = Colors.BaseColor,
+                    shape = RoundedCornerShape(Radius.Radius04)
+                )
+                .padding(
+                    horizontal = Spacings.Spacing02,
+                    vertical = Spacings.Spacing00
+                )
+        ) {
+            val hasHalfStart = (rating * 10) % 10 > 4
+            val starCount = floor(rating).toInt()
+            val totalStarCount = starCount + if (hasHalfStart) 1 else 0
+
+            repeat(starCount) { _ ->
+                Image(
+                    modifier = Modifier.size(IconSize.MediumSize),
+                    painter = painterResource(id = R.drawable.ic_star),
+                    colorFilter = ColorFilter.tint(Colors.Gold02),
+                    contentDescription = null
+                )
+            }
+            if (hasHalfStart) {
+                Image(
+                    modifier = Modifier.size(IconSize.MediumSize),
+                    painter = painterResource(id = R.drawable.ic_star_half),
+                    colorFilter = ColorFilter.tint(Colors.Gold02),
+                    contentDescription = null
+                )
+            }
+
+            repeat(5 - totalStarCount) {
+                Image(
+                    modifier = Modifier.size(IconSize.MediumSize),
+                    painter = painterResource(id = R.drawable.ic_star),
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 internal fun ChampionDetailInfoTitlePreview() {
@@ -1133,6 +1206,19 @@ internal fun ChampionSkinsPreview() {
         ChampionSkins(
             "14.5.1",
             List(5) { ChampionSkin(name = it.toString()) }
+        )
+    }
+}
+
+@Preview
+@Composable
+internal fun ChampionRatingPreview() {
+    LolChampionThemePreview {
+        ChampionRating(
+            rating = 4.5f,
+            onClickListener = {
+
+            }
         )
     }
 }
