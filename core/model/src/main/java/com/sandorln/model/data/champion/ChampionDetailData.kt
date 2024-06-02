@@ -20,5 +20,7 @@ data class ChampionDetailData(
     var passive: ChampionSpell = ChampionSpell(),
 
     var allytips: List<String> = mutableListOf(),
-    var enemytips: List<String> = mutableListOf()
+    var enemytips: List<String> = mutableListOf(),
+
+    var rating: Float = 0f
 )

@@ -278,6 +278,11 @@ fun ChampionDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
         ) {
+            Text(
+                text = championDetailData.rating.toString(),
+                style = TextStyles.SubTitle01
+            )
+
             Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
             ChampionDetailInfoTitle(title = statsTitle)

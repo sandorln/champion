@@ -1,5 +1,6 @@
 package com.sandorln.network.service
 
+import com.google.firebase.firestore.FirebaseFirestore
 import com.sandorln.network.BuildConfig
 import com.sandorln.network.model.champion.NetworkChampion
 import com.sandorln.network.model.champion.NetworkChampionDetail
@@ -10,6 +11,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import javax.inject.Inject
@@ -18,6 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class ChampionService @Inject constructor(
     private val ktorClient: HttpClient,
+    private val fireDB: FirebaseFirestore
 ) {
     /**
      * 해당 버전의 간략한 챔피온 정보 가져오기
@@ -36,7 +39,9 @@ class ChampionService @Inject constructor(
             .get(BuildConfig.BASE_URL + "/cdn/${version}/data/ko_KR/champion/${championName}.json")
             .body<BaseLolResponse<Map<String, NetworkChampionDetail>>>()
 
-        response.data?.get(championName) ?: throw Exception("")
+        val rating = getChampionRating(championName)
+
+        response.data?.get(championName)?.copy(rating = rating) ?: throw Exception("")
     }
 
     suspend fun getChampionPathNoteList(version: String): List<NetworkChampionPatchNote> = withContext(Dispatchers.IO) {
@@ -49,5 +54,26 @@ class ChampionService @Inject constructor(
 
         val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
         return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
+    }
+
+    private suspend fun getChampionRating(championName: String): Float {
+        val ratingList = fireDB
+            .collection("champion")
+            .document(championName.lowercase())
+            .collection("rating")
+            .get()
+            .await()
+            .documents
+            .mapNotNull {
+                runCatching { it.data?.get("rating") as Number }.getOrNull()
+            }
+
+        val totalRating = ratingList.sumOf { it.toDouble() }.toFloat()
+        val totalCount = ratingList.size
+
+        return if (totalCount > 0)
+            runCatching { totalRating / totalCount }.getOrNull() ?: 0f
+        else
+            0f
     }
 }
