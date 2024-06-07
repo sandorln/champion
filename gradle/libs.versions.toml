@@ -34,6 +34,8 @@ minSdk = "24"
 versionCode = "54"
 versionName = "2.02.01"
 composeCompiler = "1.5.2"
+appcompat = "1.7.0"
+material = "1.12.0"
 
 [libraries]
 androidx-card = { module = "androidx.cardview:cardview", version.ref = "card" }
@@ -86,6 +88,8 @@ android-licenses = { module = "com.google.android.gms:play-services-oss-licenses
 android-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "licensesPlugin" }
 
 org-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "gradle" }
