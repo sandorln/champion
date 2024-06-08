@@ -1,5 +1,6 @@
 package com.sandorln.game.ui.initialquiz
 
+import android.view.Gravity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +44,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseGameTextEditor
 import com.sandorln.design.component.BaseRectangleIconImage
 import com.sandorln.design.component.BaseToolbar
+import com.sandorln.design.component.ServerIconType
 import com.sandorln.design.component.html.LolHtmlTagTextView
+import com.sandorln.design.component.toast.BaseToast
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -58,8 +62,27 @@ fun InitialQuizScreen(
     initialQuizViewModel: InitialQuizViewModel = hiltViewModel(),
     onBackStack: () -> Unit
 ) {
+    val context = LocalContext.current
     val uiState by initialQuizViewModel.uiState.collectAsState()
     val gameTime by initialQuizViewModel.gameTime.collectAsState()
+
+    LaunchedEffect(true) {
+        initialQuizViewModel
+            .sideEffect
+            .collect { sideEffect ->
+                when (sideEffect) {
+                    is InitialQuizSideEffect.ShowToastMessage -> {
+                        BaseToast(
+                            context = context,
+                            baseToastType = sideEffect.messageType,
+                            messageText = sideEffect.message
+                        ).apply {
+                            setGravity(Gravity.CENTER, 0, 0)
+                        }.show()
+                    }
+                }
+            }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -154,14 +177,17 @@ private fun InitialQuizGameBody(
 
         HorizontalDivider()
 
-        BaseRectangleIconImage(modifier = Modifier.size(IconSize.XXLargeSize))
+        BaseRectangleIconImage(
+            modifier = Modifier.size(IconSize.XXLargeSize),
+            serverIconType = ServerIconType.ITEM,
+            versionName = item.version,
+            id = item.id
+        )
 
         InitialItemStatusBody(
             modifier = Modifier
-                .widthIn(
-                    max = Dimens.INITIAL_ITEM_STATUS_BODY_WIDTH_MAX
-                ),
-            item = dummyItem
+                .widthIn(max = Dimens.INITIAL_ITEM_STATUS_BODY_WIDTH_MAX),
+            item = item
         )
     }
 }
@@ -190,17 +216,9 @@ fun InitialItemStatusBody(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "totalGoldText",
+                text = item.version,
                 style = TextStyles.Body04,
                 color = Colors.Gold04
-            )
-
-            Spacer(modifier = Modifier.width(Spacings.Spacing00))
-
-            Text(
-                text = "sellGoldText",
-                style = TextStyles.Body04,
-                color = Colors.Gold05
             )
         }
 
@@ -219,11 +237,10 @@ fun GameTimeBody(time: Float) {
     val timeDecimalFormat = DecimalFormat("00.00")
     LaunchedEffect(time) {
         textColor = when {
-            time >= 60 -> Colors.Gold01
-            time >= 40 -> Colors.Gold02
-            time >= 20 -> Colors.Gold03
-            time >= 10 -> Colors.Gold04
-            time > 0 -> Colors.Gold05
+            time >= 40 -> Colors.Gold01
+            time >= 20 -> Colors.Gold02
+            time >= 10 -> Colors.Gold03
+            time > 0 -> Colors.Gold04
             else -> Colors.Gray07
         }
     }
@@ -257,6 +274,7 @@ internal fun InitialItemStatusBodyPreview() {
 
 val dummyItem = ItemData(
     name = "드락사르의 암흑검",
+    version = "14.11.01",
     tags = setOf(
         ItemTagType.Mana,
         ItemTagType.Damage,
