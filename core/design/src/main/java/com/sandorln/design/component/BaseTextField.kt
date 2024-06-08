@@ -124,7 +124,6 @@ fun BaseGameTextEditor(
     onChangeTextListener: (String) -> Unit = {},
     onDoneActionListener: () -> Unit = {}
 ) {
-    val focusManager = LocalFocusManager.current
     var textFocus by remember {
         mutableStateOf(true)
     }
@@ -162,7 +161,6 @@ fun BaseGameTextEditor(
             onValueChange = onChangeTextListener,
             maxLines = 1,
             keyboardActions = KeyboardActions {
-                focusManager.clearFocus()
                 onDoneActionListener.invoke()
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),

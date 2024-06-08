@@ -15,7 +15,8 @@ import com.sandorln.champion.navigation.moveToChampionDetail
 import com.sandorln.champion.navigation.moveToChampionPatchNoteList
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.LolChampionTheme
-import com.sandorln.home.navigation.HomeScreenRoute
+import com.sandorln.game.navigation.InitialQuizScreenRoute
+import com.sandorln.game.navigation.gameScreens
 import com.sandorln.home.navigation.homeScreens
 import com.sandorln.setting.navigation.moveToLolPatchNoteScreen
 import com.sandorln.setting.navigation.settingScreens
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
                     color = Colors.Blue06
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = HomeScreenRoute) {
+                    NavHost(navController = navController, startDestination = InitialQuizScreenRoute) {
                         homeScreens(
                             moveToChampionDetailScreen = navController::moveToChampionDetail,
                             moveToLicensesScreen = moveToLicensesScreen,
@@ -49,6 +50,9 @@ class MainActivity : ComponentActivity() {
                             moveToChampionDetailScreen = navController::moveToChampionDetail
                         )
                         settingScreens(
+                            onBackStack = navController::navigateUp
+                        )
+                        gameScreens(
                             onBackStack = navController::navigateUp
                         )
                     }

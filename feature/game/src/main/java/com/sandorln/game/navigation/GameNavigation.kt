@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.sandorln.game.ui.home.GameHomeScreen
+import com.sandorln.game.ui.initialquiz.InitialQuizScreen
 
 const val GameHomeScreenRoute = "GameHomeScreenRoute"
 const val InitialQuizScreenRoute = "InitialQuizScreenRoute"
@@ -23,6 +24,6 @@ fun NavGraphBuilder.gameScreens(
         GameHomeScreen()
     }
     composable(route = InitialQuizScreenRoute) {
-
+        InitialQuizScreen(onBackStack = onBackStack)
     }
 }

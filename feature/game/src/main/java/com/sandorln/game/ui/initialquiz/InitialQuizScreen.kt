@@ -25,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,11 +33,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseGameTextEditor
 import com.sandorln.design.component.BaseRectangleIconImage
@@ -50,12 +51,16 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
+import java.text.DecimalFormat
 
 @Composable
 fun InitialQuizScreen(
     initialQuizViewModel: InitialQuizViewModel = hiltViewModel(),
     onBackStack: () -> Unit
 ) {
+    val uiState by initialQuizViewModel.uiState.collectAsState()
+    val gameTime by initialQuizViewModel.gameTime.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -63,7 +68,8 @@ fun InitialQuizScreen(
         BaseToolbar(onClickStartIcon = onBackStack)
 
         InitialQuizGameBody(
-            item = dummyItem
+            time = gameTime,
+            item = uiState.itemData
         )
 
         Column {
@@ -79,7 +85,14 @@ fun InitialQuizScreen(
                     )
             ) {
                 BaseGameTextEditor(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    text = uiState.inputAnswer,
+                    onChangeTextListener = {
+                        initialQuizViewModel.sendAction(InitialQuizAction.ChangeAnswer(it))
+                    },
+                    onDoneActionListener = {
+                        initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone)
+                    }
                 )
 
                 Box(
@@ -102,6 +115,7 @@ fun InitialQuizScreen(
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 private fun InitialQuizGameBody(
+    time: Float,
     item: ItemData
 ) {
     Column(
@@ -115,16 +129,8 @@ private fun InitialQuizGameBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
     ) {
-        GameTimeBody(time = 50.00)
-
-        HorizontalDivider()
-
-        BaseRectangleIconImage(modifier = Modifier.size(IconSize.XXLargeSize))
-
-        InitialItemStatusBody(
-            modifier = Modifier
-                .widthIn(max = Dimens.INITIAL_ITEM_STATUS_BODY_WIDTH_MAX),
-            item = dummyItem
+        GameTimeBody(
+            time = time
         )
 
         HorizontalDivider()
@@ -134,7 +140,7 @@ private fun InitialQuizGameBody(
             horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00, Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
         ) {
-            dummyItem.name.forEach {
+            item.name.forEach {
                 if (it == ' ')
                     Spacer(modifier = Modifier.width(IconSize.LargeSize))
                 else
@@ -145,6 +151,18 @@ private fun InitialQuizGameBody(
                     )
             }
         }
+
+        HorizontalDivider()
+
+        BaseRectangleIconImage(modifier = Modifier.size(IconSize.XXLargeSize))
+
+        InitialItemStatusBody(
+            modifier = Modifier
+                .widthIn(
+                    max = Dimens.INITIAL_ITEM_STATUS_BODY_WIDTH_MAX
+                ),
+            item = dummyItem
+        )
     }
 }
 
@@ -196,49 +214,25 @@ fun InitialItemStatusBody(
 }
 
 @Composable
-fun GameTimeBody(time: Double) {
+fun GameTimeBody(time: Float) {
     var textColor: Color by remember { mutableStateOf(Colors.Blue01) }
-    var textSize: TextStyle by remember { mutableStateOf(TextStyles.SubTitle01) }
-
+    val timeDecimalFormat = DecimalFormat("00.00")
     LaunchedEffect(time) {
-        when {
-            time >= 60 -> {
-                textColor = Colors.Gold01
-                textSize = TextStyles.Title01
-            }
-
-            time >= 40 -> {
-                textColor = Colors.Gold02
-                textSize = TextStyles.Title02
-            }
-
-            time >= 20 -> {
-                textColor = Colors.Gold03
-                textSize = TextStyles.Title03
-            }
-
-            time >= 10 -> {
-                textColor = Colors.Gold04
-                textSize = TextStyles.Title04
-            }
-
-            time > 0 -> {
-                textColor = Colors.Gold05
-                textSize = TextStyles.Title04
-            }
-
-            else -> {
-                textColor = Colors.Gray07
-                textSize = TextStyles.Title04
-            }
+        textColor = when {
+            time >= 60 -> Colors.Gold01
+            time >= 40 -> Colors.Gold02
+            time >= 20 -> Colors.Gold03
+            time >= 10 -> Colors.Gold04
+            time > 0 -> Colors.Gold05
+            else -> Colors.Gray07
         }
     }
 
     Text(
-        text = time.toString(),
+        text = timeDecimalFormat.format(time),
         textAlign = TextAlign.Center,
         color = textColor,
-        style = textSize,
+        style = TextStyles.Title01.copy(letterSpacing = 12.sp),
     )
 }
 
@@ -246,7 +240,10 @@ fun GameTimeBody(time: Double) {
 @Composable
 internal fun InitialQuizScreenPreview() {
     LolChampionThemePreview {
-        InitialQuizGameBody(dummyItem)
+        InitialQuizGameBody(
+            60f,
+            dummyItem
+        )
     }
 }
 
