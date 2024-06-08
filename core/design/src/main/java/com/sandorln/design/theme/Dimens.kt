@@ -57,6 +57,9 @@ object Dimens {
 
     val CHAMPION_PATCH_MIN_HEIGHT = 120.dp
     val CHAMPION_RATING_BOTTOM_DIALOG_MIN_HEIGHT = 120.dp
+
+    val INITIAL_ITEM_STATUS_BODY_WIDTH_MAX = 320.dp
+    val GAME_DONE_BUTTON_WIDTH_MIN = 80.dp
 }
 
 object AnimationConfig {
