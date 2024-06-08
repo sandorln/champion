@@ -53,6 +53,7 @@ import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.game.util.getInitialHangul
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
 import java.text.DecimalFormat
@@ -171,7 +172,13 @@ private fun InitialQuizGameBody(
                         modifier = Modifier
                             .size(IconSize.LargeSize)
                             .background(Colors.Gray07, CircleShape)
-                    )
+                    ) {
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = it.getInitialHangul(),
+                            style = TextStyles.SubTitle01
+                        )
+                    }
             }
         }
 
