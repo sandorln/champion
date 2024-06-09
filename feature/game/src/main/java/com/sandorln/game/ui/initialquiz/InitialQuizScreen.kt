@@ -111,6 +111,7 @@ fun InitialQuizScreen(
         BaseToolbar(onClickStartIcon = onBackStack)
 
         InitialQuizGameBody(
+            modifier = Modifier.weight(1f),
             time = gameTime,
             item = uiState.itemData
         )
@@ -378,20 +379,20 @@ fun InitialRoundBody(
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 private fun InitialQuizGameBody(
+    modifier: Modifier = Modifier,
     time: Float,
     item: ItemData
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(
-                horizontal = Spacings.Spacing05,
-                vertical = Spacings.Spacing03
-            )
+            .padding(horizontal = Spacings.Spacing05)
             .verticalScroll(state = rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03, Alignment.CenterVertically)
     ) {
+        Spacer(modifier = Modifier.height(Spacings.Spacing02))
+
         GameTimeBody(
             time = time
         )
@@ -433,6 +434,8 @@ private fun InitialQuizGameBody(
                 .widthIn(max = Dimens.INITIAL_ITEM_STATUS_BODY_WIDTH_MAX),
             item = item
         )
+
+        Spacer(modifier = Modifier.height(Spacings.Spacing02))
     }
 }
 
@@ -502,8 +505,8 @@ fun GameTimeBody(time: Float) {
 internal fun InitialQuizScreenPreview() {
     LolChampionThemePreview {
         InitialQuizGameBody(
-            60f,
-            dummyItem
+            time = 60f,
+            item = dummyItem
         )
     }
 }
