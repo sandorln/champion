@@ -27,9 +27,11 @@ import kotlin.random.Random
 class InitialQuizViewModel @Inject constructor(
     private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion
 ) : ViewModel() {
-    val totalRoundCount: Int = 10
+    val totalRoundCount: Int = 5
+    private val defaultPlusScore: Int = 500
     private val _previousItemStack: Stack<Triple<Boolean, ItemData, String>> = Stack()
-    val previousItemList: List<Boolean> get() = _previousItemStack.map { it.first }
+    val previousAnswerList: List<Boolean> get() = _previousItemStack.map { it.first }
+    val previousItemList: List<Triple<Boolean, ItemData, String>> get() = _previousItemStack.toList()
     private val _nextItemSetStack: Stack<ItemData> = Stack()
 
     private val _gameTimeMutex = Mutex()
@@ -66,12 +68,14 @@ class InitialQuizViewModel @Inject constructor(
     }
 
     private var nextRoundJob: Job? = null
+    private var chainCountDate: Long = 0
     private fun nextRound(
         isAnswer: Boolean,
         preItemData: ItemData,
         preAnswer: String
     ) {
         if (nextRoundJob?.isActive == true) return
+        val nowDate = System.currentTimeMillis()
 
         viewModelScope.launch(Dispatchers.IO) {
             _gameTimeMutex.withLock {
@@ -79,7 +83,21 @@ class InitialQuizViewModel @Inject constructor(
             }
 
             _uiMutex.withLock {
+                if (isAnswer) {
+                    val diffTime = nowDate - chainCountDate
+                    val chainType = ChainType.getChainType(diffTime)
+                    val plusScore = when (chainType) {
+                        ChainType.GREAT -> defaultPlusScore * 5
+                        ChainType.EXCELLENT -> defaultPlusScore * 3
+                        ChainType.NICE -> defaultPlusScore * 2
+                        ChainType.NORMAL -> defaultPlusScore
+                    }
+
+                    _uiState.update { it.copy(score = it.score + plusScore) }
+                }
+
                 _previousItemStack.push(Triple(isAnswer, preItemData, preAnswer))
+
                 runCatching { _nextItemSetStack.pop() }
                     .onSuccess { nextItemData ->
                         _uiState.update {
@@ -93,12 +111,14 @@ class InitialQuizViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 itemData = ItemData(),
-                                inputAnswer = ""
+                                inputAnswer = "",
+                                isGameEnd = true
                             )
                         }
-                        _sideEffect.emit(InitialQuizSideEffect.EndGame)
                     }
             }
+
+            chainCountDate = nowDate
         }
     }
 
@@ -122,6 +142,7 @@ class InitialQuizViewModel @Inject constructor(
                             }
                         }
 
+                        chainCountDate = System.currentTimeMillis()
                         startGame()
                     }
             }
@@ -154,6 +175,10 @@ class InitialQuizViewModel @Inject constructor(
 
                                     _sideEffect.emit(toastMessage)
                                 }
+
+                                InitialQuizAction.CloseGameDialog -> {
+                                    _uiState.update { it.copy(isGameEnd = false) }
+                                }
                             }
                         }
                     }
@@ -163,8 +188,6 @@ class InitialQuizViewModel @Inject constructor(
 }
 
 sealed interface InitialQuizSideEffect {
-    data object EndGame : InitialQuizSideEffect
-
     data class ShowToastMessage(
         val messageType: BaseToastType,
         val message: String
@@ -173,11 +196,25 @@ sealed interface InitialQuizSideEffect {
 
 sealed interface InitialQuizAction {
     data object InitialQuizDone : InitialQuizAction
+    data object CloseGameDialog : InitialQuizAction
 
     data class ChangeAnswer(val text: String) : InitialQuizAction
 }
 
 data class InitialQuizUiState(
+    val score: Int = 0,
     val itemData: ItemData = ItemData(),
     val inputAnswer: String = "",
+    val isGameEnd: Boolean = false
 )
+
+enum class ChainType(val time: Long) {
+    GREAT(3000),
+    EXCELLENT(5000),
+    NICE(7000),
+    NORMAL(Long.MAX_VALUE);
+
+    companion object {
+        fun getChainType(diffTime: Long) = entries.firstOrNull { it.time > diffTime } ?: NORMAL
+    }
+}

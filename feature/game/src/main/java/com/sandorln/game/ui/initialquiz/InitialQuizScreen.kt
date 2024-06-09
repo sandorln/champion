@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,22 +42,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.BaseGameTextEditor
 import com.sandorln.design.component.BaseRectangleIconImage
 import com.sandorln.design.component.BaseToolbar
 import com.sandorln.design.component.ServerIconType
 import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.component.toast.BaseToast
-import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
+import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.game.util.getInitialHangul
@@ -74,8 +78,8 @@ fun InitialQuizScreen(
     val context = LocalContext.current
     val uiState by initialQuizViewModel.uiState.collectAsState()
     val gameTime by initialQuizViewModel.gameTime.collectAsState()
-    val previousRound = remember(initialQuizViewModel.previousItemList.size) {
-        initialQuizViewModel.previousItemList
+    val previousRound = remember(initialQuizViewModel.previousAnswerList.size) {
+        initialQuizViewModel.previousAnswerList
     }
 
     LaunchedEffect(true) {
@@ -88,16 +92,6 @@ fun InitialQuizScreen(
                             context = context,
                             baseToastType = sideEffect.messageType,
                             messageText = sideEffect.message
-                        ).apply {
-                            setGravity(Gravity.CENTER, 0, 0)
-                        }.show()
-                    }
-
-                    InitialQuizSideEffect.EndGame -> {
-                        BaseToast(
-                            context = context,
-                            baseToastType = BaseToastType.OKAY,
-                            messageText = "게임이 종료되었습니다"
                         ).apply {
                             setGravity(Gravity.CENTER, 0, 0)
                         }.show()
@@ -128,6 +122,148 @@ fun InitialQuizScreen(
                 initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone)
             }
         )
+
+        if (uiState.isGameEnd) {
+            Dialog(onDismissRequest = {
+                initialQuizViewModel.sendAction(InitialQuizAction.CloseGameDialog)
+                onBackStack.invoke()
+            }) {
+                GameEndDialogBody(
+                    score = uiState.score,
+                    previousItemList = initialQuizViewModel.previousItemList
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GameEndDialogBody(
+    score: Int = 0,
+    previousItemList: List<Triple<Boolean, ItemData, String>> = emptyList()
+) {
+    val scoreDecimalFormat = DecimalFormat("#,###")
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+    ) {
+        Column(
+            modifier = Modifier
+                .background(
+                    color = Colors.Blue06,
+                    shape = RoundedCornerShape(Radius.Radius02)
+                )
+                .padding(vertical = Spacings.Spacing03),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+        ) {
+            Text(
+                text = "점수표",
+                style = TextStyles.Title03
+            )
+
+            HorizontalDivider()
+
+            Text(
+                text = scoreDecimalFormat.format(score.coerceIn(0, 999999)),
+                style = TextStyles.Title01,
+                fontSize = 32.sp,
+                color = Colors.Gold02
+            )
+        }
+
+        Spacer(modifier = Modifier.height(Spacings.Spacing00))
+
+        GameEndDialogPreviousItemBody(
+            previousItemList = previousItemList
+        )
+
+        Spacer(modifier = Modifier.height(Spacings.Spacing00))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.size(IconSize.MediumSize),
+                painter = painterResource(id = DesignR.drawable.ic_clear),
+                contentDescription = null,
+                tint = Colors.Gray03
+            )
+            Text(
+                text = "닫기",
+                style = TextStyles.Title04,
+                color = Colors.Gray03
+            )
+        }
+    }
+}
+
+@Composable
+private fun GameEndDialogPreviousItemBody(
+    previousItemList: List<Triple<Boolean, ItemData, String>> = emptyList()
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = Colors.Blue06,
+                shape = RoundedCornerShape(Radius.Radius02)
+            )
+            .padding(vertical = Spacings.Spacing01)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(space = Spacings.Spacing00)
+    ) {
+        previousItemList.forEachIndexed { index, (isSubmit, item, answer) ->
+            if (index > 0)
+                HorizontalDivider()
+
+            Row(
+                modifier = Modifier.padding(horizontal = Spacings.Spacing02),
+                horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val iconId: Int
+                val tintColor: Color
+
+                if (isSubmit) {
+                    iconId = DesignR.drawable.ic_done
+                    tintColor = Colors.Green00
+                } else {
+                    iconId = DesignR.drawable.ic_clear
+                    tintColor = Colors.Orange00
+                }
+                Icon(
+                    modifier = Modifier.size(IconSize.MediumSize),
+                    painter = painterResource(id = iconId),
+                    contentDescription = null,
+                    tint = tintColor
+                )
+                BaseCircleIconImage(
+                    modifier = Modifier.size(IconSize.LargeSize),
+                    serverIconType = ServerIconType.ITEM,
+                    versionName = item.version,
+                    id = item.id
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = item.name,
+                    style = TextStyles.Body03,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = answer,
+                    style = TextStyles.Body03,
+                    color = if (isSubmit) Colors.Green00 else Colors.Gray05,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
     }
 }
 
@@ -397,6 +533,23 @@ internal fun InitialRoundBodyPreview() {
         InitialRoundBody(
             previousRound = pre,
             totalRoundCount = 10,
+        )
+    }
+}
+
+@Preview(device = Devices.PIXEL_2)
+@Composable
+internal fun GameEndDialogBodyPreview() {
+    LolChampionThemePreview {
+        GameEndDialogPreviousItemBody(
+            previousItemList = listOf(
+                Triple(true, dummyItem, "a"),
+                Triple(false, dummyItem, "a"),
+                Triple(true, dummyItem, "a"),
+                Triple(false, dummyItem, "a"),
+                Triple(true, dummyItem, "a"),
+                Triple(false, dummyItem, "a"),
+            )
         )
     }
 }
