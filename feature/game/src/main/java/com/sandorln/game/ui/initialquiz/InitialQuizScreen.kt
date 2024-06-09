@@ -144,7 +144,7 @@ fun InitialQuizScreen(
 @Composable
 private fun GameEndDialogBody(
     score: Int = 0,
-    previousItemList: List<Triple<Boolean, ItemData, String>> = emptyList(),
+    previousItemList: List<Triple<ChainType, ItemData, String>> = emptyList(),
     onDismissListener: () -> Unit
 ) {
     val scoreDecimalFormat = DecimalFormat("#,###")
@@ -207,7 +207,7 @@ private fun GameEndDialogBody(
 
 @Composable
 private fun GameEndDialogPreviousItemBody(
-    previousItemList: List<Triple<Boolean, ItemData, String>> = emptyList()
+    previousItemList: List<Triple<ChainType, ItemData, String>> = emptyList()
 ) {
     Column(
         modifier = Modifier
@@ -220,7 +220,7 @@ private fun GameEndDialogPreviousItemBody(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(space = Spacings.Spacing00)
     ) {
-        previousItemList.forEachIndexed { index, (isSubmit, item, answer) ->
+        previousItemList.forEachIndexed { index, (chainType, item, answer) ->
             if (index > 0)
                 HorizontalDivider()
 
@@ -231,6 +231,7 @@ private fun GameEndDialogPreviousItemBody(
             ) {
                 val iconId: Int
                 val tintColor: Color
+                val isSubmit = chainType != ChainType.FAIL
 
                 if (isSubmit) {
                     iconId = DesignR.drawable.ic_done
@@ -239,12 +240,23 @@ private fun GameEndDialogPreviousItemBody(
                     iconId = DesignR.drawable.ic_clear
                     tintColor = Colors.Orange00
                 }
-                Icon(
-                    modifier = Modifier.size(IconSize.MediumSize),
-                    painter = painterResource(id = iconId),
-                    contentDescription = null,
-                    tint = tintColor
-                )
+                Box(modifier = Modifier.size(IconSize.XLargeSize)) {
+                    Icon(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(IconSize.MediumSize),
+                        painter = painterResource(id = iconId),
+                        contentDescription = null,
+                        tint = tintColor
+                    )
+                    Text(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        text = chainType.name,
+                        style = TextStyles.Body04,
+                        fontSize = 4.sp,
+                        color = tintColor
+                    )
+                }
                 BaseCircleIconImage(
                     modifier = Modifier.size(IconSize.LargeSize),
                     serverIconType = ServerIconType.ITEM,
@@ -282,10 +294,8 @@ private fun InitialInputBody(
     onDoneAnswer: () -> Unit,
 ) {
     val isSubmit = inputAnswer.trim().isNotEmpty()
-    val submitColor by animateColorAsState(
-        targetValue = if (isSubmit) Colors.Gold02 else Colors.Gray05,
-        label = ""
-    )
+    val submitColor = if (isSubmit) Colors.Gold02 else Colors.Gray05
+
     Column {
         HorizontalDivider()
 
@@ -551,12 +561,11 @@ internal fun GameEndDialogBodyPreview() {
     LolChampionThemePreview {
         GameEndDialogPreviousItemBody(
             previousItemList = listOf(
-                Triple(true, dummyItem, "a"),
-                Triple(false, dummyItem, "a"),
-                Triple(true, dummyItem, "a"),
-                Triple(false, dummyItem, "a"),
-                Triple(true, dummyItem, "a"),
-                Triple(false, dummyItem, "a"),
+                Triple(ChainType.FAIL, dummyItem, "a"),
+                Triple(ChainType.NORMAL, dummyItem, "a"),
+                Triple(ChainType.NICE, dummyItem, "a"),
+                Triple(ChainType.GREAT, dummyItem, "a"),
+                Triple(ChainType.GOOD, dummyItem, "a")
             )
         )
     }

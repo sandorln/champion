@@ -26,11 +26,12 @@ import kotlin.random.Random
 class InitialQuizViewModel @Inject constructor(
     private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion
 ) : ViewModel() {
-    val totalRoundCount: Int = 5
+    val totalRoundCount: Int = 10
     private val defaultPlusScore: Int = 500
-    private val _previousItemStack: Stack<Triple<Boolean, ItemData, String>> = Stack()
-    val previousAnswerList: List<Boolean> get() = _previousItemStack.map { it.first }
-    val previousItemList: List<Triple<Boolean, ItemData, String>> get() = _previousItemStack.toList()
+
+    private val _previousItemStack: Stack<Triple<ChainType, ItemData, String>> = Stack()
+    val previousAnswerList: List<Boolean> get() = _previousItemStack.map { it.first != ChainType.FAIL }
+    val previousItemList: List<Triple<ChainType, ItemData, String>> get() = _previousItemStack.toList()
     private val _nextItemSetStack: Stack<ItemData> = Stack()
 
     private val _gameTimeMutex = Mutex()
@@ -93,20 +94,21 @@ class InitialQuizViewModel @Inject constructor(
             _inputAnswer.update { "" }
 
             _uiMutex.withLock {
+                val diffTime = nowDate - chainCountDate
+                val chainType = if (isAnswer) ChainType.getChainType(diffTime) else ChainType.FAIL
+
                 if (isAnswer) {
-                    val diffTime = nowDate - chainCountDate
-                    val chainType = ChainType.getChainType(diffTime)
                     val plusScore = when (chainType) {
                         ChainType.GREAT -> defaultPlusScore * 5
-                        ChainType.EXCELLENT -> defaultPlusScore * 3
+                        ChainType.GOOD -> defaultPlusScore * 3
                         ChainType.NICE -> defaultPlusScore * 2
                         ChainType.NORMAL -> defaultPlusScore
+                        ChainType.FAIL -> 0
                     }
-
                     _uiState.update { it.copy(score = it.score + plusScore) }
                 }
 
-                _previousItemStack.push(Triple(isAnswer, preItemData, preAnswer))
+                _previousItemStack.push(Triple(chainType, preItemData, preAnswer))
 
                 runCatching { _nextItemSetStack.pop() }
                     .onSuccess { nextItemData ->
@@ -215,11 +217,12 @@ data class InitialQuizUiState(
 
 enum class ChainType(val time: Long) {
     GREAT(3000),
-    EXCELLENT(5000),
+    GOOD(5000),
     NICE(7000),
-    NORMAL(Long.MAX_VALUE);
+    NORMAL(Long.MAX_VALUE),
+    FAIL(Long.MIN_VALUE);
 
     companion object {
-        fun getChainType(diffTime: Long) = entries.firstOrNull { it.time > diffTime } ?: NORMAL
+        fun getChainType(diffTime: Long) = entries.firstOrNull { it.time > diffTime } ?: FAIL
     }
 }
