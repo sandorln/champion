@@ -1,8 +1,11 @@
 package com.sandorln.game.ui.initialquiz
 
 import android.view.Gravity
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +52,7 @@ import com.sandorln.design.component.BaseToolbar
 import com.sandorln.design.component.ServerIconType
 import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.component.toast.BaseToast
+import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -57,6 +63,8 @@ import com.sandorln.game.util.getInitialHangul
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
 import java.text.DecimalFormat
+import java.util.Stack
+import com.sandorln.design.R as DesignR
 
 @Composable
 fun InitialQuizScreen(
@@ -66,6 +74,9 @@ fun InitialQuizScreen(
     val context = LocalContext.current
     val uiState by initialQuizViewModel.uiState.collectAsState()
     val gameTime by initialQuizViewModel.gameTime.collectAsState()
+    val previousRound = remember(initialQuizViewModel.previousItemList.size) {
+        initialQuizViewModel.previousItemList
+    }
 
     LaunchedEffect(true) {
         initialQuizViewModel
@@ -77,6 +88,16 @@ fun InitialQuizScreen(
                             context = context,
                             baseToastType = sideEffect.messageType,
                             messageText = sideEffect.message
+                        ).apply {
+                            setGravity(Gravity.CENTER, 0, 0)
+                        }.show()
+                    }
+
+                    InitialQuizSideEffect.EndGame -> {
+                        BaseToast(
+                            context = context,
+                            baseToastType = BaseToastType.OKAY,
+                            messageText = "게임이 종료되었습니다"
                         ).apply {
                             setGravity(Gravity.CENTER, 0, 0)
                         }.show()
@@ -96,43 +117,121 @@ fun InitialQuizScreen(
             item = uiState.itemData
         )
 
-        Column {
-            HorizontalDivider()
+        InitialInputBody(
+            previousRound = previousRound,
+            totalRoundCount = initialQuizViewModel.totalRoundCount,
+            inputAnswer = uiState.inputAnswer,
+            onChangeAnswer = {
+                initialQuizViewModel.sendAction(InitialQuizAction.ChangeAnswer(it))
+            },
+            onDoneAnswer = {
+                initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone)
+            }
+        )
+    }
+}
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(
-                        horizontal = Spacings.Spacing04,
-                        vertical = Spacings.Spacing02
-                    )
-            ) {
-                BaseGameTextEditor(
-                    modifier = Modifier.weight(1f),
-                    text = uiState.inputAnswer,
-                    onChangeTextListener = {
-                        initialQuizViewModel.sendAction(InitialQuizAction.ChangeAnswer(it))
-                    },
-                    onDoneActionListener = {
-                        initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone)
-                    }
+@Composable
+private fun InitialInputBody(
+    previousRound: List<Boolean>,
+    totalRoundCount: Int,
+    inputAnswer: String,
+    onChangeAnswer: (String) -> Unit,
+    onDoneAnswer: () -> Unit,
+) {
+    val isSubmit = inputAnswer.trim().isNotEmpty()
+    val submitColor by animateColorAsState(
+        targetValue = if (isSubmit) Colors.Gold02 else Colors.Gray05,
+        label = ""
+    )
+    Column {
+        HorizontalDivider()
+
+        InitialRoundBody(
+            previousRound = previousRound,
+            totalRoundCount = totalRoundCount
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .padding(
+                    horizontal = Spacings.Spacing04,
+                    vertical = Spacings.Spacing02
                 )
+        ) {
+            BaseGameTextEditor(
+                modifier = Modifier.weight(1f),
+                text = inputAnswer,
+                onChangeTextListener = onChangeAnswer,
+                onDoneActionListener = onDoneAnswer
+            )
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .widthIn(min = Dimens.GAME_DONE_BUTTON_WIDTH_MIN),
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "제출",
-                        style = TextStyles.SubTitle01,
-                        textAlign = TextAlign.Center
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clickable(
+                        enabled = isSubmit,
+                        onClick = onDoneAnswer
                     )
-                }
+                    .widthIn(min = Dimens.GAME_DONE_BUTTON_WIDTH_MIN),
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "제출",
+                    color = submitColor,
+                    style = TextStyles.SubTitle01,
+                    textAlign = TextAlign.Center
+                )
             }
         }
+    }
+}
+
+@Composable
+fun InitialRoundBody(
+    previousRound: List<Boolean>,
+    totalRoundCount: Int
+) {
+    val horizontalState = rememberScrollState()
+    Row(
+        modifier = Modifier
+            .padding(vertical = Spacings.Spacing01)
+            .fillMaxWidth()
+            .horizontalScroll(state = horizontalState),
+        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02, Alignment.CenterHorizontally)
+    ) {
+        Spacer(modifier = Modifier.width(Spacings.Spacing02))
+        repeat(totalRoundCount) { index ->
+            val isSubmit = previousRound.getOrNull(index)
+            val iconId: Int
+            val tintColor: Color
+
+            when (isSubmit) {
+                true -> {
+                    iconId = DesignR.drawable.ic_done
+                    tintColor = Colors.Green00
+                }
+
+                false -> {
+                    iconId = DesignR.drawable.ic_clear
+                    tintColor = Colors.Orange00
+                }
+
+                else -> {
+                    iconId = DesignR.drawable.ic_question
+                    tintColor = Colors.Gray06
+                }
+            }
+            Icon(
+                modifier = Modifier.size(IconSize.MediumSize),
+                painter = painterResource(id = iconId),
+                tint = tintColor,
+                contentDescription = null
+            )
+        }
+        Spacer(modifier = Modifier.width(Spacings.Spacing02))
     }
 }
 
@@ -181,8 +280,6 @@ private fun InitialQuizGameBody(
                     }
             }
         }
-
-        HorizontalDivider()
 
         BaseRectangleIconImage(
             modifier = Modifier.size(IconSize.XXLargeSize),
@@ -279,7 +376,33 @@ internal fun InitialItemStatusBodyPreview() {
     }
 }
 
-val dummyItem = ItemData(
+@Preview(device = Devices.PIXEL_2)
+@Composable
+internal fun InitialInputBodyPreview() {
+    LolChampionThemePreview {
+        InitialInputBody(
+            previousRound = pre,
+            totalRoundCount = 10,
+            inputAnswer = "",
+            onDoneAnswer = {},
+            onChangeAnswer = {}
+        )
+    }
+}
+
+@Preview(device = Devices.PIXEL_2)
+@Composable
+internal fun InitialRoundBodyPreview() {
+    LolChampionThemePreview {
+        InitialRoundBody(
+            previousRound = pre,
+            totalRoundCount = 10,
+        )
+    }
+}
+
+
+private val dummyItem = ItemData(
     name = "드락사르의 암흑검",
     version = "14.11.01",
     tags = setOf(
@@ -294,3 +417,18 @@ val dummyItem = ItemData(
     into = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4"),
     from = listOf("1", "2", "3", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4")
 )
+
+private val pre: List<Boolean> = Stack<Boolean>().apply {
+    push(true)
+    push(false)
+    push(true)
+    push(false)
+    push(true)
+}
+private val next: Stack<ItemData> = Stack<ItemData>().apply {
+    push(dummyItem)
+    push(dummyItem)
+    push(dummyItem)
+    push(dummyItem)
+    push(dummyItem)
+}

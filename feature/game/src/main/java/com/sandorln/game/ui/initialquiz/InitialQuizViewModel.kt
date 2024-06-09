@@ -27,7 +27,9 @@ import kotlin.random.Random
 class InitialQuizViewModel @Inject constructor(
     private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion
 ) : ViewModel() {
-    private val _previousItemStack: Stack<ItemData> = Stack()
+    val totalRoundCount: Int = 10
+    private val _previousItemStack: Stack<Triple<Boolean, ItemData, String>> = Stack()
+    val previousItemList: List<Boolean> get() = _previousItemStack.map { it.first }
     private val _nextItemSetStack: Stack<ItemData> = Stack()
 
     private val _gameTimeMutex = Mutex()
@@ -64,19 +66,38 @@ class InitialQuizViewModel @Inject constructor(
     }
 
     private var nextRoundJob: Job? = null
-    private fun nextRound() {
+    private fun nextRound(
+        isAnswer: Boolean,
+        preItemData: ItemData,
+        preAnswer: String
+    ) {
         if (nextRoundJob?.isActive == true) return
 
         viewModelScope.launch(Dispatchers.IO) {
             _gameTimeMutex.withLock {
-                _gameTime.update { min(it + 5f, 60f) }
+                _gameTime.update { min(it + if (isAnswer) 5f else 0f, 60f) }
             }
 
             _uiMutex.withLock {
-                _uiState.update {
-                    _previousItemStack.push(it.itemData)
-                    it.copy(itemData = _nextItemSetStack.pop())
-                }
+                _previousItemStack.push(Triple(isAnswer, preItemData, preAnswer))
+                runCatching { _nextItemSetStack.pop() }
+                    .onSuccess { nextItemData ->
+                        _uiState.update {
+                            it.copy(
+                                itemData = nextItemData,
+                                inputAnswer = ""
+                            )
+                        }
+                    }.onFailure {
+                        gameJob?.cancel()
+                        _uiState.update {
+                            it.copy(
+                                itemData = ItemData(),
+                                inputAnswer = ""
+                            )
+                        }
+                        _sideEffect.emit(InitialQuizSideEffect.EndGame)
+                    }
             }
         }
     }
@@ -87,8 +108,10 @@ class InitialQuizViewModel @Inject constructor(
                 getInitialQuizItemListByVersion
                     .invoke("14.5.1")
                     .onSuccess { summonerItemList ->
-                        while (_nextItemSetStack.count() < 10) {
-                            val randomItem = summonerItemList.random(Random(System.currentTimeMillis()))
+                        val randomSeed = Random(System.currentTimeMillis())
+
+                        while (_nextItemSetStack.count() < totalRoundCount) {
+                            val randomItem = summonerItemList.random(randomSeed)
                             if (!_nextItemSetStack.contains(randomItem))
                                 _nextItemSetStack.add(randomItem)
                         }
@@ -113,26 +136,23 @@ class InitialQuizViewModel @Inject constructor(
                                 }
 
                                 InitialQuizAction.InitialQuizDone -> {
+                                    if (gameJob?.isCompleted == true) return@collect
+
                                     val itemData = _uiState.value.itemData
                                     val answer = _uiState.value.inputAnswer
 
                                     val toastMessage: InitialQuizSideEffect
-                                    if (itemData.name.replace(" ", "") == answer.replace(" ", "")) {
-                                        nextRound()
-                                        toastMessage = InitialQuizSideEffect.ShowToastMessage(
-                                            BaseToastType.OKAY,
-                                            "정답입니다"
-                                        )
-                                    } else {
-                                        toastMessage = InitialQuizSideEffect.ShowToastMessage(
-                                            BaseToastType.WARNING,
-                                            "틀렸습니다"
-                                        )
+                                    val isAnswer = itemData.name.replace(" ", "") == answer.replace(" ", "")
 
+                                    nextRound(isAnswer, itemData, answer)
+
+                                    toastMessage = if (isAnswer) {
+                                        InitialQuizSideEffect.ShowToastMessage(BaseToastType.OKAY, "정답입니다")
+                                    } else {
+                                        InitialQuizSideEffect.ShowToastMessage(BaseToastType.WARNING, "틀렸습니다")
                                     }
 
                                     _sideEffect.emit(toastMessage)
-                                    _uiState.update { it.copy(inputAnswer = "") }
                                 }
                             }
                         }
@@ -143,6 +163,8 @@ class InitialQuizViewModel @Inject constructor(
 }
 
 sealed interface InitialQuizSideEffect {
+    data object EndGame : InitialQuizSideEffect
+
     data class ShowToastMessage(
         val messageType: BaseToastType,
         val message: String

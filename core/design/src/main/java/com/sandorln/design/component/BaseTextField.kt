@@ -141,7 +141,7 @@ fun BaseGameTextEditor(
                 shape = RoundedCornerShape(Radius.Radius02)
             )
             .border(
-                width = 1.dp,
+                width = 3.dp,
                 color = focusColor,
                 shape = RoundedCornerShape(Radius.Radius02)
             )
@@ -166,7 +166,7 @@ fun BaseGameTextEditor(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             textStyle = textStyle.copy(
                 textAlign = TextAlign.Center,
-                color = Colors.BaseColor
+                color = Colors.Gray09
             ),
             decorationBox = { innerTextField ->
                 if (text.isEmpty())

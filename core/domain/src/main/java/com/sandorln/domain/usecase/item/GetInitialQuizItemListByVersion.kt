@@ -13,7 +13,7 @@ class GetInitialQuizItemListByVersion @Inject constructor(
         itemRepository
             .getItemListByVersion(version)
             .filter {
-                it.inStore && it.mapType == MapType.SUMMONER_RIFT
+                it.inStore && (it.mapType == MapType.SUMMONER_RIFT || it.mapType == MapType.ALL) && it.depth > 1
             }
     }
 }
