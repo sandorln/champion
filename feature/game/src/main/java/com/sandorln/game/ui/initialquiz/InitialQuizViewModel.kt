@@ -3,6 +3,7 @@ package com.sandorln.game.ui.initialquiz
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.design.component.toast.BaseToastType
+import com.sandorln.domain.usecase.game.UpdateInitialGameScore
 import com.sandorln.domain.usecase.item.GetInitialQuizItemListByVersion
 import com.sandorln.model.data.item.ItemData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 class InitialQuizViewModel @Inject constructor(
-    private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion
+    private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion,
+    private val updateInitialGameScore: UpdateInitialGameScore
 ) : ViewModel() {
     val totalRoundCount: Int = 10
     private val defaultPlusScore: Int = 500
@@ -119,6 +121,7 @@ class InitialQuizViewModel @Inject constructor(
                         }
                     }.onFailure {
                         gameJob?.cancel()
+                        updateInitialGameScore.invoke(_uiState.value.score.toLong())
                         _uiState.update {
                             it.copy(
                                 itemData = ItemData(),
@@ -166,7 +169,8 @@ class InitialQuizViewModel @Inject constructor(
                             }
 
                             InitialQuizAction.InitialQuizDone -> {
-                                if (gameJob?.isCompleted == true) return@collect
+                                if (gameJob?.isCompleted == true || _inputAnswer.value.isBlank())
+                                    return@collect
 
                                 val itemData = _uiState.value.itemData
                                 val answer = _inputAnswer.value

@@ -12,12 +12,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.LolChampionThemePreview
@@ -29,13 +35,19 @@ import com.sandorln.setting.R
 fun SettingHomeScreen(
     moveToLicensesScreen: () -> Unit,
     moveToLolPatchNoteScreen: () -> Unit,
-    moveToInitialQuizScreen : ()->Unit
+    moveToInitialQuizScreen: () -> Unit,
+    settingHomeViewModel: SettingHomeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val packageName = context.packageName
     val versionName = context.packageManager
         .getPackageInfo(packageName, 0)
         .versionName
+
+    var score by remember { mutableStateOf(0L) }
+    LaunchedEffect(true) {
+        score = settingHomeViewModel.getInitialGameScore()
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -48,6 +60,13 @@ fun SettingHomeScreen(
         SettingMenuBody(
             title = stringResource(id = R.string.menu_open_licenses),
             onClick = moveToLicensesScreen
+        )
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "현재 점수 : $score",
+            style = TextStyles.Title03,
+            textAlign = TextAlign.Center
         )
 
         SettingMenuBody(

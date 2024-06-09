@@ -13,19 +13,14 @@ import javax.inject.Singleton
 class GameService @Inject constructor(
     private val fireDB: FirebaseFirestore
 ) {
-    suspend fun getCurrentGameScore(fireStoreGame: FireStoreGame): Long {
-        val id = FirebaseInstallations.getInstance().getUserId()
-
-        return runCatching {
-            fireDB
-                .getGameDocument(fireStoreGame)
-                .document(id)
-                .get()
-                .await()
-                .data
-                ?.get("score") as Long
-        }.getOrNull() ?: 0L
-    }
+    suspend fun getCurrentGameScore(fireStoreGame: FireStoreGame): Long =
+        fireDB
+            .getGameDocument(fireStoreGame)
+            .document(FirebaseInstallations.getInstance().getUserId())
+            .get()
+            .await()
+            .data
+            ?.get("score") as Long
 
     suspend fun updateGameScore(fireStoreGame: FireStoreGame, score: Long) {
         val id = FirebaseInstallations.getInstance().getUserId()
