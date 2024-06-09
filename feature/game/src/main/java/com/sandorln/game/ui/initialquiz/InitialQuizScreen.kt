@@ -124,7 +124,7 @@ fun InitialQuizScreen(
 
 @Composable
 private fun GameEndDialogBody(
-    score: Int = 0,
+    score: Long = 0,
     previousItemList: List<Triple<ChainType, ItemData, String>> = emptyList(),
     onDismissListener: () -> Unit
 ) {

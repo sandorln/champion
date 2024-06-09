@@ -30,6 +30,7 @@ class InitialQuizViewModel @Inject constructor(
 ) : ViewModel() {
     val totalRoundCount: Int = 10
     private val defaultPlusScore: Int = 500
+    private val remainingTimePlusScore: Int = 500
 
     private val _previousItemStack: Stack<Triple<ChainType, ItemData, String>> = Stack()
     val previousAnswerList: List<Boolean> get() = _previousItemStack.map { it.first != ChainType.FAIL }
@@ -121,9 +122,15 @@ class InitialQuizViewModel @Inject constructor(
                         }
                     }.onFailure {
                         gameJob?.cancel()
-                        updateInitialGameScore.invoke(_uiState.value.score.toLong())
+                        val answerPer = previousAnswerList.count { it }.toFloat() / totalRoundCount.toFloat()
+                        val remainingTime = _gameTime.value
+                        val score = _uiState.value.score
+                        val finalScore = (score + remainingTime * remainingTimePlusScore * answerPer).toLong()
+
+                        updateInitialGameScore.invoke(finalScore)
                         _uiState.update {
                             it.copy(
+                                score = finalScore,
                                 itemData = ItemData(),
                                 isGameEnd = true
                             )
@@ -133,6 +140,11 @@ class InitialQuizViewModel @Inject constructor(
 
             chainCountDate = nowDate
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        gameJob?.cancel()
     }
 
     init {
@@ -212,7 +224,7 @@ sealed interface InitialQuizAction {
 }
 
 data class InitialQuizUiState(
-    val score: Int = 0,
+    val score: Long = 0,
     val itemData: ItemData = ItemData(),
     val isGameEnd: Boolean = false
 )
