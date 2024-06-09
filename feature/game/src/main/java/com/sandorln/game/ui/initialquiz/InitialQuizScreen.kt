@@ -81,6 +81,10 @@ fun InitialQuizScreen(
     val previousRound = remember(initialQuizViewModel.previousAnswerList.size) {
         initialQuizViewModel.previousAnswerList
     }
+    val onGameDialogDismissListener: () -> Unit = {
+        initialQuizViewModel.sendAction(InitialQuizAction.CloseGameDialog)
+        onBackStack.invoke()
+    }
 
     LaunchedEffect(true) {
         initialQuizViewModel
@@ -124,13 +128,11 @@ fun InitialQuizScreen(
         )
 
         if (uiState.isGameEnd) {
-            Dialog(onDismissRequest = {
-                initialQuizViewModel.sendAction(InitialQuizAction.CloseGameDialog)
-                onBackStack.invoke()
-            }) {
+            Dialog(onDismissRequest = onGameDialogDismissListener) {
                 GameEndDialogBody(
                     score = uiState.score,
-                    previousItemList = initialQuizViewModel.previousItemList
+                    previousItemList = initialQuizViewModel.previousItemList,
+                    onDismissListener = onGameDialogDismissListener
                 )
             }
         }
@@ -140,7 +142,8 @@ fun InitialQuizScreen(
 @Composable
 private fun GameEndDialogBody(
     score: Int = 0,
-    previousItemList: List<Triple<Boolean, ItemData, String>> = emptyList()
+    previousItemList: List<Triple<Boolean, ItemData, String>> = emptyList(),
+    onDismissListener: () -> Unit
 ) {
     val scoreDecimalFormat = DecimalFormat("#,###")
 
@@ -182,6 +185,7 @@ private fun GameEndDialogBody(
         Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
         Row(
+            modifier = Modifier.clickable(onClick = onDismissListener),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

@@ -86,7 +86,8 @@ fun HomeScreen(
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
     moveToLicensesScreen: () -> Unit,
     moveToLolPatchNoteScreen: () -> Unit,
-    moveToChampionPatchNoteListScreen: (version: String) -> Unit
+    moveToChampionPatchNoteListScreen: (version: String) -> Unit,
+    moveToInitialQuizScreen: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -155,7 +156,8 @@ fun HomeScreen(
 
                         HomeScreenType.Setting -> SettingHomeScreen(
                             moveToLicensesScreen = moveToLicensesScreen,
-                            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen
+                            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen,
+                            moveToInitialQuizScreen = moveToInitialQuizScreen
                         )
                     }
                 }

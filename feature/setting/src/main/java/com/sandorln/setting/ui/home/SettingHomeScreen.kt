@@ -28,7 +28,8 @@ import com.sandorln.setting.R
 @Composable
 fun SettingHomeScreen(
     moveToLicensesScreen: () -> Unit,
-    moveToLolPatchNoteScreen: () -> Unit
+    moveToLolPatchNoteScreen: () -> Unit,
+    moveToInitialQuizScreen : ()->Unit
 ) {
     val context = LocalContext.current
     val packageName = context.packageName
@@ -47,6 +48,11 @@ fun SettingHomeScreen(
         SettingMenuBody(
             title = stringResource(id = R.string.menu_open_licenses),
             onClick = moveToLicensesScreen
+        )
+
+        SettingMenuBody(
+            title = "초성 게임 - TEST",
+            onClick = moveToInitialQuizScreen
         )
 
         Text(
@@ -97,7 +103,8 @@ fun SettingHomeScreenPreview() {
     LolChampionThemePreview {
         SettingHomeScreen(
             moveToLicensesScreen = {},
-            moveToLolPatchNoteScreen = {}
+            moveToLolPatchNoteScreen = {},
+            moveToInitialQuizScreen = {}
         )
     }
 }

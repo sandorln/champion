@@ -126,7 +126,7 @@ class InitialQuizViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             launch {
                 getInitialQuizItemListByVersion
-                    .invoke("14.5.1")
+                    .invoke("14.11.1")
                     .onSuccess { summonerItemList ->
                         val randomSeed = Random(System.currentTimeMillis())
 
