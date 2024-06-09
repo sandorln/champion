@@ -75,7 +75,6 @@ fun InitialQuizScreen(
     initialQuizViewModel: InitialQuizViewModel = hiltViewModel(),
     onBackStack: () -> Unit
 ) {
-    val context = LocalContext.current
     val uiState by initialQuizViewModel.uiState.collectAsState()
     val gameTime by initialQuizViewModel.gameTime.collectAsState()
     val inputAnswer by initialQuizViewModel.inputAnswer.collectAsState()
@@ -85,24 +84,6 @@ fun InitialQuizScreen(
     val onGameDialogDismissListener: () -> Unit = {
         initialQuizViewModel.sendAction(InitialQuizAction.CloseGameDialog)
         onBackStack.invoke()
-    }
-
-    LaunchedEffect(true) {
-        initialQuizViewModel
-            .sideEffect
-            .collect { sideEffect ->
-                when (sideEffect) {
-                    is InitialQuizSideEffect.ShowToastMessage -> {
-                        BaseToast(
-                            context = context,
-                            baseToastType = sideEffect.messageType,
-                            messageText = sideEffect.message
-                        ).apply {
-                            setGravity(Gravity.CENTER, 0, 0)
-                        }.show()
-                    }
-                }
-            }
     }
 
     Column(

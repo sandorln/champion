@@ -200,10 +200,8 @@ class InitialQuizViewModel @Inject constructor(
 }
 
 sealed interface InitialQuizSideEffect {
-    data class ShowToastMessage(
-        val messageType: BaseToastType,
-        val message: String
-    ) : InitialQuizSideEffect
+    @Deprecated("게임 중 토스트메세지를 띄우면 느려짐")
+    data class ShowToastMessage(val messageType: BaseToastType, val message: String) : InitialQuizSideEffect
 }
 
 sealed interface InitialQuizAction {
