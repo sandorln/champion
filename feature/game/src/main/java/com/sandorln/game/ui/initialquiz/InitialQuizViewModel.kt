@@ -62,7 +62,17 @@ class InitialQuizViewModel @Inject constructor(
                     _gameTime.update { max(it - 0.01f, 0f) }
                 }
 
-                if (_gameTime.value <= 0) break
+                if (_gameTime.value <= 0) {
+                    _uiMutex.withLock {
+                        _uiState.update {
+                            it.copy(
+                                itemData = ItemData(),
+                                isGameEnd = true
+                            )
+                        }
+                    }
+                    break
+                }
             }
         }
     }
