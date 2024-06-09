@@ -212,7 +212,7 @@ class InitialQuizViewModel @Inject constructor(
 }
 
 sealed interface InitialQuizSideEffect {
-    @Deprecated("게임 중 토스트메세지를 띄우면 느려짐")
+    @Deprecated("게임 중 TOAST 띄우면 입력메세지 밀리는 현상 발생")
     data class ShowToastMessage(val messageType: BaseToastType, val message: String) : InitialQuizSideEffect
 }
 

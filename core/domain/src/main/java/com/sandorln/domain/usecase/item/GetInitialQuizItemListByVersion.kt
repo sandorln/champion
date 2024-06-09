@@ -2,6 +2,7 @@ package com.sandorln.domain.usecase.item
 
 import com.sandorln.data.repository.item.ItemRepository
 import com.sandorln.model.data.map.MapType
+import com.sandorln.model.type.ItemTagType
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -13,7 +14,9 @@ class GetInitialQuizItemListByVersion @Inject constructor(
         itemRepository
             .getItemListByVersion(version)
             .filter {
-                it.inStore && (it.mapType == MapType.SUMMONER_RIFT || it.mapType == MapType.ALL) && it.depth > 1
+                it.inStore &&
+                        it.tags.none { tag -> tag == ItemTagType.Consumable } &&
+                        (it.mapType == MapType.SUMMONER_RIFT || it.mapType == MapType.ALL)
             }
     }
 }
