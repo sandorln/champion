@@ -78,6 +78,7 @@ fun InitialQuizScreen(
     val context = LocalContext.current
     val uiState by initialQuizViewModel.uiState.collectAsState()
     val gameTime by initialQuizViewModel.gameTime.collectAsState()
+    val inputAnswer by initialQuizViewModel.inputAnswer.collectAsState()
     val previousRound = remember(initialQuizViewModel.previousAnswerList.size) {
         initialQuizViewModel.previousAnswerList
     }
@@ -119,7 +120,7 @@ fun InitialQuizScreen(
         InitialInputBody(
             previousRound = previousRound,
             totalRoundCount = initialQuizViewModel.totalRoundCount,
-            inputAnswer = uiState.inputAnswer,
+            inputAnswer = inputAnswer,
             onChangeAnswer = {
                 initialQuizViewModel.sendAction(InitialQuizAction.ChangeAnswer(it))
             },

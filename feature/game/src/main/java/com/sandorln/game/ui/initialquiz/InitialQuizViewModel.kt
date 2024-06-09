@@ -20,7 +20,6 @@ import kotlinx.coroutines.sync.withLock
 import java.util.Stack
 import javax.inject.Inject
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.random.Random
 
 @HiltViewModel
@@ -41,6 +40,9 @@ class InitialQuizViewModel @Inject constructor(
     private val _uiMutex = Mutex()
     private val _uiState = MutableStateFlow(InitialQuizUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _inputAnswer = MutableStateFlow("")
+    val inputAnswer = _inputAnswer.asStateFlow()
 
     private val _sideEffect = MutableSharedFlow<InitialQuizSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
@@ -88,9 +90,7 @@ class InitialQuizViewModel @Inject constructor(
         val nowDate = System.currentTimeMillis()
 
         viewModelScope.launch(Dispatchers.IO) {
-            _gameTimeMutex.withLock {
-                _gameTime.update { min(it + if (isAnswer) 5f else 0f, 60f) }
-            }
+            _inputAnswer.update { "" }
 
             _uiMutex.withLock {
                 if (isAnswer) {
@@ -112,8 +112,7 @@ class InitialQuizViewModel @Inject constructor(
                     .onSuccess { nextItemData ->
                         _uiState.update {
                             it.copy(
-                                itemData = nextItemData,
-                                inputAnswer = ""
+                                itemData = nextItemData
                             )
                         }
                     }.onFailure {
@@ -121,7 +120,6 @@ class InitialQuizViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 itemData = ItemData(),
-                                inputAnswer = "",
                                 isGameEnd = true
                             )
                         }
@@ -160,35 +158,33 @@ class InitialQuizViewModel @Inject constructor(
             launch {
                 _action
                     .collect { action ->
-                        _uiMutex.withLock {
-                            when (action) {
-                                is InitialQuizAction.ChangeAnswer -> {
-                                    _uiState.update { it.copy(inputAnswer = action.text) }
+                        when (action) {
+                            is InitialQuizAction.ChangeAnswer -> {
+                                _inputAnswer.update { action.text }
+                            }
+
+                            InitialQuizAction.InitialQuizDone -> {
+                                if (gameJob?.isCompleted == true) return@collect
+
+                                val itemData = _uiState.value.itemData
+                                val answer = _inputAnswer.value
+
+                                val toastMessage: InitialQuizSideEffect
+                                val isAnswer = itemData.name.replace(" ", "") == answer.replace(" ", "")
+
+                                nextRound(isAnswer, itemData, answer)
+
+                                toastMessage = if (isAnswer) {
+                                    InitialQuizSideEffect.ShowToastMessage(BaseToastType.OKAY, "정답입니다")
+                                } else {
+                                    InitialQuizSideEffect.ShowToastMessage(BaseToastType.WARNING, "틀렸습니다")
                                 }
 
-                                InitialQuizAction.InitialQuizDone -> {
-                                    if (gameJob?.isCompleted == true) return@collect
+                                _sideEffect.emit(toastMessage)
+                            }
 
-                                    val itemData = _uiState.value.itemData
-                                    val answer = _uiState.value.inputAnswer
-
-                                    val toastMessage: InitialQuizSideEffect
-                                    val isAnswer = itemData.name.replace(" ", "") == answer.replace(" ", "")
-
-                                    nextRound(isAnswer, itemData, answer)
-
-                                    toastMessage = if (isAnswer) {
-                                        InitialQuizSideEffect.ShowToastMessage(BaseToastType.OKAY, "정답입니다")
-                                    } else {
-                                        InitialQuizSideEffect.ShowToastMessage(BaseToastType.WARNING, "틀렸습니다")
-                                    }
-
-                                    _sideEffect.emit(toastMessage)
-                                }
-
-                                InitialQuizAction.CloseGameDialog -> {
-                                    _uiState.update { it.copy(isGameEnd = false) }
-                                }
+                            InitialQuizAction.CloseGameDialog -> {
+                                _uiState.update { it.copy(isGameEnd = false) }
                             }
                         }
                     }
@@ -214,7 +210,6 @@ sealed interface InitialQuizAction {
 data class InitialQuizUiState(
     val score: Int = 0,
     val itemData: ItemData = ItemData(),
-    val inputAnswer: String = "",
     val isGameEnd: Boolean = false
 )
 
