@@ -1,9 +1,10 @@
 package com.sandorln.datastore.di
 
-import com.sandorln.datastore.appsetting.AppSettingDatasource
-import com.sandorln.datastore.appsetting.DefaultAppSettingDatasource
-import com.sandorln.datastore.version.DefaultVersionDatasource
-import com.sandorln.datastore.version.VersionDatasource
+import com.sandorln.datastore.local.appsetting.AppSettingDatasource
+import com.sandorln.datastore.local.appsetting.DefaultAppSettingDatasource
+import com.sandorln.datastore.local.game.DefaultGameDatastore
+import com.sandorln.datastore.local.version.DefaultVersionDatasource
+import com.sandorln.datastore.local.version.VersionDatasource
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -20,4 +21,8 @@ interface DatasourceModule {
     @Binds
     @Singleton
     fun bindsVersionDatasource(versionDatasource: DefaultVersionDatasource): VersionDatasource
+
+    @Binds
+    @Singleton
+    fun bindsGameDatasource(versionDatasource: DefaultGameDatastore): VersionDatasource
 }

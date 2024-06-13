@@ -1,4 +1,4 @@
-package com.sandorln.datastore.version
+package com.sandorln.datastore.local.version
 
 import kotlinx.coroutines.flow.Flow
 

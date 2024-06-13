@@ -1,4 +1,4 @@
-package com.sandorln.datastore.appsetting
+package com.sandorln.datastore.local.appsetting
 
 import kotlinx.coroutines.flow.Flow
 

@@ -6,7 +6,7 @@ import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.model.ItemEntity
 import com.sandorln.database.model.SummaryItemEntity
-import com.sandorln.datastore.version.VersionDatasource
+import com.sandorln.datastore.local.version.VersionDatasource
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.item.SummaryItemImage

@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.sandorln.datastore.appsetting.AppSettingDatasource
-import com.sandorln.datastore.appsetting.DefaultAppSettingDatasource
+import com.sandorln.datastore.local.appsetting.AppSettingDatasource
+import com.sandorln.datastore.local.appsetting.DefaultAppSettingDatasource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
