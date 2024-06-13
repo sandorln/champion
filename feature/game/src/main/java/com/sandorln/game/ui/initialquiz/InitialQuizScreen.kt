@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,17 +28,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,20 +83,35 @@ fun InitialQuizScreen(
     val previousRound = remember(initialQuizViewModel.previousAnswerList.size) {
         initialQuizViewModel.previousAnswerList
     }
+
     val onGameDialogDismissListener: () -> Unit = {
         initialQuizViewModel.sendAction(InitialQuizAction.CloseGameDialog)
         onBackStack.invoke()
+    }
+
+    val timeProgressColor by remember(gameTime) {
+        val progress = (gameTime / InitialQuizViewModel.INIT_GAME_TIME).coerceIn(0f, 1f)
+        val color = lerp(Color.Red, Color.Green, progress)
+        mutableStateOf(color)
     }
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        BaseToolbar(onClickStartIcon = onBackStack)
+        Column {
+            BaseToolbar(onClickStartIcon = onBackStack)
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp),
+                progress = { gameTime / InitialQuizViewModel.INIT_GAME_TIME },
+                color = timeProgressColor
+            )
+        }
 
         InitialQuizGameBody(
             modifier = Modifier.weight(1f),
-            time = gameTime,
             item = uiState.itemData
         )
 
@@ -139,14 +155,32 @@ fun InitialQuizScreen(
 private fun ReadyTimeDialogBody(
     readyTime: Float
 ) {
+    val progress = (readyTime / InitialQuizViewModel.INIT_READY_TIME).coerceIn(0f, 1f)
+    val progressColor by remember(readyTime) {
+        val color = lerp(Color.Red, Color.Green, progress)
+        mutableStateOf(color)
+    }
+
     Box {
         CircularProgressIndicator(
             modifier = Modifier
                 .size(Dimens.GAME_READY_TIME_PROGRESS)
                 .align(Alignment.Center),
-            progress = { readyTime / InitialQuizViewModel.INIT_READY_TIME },
-            color = Colors.Gold02,
+            progress = { progress },
+            color = progressColor,
             trackColor = Colors.Gray05,
+            strokeWidth = 2.dp
+        )
+        Text(
+            modifier = Modifier
+                .offset(y = 6.dp)
+                .align(Alignment.Center),
+            text = ceil(readyTime).toInt().toString(),
+            style = TextStyles
+                .Title01
+                .copy(fontSize = 124.sp)
+                .addShadow(),
+            color = Colors.Gray05
         )
         Text(
             modifier = Modifier
@@ -197,11 +231,13 @@ private fun GameEndDialogBody(
             )
         }
 
-        Spacer(modifier = Modifier.height(Spacings.Spacing00))
+        if (previousItemList.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
-        GameEndDialogPreviousItemBody(
-            previousItemList = previousItemList
-        )
+            GameEndDialogPreviousItemBody(
+                previousItemList = previousItemList
+            )
+        }
 
         Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
@@ -410,7 +446,6 @@ fun InitialRoundBody(
 @OptIn(ExperimentalLayoutApi::class)
 private fun InitialQuizGameBody(
     modifier: Modifier = Modifier,
-    time: Float,
     item: ItemData
 ) {
     Column(
@@ -422,12 +457,6 @@ private fun InitialQuizGameBody(
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03, Alignment.CenterVertically)
     ) {
         Spacer(modifier = Modifier.height(Spacings.Spacing02))
-
-        GameTimeBody(
-            time = time
-        )
-
-        HorizontalDivider()
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -508,34 +537,11 @@ fun InitialItemStatusBody(
     }
 }
 
-@Composable
-fun GameTimeBody(time: Float) {
-    var textColor: Color by remember { mutableStateOf(Colors.Blue01) }
-    val timeDecimalFormat = DecimalFormat("00.00")
-    LaunchedEffect(time) {
-        textColor = when {
-            time >= 40 -> Colors.Gold01
-            time >= 20 -> Colors.Gold02
-            time >= 10 -> Colors.Gold03
-            time > 0 -> Colors.Gold04
-            else -> Colors.Gray07
-        }
-    }
-
-    Text(
-        text = timeDecimalFormat.format(time),
-        textAlign = TextAlign.Center,
-        color = textColor,
-        style = TextStyles.Title01.copy(letterSpacing = 12.sp),
-    )
-}
-
 @Preview(device = Devices.PIXEL_2)
 @Composable
 internal fun InitialQuizScreenPreview() {
     LolChampionThemePreview {
         InitialQuizGameBody(
-            time = 60f,
             item = dummyItem
         )
     }
