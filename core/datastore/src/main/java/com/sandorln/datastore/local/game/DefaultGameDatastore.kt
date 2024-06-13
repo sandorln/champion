@@ -14,14 +14,14 @@ class DefaultGameDatastore @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : GameDatastore {
     companion object {
-        private val KEY_INIT_GAME_SCORE = longPreferencesKey(PreferencesKeys.IS_QUESTION_NEWEST_LOL_VERSION)
+        private val KEY_INITIAL_GAME_SCORE = longPreferencesKey(PreferencesKeys.INITIAL_GAME_SCORE)
     }
 
-    override val maxLocalScore: Flow<Long> = dataStore.data.map { it[KEY_INIT_GAME_SCORE] ?: 0L }
+    override val initialGameLocalScore: Flow<Long> = dataStore.data.map { it[KEY_INITIAL_GAME_SCORE] ?: 0L }
 
-    override suspend fun updateInitGameMaxLocalScore(score: Long) {
-        val currentMaxLocalScore = maxLocalScore.firstOrNull() ?: 0
+    override suspend fun updateInitialGameMaxLocalScore(score: Long) {
+        val currentMaxLocalScore = initialGameLocalScore.firstOrNull() ?: 0
         if (currentMaxLocalScore < score)
-            dataStore.edit { it[KEY_INIT_GAME_SCORE] = score }
+            dataStore.edit { it[KEY_INITIAL_GAME_SCORE] = score }
     }
 }

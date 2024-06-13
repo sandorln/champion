@@ -1,13 +1,16 @@
 package com.sandorln.setting.ui.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.game.GetInitialGameScore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingHomeViewModel @Inject constructor(
-    private val getInitialGameScore: GetInitialGameScore
+    getInitialGameScore: GetInitialGameScore
 ) : ViewModel() {
-    suspend fun getInitialGameScore() = getInitialGameScore.invoke()
+    val initialGameScore = getInitialGameScore.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 }

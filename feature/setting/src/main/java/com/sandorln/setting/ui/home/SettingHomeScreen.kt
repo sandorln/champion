@@ -13,6 +13,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,10 +45,7 @@ fun SettingHomeScreen(
         .getPackageInfo(packageName, 0)
         .versionName
 
-    var score by remember { mutableStateOf(0L) }
-    LaunchedEffect(true) {
-        score = settingHomeViewModel.getInitialGameScore()
-    }
+    val score by settingHomeViewModel.initialGameScore.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()

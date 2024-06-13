@@ -8,5 +8,5 @@ import javax.inject.Singleton
 class GetInitialGameScore @Inject constructor(
     private val gameRepository: GameRepository
 ) {
-    suspend operator fun invoke() = runCatching { gameRepository.getCurrentInitialGameScore() }.getOrNull() ?: 0L
+    operator fun invoke() = gameRepository.initialGameScore
 }

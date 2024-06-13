@@ -3,6 +3,7 @@ package com.sandorln.datastore.di
 import com.sandorln.datastore.local.appsetting.AppSettingDatasource
 import com.sandorln.datastore.local.appsetting.DefaultAppSettingDatasource
 import com.sandorln.datastore.local.game.DefaultGameDatastore
+import com.sandorln.datastore.local.game.GameDatastore
 import com.sandorln.datastore.local.version.DefaultVersionDatasource
 import com.sandorln.datastore.local.version.VersionDatasource
 import dagger.Binds
@@ -24,5 +25,5 @@ interface DatasourceModule {
 
     @Binds
     @Singleton
-    fun bindsGameDatasource(versionDatasource: DefaultGameDatastore): VersionDatasource
+    fun bindsGameDatasource(versionDatasource: DefaultGameDatastore): GameDatastore
 }

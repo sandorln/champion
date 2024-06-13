@@ -3,7 +3,7 @@ package com.sandorln.datastore.local.game
 import kotlinx.coroutines.flow.Flow
 
 interface GameDatastore {
-    val maxLocalScore: Flow<Long>
+    val initialGameLocalScore: Flow<Long>
 
-    suspend fun updateInitGameMaxLocalScore(score : Long)
+    suspend fun updateInitialGameMaxLocalScore(score : Long)
 }

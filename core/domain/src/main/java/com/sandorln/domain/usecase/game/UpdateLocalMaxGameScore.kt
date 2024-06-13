@@ -9,8 +9,6 @@ class UpdateLocalMaxGameScore @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     suspend operator fun invoke(score: Long) = runCatching {
-        val preScore = gameRepository.getCurrentInitialGameScore()
-        if (score > preScore)
-            gameRepository.updateInitialGameScore(score)
+        gameRepository.updateInitialGameScore(score)
     }
 }
