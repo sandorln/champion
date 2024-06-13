@@ -24,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -45,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.BaseGameTextEditor
@@ -59,11 +61,13 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.design.theme.addShadow
 import com.sandorln.game.util.getInitialHangul
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
 import java.text.DecimalFormat
 import java.util.Stack
+import kotlin.math.ceil
 import com.sandorln.design.R as DesignR
 
 @Composable
@@ -73,6 +77,7 @@ fun InitialQuizScreen(
 ) {
     val uiState by initialQuizViewModel.uiState.collectAsState()
     val gameTime by initialQuizViewModel.gameTime.collectAsState()
+    val readyTime by initialQuizViewModel.readyTime.collectAsState()
     val inputAnswer by initialQuizViewModel.inputAnswer.collectAsState()
     val previousRound = remember(initialQuizViewModel.previousAnswerList.size) {
         initialQuizViewModel.previousAnswerList
@@ -115,6 +120,43 @@ fun InitialQuizScreen(
                 )
             }
         }
+
+        if (readyTime > 0) {
+            Dialog(
+                onDismissRequest = { },
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                ReadyTimeDialogBody(readyTime)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReadyTimeDialogBody(
+    readyTime: Float
+) {
+    Box {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .size(Dimens.GAME_READY_TIME_PROGRESS)
+                .align(Alignment.Center),
+            progress = { readyTime / InitialQuizViewModel.INIT_READY_TIME },
+            color = Colors.Gold02,
+            trackColor = Colors.Gray05,
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Center),
+            text = ceil(readyTime).toInt().toString(),
+            style = TextStyles
+                .Title01
+                .copy(fontSize = 124.sp)
+                .addShadow()
+        )
     }
 }
 
@@ -544,6 +586,16 @@ internal fun GameEndDialogBodyPreview() {
                 Triple(ChainType.GREAT, dummyItem, "a"),
                 Triple(ChainType.GOOD, dummyItem, "a")
             )
+        )
+    }
+}
+
+@Preview(device = Devices.PIXEL_2)
+@Composable
+internal fun ReadyTimeDialogBodyPreview() {
+    LolChampionThemePreview {
+        ReadyTimeDialogBody(
+            readyTime = 2.5f
         )
     }
 }

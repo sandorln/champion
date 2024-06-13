@@ -28,6 +28,11 @@ class InitialQuizViewModel @Inject constructor(
     private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion,
     private val updateInitialGameScore: UpdateInitialGameScore
 ) : ViewModel() {
+    companion object {
+        const val INIT_READY_TIME = 3f
+        const val INIT_GAME_TIME = 60f
+    }
+
     val totalRoundCount: Int = 10
     private val defaultPlusScore: Int = 500
     private val remainingTimePlusScore: Int = 500
@@ -38,8 +43,10 @@ class InitialQuizViewModel @Inject constructor(
     private val _nextItemSetStack: Stack<ItemData> = Stack()
 
     private val _gameTimeMutex = Mutex()
-    private val _gameTime = MutableStateFlow(60f)
+    private val _gameTime = MutableStateFlow(INIT_GAME_TIME)
     val gameTime = _gameTime.asStateFlow()
+    private val _readyTime = MutableStateFlow(INIT_READY_TIME)
+    val readyTime = _readyTime.asStateFlow()
 
     private val _uiMutex = Mutex()
     private val _uiState = MutableStateFlow(InitialQuizUiState())
@@ -60,8 +67,21 @@ class InitialQuizViewModel @Inject constructor(
 
     private var gameJob: Job? = null
     private fun startGame() {
-        gameJob?.cancel()
+        if (gameJob?.isActive == true) return
+
         gameJob = viewModelScope.launch {
+            _readyTime.emit(INIT_READY_TIME)
+            _gameTime.emit(INIT_GAME_TIME)
+
+            while (true) {
+                val readyTime = _readyTime.value
+                if (readyTime <= 0) break
+
+                delay(10)
+
+                _readyTime.update { readyTime - 0.01f }
+            }
+
             while (true) {
                 delay(10)
                 _gameTimeMutex.withLock {
@@ -142,11 +162,6 @@ class InitialQuizViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        gameJob?.cancel()
-    }
-
     init {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
@@ -187,18 +202,8 @@ class InitialQuizViewModel @Inject constructor(
                                 val itemData = _uiState.value.itemData
                                 val answer = _inputAnswer.value
 
-                                val toastMessage: InitialQuizSideEffect
                                 val isAnswer = itemData.name.replace(" ", "") == answer.replace(" ", "")
-
                                 nextRound(isAnswer, itemData, answer)
-
-                                toastMessage = if (isAnswer) {
-                                    InitialQuizSideEffect.ShowToastMessage(BaseToastType.OKAY, "정답입니다")
-                                } else {
-                                    InitialQuizSideEffect.ShowToastMessage(BaseToastType.WARNING, "틀렸습니다")
-                                }
-
-                                _sideEffect.emit(toastMessage)
                             }
 
                             InitialQuizAction.CloseGameDialog -> {
