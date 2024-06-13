@@ -3,7 +3,7 @@ package com.sandorln.game.ui.initialquiz
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.design.component.toast.BaseToastType
-import com.sandorln.domain.usecase.game.UpdateInitialGameScore
+import com.sandorln.domain.usecase.game.UpdateLocalMaxGameScore
 import com.sandorln.domain.usecase.item.GetInitialQuizItemListByVersion
 import com.sandorln.model.data.item.ItemData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +26,7 @@ import kotlin.random.Random
 @HiltViewModel
 class InitialQuizViewModel @Inject constructor(
     private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion,
-    private val updateInitialGameScore: UpdateInitialGameScore
+    private val updateLocalMaxGameScore: UpdateLocalMaxGameScore
 ) : ViewModel() {
     companion object {
         const val INIT_READY_TIME = 3f
@@ -147,7 +147,7 @@ class InitialQuizViewModel @Inject constructor(
                         val score = _uiState.value.score
                         val finalScore = (score + remainingTime * remainingTimePlusScore * answerPer).toLong()
 
-                        updateInitialGameScore.invoke(finalScore)
+                        updateLocalMaxGameScore.invoke(finalScore)
                         _uiState.update {
                             it.copy(
                                 score = finalScore,

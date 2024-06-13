@@ -110,10 +110,11 @@ fun InitialQuizScreen(
             )
         }
 
-        InitialQuizGameBody(
-            modifier = Modifier.weight(1f),
-            item = uiState.itemData
-        )
+        if (readyTime <= 0)
+            InitialQuizGameBody(
+                modifier = Modifier.weight(1f),
+                item = uiState.itemData
+            )
 
         InitialInputBody(
             previousRound = previousRound,
