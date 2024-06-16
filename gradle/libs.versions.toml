@@ -31,7 +31,7 @@ jsoup = "1.17.2"
 
 complieSdk = "34"
 minSdk = "24"
-versionCode = "56"
+versionCode = "57"
 versionName = "3.01.01"
 composeCompiler = "1.5.2"
 appcompat = "1.7.0"
