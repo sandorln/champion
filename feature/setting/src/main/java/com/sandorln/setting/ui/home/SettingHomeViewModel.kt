@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -28,9 +29,9 @@ class SettingHomeViewModel @Inject constructor(
     getGameRank: GetGameRank,
     private val refreshGameRank: RefreshGameRank
 ) : ViewModel() {
-    val initialGameRank = getGameRank.invoke()
-        .map { it[GameType.Initial] ?: 31 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 31)
+    val initialGameRank : StateFlow<Int?> = getGameRank.invoke()
+        .map { it[GameType.Initial] }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     private val _remainingRankRefreshTime: MutableStateFlow<Long> = MutableStateFlow(0)
     val remainingRankRefreshTime = _remainingRankRefreshTime.asStateFlow()

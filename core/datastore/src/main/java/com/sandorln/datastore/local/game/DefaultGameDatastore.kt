@@ -18,7 +18,7 @@ class DefaultGameDatastore @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : GameDatastore {
     companion object {
-        private const val REFRESH_DELAY_MINUTE_TIME = 5
+        private const val REFRESH_DELAY_MINUTE_TIME = 1
 
         private val KEY_INITIAL_GAME_SCORE = longPreferencesKey(PreferencesKeys.INITIAL_GAME_SCORE)
         private val KEY_REFRESH_RANK_GAME_NEXT_TIME = longPreferencesKey(PreferencesKeys.REFRESH_RANK_GAME_NEXT_TIME)

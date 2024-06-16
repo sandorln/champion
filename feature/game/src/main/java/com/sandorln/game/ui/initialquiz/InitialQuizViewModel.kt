@@ -33,7 +33,7 @@ class InitialQuizViewModel @Inject constructor(
         const val INIT_GAME_TIME = 60f
     }
 
-    val totalRoundCount: Int = 10
+    val totalRoundCount: Int = 15
     private val defaultPlusScore: Int = 500
     private val remainingTimePlusScore: Int = 500
 
@@ -83,9 +83,9 @@ class InitialQuizViewModel @Inject constructor(
             }
 
             while (true) {
-                delay(10)
+                delay(250)
                 _gameTimeMutex.withLock {
-                    _gameTime.update { max(it - 0.01f, 0f) }
+                    _gameTime.update { max(it - 0.25f, 0f) }
                 }
 
                 if (_gameTime.value <= 0) {

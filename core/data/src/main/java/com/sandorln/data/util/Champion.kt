@@ -159,9 +159,7 @@ fun NetworkChampionDetail.asData(otherChampionDetail: ChampionDetailData = Champ
         spells = spells.mapIndexed { index, networkChampionSpell ->
             networkChampionSpell.asData(index + 1)
         },
-        passive = passive.asData(),
-        rating = rating,
-        writingRating = writingRating
+        passive = passive.asData()
     )
 
 fun NetworkChampionSkin.asData(): ChampionSkin = ChampionSkin(

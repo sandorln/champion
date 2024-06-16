@@ -4,6 +4,7 @@ import com.sandorln.data.repository.champion.ChampionRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@Deprecated("Firebase 사용량 때문에 금지")
 @Singleton
 class SetChampionRating @Inject constructor(
     private val championRepository: ChampionRepository

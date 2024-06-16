@@ -287,10 +287,6 @@ fun ChampionDetailScreen(
         ) {
             Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
-            ChampionRating(rating = championDetailData.rating) {
-                championDetailViewModel.sendAction(ChampionDetailAction.ChangeRatingEditorDialog(true))
-            }
-
             ChampionDetailInfoTitle(title = statsTitle)
 
             ChampionStatusBody(
@@ -370,18 +366,6 @@ fun ChampionDetailScreen(
                     }
                 }
             }
-        }
-
-        if (uiState.isShowRatingEditorDialog) {
-            ChampionRatingEditor(
-                initRating = uiState.championDetailData.writingRating,
-                onDismissListener = {
-                    championDetailViewModel.sendAction(ChampionDetailAction.ChangeRatingEditorDialog(false))
-                },
-                onSubmitListener = {
-                    championDetailViewModel.sendAction(ChampionDetailAction.SetChampionRating(it))
-                }
-            )
         }
     }
 }
@@ -1066,6 +1050,7 @@ fun ChampionSkins(
     }
 }
 
+@Deprecated("챔피언 평가는 사용하지 않는 것으로 Firebase 사용량이 너무 늘어남")
 @Composable
 fun ChampionRating(
     rating: Float,
@@ -1138,6 +1123,7 @@ fun ChampionRating(
     }
 }
 
+@Deprecated("Firebase 사용량 때문에 금지")
 @Composable
 fun ChampionRatingEditor(
     initRating: Int = 0,

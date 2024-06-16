@@ -152,6 +152,7 @@ class DefaultChampionRepository @Inject constructor(
     override suspend fun getChampionPatchNoteList(version: String): List<ChampionPatchNote> =
         championService.getChampionPathNoteList(version).map(NetworkChampionPatchNote::asData)
 
+    @Deprecated("Firebase 사용량 때문에 금지")
     override suspend fun setChampionRating(
         championName: String,
         rating: Int

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.design.theme.AnimationConfig
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.Dimens.INITIAL_GAME_TITLE_SIZE
@@ -75,16 +76,6 @@ fun SettingHomeScreen(
             .fillMaxSize()
             .verticalScroll(state = rememberScrollState())
     ) {
-        SettingMenuBody(
-            title = stringResource(id = R.string.menu_lol_patch_notes),
-            onClick = moveToLolPatchNoteScreen
-        )
-
-        SettingMenuBody(
-            title = stringResource(id = R.string.menu_open_licenses),
-            onClick = moveToLicensesScreen
-        )
-
         InitialGameRankingBody(
             score = score,
             rank = rank,
@@ -94,6 +85,16 @@ fun SettingHomeScreen(
         )
 
         HorizontalDivider()
+
+        SettingMenuBody(
+            title = stringResource(id = R.string.menu_lol_patch_notes),
+            onClick = moveToLolPatchNoteScreen
+        )
+
+        SettingMenuBody(
+            title = stringResource(id = R.string.menu_open_licenses),
+            onClick = moveToLicensesScreen
+        )
 
         Text(
             modifier = Modifier
@@ -142,18 +143,23 @@ private val INITIAL_GAME_TITLE = listOf("ㅊ", "ㅅ", "ㄱ", "ㅇ")
 @Composable
 fun InitialGameRankingBody(
     score: Long,
-    rank: Int,
+    rank: Int?,
     refreshRemainingTime: Long,
     onClickInitialRankRefreshBtn: () -> Unit,
     onClickInitialGameStart: () -> Unit
 ) {
-    val rankText = if (rank > 30) "- 위" else "$rank 위"
+    val rankText = when {
+        rank == null -> "?? 위"
+        rank > 30 -> "+30 위"
+        else -> "$rank 위"
+    }
+
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val btnOffset by infiniteTransition.animateFloat(
         initialValue = 0.dp.value,
-        targetValue = -Spacings.Spacing01.value,
+        targetValue = -Spacings.Spacing00.value,
         animationSpec = infiniteRepeatable(
-            animation = tween(500, easing = LinearEasing),
+            animation = tween(AnimationConfig.FAST, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = ""
@@ -272,7 +278,7 @@ fun InitialGameRankingBodyPreview() {
     LolChampionThemePreview {
         InitialGameRankingBody(
             score = 10000,
-            rank = 31,
+            rank = null,
             refreshRemainingTime = 0,
             onClickInitialRankRefreshBtn = {},
             onClickInitialGameStart = {}
