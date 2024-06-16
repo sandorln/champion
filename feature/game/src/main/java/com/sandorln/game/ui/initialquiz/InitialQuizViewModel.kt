@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.domain.usecase.game.UpdateLocalMaxGameScore
 import com.sandorln.domain.usecase.item.GetInitialQuizItemListByVersion
+import com.sandorln.domain.usecase.version.GetAllVersionList
 import com.sandorln.model.data.item.ItemData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -26,7 +28,8 @@ import kotlin.random.Random
 @HiltViewModel
 class InitialQuizViewModel @Inject constructor(
     private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion,
-    private val updateLocalMaxGameScore: UpdateLocalMaxGameScore
+    private val updateLocalMaxGameScore: UpdateLocalMaxGameScore,
+    getAllVersionList: GetAllVersionList
 ) : ViewModel() {
     companion object {
         const val INIT_READY_TIME = 3f
@@ -165,8 +168,10 @@ class InitialQuizViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
+                val latestVersion = getAllVersionList.invoke().firstOrNull()?.firstOrNull()?.name ?: "14.11.1"
+
                 getInitialQuizItemListByVersion
-                    .invoke("14.11.1")
+                    .invoke(latestVersion)
                     .onSuccess { summonerItemList ->
                         val randomSeed = Random(System.currentTimeMillis())
 
