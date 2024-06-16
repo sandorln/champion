@@ -36,7 +36,7 @@ class InitialQuizViewModel @Inject constructor(
         const val INIT_GAME_TIME = 60f
     }
 
-    val totalRoundCount: Int = 15
+    val totalRoundCount: Int = 10
     private val defaultPlusScore: Int = 500
     private val remainingTimePlusScore: Int = 500
 
@@ -55,6 +55,7 @@ class InitialQuizViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(InitialQuizUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _inputAnswerMutex = Mutex()
     private val _inputAnswer = MutableStateFlow("")
     val inputAnswer = _inputAnswer.asStateFlow()
 
@@ -117,7 +118,9 @@ class InitialQuizViewModel @Inject constructor(
         val nowDate = System.currentTimeMillis()
 
         viewModelScope.launch(Dispatchers.IO) {
-            _inputAnswer.update { "" }
+            _inputAnswerMutex.withLock {
+                _inputAnswer.update { "" }
+            }
 
             _uiMutex.withLock {
                 val diffTime = nowDate - chainCountDate
@@ -197,7 +200,9 @@ class InitialQuizViewModel @Inject constructor(
                     .collect { action ->
                         when (action) {
                             is InitialQuizAction.ChangeAnswer -> {
-                                _inputAnswer.update { action.text }
+                                _inputAnswerMutex.withLock {
+                                    _inputAnswer.update { action.text }
+                                }
                             }
 
                             InitialQuizAction.InitialQuizDone -> {
