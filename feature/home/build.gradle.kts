@@ -43,4 +43,5 @@ dependencies {
     api(project(":feature:item"))
     api(project(":feature:spell"))
     api(project(":feature:setting"))
+    api(project(":feature:game"))
 }

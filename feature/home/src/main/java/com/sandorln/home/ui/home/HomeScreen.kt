@@ -55,6 +55,7 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.game.ui.home.GameHomeScreen
 import com.sandorln.home.R
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
@@ -70,12 +71,14 @@ sealed class HomeScreenType(@DrawableRes val svgId: Int) {
     data object Item : HomeScreenType(designR.drawable.ic_main_item)
     data object SummonerSpell : HomeScreenType(designR.drawable.ic_main_spell)
     data object Setting : HomeScreenType(designR.drawable.ic_main_special)
+    data object Game : HomeScreenType(designR.drawable.ic_lol_flat_gold)
 }
 
 private val homeItems = listOf(
     HomeScreenType.Champion,
     HomeScreenType.Item,
     HomeScreenType.SummonerSpell,
+    HomeScreenType.Game,
     HomeScreenType.Setting
 )
 
@@ -156,7 +159,10 @@ fun HomeScreen(
 
                         HomeScreenType.Setting -> SettingHomeScreen(
                             moveToLicensesScreen = moveToLicensesScreen,
-                            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen,
+                            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen
+                        )
+
+                        HomeScreenType.Game -> GameHomeScreen(
                             moveToInitialQuizScreen = moveToInitialQuizScreen
                         )
                     }
@@ -356,6 +362,7 @@ internal fun HomeBottomNavigation(
                         HomeScreenType.Item -> R.string.menu_item
                         HomeScreenType.Setting -> R.string.menu_setting
                         HomeScreenType.SummonerSpell -> R.string.menu_spell
+                        HomeScreenType.Game -> R.string.menu_game
                     }
                     Text(
                         text = stringResource(id = titleId),

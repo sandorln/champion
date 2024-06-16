@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.domain.usecase.game.UpdateLocalMaxGameScore
 import com.sandorln.domain.usecase.item.GetInitialQuizItemListByVersion
-import com.sandorln.domain.usecase.version.GetAllVersionList
+import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.item.ItemData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ import kotlin.random.Random
 class InitialQuizViewModel @Inject constructor(
     private val getInitialQuizItemListByVersion: GetInitialQuizItemListByVersion,
     private val updateLocalMaxGameScore: UpdateLocalMaxGameScore,
-    getAllVersionList: GetAllVersionList
+    currentVersion: GetCurrentVersion
 ) : ViewModel() {
     companion object {
         const val INIT_READY_TIME = 3f
@@ -163,7 +163,7 @@ class InitialQuizViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
-                val latestVersion = getAllVersionList.invoke().firstOrNull()?.firstOrNull()?.name ?: "14.11.1"
+                val latestVersion = currentVersion.invoke().firstOrNull()?.name ?: "14.12.1"
 
                 getInitialQuizItemListByVersion
                     .invoke(latestVersion)
