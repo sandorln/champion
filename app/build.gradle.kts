@@ -76,5 +76,6 @@ dependencies {
 
     implementation(project(":core:design"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:game"))
 }
 

@@ -2,6 +2,7 @@ package com.sandorln.design.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -12,7 +13,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,23 +24,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sandorln.design.R
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
-import com.sandorln.design.theme.LolChampionTheme
+import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 
 @Composable
-fun BaseTextEditor(
+fun BaseSearchTextEditor(
     modifier: Modifier = Modifier,
     text: String = "",
     textStyle: TextStyle = TextStyles.Body01,
@@ -115,15 +115,93 @@ fun BaseTextEditor(
     }
 }
 
+@Composable
+fun BaseGameTextEditor(
+    modifier: Modifier = Modifier,
+    text: String = "",
+    textStyle: TextStyle = TextStyles.Body01,
+    hint: String = "정답 입력",
+    onChangeTextListener: (String) -> Unit = {},
+    onDoneActionListener: () -> Unit = {}
+) {
+    var textFocus by remember {
+        mutableStateOf(true)
+    }
+    val focusColor = if (textFocus) {
+        Colors.BaseColor
+    } else {
+        Colors.Gray08
+    }
+
+    Row(
+        modifier = modifier
+            .heightIn(min = 46.dp)
+            .background(
+                color = Colors.Gray01,
+                shape = RoundedCornerShape(Radius.Radius02)
+            )
+            .border(
+                width = 3.dp,
+                color = focusColor,
+                shape = RoundedCornerShape(Radius.Radius02)
+            )
+            .padding(
+                horizontal = Spacings.Spacing03,
+                vertical = Spacings.Spacing00
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        BasicTextField(
+            modifier = Modifier
+                .onFocusChanged { textFocus = it.isFocused }
+                .weight(1f),
+            value = text,
+            cursorBrush = SolidColor(Colors.BaseColor),
+            onValueChange = onChangeTextListener,
+            maxLines = 1,
+            keyboardActions = KeyboardActions {
+                onDoneActionListener.invoke()
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            textStyle = textStyle.copy(
+                textAlign = TextAlign.Center,
+                color = Colors.Gray09
+            ),
+            decorationBox = { innerTextField ->
+                if (text.isEmpty())
+                    Text(
+                        text = hint,
+                        color = Colors.Gray05,
+                        style = textStyle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                innerTextField.invoke()
+            }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun BaseSearchTextEditorPreview() {
+    LolChampionThemePreview {
+        BaseSearchTextEditor(
+            hint = "챔피언 검색",
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
 @Preview
 @Composable
 fun BaseTextEditorPreview() {
-    LolChampionTheme {
-        Surface {
-            BaseTextEditor(
-                hint = "챔피언 검색",
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+    LolChampionThemePreview {
+        BaseGameTextEditor(
+            hint = "정답 입력",
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

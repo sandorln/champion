@@ -46,7 +46,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.champion.ui.home.ChampionHomeScreen
 import com.sandorln.design.component.BaseCircleIconImage
-import com.sandorln.design.component.CircleIconType
+import com.sandorln.design.component.ServerIconType
 import com.sandorln.design.component.dialog.BaseBottomSheetDialog
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
@@ -86,7 +86,8 @@ fun HomeScreen(
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
     moveToLicensesScreen: () -> Unit,
     moveToLolPatchNoteScreen: () -> Unit,
-    moveToChampionPatchNoteListScreen: (version: String) -> Unit
+    moveToChampionPatchNoteListScreen: (version: String) -> Unit,
+    moveToInitialQuizScreen: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -155,7 +156,8 @@ fun HomeScreen(
 
                         HomeScreenType.Setting -> SettingHomeScreen(
                             moveToLicensesScreen = moveToLicensesScreen,
-                            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen
+                            moveToLolPatchNoteScreen = moveToLolPatchNoteScreen,
+                            moveToInitialQuizScreen = moveToInitialQuizScreen
                         )
                     }
                 }
@@ -236,14 +238,14 @@ fun VersionItemBody(
 
         if (newChampionIdList.isNotEmpty())
             NewContentListBody(
-                circleIconType = CircleIconType.CHAMPION,
+                serverIconType = ServerIconType.CHAMPION,
                 newIdList = newChampionIdList,
                 versionName = version.name
             )
 
         if (newItemIdList.isNotEmpty())
             NewContentListBody(
-                circleIconType = CircleIconType.ITEM,
+                serverIconType = ServerIconType.ITEM,
                 newIdList = newItemIdList,
                 versionName = version.name
             )
@@ -254,13 +256,13 @@ private const val MAX_COUNT = 3
 
 @Composable
 private fun NewContentListBody(
-    circleIconType: CircleIconType = CircleIconType.CHAMPION,
+    serverIconType: ServerIconType = ServerIconType.CHAMPION,
     newIdList: List<String> = emptyList(),
     versionName: String = ""
 ) {
-    val circleTypeIcon = when (circleIconType) {
-        CircleIconType.ITEM -> com.sandorln.design.R.drawable.ic_main_item
-        CircleIconType.CHAMPION -> com.sandorln.design.R.drawable.ic_main_champion
+    val circleTypeIcon = when (serverIconType) {
+        ServerIconType.ITEM -> com.sandorln.design.R.drawable.ic_main_item
+        ServerIconType.CHAMPION -> com.sandorln.design.R.drawable.ic_main_champion
     }
 
     Box {
@@ -288,7 +290,7 @@ private fun NewContentListBody(
                         .size(IconSize.LargeSize),
                     versionName = versionName,
                     id = id,
-                    circleIconType = circleIconType
+                    serverIconType = serverIconType
                 )
             }
 
