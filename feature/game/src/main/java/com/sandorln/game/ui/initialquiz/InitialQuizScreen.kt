@@ -63,6 +63,7 @@ import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
+import com.sandorln.design.util.thousandDotDecimalFormat
 import com.sandorln.game.util.getInitialHangul
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
@@ -201,8 +202,6 @@ private fun GameEndDialogBody(
     previousItemList: List<Triple<ChainType, ItemData, String>> = emptyList(),
     onDismissListener: () -> Unit
 ) {
-    val scoreDecimalFormat = DecimalFormat("#,###")
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
@@ -225,7 +224,7 @@ private fun GameEndDialogBody(
             HorizontalDivider()
 
             Text(
-                text = scoreDecimalFormat.format(score.coerceIn(0, 999999)),
+                text = thousandDotDecimalFormat.format(score.coerceIn(0, 999999)),
                 style = TextStyles.Title01,
                 fontSize = 32.sp,
                 color = Colors.Gold02
