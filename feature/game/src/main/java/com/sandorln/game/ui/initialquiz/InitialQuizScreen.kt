@@ -1,5 +1,6 @@
 package com.sandorln.game.ui.initialquiz
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,9 +33,11 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,7 +70,6 @@ import com.sandorln.design.util.thousandDotDecimalFormat
 import com.sandorln.game.util.getInitialHangul
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
-import java.text.DecimalFormat
 import java.util.Stack
 import kotlin.math.ceil
 import com.sandorln.design.R as DesignR
@@ -80,7 +82,6 @@ fun InitialQuizScreen(
     val uiState by initialQuizViewModel.uiState.collectAsState()
     val gameTime by initialQuizViewModel.gameTime.collectAsState()
     val readyTime by initialQuizViewModel.readyTime.collectAsState()
-    val inputAnswer by initialQuizViewModel.inputAnswer.collectAsState()
     val previousRound = remember(initialQuizViewModel.previousAnswerList.size) {
         initialQuizViewModel.previousAnswerList
     }
@@ -120,12 +121,8 @@ fun InitialQuizScreen(
         InitialInputBody(
             previousRound = previousRound,
             totalRoundCount = initialQuizViewModel.totalRoundCount,
-            inputAnswer = inputAnswer,
-            onChangeAnswer = {
-                initialQuizViewModel.sendAction(InitialQuizAction.ChangeAnswer(it))
-            },
             onDoneAnswer = {
-                initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone)
+                initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone(it))
             }
         )
 
@@ -344,12 +341,19 @@ private fun GameEndDialogPreviousItemBody(
 private fun InitialInputBody(
     previousRound: List<Boolean>,
     totalRoundCount: Int,
-    inputAnswer: String,
-    onChangeAnswer: (String) -> Unit,
-    onDoneAnswer: () -> Unit,
+    onDoneAnswer: (String) -> Unit,
 ) {
-    val isSubmit = inputAnswer.trim().isNotEmpty()
-    val submitColor = if (isSubmit) Colors.Gold02 else Colors.Gray05
+    var text by remember { mutableStateOf("") }
+    val isEnableSubmit: Boolean by remember(text) { derivedStateOf { text.isNotEmpty() } }
+    val onDoneActionListener = {
+        onDoneAnswer.invoke(text)
+        text = ""
+    }
+
+    val submitColor by animateColorAsState(
+        targetValue = if (isEnableSubmit) Colors.Gold02 else Colors.Gray05,
+        label = ""
+    )
 
     Column {
         HorizontalDivider()
@@ -370,17 +374,17 @@ private fun InitialInputBody(
         ) {
             BaseGameTextEditor(
                 modifier = Modifier.weight(1f),
-                text = inputAnswer,
-                onChangeTextListener = onChangeAnswer,
-                onDoneActionListener = onDoneAnswer
+                text = text,
+                onChangeTextListener = { text = it },
+                onDoneActionListener = onDoneActionListener
             )
 
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .clickable(
-                        enabled = isSubmit,
-                        onClick = onDoneAnswer
+                        enabled = isEnableSubmit,
+                        onClick = onDoneActionListener
                     )
                     .widthIn(min = Dimens.GAME_DONE_BUTTON_WIDTH_MIN),
             ) {
@@ -562,9 +566,7 @@ internal fun InitialInputBodyPreview() {
         InitialInputBody(
             previousRound = pre,
             totalRoundCount = 10,
-            inputAnswer = "",
-            onDoneAnswer = {},
-            onChangeAnswer = {}
+            onDoneAnswer = {}
         )
     }
 }

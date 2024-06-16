@@ -55,10 +55,6 @@ class InitialQuizViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(InitialQuizUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _inputAnswerMutex = Mutex()
-    private val _inputAnswer = MutableStateFlow("")
-    val inputAnswer = _inputAnswer.asStateFlow()
-
     private val _sideEffect = MutableSharedFlow<InitialQuizSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
@@ -87,9 +83,9 @@ class InitialQuizViewModel @Inject constructor(
             }
 
             while (true) {
-                delay(250)
+                delay(10)
                 _gameTimeMutex.withLock {
-                    _gameTime.update { max(it - 0.25f, 0f) }
+                    _gameTime.update { max(it - 0.01f, 0f) }
                 }
 
                 if (_gameTime.value <= 0) {
@@ -118,10 +114,6 @@ class InitialQuizViewModel @Inject constructor(
         val nowDate = System.currentTimeMillis()
 
         viewModelScope.launch(Dispatchers.IO) {
-            _inputAnswerMutex.withLock {
-                _inputAnswer.update { "" }
-            }
-
             _uiMutex.withLock {
                 val diffTime = nowDate - chainCountDate
                 val chainType = if (isAnswer) ChainType.getChainType(diffTime) else ChainType.FAIL
@@ -199,19 +191,12 @@ class InitialQuizViewModel @Inject constructor(
                 _action
                     .collect { action ->
                         when (action) {
-                            is InitialQuizAction.ChangeAnswer -> {
-                                _inputAnswerMutex.withLock {
-                                    _inputAnswer.update { action.text }
-                                }
-                            }
-
-                            InitialQuizAction.InitialQuizDone -> {
-                                if (gameJob?.isCompleted == true || _inputAnswer.value.isBlank())
+                            is InitialQuizAction.InitialQuizDone -> {
+                                val answer = action.answer
+                                if (gameJob?.isCompleted == true || answer.isEmpty())
                                     return@collect
 
                                 val itemData = _uiState.value.itemData
-                                val answer = _inputAnswer.value
-
                                 val isAnswer = itemData.name.replace(" ", "") == answer.replace(" ", "")
                                 nextRound(isAnswer, itemData, answer)
                             }
@@ -232,10 +217,8 @@ sealed interface InitialQuizSideEffect {
 }
 
 sealed interface InitialQuizAction {
-    data object InitialQuizDone : InitialQuizAction
+    data class InitialQuizDone(val answer: String) : InitialQuizAction
     data object CloseGameDialog : InitialQuizAction
-
-    data class ChangeAnswer(val text: String) : InitialQuizAction
 }
 
 data class InitialQuizUiState(
