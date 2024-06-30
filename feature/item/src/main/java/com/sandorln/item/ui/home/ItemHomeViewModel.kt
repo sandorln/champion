@@ -9,6 +9,7 @@ import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
+import com.sandorln.item.R
 import com.sandorln.item.model.ItemBuildException
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
@@ -273,6 +274,9 @@ class ItemHomeViewModel @Inject constructor(
 
                                             uiState.copy(itemBuildList = itemBuildSet)
                                         }
+                                        _sideEffect.emit(
+                                            ItemHomeSideEffect.ShowMessage(R.string.item_build_success)
+                                        )
                                     }
                                 }
                             }
@@ -338,5 +342,6 @@ sealed interface ItemHomeAction {
 }
 
 sealed interface ItemHomeSideEffect {
+    data class ShowMessage(val stringId : Int) : ItemHomeSideEffect
     data class ShowErrorMessage(val exception: Exception) : ItemHomeSideEffect
 }

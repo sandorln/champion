@@ -115,6 +115,10 @@ fun ItemHomeScreen(
                         val message = context.getString(errorId)
                         BaseToast(context, BaseToastType.WARNING, message).show()
                     }
+
+                    is ItemHomeSideEffect.ShowMessage -> {
+                        BaseToast(context, BaseToastType.OKAY, context.getString(it.stringId)).show()
+                    }
                 }
             }
     }
@@ -280,7 +284,6 @@ fun ItemHomeScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = Spacings.Spacing05)
                                 .verticalScroll(rememberScrollState()),
                             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -300,6 +303,8 @@ fun ItemHomeScreen(
 
                                 ItemBuildUniqueBody(totalItemBuildUniqueList)
                             }
+
+                            Spacer(modifier = Modifier.height(Spacings.Spacing02))
                         }
                     }
                 })
