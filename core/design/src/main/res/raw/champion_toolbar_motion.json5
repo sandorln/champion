@@ -1,0 +1,90 @@
+{
+  ConstraintSets: {
+    start: {
+      championImage: {
+        width: 150,
+        height: 150,
+        start: [
+          'parent',
+          'start',
+          0
+        ],
+        end: [
+          'parent',
+          'end',
+          0
+        ],
+        top: [
+          'parent',
+          'top',
+          0
+        ],
+      },
+      content: {
+        start: [
+          'parent',
+          'start',
+          0
+        ],
+        end: [
+          'parent',
+          'end',
+          0
+        ],
+        top: [
+          'championImage',
+          'bottom',
+          0
+        ],
+        bottom: [
+          'parent',
+          'bottom',
+          0
+        ]
+      }
+    },
+    end: {
+      championImage: {
+        width: 30,
+        height: 30,
+        start: [
+          'parent',
+          'start',
+          0
+        ],
+        end: [
+          'parent',
+          'end',
+          0
+        ],
+        top: [
+          'parent',
+          'top',
+          0
+        ]
+      },
+      content: {
+        top: [
+          'championImage',
+          'bottom',
+          0
+        ],
+        start: [
+          'parent',
+          'start',
+          0
+        ],
+        end: [
+          'parent',
+          'end',
+          0
+        ],
+        bottom: [
+          'parent',
+          'bottom',
+          0
+        ],
+      }
+    }
+  }
+}

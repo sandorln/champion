@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Champion</string>
+    <string name="app_name">롤 백과사전</string>
+    <string name="app_name_dev">롤 백과사전 DEV</string>
 </resources>
