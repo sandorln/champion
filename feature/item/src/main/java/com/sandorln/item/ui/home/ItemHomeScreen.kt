@@ -233,6 +233,12 @@ fun ItemHomeScreen(
                 selectedItemId = selectedItemId,
                 onDismissRequest = {
                     itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(null))
+                },
+                onAddItemBuildData = {
+                    itemHomeViewModel.sendAction(ItemHomeAction.AddItemBuild(it))
+                },
+                onChangeSelectItem = {
+                    itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it))
                 }
             )
         }

@@ -161,6 +161,39 @@ class ItemHomeViewModel @Inject constructor(
                             ItemHomeAction.ToggleVisibleBuildBody -> {
                                 _itemUiState.update { it.copy(isShowBuildBody = !it.isShowBuildBody) }
                             }
+
+                            is ItemHomeAction.AddItemBuild -> {
+                                val itemBuildList = _itemUiState.value.itemBuildList
+                                val addItemData = action.itemData
+                                val shouldAddItemBuildList = itemBuildList.size < 6
+                                val hasSameLegendItem = addItemData.depth > 2 && itemBuildList.any { it.id == addItemData.id }
+
+                                if (shouldAddItemBuildList && !hasSameLegendItem) {
+                                    _itemUiState.update { uiState ->
+                                        val itemBuildSet = uiState
+                                            .itemBuildList
+                                            .toMutableList()
+                                            .apply {
+                                                add(addItemData)
+                                            }
+
+                                        uiState.copy(itemBuildList = itemBuildSet)
+                                    }
+                                } else {
+                                    _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(Exception("해당 아이템을 추가할 수 없습니다")))
+                                }
+                            }
+
+                            is ItemHomeAction.DeleteItemBuild -> {
+                                _itemUiState.update { uiState ->
+                                    val itemBuildList = uiState
+                                        .itemBuildList
+                                        .toMutableList()
+                                        .apply { removeAt(action.index) }
+
+                                    uiState.copy(itemBuildList = itemBuildList)
+                                }
+                            }
                         }
                     }
                 }
@@ -195,7 +228,8 @@ data class ItemHomeUiState(
     val selectedItemId: String? = null,
     val currentVersionName: String = "",
     val isShowFilterBody: Boolean = false,
-    val isShowBuildBody: Boolean = false
+    val isShowBuildBody: Boolean = false,
+    val itemBuildList: List<ItemData> = listOf()
 )
 
 sealed interface ItemHomeAction {
@@ -206,6 +240,9 @@ sealed interface ItemHomeAction {
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
+    data class AddItemBuild(val itemData: ItemData) : ItemHomeAction
+    data class DeleteItemBuild(val index: Int) : ItemHomeAction
+
     data object ToggleVisibleFilterBody : ItemHomeAction
     data object ToggleVisibleBuildBody : ItemHomeAction
 }
