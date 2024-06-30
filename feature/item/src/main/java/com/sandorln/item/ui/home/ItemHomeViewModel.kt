@@ -154,8 +154,12 @@ class ItemHomeViewModel @Inject constructor(
                                 _itemUiState.emit(currentUiState.copy(selectedItemId = action.itemDataId))
                             }
 
-                            is ItemHomeAction.ChangeVisibleFilterBody -> {
-                                _itemUiState.update { it.copy(isShowFilterBody = action.isVisible) }
+                            ItemHomeAction.ToggleVisibleFilterBody -> {
+                                _itemUiState.update { it.copy(isShowFilterBody = !it.isShowFilterBody) }
+                            }
+
+                            ItemHomeAction.ToggleVisibleBuildBody -> {
+                                _itemUiState.update { it.copy(isShowBuildBody = !it.isShowBuildBody) }
                             }
                         }
                     }
@@ -191,6 +195,7 @@ data class ItemHomeUiState(
     val selectedItemId: String? = null,
     val currentVersionName: String = "",
     val isShowFilterBody: Boolean = false,
+    val isShowBuildBody: Boolean = false
 )
 
 sealed interface ItemHomeAction {
@@ -201,7 +206,8 @@ sealed interface ItemHomeAction {
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
-    data class ChangeVisibleFilterBody(val isVisible: Boolean) : ItemHomeAction
+    data object ToggleVisibleFilterBody : ItemHomeAction
+    data object ToggleVisibleBuildBody : ItemHomeAction
 }
 
 sealed interface ItemHomeSideEffect {

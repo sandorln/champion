@@ -1,6 +1,12 @@
 package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,16 +15,20 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -29,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
@@ -114,8 +126,29 @@ fun ItemHomeScreen(
             pullToRefreshState = pullToRefreshState
         ) {
             item {
+                ItemHomeMenuBody(
+                    title = "아이템 빌더",
+                    isShowDetailBody = uiState.isShowBuildBody,
+                    onToggleVisibleDetailBody = {
+                        itemHomeViewModel.sendAction(ItemHomeAction.ToggleVisibleBuildBody)
+                    }
+                )
+            }
 
-                if (uiState.isShowFilterBody) {
+            item {
+                ItemHomeMenuBody(
+                    title = "아이템 필터",
+                    isShowDetailBody = uiState.isShowFilterBody,
+                    onToggleVisibleDetailBody = {
+                        itemHomeViewModel.sendAction(ItemHomeAction.ToggleVisibleFilterBody)
+                    }
+                )
+
+                AnimatedVisibility(
+                    visible = uiState.isShowFilterBody,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
                     FilterSelectBody(
                         isSelectNewItem = uiState.isSelectNewItem,
                         selectItemTag = uiState.selectTag,
@@ -371,6 +404,53 @@ fun ItemTagTypeFilerList(
     }
 }
 
+@Composable
+fun ItemHomeMenuBody(
+    title: String = "",
+    isShowDetailBody: Boolean = false,
+    onToggleVisibleDetailBody: () -> Unit = {}
+) {
+    val iconId = if (isShowDetailBody) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down
+    val titleColor by animateColorAsState(
+        targetValue = if (isShowDetailBody) Colors.Gold05 else Colors.Gold02,
+        label = ""
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .heightIn(45.dp)
+            .clickable(onClick = onToggleVisibleDetailBody)
+    ) {
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = Spacings.Spacing05),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = title,
+                style = TextStyles.Title03,
+                color = titleColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Icon(
+                painter = painterResource(id = iconId),
+                contentDescription = null,
+                tint = titleColor
+            )
+        }
+
+        if (!isShowDetailBody)
+            HorizontalDivider()
+    }
+}
+
 private fun LazyListScope.baseItemList(
     title: String = "제목",
     spanCount: Int = 5,
@@ -436,5 +516,16 @@ fun ItemIconBodyPreview() {
 fun FilterSelectBodyPreview() {
     LolChampionThemePreview {
         FilterSelectBody()
+    }
+}
+
+@Preview
+@Composable
+fun FilterTitleBodyPreview() {
+    LolChampionThemePreview {
+        ItemHomeMenuBody(
+            title = "아이템 필터",
+            isShowDetailBody = true
+        )
     }
 }
