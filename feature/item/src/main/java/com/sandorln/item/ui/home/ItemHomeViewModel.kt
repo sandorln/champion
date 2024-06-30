@@ -54,7 +54,7 @@ class ItemHomeViewModel @Inject constructor(
 
     private val _itemFilter: suspend (ItemHomeUiState, List<ItemData>, List<String>) -> List<ItemData> = { uiState, itemList, newItemIdList ->
         val searchKeyword = uiState.searchKeyword
-        val selectMapType = uiState.isSelectMapType
+        val selectMapType = uiState.selectMapType
         val filterItemList = if (uiState.isSelectNewItem) {
             itemList.fastFilter { newItemIdList.contains(it.id) }
         } else {
@@ -132,7 +132,7 @@ class ItemHomeViewModel @Inject constructor(
                             }
 
                             is ItemHomeAction.ChangeMapTypeFilter -> {
-                                _itemUiState.emit(currentUiState.copy(isSelectMapType = action.mapType))
+                                _itemUiState.emit(currentUiState.copy(selectMapType = action.mapType))
                             }
 
                             is ItemHomeAction.ToggleItemTagType -> {
@@ -152,6 +152,10 @@ class ItemHomeViewModel @Inject constructor(
 
                             is ItemHomeAction.SelectItemData -> {
                                 _itemUiState.emit(currentUiState.copy(selectedItemId = action.itemDataId))
+                            }
+
+                            is ItemHomeAction.ChangeVisibleFilterBody -> {
+                                _itemUiState.update { it.copy(isShowFilterBody = action.isVisible) }
                             }
                         }
                     }
@@ -181,11 +185,12 @@ class ItemHomeViewModel @Inject constructor(
 data class ItemHomeUiState(
     val isLoading: Boolean = false,
     val searchKeyword: String = "",
-    val isSelectMapType: MapType = MapType.SUMMONER_RIFT,
+    val selectMapType: MapType = MapType.SUMMONER_RIFT,
     val selectTag: Set<ItemTagType> = emptySet(),
     val isSelectNewItem: Boolean = false,
     val selectedItemId: String? = null,
-    val currentVersionName: String = ""
+    val currentVersionName: String = "",
+    val isShowFilterBody: Boolean = false,
 )
 
 sealed interface ItemHomeAction {
@@ -196,6 +201,7 @@ sealed interface ItemHomeAction {
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
+    data class ChangeVisibleFilterBody(val isVisible: Boolean) : ItemHomeAction
 }
 
 sealed interface ItemHomeSideEffect {

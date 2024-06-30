@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -113,34 +114,21 @@ fun ItemHomeScreen(
             pullToRefreshState = pullToRefreshState
         ) {
             item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            vertical = Spacings.Spacing03,
-                            horizontal = Spacings.Spacing05
-                        ),
-                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
-                ) {
-                    ItemNewFilerList(
-                        isNewItemSelect = uiState.isSelectNewItem,
+
+                if (uiState.isShowFilterBody) {
+                    FilterSelectBody(
+                        isSelectNewItem = uiState.isSelectNewItem,
+                        selectItemTag = uiState.selectTag,
+                        selectMapType = uiState.selectMapType,
                         onToggleNewItemFilter = {
                             itemHomeViewModel.sendAction(ItemHomeAction.ToggleSelectNewItem)
-                        }
-                    )
-
-                    ItemTagTypeFilerList(
-                        selectItemTag = uiState.selectTag,
+                        },
                         onToggleItemTagTypeFilter = { itemTagType ->
                             val action = ItemHomeAction.ToggleItemTagType(itemTagType)
                             itemHomeViewModel.sendAction(action)
-                        }
-                    )
-
-                    ItemMapFilerList(
-                        isSelectMapType = uiState.isSelectMapType,
-                        onClickMapFilterTag = {
-                            val action = ItemHomeAction.ChangeMapTypeFilter(it)
+                        },
+                        onClickMapFilterTag = { mapType ->
+                            val action = ItemHomeAction.ChangeMapTypeFilter(mapType)
                             itemHomeViewModel.sendAction(action)
                         }
                     )
@@ -281,10 +269,51 @@ fun ItemNewFilerList(
     }
 }
 
+@Composable
+fun FilterSelectBody(
+    isSelectNewItem: Boolean = false,
+    selectItemTag: Set<ItemTagType> = emptySet(),
+    selectMapType: MapType = MapType.ALL,
+    onToggleNewItemFilter: () -> Unit = {},
+    onToggleItemTagTypeFilter: (itemTagType: ItemTagType) -> Unit = {},
+    onClickMapFilterTag: (mapType: MapType) -> Unit = {}
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    vertical = Spacings.Spacing03,
+                    horizontal = Spacings.Spacing05
+                ),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+        ) {
+            ItemNewFilerList(
+                isNewItemSelect = isSelectNewItem,
+                onToggleNewItemFilter = onToggleNewItemFilter
+            )
+
+            ItemTagTypeFilerList(
+                selectItemTag = selectItemTag,
+                onToggleItemTagTypeFilter = onToggleItemTagTypeFilter
+            )
+
+            ItemMapFilerList(
+                selectMapType = selectMapType,
+                onClickMapFilterTag = onClickMapFilterTag
+            )
+        }
+
+        Spacer(modifier = Modifier.height(Spacings.Spacing02))
+
+        HorizontalDivider()
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ItemMapFilerList(
-    isSelectMapType: MapType = MapType.ALL,
+    selectMapType: MapType = MapType.ALL,
     onClickMapFilterTag: (mapType: MapType) -> Unit = {}
 ) {
     Column {
@@ -300,7 +329,7 @@ fun ItemMapFilerList(
         ) {
             MapType.entries.filter { it != MapType.ALL }.forEach { mapType ->
                 BaseFilterTag(
-                    isCheck = isSelectMapType == mapType,
+                    isCheck = selectMapType == mapType,
                     title = stringResource(id = mapType.getTitleStringId()),
                     onClickTag = {
                         onClickMapFilterTag.invoke(mapType)
@@ -399,5 +428,13 @@ fun ItemFilerListPreview() {
 fun ItemIconBodyPreview() {
     LolChampionThemePreview {
         ItemBody()
+    }
+}
+
+@Preview
+@Composable
+fun FilterSelectBodyPreview() {
+    LolChampionThemePreview {
+        FilterSelectBody()
     }
 }
