@@ -32,7 +32,9 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -50,7 +52,9 @@ import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseSearchTextEditor
+import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.component.toast.BaseToast
+import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -58,6 +62,7 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.item.model.ItemBuildException
 import com.sandorln.item.ui.dialog.ItemDetailDialog
 import com.sandorln.item.util.getTitleStringId
 import com.sandorln.model.data.item.ItemData
@@ -82,6 +87,11 @@ fun ItemHomeScreen(
     val currentVersion = uiState.currentVersionName
     val itemBuildList = uiState.itemBuildList
     val totalItemBuildStatus by itemHomeViewModel.itemBuildStatus.collectAsState()
+    val totalItemBuildUniqueList by itemHomeViewModel.itemBuildUniqueList.collectAsState()
+    val totalItemBuildGold by itemHomeViewModel.itemBuildGold.collectAsState()
+    val hasUniqueList by remember(totalItemBuildUniqueList) {
+        derivedStateOf { totalItemBuildUniqueList.any { it.second.isNotEmpty() } }
+    }
 
     val onClickItem: (ItemData) -> Unit = {
         itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it.id))
@@ -97,7 +107,13 @@ fun ItemHomeScreen(
             .collect {
                 when (it) {
                     is ItemHomeSideEffect.ShowErrorMessage -> {
-                        BaseToast.createDefaultErrorToast(context).show()
+                        val errorId = when (it.exception) {
+                            ItemBuildException.NotAddSameLegendItem -> itemR.string.item_build_same_legend_error
+                            ItemBuildException.NotShouldAddItemSize -> itemR.string.item_build_should_add_error
+                            else -> R.string.default_error_message
+                        }
+                        val message = context.getString(errorId)
+                        BaseToast(context, BaseToastType.WARNING, message).show()
                     }
                 }
             }
@@ -238,9 +254,10 @@ fun ItemHomeScreen(
                 sheetContent = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
                     ) {
-                        Spacer(modifier = Modifier.height(Spacings.Spacing02))
+                        Spacer(modifier = Modifier)
 
                         Box(
                             modifier = Modifier
@@ -251,8 +268,6 @@ fun ItemHomeScreen(
                                 .height(3.dp)
                                 .width(25.dp)
                         )
-
-                        Spacer(modifier = Modifier.height(Spacings.Spacing02))
 
                         ItemBuildListBody(
                             itemBuildList = itemBuildList,
@@ -265,15 +280,57 @@ fun ItemHomeScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(bottom = Spacings.Spacing05)
                                 .verticalScroll(rememberScrollState()),
-                            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing05)
+                            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            ItemBuildStatusBody(
-                                totalItemStatus = totalItemBuildStatus
+                            Text(
+                                text = "$totalItemBuildGold G",
+                                style = TextStyles.SubTitle03,
+                                color = Colors.Gold02
                             )
+
+                            HorizontalDivider()
+
+                            ItemBuildStatusBody(totalItemBuildStatus)
+
+                            if (hasUniqueList) {
+                                HorizontalDivider()
+
+                                ItemBuildUniqueBody(totalItemBuildUniqueList)
+                            }
                         }
                     }
                 })
+    }
+}
+
+@Composable
+fun ItemBuildUniqueBody(
+    totalItemUniqueList: List<Pair<String, String>> = emptyList()
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+    ) {
+        totalItemUniqueList.forEachIndexed { index, unique ->
+            Text(
+                modifier = Modifier.padding(horizontal = Spacings.Spacing05),
+                text = unique.first,
+                style = TextStyles.SubTitle03,
+                color = Colors.Gold02
+            )
+
+            LolHtmlTagTextView(
+                modifier = Modifier.padding(horizontal = Spacings.Spacing05),
+                textSize = TextStyles.Body03.fontSize.value,
+                lolDescription = unique.second
+            )
+
+            if (index < totalItemUniqueList.lastIndex)
+                HorizontalDivider()
+        }
     }
 }
 
@@ -478,11 +535,21 @@ fun ItemBuildListBody(
 fun ItemBuildStatusBody(
     totalItemStatus: Map<String, Pair<Int, String>> = emptyMap(),
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacings.Spacing05),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Text(
+            text = stringResource(id = itemR.string.item_build_status_title),
+            style = TextStyles.SubTitle03,
+            color = Colors.Gold02
+        )
         totalItemStatus.forEach {
             Text(
                 text = "${it.key} : ${it.value.first}${it.value.second}",
-                style = TextStyles.Body04
+                style = TextStyles.Body03
             )
         }
     }
@@ -561,5 +628,20 @@ fun FilterSelectBodyPreview() {
 fun ItemBuildBodyPreview() {
     LolChampionThemePreview {
         ItemBuildListBody()
+    }
+}
+
+@Preview
+@Composable
+fun ItemBuildStatusBodyPreview() {
+    LolChampionThemePreview {
+        ItemBuildStatusBody(
+            totalItemStatus = mapOf(
+                "공격력" to (20 to ""),
+                "공격속도%" to (20 to "%"),
+                "생명력" to (1000 to ""),
+                "공격력" to (20 to ""),
+            )
+        )
     }
 }

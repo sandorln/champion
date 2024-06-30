@@ -1,6 +1,5 @@
 package com.sandorln.item.ui.home
 
-import android.util.Log
 import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +9,7 @@ import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
+import com.sandorln.item.model.ItemBuildException
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
@@ -93,13 +93,48 @@ class ItemHomeViewModel @Inject constructor(
                         val suffix = valuePartition.second
                         val defaultStatus = totalStatus[statusTitle + suffix] ?: Pair(0, "")
                         val sumValue = defaultStatus.first + (value.toIntOrNull() ?: 0)
-                        totalStatus[statusTitle + suffix] = sumValue to suffix
+                        if (statusTitle.isNotEmpty())
+                            totalStatus[statusTitle + suffix] = sumValue to suffix
                     }
             }
 
             totalStatus.toSortedMap()
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    val itemBuildUniqueList = _itemUiState
+        .map { uiState -> uiState.itemBuildList }
+        .distinctUntilChanged()
+        .map { itemDataList ->
+            itemDataList
+                .map { itemData ->
+                    var unique = itemData.description.substringAfter("</stats>")
+                    while (unique.startsWith("</stats>")) {
+                        unique = unique.substringAfter("</stats>")
+                    }
+
+                    unique = unique
+                        .replace("<li>", "<br>")
+                        .replace("</mainText>","")
+
+                    while (unique.startsWith("<br>")) {
+                        unique = unique.substringAfter("<br>")
+                    }
+
+                    itemData.name to unique
+                }
+                .distinctBy { it.first }
+                .filter { it.second.isNotEmpty() }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    val itemBuildGold = _itemUiState
+        .map { uiState ->
+            uiState.itemBuildList.sumOf { itemData ->
+                itemData.gold.total
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 
     private val _itemAction = MutableSharedFlow<ItemHomeAction>()
     fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
@@ -151,11 +186,6 @@ class ItemHomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                itemBuildStatus.collectLatest {
-                    Log.d("status", "Status $it")
-                }
-            }
-            launch {
                 getCurrentVersion
                     .invoke()
                     .map { it.name }
@@ -164,7 +194,8 @@ class ItemHomeViewModel @Inject constructor(
                         _itemMutex.withLock {
                             _itemUiState.update {
                                 it.copy(
-                                    currentVersionName = version
+                                    currentVersionName = version,
+                                    itemBuildList = emptyList()
                                 )
                             }
                         }
@@ -222,30 +253,40 @@ class ItemHomeViewModel @Inject constructor(
                                 val shouldAddItemBuildList = itemBuildList.size < ITEM_BUILD_MAX_COUNT
                                 val hasSameLegendItem = addItemData.depth >= ITEM_LEGEND_DEPTH && itemBuildList.any { it.id == addItemData.id }
 
-                                if (shouldAddItemBuildList && !hasSameLegendItem) {
-                                    _itemUiState.update { uiState ->
-                                        val itemBuildSet = uiState
-                                            .itemBuildList
-                                            .toMutableList()
-                                            .apply {
-                                                add(addItemData)
-                                            }
-
-                                        uiState.copy(itemBuildList = itemBuildSet)
+                                when {
+                                    !shouldAddItemBuildList -> {
+                                        _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotShouldAddItemSize))
                                     }
-                                } else {
-                                    _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(Exception("해당 아이템을 추가할 수 없습니다")))
+
+                                    hasSameLegendItem -> {
+                                        _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotAddSameLegendItem))
+                                    }
+
+                                    else -> {
+                                        _itemUiState.update { uiState ->
+                                            val itemBuildSet = uiState
+                                                .itemBuildList
+                                                .toMutableList()
+                                                .apply {
+                                                    add(addItemData)
+                                                }
+
+                                            uiState.copy(itemBuildList = itemBuildSet)
+                                        }
+                                    }
                                 }
                             }
 
                             is ItemHomeAction.DeleteItemBuild -> {
-                                _itemUiState.update { uiState ->
-                                    val itemBuildList = uiState
-                                        .itemBuildList
-                                        .toMutableList()
-                                        .apply { removeAt(action.index) }
+                                runCatching {
+                                    _itemUiState.update { uiState ->
+                                        val itemBuildList = uiState
+                                            .itemBuildList
+                                            .toMutableList()
+                                            .apply { removeAt(action.index) }
 
-                                    uiState.copy(itemBuildList = itemBuildList)
+                                        uiState.copy(itemBuildList = itemBuildList)
+                                    }
                                 }
                             }
                         }
