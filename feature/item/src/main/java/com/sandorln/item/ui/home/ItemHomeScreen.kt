@@ -1,16 +1,13 @@
 package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -26,6 +23,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -44,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,6 +59,7 @@ import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
+import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.item.ui.dialog.ItemDetailDialog
@@ -126,46 +129,22 @@ fun ItemHomeScreen(
             pullToRefreshState = pullToRefreshState
         ) {
             item {
-                ItemHomeMenuBody(
-                    title = "아이템 빌더",
-                    isShowDetailBody = uiState.isShowBuildBody,
-                    onToggleVisibleDetailBody = {
-                        itemHomeViewModel.sendAction(ItemHomeAction.ToggleVisibleBuildBody)
+                FilterSelectBody(
+                    isSelectNewItem = uiState.isSelectNewItem,
+                    selectItemTag = uiState.selectTag,
+                    selectMapType = uiState.selectMapType,
+                    onToggleNewItemFilter = {
+                        itemHomeViewModel.sendAction(ItemHomeAction.ToggleSelectNewItem)
+                    },
+                    onToggleItemTagTypeFilter = { itemTagType ->
+                        val action = ItemHomeAction.ToggleItemTagType(itemTagType)
+                        itemHomeViewModel.sendAction(action)
+                    },
+                    onClickMapFilterTag = { mapType ->
+                        val action = ItemHomeAction.ChangeMapTypeFilter(mapType)
+                        itemHomeViewModel.sendAction(action)
                     }
                 )
-            }
-
-            item {
-                ItemHomeMenuBody(
-                    title = "아이템 필터",
-                    isShowDetailBody = uiState.isShowFilterBody,
-                    onToggleVisibleDetailBody = {
-                        itemHomeViewModel.sendAction(ItemHomeAction.ToggleVisibleFilterBody)
-                    }
-                )
-
-                AnimatedVisibility(
-                    visible = uiState.isShowFilterBody,
-                    enter = expandVertically() + fadeIn(),
-                    exit = shrinkVertically() + fadeOut()
-                ) {
-                    FilterSelectBody(
-                        isSelectNewItem = uiState.isSelectNewItem,
-                        selectItemTag = uiState.selectTag,
-                        selectMapType = uiState.selectMapType,
-                        onToggleNewItemFilter = {
-                            itemHomeViewModel.sendAction(ItemHomeAction.ToggleSelectNewItem)
-                        },
-                        onToggleItemTagTypeFilter = { itemTagType ->
-                            val action = ItemHomeAction.ToggleItemTagType(itemTagType)
-                            itemHomeViewModel.sendAction(action)
-                        },
-                        onClickMapFilterTag = { mapType ->
-                            val action = ItemHomeAction.ChangeMapTypeFilter(mapType)
-                            itemHomeViewModel.sendAction(action)
-                        }
-                    )
-                }
             }
 
             stickyHeader {
@@ -225,6 +204,11 @@ fun ItemHomeScreen(
                     itemChunkList = normalItemChunkList,
                     onClickItem = onClickItem
                 )
+
+            item {
+                val space = if (uiState.itemBuildList.isNotEmpty()) 65.dp else 0.dp
+                Spacer(modifier = Modifier.height(space))
+            }
         }
 
         if (selectedItemId != null) {
@@ -242,11 +226,55 @@ fun ItemHomeScreen(
                 }
             )
         }
+
+        if (uiState.itemBuildList.isNotEmpty())
+            BottomSheetScaffold(
+                sheetPeekHeight = 65.dp,
+                sheetDragHandle = null,
+                sheetContainerColor = Colors.Blue06,
+                sheetShape = RoundedCornerShape(topStart = Radius.Radius05, topEnd = Radius.Radius05),
+                sheetContent = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(Spacings.Spacing02))
+
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    Colors.Gray06,
+                                    RoundedCornerShape(Radius.Radius05)
+                                )
+                                .height(3.dp)
+                                .width(25.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacings.Spacing02))
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing05)
+                        ) {
+                            ItemBuildListBody(
+                                itemBuildList = uiState.itemBuildList,
+                                currentSpriteMap = currentSpriteMap,
+                                onDeleteItemBuildIndex = {
+                                    itemHomeViewModel.sendAction(ItemHomeAction.DeleteItemBuild(it))
+                                }
+                            )
+
+                        }
+                    }
+                }) {}
     }
 }
 
 @Composable
 fun ItemBody(
+    itemIconSize: Dp = IconSize.XXLargeSize,
     item: ItemData = ItemData(),
     currentSpriteMap: Map<String, Bitmap?> = emptyMap(),
     onClickItem: (ItemData) -> Unit = {}
@@ -254,15 +282,15 @@ fun ItemBody(
     Column(
         modifier = Modifier
             .clickable { onClickItem.invoke(item) }
-            .width(IconSize.XXLargeSize),
+            .width(itemIconSize),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         val bitmap = item.image.getImageBitmap(currentSpriteMap)
         BaseBitmapImage(
             bitmap = bitmap,
-            loadingDrawableId = com.sandorln.design.R.drawable.ic_main_item,
-            imageSize = IconSize.XXLargeSize
+            loadingDrawableId = R.drawable.ic_main_item,
+            imageSize = itemIconSize
         )
 
         Text(
@@ -411,49 +439,33 @@ fun ItemTagTypeFilerList(
 }
 
 @Composable
-fun ItemHomeMenuBody(
-    title: String = "",
-    isShowDetailBody: Boolean = false,
-    onToggleVisibleDetailBody: () -> Unit = {}
+fun ItemBuildListBody(
+    itemBuildList: List<ItemData> = emptyList(),
+    currentSpriteMap: Map<String, Bitmap?> = emptyMap(),
+    onDeleteItemBuildIndex: (Int) -> Unit = {}
 ) {
-    val iconId = if (isShowDetailBody) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down
-    val titleColor by animateColorAsState(
-        targetValue = if (isShowDetailBody) Colors.Gold05 else Colors.Gold02,
-        label = ""
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .heightIn(45.dp)
-            .clickable(onClick = onToggleVisibleDetailBody)
-    ) {
+    Column {
         Row(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = Spacings.Spacing05),
-            verticalAlignment = Alignment.CenterVertically
+                .horizontalScroll(state = rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(
+                space = Spacings.Spacing01,
+                alignment = Alignment.CenterHorizontally
+            )
         ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = title,
-                style = TextStyles.Title03,
-                color = titleColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Icon(
-                painter = painterResource(id = iconId),
-                contentDescription = null,
-                tint = titleColor
-            )
+            repeat(ItemHomeViewModel.ITEM_BUILD_MAX_COUNT) { index ->
+                val itemData = itemBuildList.getOrNull(index) ?: ItemData()
+                ItemBody(
+                    itemIconSize = IconSize.XLargeSize,
+                    item = itemData,
+                    currentSpriteMap = currentSpriteMap,
+                    onClickItem = {
+                        onDeleteItemBuildIndex.invoke(index)
+                    }
+                )
+            }
         }
-
-        if (!isShowDetailBody)
-            HorizontalDivider()
     }
 }
 
@@ -527,11 +539,8 @@ fun FilterSelectBodyPreview() {
 
 @Preview
 @Composable
-fun FilterTitleBodyPreview() {
+fun ItemBuildBodyPreview() {
     LolChampionThemePreview {
-        ItemHomeMenuBody(
-            title = "아이템 필터",
-            isShowDetailBody = true
-        )
+        ItemBuildListBody()
     }
 }

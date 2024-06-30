@@ -63,8 +63,6 @@ object Dimens {
     val GAME_READY_TIME_PROGRESS = 240.dp
 
     val INITIAL_GAME_TITLE_SIZE = 40.dp
-
-    val ITEM_FILTER_TITLE_MIN_HEIGHT = 80.dp
 }
 
 object AnimationConfig {

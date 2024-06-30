@@ -41,6 +41,11 @@ class ItemHomeViewModel @Inject constructor(
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
     getCurrentVersion: GetCurrentVersion
 ) : ViewModel() {
+    companion object {
+        const val ITEM_BUILD_MAX_COUNT = 6
+        const val ITEM_LEGEND_DEPTH = 3
+    }
+
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
 
@@ -154,19 +159,11 @@ class ItemHomeViewModel @Inject constructor(
                                 _itemUiState.emit(currentUiState.copy(selectedItemId = action.itemDataId))
                             }
 
-                            ItemHomeAction.ToggleVisibleFilterBody -> {
-                                _itemUiState.update { it.copy(isShowFilterBody = !it.isShowFilterBody) }
-                            }
-
-                            ItemHomeAction.ToggleVisibleBuildBody -> {
-                                _itemUiState.update { it.copy(isShowBuildBody = !it.isShowBuildBody) }
-                            }
-
                             is ItemHomeAction.AddItemBuild -> {
                                 val itemBuildList = _itemUiState.value.itemBuildList
                                 val addItemData = action.itemData
-                                val shouldAddItemBuildList = itemBuildList.size < 6
-                                val hasSameLegendItem = addItemData.depth > 2 && itemBuildList.any { it.id == addItemData.id }
+                                val shouldAddItemBuildList = itemBuildList.size < ITEM_BUILD_MAX_COUNT
+                                val hasSameLegendItem = addItemData.depth >= ITEM_LEGEND_DEPTH && itemBuildList.any { it.id == addItemData.id }
 
                                 if (shouldAddItemBuildList && !hasSameLegendItem) {
                                     _itemUiState.update { uiState ->
@@ -227,8 +224,6 @@ data class ItemHomeUiState(
     val isSelectNewItem: Boolean = false,
     val selectedItemId: String? = null,
     val currentVersionName: String = "",
-    val isShowFilterBody: Boolean = false,
-    val isShowBuildBody: Boolean = false,
     val itemBuildList: List<ItemData> = listOf()
 )
 
@@ -242,9 +237,6 @@ sealed interface ItemHomeAction {
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
     data class AddItemBuild(val itemData: ItemData) : ItemHomeAction
     data class DeleteItemBuild(val index: Int) : ItemHomeAction
-
-    data object ToggleVisibleFilterBody : ItemHomeAction
-    data object ToggleVisibleBuildBody : ItemHomeAction
 }
 
 sealed interface ItemHomeSideEffect {
