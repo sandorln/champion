@@ -43,9 +43,7 @@ class ChampionService @Inject constructor(
             .get(BuildConfig.BASE_URL + "/cdn/${version}/data/ko_KR/champion/${championName}.json")
             .body<BaseLolResponse<Map<String, NetworkChampionDetail>>>()
 
-        val (totalRating, writingRating) = getChampionRating(championName)
-
-        response.data?.get(championName)?.copy(rating = totalRating, writingRating = writingRating) ?: throw Exception("")
+        response.data?.get(championName) ?: throw Exception("")
     }
 
     suspend fun getChampionPathNoteList(version: String): List<NetworkChampionPatchNote> = withContext(Dispatchers.IO) {
@@ -63,6 +61,7 @@ class ChampionService @Inject constructor(
     /**
      * @return Total Rating & User Writing Rating
      */
+    @Deprecated("Firebase 사용량 때문에 금지")
     suspend fun getChampionRating(championName: String): Pair<Float, Int> {
         val id = FirebaseInstallations.getInstance().getUserId()
         var writingRating = 0
@@ -87,6 +86,7 @@ class ChampionService @Inject constructor(
             0f to writingRating
     }
 
+    @Deprecated("Firebase 사용량 때문에 금지")
     suspend fun setChampionRating(championName: String, rating: Int) {
         val id = FirebaseInstallations.getInstance().getUserId()
         val data = mapOf("rating" to rating)

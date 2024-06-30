@@ -46,7 +46,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.champion.ui.home.ChampionHomeScreen
 import com.sandorln.design.component.BaseCircleIconImage
-import com.sandorln.design.component.CircleIconType
+import com.sandorln.design.component.ServerIconType
 import com.sandorln.design.component.dialog.BaseBottomSheetDialog
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.IconSize
@@ -55,6 +55,7 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.game.ui.home.GameHomeScreen
 import com.sandorln.home.R
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
@@ -70,12 +71,14 @@ sealed class HomeScreenType(@DrawableRes val svgId: Int) {
     data object Item : HomeScreenType(designR.drawable.ic_main_item)
     data object SummonerSpell : HomeScreenType(designR.drawable.ic_main_spell)
     data object Setting : HomeScreenType(designR.drawable.ic_main_special)
+    data object Game : HomeScreenType(designR.drawable.ic_lol_flat_gold)
 }
 
 private val homeItems = listOf(
     HomeScreenType.Champion,
     HomeScreenType.Item,
     HomeScreenType.SummonerSpell,
+    HomeScreenType.Game,
     HomeScreenType.Setting
 )
 
@@ -86,7 +89,8 @@ fun HomeScreen(
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit,
     moveToLicensesScreen: () -> Unit,
     moveToLolPatchNoteScreen: () -> Unit,
-    moveToChampionPatchNoteListScreen: (version: String) -> Unit
+    moveToChampionPatchNoteListScreen: (version: String) -> Unit,
+    moveToInitialQuizScreen: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -156,6 +160,10 @@ fun HomeScreen(
                         HomeScreenType.Setting -> SettingHomeScreen(
                             moveToLicensesScreen = moveToLicensesScreen,
                             moveToLolPatchNoteScreen = moveToLolPatchNoteScreen
+                        )
+
+                        HomeScreenType.Game -> GameHomeScreen(
+                            moveToInitialQuizScreen = moveToInitialQuizScreen
                         )
                     }
                 }
@@ -236,14 +244,14 @@ fun VersionItemBody(
 
         if (newChampionIdList.isNotEmpty())
             NewContentListBody(
-                circleIconType = CircleIconType.CHAMPION,
+                serverIconType = ServerIconType.CHAMPION,
                 newIdList = newChampionIdList,
                 versionName = version.name
             )
 
         if (newItemIdList.isNotEmpty())
             NewContentListBody(
-                circleIconType = CircleIconType.ITEM,
+                serverIconType = ServerIconType.ITEM,
                 newIdList = newItemIdList,
                 versionName = version.name
             )
@@ -254,13 +262,13 @@ private const val MAX_COUNT = 3
 
 @Composable
 private fun NewContentListBody(
-    circleIconType: CircleIconType = CircleIconType.CHAMPION,
+    serverIconType: ServerIconType = ServerIconType.CHAMPION,
     newIdList: List<String> = emptyList(),
     versionName: String = ""
 ) {
-    val circleTypeIcon = when (circleIconType) {
-        CircleIconType.ITEM -> com.sandorln.design.R.drawable.ic_main_item
-        CircleIconType.CHAMPION -> com.sandorln.design.R.drawable.ic_main_champion
+    val circleTypeIcon = when (serverIconType) {
+        ServerIconType.ITEM -> com.sandorln.design.R.drawable.ic_main_item
+        ServerIconType.CHAMPION -> com.sandorln.design.R.drawable.ic_main_champion
     }
 
     Box {
@@ -288,7 +296,7 @@ private fun NewContentListBody(
                         .size(IconSize.LargeSize),
                     versionName = versionName,
                     id = id,
-                    circleIconType = circleIconType
+                    serverIconType = serverIconType
                 )
             }
 
@@ -354,6 +362,7 @@ internal fun HomeBottomNavigation(
                         HomeScreenType.Item -> R.string.menu_item
                         HomeScreenType.Setting -> R.string.menu_setting
                         HomeScreenType.SummonerSpell -> R.string.menu_spell
+                        HomeScreenType.Game -> R.string.menu_game
                     }
                     Text(
                         text = stringResource(id = titleId),

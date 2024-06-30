@@ -38,7 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
-import com.sandorln.design.component.BaseTextEditor
+import com.sandorln.design.component.BaseSearchTextEditor
 import com.sandorln.design.component.toast.BaseToast
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
@@ -161,7 +161,7 @@ fun ItemHomeScreen(
                             )
                         )
                 ) {
-                    BaseTextEditor(
+                    BaseSearchTextEditor(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(

@@ -38,7 +38,6 @@ class ChampionDetailViewModel @Inject constructor(
     private val getSimilarChampionList: GetSimilarChampionList,
     private val getChampionVersionList: GetChampionVersionList,
     private val getChampionDiffStatusVersion: GetChampionDiffStatusVersion,
-    private val setChampionRating: SetChampionRating
 ) : ViewModel() {
     private val _championId = savedStateHandle.get<String>(BundleKeys.CHAMPION_ID) ?: ""
     private val _version = savedStateHandle.getStateFlow(BundleKeys.CHAMPION_VERSION, "")
@@ -195,18 +194,6 @@ class ChampionDetailViewModel @Inject constructor(
                             _uiState.update {
                                 it.copy(isShowRatingEditorDialog = false)
                             }
-                            setChampionRating
-                                .invoke(_championId, action.rating)
-                                .onSuccess { (totalRating, writingRating) ->
-                                    _uiState.update {
-                                        it.copy(
-                                            championDetailData = tempChampion.copy(
-                                                rating = totalRating,
-                                                writingRating = writingRating
-                                            )
-                                        )
-                                    }
-                                }
                         }
                     }
                 }
@@ -234,7 +221,11 @@ sealed interface ChampionDetailAction {
     data class ChangeVersion(val versionName: String) : ChampionDetailAction
     data class ChangeSelectSkill(val skill: ChampionSpell) : ChampionDetailAction
     data class ChangeVersionListDialog(val visible: Boolean) : ChampionDetailAction
+
+    @Deprecated("Firebase 사용량 때문에 금지")
     data class ChangeRatingEditorDialog(val visible: Boolean) : ChampionDetailAction
+
+    @Deprecated("Firebase 사용량 때문에 금지")
     data class SetChampionRating(val rating: Int) : ChampionDetailAction
 }
 

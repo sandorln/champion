@@ -13,7 +13,5 @@ data class NetworkChampionDetail(
 
     val skins: List<NetworkChampionSkin> = listOf(),
     val spells: List<NetworkChampionSpell> = listOf(),
-    val passive: NetworkChampionPassive = NetworkChampionPassive(),
-    val rating: Float = 0f,
-    val writingRating : Int = 0
+    val passive: NetworkChampionPassive = NetworkChampionPassive()
 )

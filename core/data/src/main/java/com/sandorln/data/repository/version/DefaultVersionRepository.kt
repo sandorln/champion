@@ -6,7 +6,7 @@ import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.VersionEntity
-import com.sandorln.datastore.version.VersionDatasource
+import com.sandorln.datastore.local.version.VersionDatasource
 import com.sandorln.model.data.version.Version
 import com.sandorln.network.service.VersionService
 import kotlinx.coroutines.CoroutineScope

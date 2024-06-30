@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,10 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
-import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.setting.R
@@ -28,7 +28,7 @@ import com.sandorln.setting.R
 @Composable
 fun SettingHomeScreen(
     moveToLicensesScreen: () -> Unit,
-    moveToLolPatchNoteScreen: () -> Unit
+    moveToLolPatchNoteScreen: () -> Unit,
 ) {
     val context = LocalContext.current
     val packageName = context.packageName
@@ -37,7 +37,9 @@ fun SettingHomeScreen(
         .versionName
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(state = rememberScrollState())
     ) {
         SettingMenuBody(
             title = stringResource(id = R.string.menu_lol_patch_notes),
@@ -87,17 +89,6 @@ fun SettingMenuBody(
         )
         HorizontalDivider(
             modifier = Modifier.align(Alignment.BottomCenter)
-        )
-    }
-}
-
-@Preview
-@Composable
-fun SettingHomeScreenPreview() {
-    LolChampionThemePreview {
-        SettingHomeScreen(
-            moveToLicensesScreen = {},
-            moveToLolPatchNoteScreen = {}
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.sandorln.design.util
 
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -30,3 +31,5 @@ fun String.before(): String =
         onSuccess = { it },
         onFailure = { "Error" }
     )
+
+val thousandDotDecimalFormat = DecimalFormat("#,###")
