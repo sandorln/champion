@@ -47,4 +47,8 @@
 
     <string name="item_stats_boots">장화</string>
     <string name="item_stats_consumable">소모성</string>
+
+    <string name="item_build_status_title">아이템 능력치 총합</string>
+    <string name="item_build_should_add_error">더이상 아이템을 추가할 수 없습니다</string>
+    <string name="item_build_same_legend_error">동일한 전설급 아이템은 추가할 수 없습니다</string>
 </resources>
