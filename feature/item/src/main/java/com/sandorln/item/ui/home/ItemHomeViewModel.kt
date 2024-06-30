@@ -1,5 +1,6 @@
 package com.sandorln.item.ui.home
 
+import android.util.Log
 import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -48,6 +50,56 @@ class ItemHomeViewModel @Inject constructor(
 
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
+    val itemBuildStatus = _itemUiState
+        .map { uiState -> uiState.itemBuildList }
+        .distinctUntilChanged()
+        .map { itemDataList ->
+            val totalStatus: MutableMap<String, Pair<Int, String>> = mutableMapOf()
+            val currentVersionName = getCurrentVersion.invoke().firstOrNull()?.name ?: ""
+            val (major1, minor1, _) = currentVersionName.split('.').map { it.toInt() }
+            val hasAttentionTag = major1 > 10 || (major1 >= 10 && minor1 > 22)
+
+            itemDataList.forEach { item ->
+                item
+                    .description
+                    .substringAfter("<stats>")
+                    .substringBefore("</stats>")
+                    .split("<br>")
+                    .forEach { status ->
+                        val statusTitle: String
+                        val valuePartition: Pair<String, String>
+                        if (hasAttentionTag) {
+                            statusTitle = status
+                                .substringBefore("<attention>")
+                                .trim()
+
+                            valuePartition = status
+                                .substringBefore("</attention>")
+                                .substringAfter("<attention>")
+                                .trim()
+                                .partition { (48..57).contains(it.code) }
+                        } else {
+                            statusTitle = status
+                                .substringBefore("+")
+                                .trim()
+
+                            valuePartition = status
+                                .substringAfter("+")
+                                .trim()
+                                .partition { (48..57).contains(it.code) }
+                        }
+
+                        val value = valuePartition.first
+                        val suffix = valuePartition.second
+                        val defaultStatus = totalStatus[statusTitle + suffix] ?: Pair(0, "")
+                        val sumValue = defaultStatus.first + (value.toIntOrNull() ?: 0)
+                        totalStatus[statusTitle + suffix] = sumValue to suffix
+                    }
+            }
+
+            totalStatus.toSortedMap()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     private val _itemAction = MutableSharedFlow<ItemHomeAction>()
     fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
@@ -98,6 +150,11 @@ class ItemHomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            launch {
+                itemBuildStatus.collectLatest {
+                    Log.d("status", "Status $it")
+                }
+            }
             launch {
                 getCurrentVersion
                     .invoke()

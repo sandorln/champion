@@ -1,7 +1,6 @@
 package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,13 +11,11 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
@@ -26,10 +23,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -40,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,7 +66,7 @@ import com.sandorln.model.type.ItemTagType
 import kotlin.math.floor
 import com.sandorln.item.R as itemR
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ItemHomeScreen(
     itemHomeViewModel: ItemHomeViewModel = hiltViewModel()
@@ -84,6 +80,8 @@ fun ItemHomeScreen(
     val (consumableItemList, normalItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) }
     val selectedItemId = uiState.selectedItemId
     val currentVersion = uiState.currentVersionName
+    val itemBuildList = uiState.itemBuildList
+    val totalItemBuildStatus by itemHomeViewModel.itemBuildStatus.collectAsState()
 
     val onClickItem: (ItemData) -> Unit = {
         itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it.id))
@@ -206,7 +204,10 @@ fun ItemHomeScreen(
                 )
 
             item {
-                val space = if (uiState.itemBuildList.isNotEmpty()) 65.dp else 0.dp
+                val space = if (itemBuildList.isNotEmpty())
+                    Dimens.ITEM_BUILD_PEEK_HEIGHT + Spacings.Spacing02
+                else
+                    0.dp
                 Spacer(modifier = Modifier.height(space))
             }
         }
@@ -229,7 +230,8 @@ fun ItemHomeScreen(
 
         if (uiState.itemBuildList.isNotEmpty())
             BottomSheetScaffold(
-                sheetPeekHeight = 65.dp,
+                content = {},
+                sheetPeekHeight = Dimens.ITEM_BUILD_PEEK_HEIGHT,
                 sheetDragHandle = null,
                 sheetContainerColor = Colors.Blue06,
                 sheetShape = RoundedCornerShape(topStart = Radius.Radius05, topEnd = Radius.Radius05),
@@ -252,23 +254,26 @@ fun ItemHomeScreen(
 
                         Spacer(modifier = Modifier.height(Spacings.Spacing02))
 
+                        ItemBuildListBody(
+                            itemBuildList = itemBuildList,
+                            currentSpriteMap = currentSpriteMap,
+                            onDeleteItemBuildIndex = {
+                                itemHomeViewModel.sendAction(ItemHomeAction.DeleteItemBuild(it))
+                            }
+                        )
+
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .verticalScroll(rememberScrollState()),
                             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing05)
                         ) {
-                            ItemBuildListBody(
-                                itemBuildList = uiState.itemBuildList,
-                                currentSpriteMap = currentSpriteMap,
-                                onDeleteItemBuildIndex = {
-                                    itemHomeViewModel.sendAction(ItemHomeAction.DeleteItemBuild(it))
-                                }
+                            ItemBuildStatusBody(
+                                totalItemStatus = totalItemBuildStatus
                             )
-
                         }
                     }
-                }) {}
+                })
     }
 }
 
@@ -465,6 +470,20 @@ fun ItemBuildListBody(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ItemBuildStatusBody(
+    totalItemStatus: Map<String, Pair<Int, String>> = emptyMap(),
+) {
+    Column {
+        totalItemStatus.forEach {
+            Text(
+                text = "${it.key} : ${it.value.first}${it.value.second}",
+                style = TextStyles.Body04
+            )
         }
     }
 }
