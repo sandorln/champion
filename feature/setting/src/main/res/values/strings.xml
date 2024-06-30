@@ -5,6 +5,7 @@
     <string name="app_version" translatable="false">App Version %1$s</string>
 
     <string name="lol_patch_notes_url">https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-%1$d-%2$d-notes/</string>
+    <string name="lol_patch_notes_url_14_12_up">https://www.leagueoflegends.com/ko-kr/news/game-updates/lol-patch-%1$d-%2$d-notes/</string>
     <string name="lol_patch_note_item_title">Version - %1$d.%2$d</string>
     <string name="lol_patch_note_title">롤 패치 노트 목록</string>
 </resources>

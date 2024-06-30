@@ -62,7 +62,11 @@ fun LolPatchNoteBody(
     lolPatch: Pair<Int, Int> = 0 to 0
 ) {
     val context = LocalContext.current
-    val url = stringResource(id = R.string.lol_patch_notes_url, lolPatch.first, lolPatch.second)
+    val urlId = if (lolPatch.first < 14 || (lolPatch.first == 14 && lolPatch.second < 13))
+        R.string.lol_patch_notes_url
+    else
+        R.string.lol_patch_notes_url_14_12_up
+    val url = stringResource(id = urlId, lolPatch.first, lolPatch.second)
     val title = stringResource(id = R.string.lol_patch_note_item_title, lolPatch.first, lolPatch.second)
 
     Box(

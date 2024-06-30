@@ -54,7 +54,10 @@ class ChampionService @Inject constructor(
         /* Version 이 10보다 낮을 시 패치노트가 존재하지 않음 */
         if (major1 < 10) return@withContext emptyList()
 
-        val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
+        val url = if (major1 < 14 || (major1 == 14 && minor1 < 13))
+            "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
+        else
+            "https://www.leagueoflegends.com/ko-kr/news/game-updates/lol-patch-$major1-$minor1-notes/"
         return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
     }
 
