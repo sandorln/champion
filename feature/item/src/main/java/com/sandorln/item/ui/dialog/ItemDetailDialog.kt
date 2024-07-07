@@ -105,6 +105,7 @@ fun ItemDetailDialog(
                 bitmap = baseItem.image.getImageBitmap(currentSpriteMap),
                 onAddItemBuildData = {
                     onAddItemBuildData.invoke(baseItem)
+                    onDismissRequest.invoke()
                 }
             )
 
