@@ -23,12 +23,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -71,7 +73,7 @@ import com.sandorln.model.type.ItemTagType
 import kotlin.math.floor
 import com.sandorln.item.R as itemR
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ItemHomeScreen(
     itemHomeViewModel: ItemHomeViewModel = hiltViewModel()
@@ -89,9 +91,6 @@ fun ItemHomeScreen(
     val totalItemBuildStatus by itemHomeViewModel.itemBuildStatus.collectAsState()
     val totalItemBuildUniqueList by itemHomeViewModel.itemBuildUniqueList.collectAsState()
     val totalItemBuildGold by itemHomeViewModel.itemBuildGold.collectAsState()
-    val hasUniqueList by remember(totalItemBuildUniqueList) {
-        derivedStateOf { totalItemBuildUniqueList.any { it.second.isNotEmpty() } }
-    }
 
     val onClickItem: (ItemData) -> Unit = {
         itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it.id))
@@ -224,11 +223,7 @@ fun ItemHomeScreen(
                 )
 
             item {
-                val space = if (itemBuildList.isNotEmpty())
-                    Dimens.ITEM_BUILD_PEEK_HEIGHT + Spacings.Spacing02
-                else
-                    0.dp
-                Spacer(modifier = Modifier.height(space))
+                Spacer(modifier = Modifier.height(Dimens.ITEM_BUILD_PEEK_HEIGHT + Spacings.Spacing02))
             }
         }
 
@@ -248,67 +243,105 @@ fun ItemHomeScreen(
             )
         }
 
-        if (uiState.itemBuildList.isNotEmpty())
-            BottomSheetScaffold(
-                content = {},
-                sheetPeekHeight = Dimens.ITEM_BUILD_PEEK_HEIGHT,
-                sheetDragHandle = null,
-                sheetContainerColor = Colors.Blue06,
-                sheetShape = RoundedCornerShape(topStart = Radius.Radius05, topEnd = Radius.Radius05),
-                sheetContent = {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
-                    ) {
-                        Spacer(modifier = Modifier)
-
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    Colors.Gray06,
-                                    RoundedCornerShape(Radius.Radius05)
-                                )
-                                .height(3.dp)
-                                .width(25.dp)
-                        )
-
-                        ItemBuildListBody(
-                            itemBuildList = itemBuildList,
-                            currentSpriteMap = currentSpriteMap,
-                            onDeleteItemBuildIndex = {
-                                itemHomeViewModel.sendAction(ItemHomeAction.DeleteItemBuild(it))
-                            }
-                        )
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .verticalScroll(rememberScrollState()),
-                            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "$totalItemBuildGold G",
-                                style = TextStyles.SubTitle03,
-                                color = Colors.Gold02
-                            )
-
-                            HorizontalDivider()
-
-                            ItemBuildStatusBody(totalItemBuildStatus)
-
-                            if (hasUniqueList) {
-                                HorizontalDivider()
-
-                                ItemBuildUniqueBody(totalItemBuildUniqueList)
-                            }
-
-                            Spacer(modifier = Modifier.height(Spacings.Spacing02))
-                        }
-                    }
-                })
+        ItemBuildBottomSheet(
+            itemBuildList = itemBuildList,
+            currentSpriteMap = currentSpriteMap,
+            totalItemBuildGold = totalItemBuildGold,
+            totalItemBuildStatus = totalItemBuildStatus,
+            totalItemBuildUniqueList = totalItemBuildUniqueList,
+            onDeleteItemBuildIndex = {
+                itemHomeViewModel.sendAction(ItemHomeAction.DeleteItemBuild(it))
+            }
+        )
     }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun ItemBuildBottomSheet(
+    itemBuildList: List<ItemData>,
+    currentSpriteMap: Map<String, Bitmap>,
+    totalItemBuildGold: Int,
+    totalItemBuildStatus: Map<String, Pair<Int, String>>,
+    totalItemBuildUniqueList: List<Pair<String, String>>,
+    onDeleteItemBuildIndex: (Int) -> Unit
+) {
+    val hasUniqueList by remember(totalItemBuildUniqueList) {
+        derivedStateOf { totalItemBuildUniqueList.any { it.second.isNotEmpty() } }
+    }
+
+    val bottomSheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.PartiallyExpanded,
+        skipHiddenState = false
+    )
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = bottomSheetState
+    )
+
+    LaunchedEffect(bottomSheetState.currentValue) {
+        if (bottomSheetState.currentValue == SheetValue.Hidden) {
+            bottomSheetState.partialExpand()
+        }
+    }
+
+    BottomSheetScaffold(
+        content = {},
+        scaffoldState = bottomSheetScaffoldState,
+        sheetPeekHeight = Dimens.ITEM_BUILD_PEEK_HEIGHT,
+        sheetDragHandle = null,
+        sheetContainerColor = Colors.Blue06,
+        sheetShape = RoundedCornerShape(topStart = Radius.Radius05, topEnd = Radius.Radius05),
+        sheetContent = {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+            ) {
+                Spacer(modifier = Modifier)
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            Colors.Gray06,
+                            RoundedCornerShape(Radius.Radius05)
+                        )
+                        .height(3.dp)
+                        .width(25.dp)
+                )
+
+                ItemBuildListBody(
+                    itemBuildList = itemBuildList,
+                    currentSpriteMap = currentSpriteMap,
+                    onDeleteItemBuildIndex = onDeleteItemBuildIndex
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "$totalItemBuildGold G",
+                        style = TextStyles.SubTitle03,
+                        color = Colors.Gold02
+                    )
+
+                    HorizontalDivider()
+
+                    ItemBuildStatusBody(totalItemBuildStatus)
+
+                    if (hasUniqueList) {
+                        HorizontalDivider()
+
+                        ItemBuildUniqueBody(totalItemBuildUniqueList)
+                    }
+
+                    Spacer(modifier = Modifier.height(Spacings.Spacing02))
+                }
+            }
+        })
 }
 
 @Composable
