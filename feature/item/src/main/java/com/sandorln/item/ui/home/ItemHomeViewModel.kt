@@ -11,6 +11,8 @@ import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.item.R
 import com.sandorln.item.model.ItemBuildException
+import com.sandorln.item.util.getStatusList
+import com.sandorln.item.util.getUniqueStatusList
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
@@ -20,13 +22,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -51,91 +54,48 @@ class ItemHomeViewModel @Inject constructor(
 
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
-    val itemBuildStatus = _itemUiState
-        .map { uiState -> uiState.itemBuildList }
-        .distinctUntilChanged()
+    private val _itemBuildList: StateFlow<List<ItemData>> = _itemUiState
+        .distinctUntilChangedBy { it.itemBuildList }
+        .map { it.itemBuildList }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val itemBuildStatus = _itemBuildList
         .map { itemDataList ->
             val totalStatus: MutableMap<String, Pair<Int, String>> = mutableMapOf()
-            val currentVersionName = getCurrentVersion.invoke().firstOrNull()?.name ?: ""
-            val (major1, minor1, _) = currentVersionName.split('.').map { it.toInt() }
-            val hasAttentionTag = major1 > 10 || (major1 >= 10 && minor1 > 22)
 
-            itemDataList.forEach { item ->
-                item
-                    .description
-                    .substringAfter("<stats>")
-                    .substringBefore("</stats>")
-                    .split("<br>")
-                    .forEach { status ->
-                        val statusTitle: String
-                        val valuePartition: Pair<String, String>
-                        if (hasAttentionTag) {
-                            statusTitle = status
-                                .substringBefore("<attention>")
-                                .trim()
-
-                            valuePartition = status
-                                .substringBefore("</attention>")
-                                .substringAfter("<attention>")
-                                .trim()
-                                .partition { (48..57).contains(it.code) }
-                        } else {
-                            statusTitle = status
-                                .substringBefore("+")
-                                .trim()
-
-                            valuePartition = status
-                                .substringAfter("+")
-                                .trim()
-                                .partition { (48..57).contains(it.code) }
-                        }
-
-                        val value = valuePartition.first
-                        val suffix = valuePartition.second
-                        val defaultStatus = totalStatus[statusTitle + suffix] ?: Pair(0, "")
-                        val sumValue = defaultStatus.first + (value.toIntOrNull() ?: 0)
-                        if (statusTitle.isNotEmpty())
-                            totalStatus[statusTitle + suffix] = sumValue to suffix
+            itemDataList
+                .map(ItemData::getStatusList)
+                .forEach { itemStatusList ->
+                    itemStatusList.forEach { (title, value, suffix) ->
+                        val defaultStatus = totalStatus[title + suffix] ?: Pair(0, "")
+                        val sumValue = defaultStatus.first + value
+                        totalStatus[title + suffix] = sumValue to suffix
                     }
-            }
+                }
 
             totalStatus.toSortedMap()
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    val itemBuildUniqueList = _itemUiState
-        .map { uiState -> uiState.itemBuildList }
-        .distinctUntilChanged()
+    val itemBuildUniqueList = _itemBuildList
         .map { itemDataList ->
             itemDataList
-                .map { itemData ->
-                    var unique = itemData.description.substringAfter("</stats>")
-                    while (unique.startsWith("</stats>")) {
-                        unique = unique.substringAfter("</stats>")
-                    }
-
-                    unique = unique
-                        .replace("<li>", "<br>")
-                        .replace("</mainText>","")
-
-                    while (unique.startsWith("<br>")) {
-                        unique = unique.substringAfter("<br>")
-                    }
-
-                    itemData.name to unique
-                }
+                .map(ItemData::getUniqueStatusList)
                 .distinctBy { it.first }
                 .filter { it.second.isNotEmpty() }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    val itemBuildGold = _itemUiState
-        .map { uiState ->
-            uiState.itemBuildList.sumOf { itemData ->
-                itemData.gold.total
-            }
-        }
+    val itemBuildGold = _itemBuildList
+        .map { itemBuildList -> itemBuildList.sumOf { itemData -> itemData.gold.total } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
+
+    val itemBuildDepthList: StateFlow<Map<Int, List<ItemData>>> = _itemBuildList
+        .map { itemBuildList ->
+
+            emptyMap<Int, List<ItemData>>()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
 
     private val _itemAction = MutableSharedFlow<ItemHomeAction>()
     fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
@@ -342,6 +302,6 @@ sealed interface ItemHomeAction {
 }
 
 sealed interface ItemHomeSideEffect {
-    data class ShowMessage(val stringId : Int) : ItemHomeSideEffect
+    data class ShowMessage(val stringId: Int) : ItemHomeSideEffect
     data class ShowErrorMessage(val exception: Exception) : ItemHomeSideEffect
 }
