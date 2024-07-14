@@ -24,6 +24,9 @@ android {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
