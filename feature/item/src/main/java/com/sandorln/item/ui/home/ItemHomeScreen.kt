@@ -573,6 +573,8 @@ fun ItemBuildListBody(
 fun ItemBuildStatusBody(
     totalItemStatus: Map<String, Pair<Int, String>> = emptyMap(),
 ) {
+    val chunkItemStatusList = totalItemStatus.toList().chunked(2)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -584,11 +586,22 @@ fun ItemBuildStatusBody(
             style = TextStyles.SubTitle03,
             color = Colors.Gold02
         )
-        totalItemStatus.forEach {
-            Text(
-                text = "${it.key} : ${it.value.first}${it.value.second}",
-                style = TextStyles.Body03
-            )
+
+        chunkItemStatusList.forEach { list ->
+            Row {
+                list.forEach {itemStatus->
+                    val title = itemStatus.first
+                    val status = itemStatus.second.first
+                    val suffix = itemStatus.second.second
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = "$title : ${status}${suffix}",
+                        style = TextStyles.Body03,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+            }
         }
     }
 }
