@@ -34,6 +34,7 @@ class InitialQuizViewModel @Inject constructor(
     companion object {
         const val INIT_READY_TIME = 3f
         const val INIT_GAME_TIME = 60f
+        const val INIT_VERSION_NAMe = "14.13.1"
     }
 
     val totalRoundCount: Int = 10
@@ -160,7 +161,7 @@ class InitialQuizViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
-                val latestVersion = currentVersion.invoke().firstOrNull()?.name ?: "14.12.1"
+                val latestVersion = currentVersion.invoke().firstOrNull()?.name ?: INIT_VERSION_NAMe
 
                 getInitialQuizItemListByVersion
                     .invoke(latestVersion)
