@@ -129,7 +129,7 @@ class ItemHomeViewModel @Inject constructor(
         }.run {
             if (selectMapType == MapType.ARAM || selectMapType == MapType.SUMMONER_RIFT) {
                 map { itemData ->
-                    if (itemData.depth == 0) return@map itemData
+                    if (itemData.depth == 0 || itemData.tags.contains(ItemTagType.Consumable)) return@map itemData
 
                     val firstIntoItem = itemListIdMap[itemData.into.firstOrNull()]
                     val firstFromItem = itemListIdMap[itemData.from.firstOrNull()]

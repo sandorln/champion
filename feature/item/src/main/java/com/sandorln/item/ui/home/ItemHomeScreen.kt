@@ -84,7 +84,7 @@ fun ItemHomeScreen(
     val uiState by itemHomeViewModel.itemUiState.collectAsState()
 
     val (bootItemList, notBootItemList) = currentItemList.partition { it.tags.contains(ItemTagType.Boots) }
-    val (consumableItemList, notConsumableItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) }
+    val (consumableItemList, notConsumableItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) && it.depth < ItemHomeViewModel.ITEM_LEGEND_DEPTH }
     val (normalItemList, notNormalItemList) = notConsumableItemList.partition { it.depth < 2 }
     val (epicItemList, notEpicItemList) = notNormalItemList.partition { it.depth < ItemHomeViewModel.ITEM_LEGEND_DEPTH }
     val (orrnItemList, legendItemList) = notEpicItemList.partition { it.depth == Int.MAX_VALUE }
