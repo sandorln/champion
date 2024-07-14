@@ -23,8 +23,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ChampionService @Inject constructor(
-    private val ktorClient: HttpClient,
-    private val fireDB: FirebaseFirestore
+    private val ktorClient: HttpClient
 ) {
     /**
      * 해당 버전의 간략한 챔피온 정보 가져오기
@@ -59,46 +58,5 @@ class ChampionService @Inject constructor(
         else
             "https://www.leagueoflegends.com/ko-kr/news/game-updates/lol-patch-$major1-$minor1-notes/"
         return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
-    }
-
-    /**
-     * @return Total Rating & User Writing Rating
-     */
-    @Deprecated("Firebase 사용량 때문에 금지")
-    suspend fun getChampionRating(championName: String): Pair<Float, Int> {
-        val id = FirebaseInstallations.getInstance().getUserId()
-        var writingRating = 0
-        val ratingList = fireDB
-            .getLolDocument(FireStoreDocument.RATING)
-            .collection(championName.lowercase())
-            .get()
-            .await()
-            .documents
-            .mapNotNull {
-                val rating = runCatching { it.data?.get("rating") as Number }.getOrNull()
-                if (it.id == id) writingRating = rating?.toInt() ?: 0
-                rating
-            }
-
-        val totalRating = ratingList.sumOf { it.toDouble() }.toFloat()
-        val totalCount = ratingList.size
-
-        return if (totalCount > 0)
-            (runCatching { totalRating / totalCount }.getOrNull() ?: 0f) to writingRating
-        else
-            0f to writingRating
-    }
-
-    @Deprecated("Firebase 사용량 때문에 금지")
-    suspend fun setChampionRating(championName: String, rating: Int) {
-        val id = FirebaseInstallations.getInstance().getUserId()
-        val data = mapOf("rating" to rating)
-
-        fireDB
-            .getLolDocument(FireStoreDocument.RATING)
-            .collection(championName.lowercase())
-            .document(id)
-            .set(data)
-            .await()
     }
 }
