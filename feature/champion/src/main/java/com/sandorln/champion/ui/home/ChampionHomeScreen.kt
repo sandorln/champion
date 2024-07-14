@@ -245,53 +245,6 @@ private fun ChampionBody(
     }
 }
 
-@Deprecated("필터가 불필요하다고 판단 : ver 2.01.00 삭제")
-@Composable
-fun ChampionTagFilterBody(
-    modifier: Modifier = Modifier,
-    selectedTagSet: Set<ChampionTag> = setOf(),
-    onClickAction: (ChampionTag) -> Unit
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(
-            Spacings.Spacing05,
-            Alignment.CenterHorizontally
-        )
-    ) {
-        ChampionTag.entries.forEach { championTag ->
-            val iconId = championTag.getResourceId()
-            val isSelect = selectedTagSet.contains(championTag)
-            val contentColor = when {
-                isSelect -> Colors.Gold02
-                else -> Colors.Gray07
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .clickable {
-                            onClickAction.invoke(championTag)
-                        }
-                        .size(IconSize.LargeSize),
-                    painter = painterResource(id = iconId),
-                    contentDescription = null,
-                    tint = contentColor
-                )
-
-                Text(
-                    text = championTag.name,
-                    style = TextStyles.Body04,
-                    color = contentColor
-                )
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun ChampionPatchNoteListBody(
@@ -424,18 +377,6 @@ fun ChampionPatchNoteBody(championPatchNote: ChampionPatchNote) {
             style = TextStyles.Body03,
             color = Colors.Gray03
         )
-    }
-}
-
-@Preview
-@Composable
-internal fun ChampionTagBodyPreview() {
-    LolChampionThemePreview {
-        ChampionTagFilterBody(
-            selectedTagSet = setOf(*ChampionTag.entries.toTypedArray())
-        ) {
-
-        }
     }
 }
 

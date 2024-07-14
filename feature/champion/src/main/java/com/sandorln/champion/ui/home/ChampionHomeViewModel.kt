@@ -20,10 +20,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -116,22 +114,6 @@ class ChampionHomeViewModel @Inject constructor(
                             is ChampionHomeAction.ChangeChampionSearchKeyword -> {
                                 _championUiState.update { it.copy(searchKeyword = action.searchKeyword) }
                             }
-
-                            is ChampionHomeAction.ToggleChampionTag -> {
-                                val championTag = action.championTag
-                                val tempChampionTagSet = currentUiState
-                                    .selectChampionTagSet
-                                    .toMutableSet()
-                                    .apply {
-                                        if (contains(championTag)) {
-                                            remove(championTag)
-                                        } else {
-                                            add(championTag)
-                                        }
-                                    }
-
-                                _championUiState.update { it.copy(selectChampionTagSet = tempChampionTagSet) }
-                            }
                         }
                     }
                 }
@@ -180,8 +162,6 @@ sealed interface ChampionHomeAction {
     data object RefreshChampionData : ChampionHomeAction
 
     data class ChangeChampionSearchKeyword(val searchKeyword: String) : ChampionHomeAction
-    @Deprecated("필터가 불필요하다고 판단 : ver 2.01.00 삭제")
-    data class ToggleChampionTag(val championTag: ChampionTag) : ChampionHomeAction
 }
 
 sealed interface ChampionHomeSideEffect {

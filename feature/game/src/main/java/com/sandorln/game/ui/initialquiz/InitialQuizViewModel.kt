@@ -55,9 +55,6 @@ class InitialQuizViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(InitialQuizUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<InitialQuizSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
-
     private val _action = MutableSharedFlow<InitialQuizAction>()
     fun sendAction(initialQuizAction: InitialQuizAction) {
         viewModelScope.launch {
@@ -209,11 +206,6 @@ class InitialQuizViewModel @Inject constructor(
             }
         }
     }
-}
-
-sealed interface InitialQuizSideEffect {
-    @Deprecated("게임 중 TOAST 띄우면 입력메세지 밀리는 현상 발생")
-    data class ShowToastMessage(val messageType: BaseToastType, val message: String) : InitialQuizSideEffect
 }
 
 sealed interface InitialQuizAction {

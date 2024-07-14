@@ -24,10 +24,4 @@ interface ChampionRepository {
     suspend fun getChampionVersionList(championId: String): List<String>
     suspend fun getChampionDiffStatusVersion(championId: String): Map<String, Boolean>
     suspend fun getChampionPatchNoteList(version: String): List<ChampionPatchNote>
-
-    /**
-     * @return 변경 된 후 평점 값 (Total / UserRating)
-     */
-    @Deprecated("Firebase 사용량 때문에 금지")
-    suspend fun setChampionRating(championName: String, rating : Int) : Pair<Float,Int>
 }
