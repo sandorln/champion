@@ -84,13 +84,24 @@ fun ItemHomeScreen(
     val uiState by itemHomeViewModel.itemUiState.collectAsState()
 
     val (bootItemList, notBootItemList) = currentItemList.partition { it.tags.contains(ItemTagType.Boots) }
-    val (consumableItemList, normalItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) }
+    val (consumableItemList, notConsumableItemList) = notBootItemList.partition { it.tags.contains(ItemTagType.Consumable) }
+    val (normalItemList, notNormalItemList) = notConsumableItemList.partition { it.depth < 2 }
+    val (epicItemList, notEpicItemList) = notNormalItemList.partition { it.depth < ItemHomeViewModel.ITEM_LEGEND_DEPTH }
+    val (orrnItemList, legendItemList) = notEpicItemList.partition { it.depth == Int.MAX_VALUE }
+
     val selectedItemId = uiState.selectedItemId
     val currentVersion = uiState.currentVersionName
     val itemBuildList = uiState.itemBuildList
     val totalItemBuildStatus by itemHomeViewModel.itemBuildStatus.collectAsState()
     val totalItemBuildUniqueList by itemHomeViewModel.itemBuildUniqueList.collectAsState()
     val totalItemBuildGold by itemHomeViewModel.itemBuildGold.collectAsState()
+
+    val bootsTitle = stringResource(id = itemR.string.item_boots)
+    val consumableTitle = stringResource(id = itemR.string.item_consumable)
+    val normalTitle = stringResource(id = itemR.string.item_normal)
+    val epicTitle = stringResource(id = itemR.string.item_epic)
+    val legendTitle = stringResource(id = itemR.string.item_legend)
+    val orrnTitle = stringResource(id = itemR.string.item_orrn)
 
     val onClickItem: (ItemData) -> Unit = {
         itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it.id))
@@ -137,10 +148,9 @@ fun ItemHomeScreen(
         val bootsItemListChunkList = bootItemList.chunked(spanCount)
         val consumableItemChunkList = consumableItemList.chunked(spanCount)
         val normalItemChunkList = normalItemList.chunked(spanCount)
-
-        val bootsTitle = stringResource(id = itemR.string.item_boots)
-        val consumableTitle = stringResource(id = itemR.string.item_consumable)
-        val normalTitle = stringResource(id = itemR.string.item_normal)
+        val epicItemChunkList = epicItemList.chunked(spanCount)
+        val legendItemChunkList = legendItemList.chunked(spanCount)
+        val orrnItemChunkList = orrnItemList.chunked(spanCount)
 
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
@@ -219,6 +229,33 @@ fun ItemHomeScreen(
                     spanCount = spanCount,
                     spriteMap = currentSpriteMap,
                     itemChunkList = normalItemChunkList,
+                    onClickItem = onClickItem
+                )
+
+            if (epicItemChunkList.isNotEmpty())
+                baseItemList(
+                    title = epicTitle,
+                    spanCount = spanCount,
+                    spriteMap = currentSpriteMap,
+                    itemChunkList = epicItemChunkList,
+                    onClickItem = onClickItem
+                )
+
+            if (legendItemChunkList.isNotEmpty())
+                baseItemList(
+                    title = legendTitle,
+                    spanCount = spanCount,
+                    spriteMap = currentSpriteMap,
+                    itemChunkList = legendItemChunkList,
+                    onClickItem = onClickItem
+                )
+
+            if (orrnItemChunkList.isNotEmpty())
+                baseItemList(
+                    title = orrnTitle,
+                    spanCount = spanCount,
+                    spriteMap = currentSpriteMap,
+                    itemChunkList = orrnItemChunkList,
                     onClickItem = onClickItem
                 )
 
@@ -589,7 +626,7 @@ fun ItemBuildStatusBody(
 
         chunkItemStatusList.forEach { list ->
             Row {
-                list.forEach {itemStatus->
+                list.forEach { itemStatus ->
                     val title = itemStatus.first
                     val status = itemStatus.second.first
                     val suffix = itemStatus.second.second

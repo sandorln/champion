@@ -14,6 +14,9 @@
     <string name="item_boots">장화</string>
     <string name="item_consumable">소모성 아이템</string>
     <string name="item_normal">일반 아이템</string>
+    <string name="item_epic">서사 아이템</string>
+    <string name="item_legend">전설 아이템</string>
+    <string name="item_orrn">오른 아이템</string>
 
     <string name="item_list_title">아이템 목록</string>
     <string name="item_filter_all">모든 아이템</string>

@@ -17,9 +17,6 @@ interface ItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItemDataList(championList: List<ItemEntity>)
 
-    @Query("SELECT id, name, image, tags, maps FROM ItemEntity WHERE version == :version AND inStore == 1")
-    fun getAllSummaryItemData(version: String): Flow<List<SummaryItemEntity>>
-
     @Query(
         "SELECT id FROM itementity WHERE version == :currentVersion " +
                 "AND id NOT IN (SELECT id FROM itementity WHERE version == :preVersion) " +

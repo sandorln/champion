@@ -50,6 +50,7 @@ class ItemHomeViewModel @Inject constructor(
     companion object {
         const val ITEM_BUILD_MAX_COUNT = 6
         const val ITEM_LEGEND_DEPTH = 3
+        private val SUPPORT_ITEM_ID_LIST = listOf("3869", "3870", "3871", "3876", "3877", "4643", "4638") // 서폿 아이템 ID
     }
 
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
@@ -89,14 +90,6 @@ class ItemHomeViewModel @Inject constructor(
         .map { itemBuildList -> itemBuildList.sumOf { itemData -> itemData.gold.total } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 
-    val itemBuildDepthList: StateFlow<Map<Int, List<ItemData>>> = _itemBuildList
-        .map { itemBuildList ->
-
-            emptyMap<Int, List<ItemData>>()
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
-
-
     private val _itemAction = MutableSharedFlow<ItemHomeAction>()
     fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
         _itemAction.emit(itemHomeAction)
@@ -105,7 +98,8 @@ class ItemHomeViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ItemHomeSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    private val _itemFilter: suspend (ItemHomeUiState, List<ItemData>, List<String>) -> List<ItemData> = { uiState, itemList, newItemIdList ->
+    private val _itemFilterTransform: suspend (ItemHomeUiState, List<ItemData>, List<String>) -> List<ItemData> = { uiState, itemList, newItemIdList ->
+        val itemListIdMap = itemList.associateBy(ItemData::id)
         val searchKeyword = uiState.searchKeyword
         val selectMapType = uiState.selectMapType
         val filterItemList = if (uiState.isSelectNewItem) {
@@ -115,7 +109,8 @@ class ItemHomeViewModel @Inject constructor(
         }
 
         filterItemList.filter { item ->
-            if (!item.inStore) return@filter false
+            val isMutationItem = item.gold.total == 0 && item.gold.sell == 0
+            if (isMutationItem) return@filter false
 
             /* Tag Type Filter */
             when {
@@ -131,6 +126,28 @@ class ItemHomeViewModel @Inject constructor(
                 isMatchMapType || isItemAllType -> item.name.contains(searchKeyword)
                 else -> false
             }
+        }.run {
+            if (selectMapType == MapType.ARAM || selectMapType == MapType.SUMMONER_RIFT) {
+                map { itemData ->
+                    if (itemData.depth == 0) return@map itemData
+
+                    val firstIntoItem = itemListIdMap[itemData.into.firstOrNull()]
+                    val firstFromItem = itemListIdMap[itemData.from.firstOrNull()]
+
+                    val isPreOrnnItem = itemData.into.size == 1 && (firstIntoItem?.gold?.total ?: 0) == itemData.gold.total
+                    val isNotOrrnItem = SUPPORT_ITEM_ID_LIST.none { it == itemData.id }
+                    val isOrnnItem = itemData.from.size == 1 && (firstFromItem?.gold?.total ?: 0) == itemData.gold.total && isNotOrrnItem
+                    val isLegendItem = itemData.into.isEmpty()
+
+                    when {
+                        isPreOrnnItem -> itemData.copy(depth = ITEM_LEGEND_DEPTH)
+                        isOrnnItem -> itemData.copy(depth = Int.MAX_VALUE)
+                        isLegendItem -> itemData.copy(depth = ITEM_LEGEND_DEPTH)
+                        else -> itemData
+                    }
+                }
+            } else
+                map { itemData -> itemData.copy(depth = 1) }
         }
     }
 
@@ -141,7 +158,7 @@ class ItemHomeViewModel @Inject constructor(
 
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemIdList, _itemFilter)
+    val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemIdList, _itemFilterTransform)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
