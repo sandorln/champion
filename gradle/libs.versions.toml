@@ -5,7 +5,7 @@ espressoCore = "3.5.1"
 gradle = "8.2.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
-kotlin = "1.9.0"
+kotlin = "2.0.0"
 composeMaterial = "1.5.4"
 composeMaterial3 = "1.2.0-rc01"
 naviVersion = "2.7.5"
@@ -21,7 +21,7 @@ ktor = "2.3.6"
 serialization = "1.9.0"
 datastore = "1.0.0"
 crashlytics = "2.9.9"
-ksp = "1.9.0-1.0.13"
+ksp = "2.0.0-1.0.23"
 glide = "1.0.0-beta01"
 exoplayer = "1.2.0"
 card = "1.0.0"
@@ -100,3 +100,4 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-service = { id = "com.google.gms.google-services", version.ref = "gms" }
 firebase-crashlytices = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
