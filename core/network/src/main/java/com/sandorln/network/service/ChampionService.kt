@@ -62,7 +62,7 @@ class ChampionService @Inject constructor(
 
         val oldUrlChampionResult = oldPatchUrl.await().getOrNull()
         val newUrlChampionResult = newPatchUrl.await().getOrNull()
-        val finalChampionPatchList = oldUrlChampionResult?.takeIf { it.isNotEmpty() } ?: newUrlChampionResult ?: emptyList()
+        val finalChampionPatchList = oldUrlChampionResult?.takeIf(List<NetworkChampionPatchNote>::isNotEmpty) ?: newUrlChampionResult ?: emptyList()
 
         return@withContext finalChampionPatchList
     }

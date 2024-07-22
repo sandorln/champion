@@ -13,4 +13,6 @@ interface VersionRepository {
     suspend fun refreshVersionList(): Result<Any>
     suspend fun getNotInitCompleteVersionList(): List<Version>
     suspend fun updateVersionData(version: Version)
+
+    suspend fun getLolPatchNoteUrl(major1: Int, minor1: Int): String
 }
