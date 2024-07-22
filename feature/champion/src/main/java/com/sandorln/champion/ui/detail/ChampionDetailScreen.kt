@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,10 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -68,7 +63,6 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.fastJoinToString
 import androidx.constraintlayout.compose.ConstraintSetScope
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.sandorln.champion.util.getResourceId
 import com.sandorln.champion.util.statusCompareColor
 import com.sandorln.design.R
@@ -93,7 +87,6 @@ import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
-import kotlin.math.floor
 import com.sandorln.champion.R as championR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1050,141 +1043,6 @@ fun ChampionSkins(
     }
 }
 
-@Deprecated("챔피언 평가는 사용하지 않는 것으로 Firebase 사용량이 너무 늘어남")
-@Composable
-fun ChampionRating(
-    rating: Float,
-    onClickListener: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = Spacings.Spacing04,
-                vertical = Spacings.Spacing01
-            ),
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween
-    ) {
-        Text(
-            text = "챔피언 평가",
-            style = TextStyles.Title03,
-            color = Colors.Gold02
-        )
-
-        Row(
-            modifier = Modifier
-                .clickable(
-                    enabled = true,
-                    onClick = onClickListener
-                )
-                .background(
-                    color = Colors.Gray09,
-                    shape = RoundedCornerShape(Radius.Radius04)
-                )
-                .border(
-                    width = 1.dp,
-                    color = Colors.BaseColor,
-                    shape = RoundedCornerShape(Radius.Radius04)
-                )
-                .padding(
-                    horizontal = Spacings.Spacing02,
-                    vertical = Spacings.Spacing00
-                )
-        ) {
-            val hasHalfStart = (rating * 10) % 10 > 4
-            val starCount = floor(rating).toInt()
-            val totalStarCount = starCount + if (hasHalfStart) 1 else 0
-
-            repeat(starCount) { _ ->
-                Image(
-                    modifier = Modifier.size(IconSize.MediumSize),
-                    painter = painterResource(id = R.drawable.ic_star),
-                    colorFilter = ColorFilter.tint(Colors.Gold02),
-                    contentDescription = null
-                )
-            }
-            if (hasHalfStart) {
-                Image(
-                    modifier = Modifier.size(IconSize.MediumSize),
-                    painter = painterResource(id = R.drawable.ic_star_half),
-                    colorFilter = ColorFilter.tint(Colors.Gold02),
-                    contentDescription = null
-                )
-            }
-
-            repeat(5 - totalStarCount) {
-                Image(
-                    modifier = Modifier.size(IconSize.MediumSize),
-                    painter = painterResource(id = R.drawable.ic_star),
-                    contentDescription = null
-                )
-            }
-        }
-    }
-}
-
-@Deprecated("Firebase 사용량 때문에 금지")
-@Composable
-fun ChampionRatingEditor(
-    initRating: Int = 0,
-    onDismissListener: () -> Unit,
-    onSubmitListener: (Int) -> Unit
-) {
-    var rating by remember { mutableIntStateOf(initRating) }
-    val enable by remember(rating) { mutableStateOf(rating > 0) }
-
-    BottomSheetDialog(onDismissRequest = onDismissListener) {
-        Column(
-            modifier = Modifier
-                .background(
-                    Colors.Blue07,
-                    RoundedCornerShape(
-                        topStart = Radius.Radius04,
-                        topEnd = Radius.Radius04
-                    )
-                )
-                .fillMaxWidth()
-                .heightIn(min = Dimens.CHAMPION_RATING_BOTTOM_DIALOG_MIN_HEIGHT)
-                .padding(
-                    top = Spacings.Spacing02,
-                    bottom = Spacings.Spacing04
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(Colors.Gray09, RoundedCornerShape(Radius.Radius04))
-                    .width(Spacings.Spacing08)
-                    .height(Spacings.Spacing00)
-            )
-
-            Row {
-                repeat(5) { index ->
-                    val startIndex = index + 1
-                    val isSelectArea = startIndex <= rating
-                    val colorTint = if (isSelectArea) Colors.Gold02 else Colors.BasicBlack
-                    Image(
-                        modifier = Modifier
-                            .size(IconSize.XXLargeSize)
-                            .clickable { rating = startIndex },
-                        painter = painterResource(id = R.drawable.ic_star),
-                        colorFilter = ColorFilter.tint(colorTint),
-                        contentDescription = null
-                    )
-                }
-            }
-
-            Text(
-                text = "선택",
-                style = TextStyles.SubTitle01,
-                color = if (enable) Colors.Gold02 else Colors.Gray07,
-                modifier = Modifier.clickable(enabled = enable) { onSubmitListener.invoke(rating) }
-            )
-        }
-    }
-}
-
 @Preview
 @Composable
 internal fun ChampionDetailInfoTitlePreview() {
@@ -1270,19 +1128,6 @@ internal fun ChampionSkinsPreview() {
         ChampionSkins(
             "14.5.1",
             List(5) { ChampionSkin(name = it.toString()) }
-        )
-    }
-}
-
-@Preview
-@Composable
-internal fun ChampionRatingPreview() {
-    LolChampionThemePreview {
-        ChampionRating(
-            rating = 4.5f,
-            onClickListener = {
-
-            }
         )
     }
 }

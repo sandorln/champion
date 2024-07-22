@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,12 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.component.BaseToolbar
+import com.sandorln.design.component.toast.BaseToast
+import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.setting.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun LolPatchNoteScreen(
@@ -41,6 +45,8 @@ fun LolPatchNoteScreen(
     onBackStack: () -> Unit
 ) {
     val lolPatchList by lolPatchNoteViewModel.allVersionList.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column {
         BaseToolbar(
@@ -51,7 +57,15 @@ fun LolPatchNoteScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             items(lolPatchList.size) { index ->
-                LolPatchNoteBody(lolPatchList[index])
+                LolPatchNoteBody(lolPatch = lolPatchList[index]) { major1: Int, minor1: Int ->
+                    coroutineScope.launch {
+                        val url = lolPatchNoteViewModel.getPatchNoteUrl(major1, minor1)
+                        if (url.isNotEmpty())
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        else
+                            BaseToast(context, BaseToastType.WARNING, context.getString(R.string.lol_patch_url_empty))
+                    }
+                }
             }
         }
     }
@@ -59,17 +73,14 @@ fun LolPatchNoteScreen(
 
 @Composable
 fun LolPatchNoteBody(
-    lolPatch: Pair<Int, Int> = 0 to 0
+    lolPatch: Pair<Int, Int> = 0 to 0,
+    onClickAction: (major1: Int, minor1: Int) -> Unit
 ) {
-    val context = LocalContext.current
-    val url = stringResource(id = R.string.lol_patch_notes_url, lolPatch.first, lolPatch.second)
     val title = stringResource(id = R.string.lol_patch_note_item_title, lolPatch.first, lolPatch.second)
 
     Box(
         modifier = Modifier
-            .clickable {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-            }
+            .clickable { onClickAction.invoke(lolPatch.first, lolPatch.second) }
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .heightIn(min = Dimens.SETTING_MENU_HEIGHT_MIN)

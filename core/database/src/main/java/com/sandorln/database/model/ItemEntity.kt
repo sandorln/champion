@@ -40,10 +40,13 @@ data class ItemEntity(
 
 data class SummaryItemEntity(
     var id: String = "",
+    val depth: Int = 0,
     val name: String = "",
     var image: LOLImageEntity = LOLImageEntity(),
     val tags: List<String> = mutableListOf(),
     val maps: ItemEntity.MapTypeEntity = ItemEntity.MapTypeEntity.NONE,
+    val into: List<String> = mutableListOf(),
+    val gold: ItemEntity.GoldEntity = ItemEntity.GoldEntity()
 )
 
 data class SummaryItemImageEntity(

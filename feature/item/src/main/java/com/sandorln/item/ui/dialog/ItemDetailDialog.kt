@@ -22,9 +22,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -37,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
@@ -61,7 +64,9 @@ fun ItemDetailDialog(
     versionName: String,
     selectedItemId: String,
     itemDetailDialogViewModel: ItemDetailDialogViewModel = hiltViewModel(),
-    onDismissRequest: () -> Unit = {}
+    onAddItemBuildData: (ItemData) -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+    onChangeSelectItem: (String) -> Unit = {}
 ) {
     itemDetailDialogViewModel.initSetIdAndVersion(selectedItemId, versionName)
 
@@ -72,10 +77,9 @@ fun ItemDetailDialog(
     val intoItemImageList by remember { derivedStateOf { uiState.intoSummaryItemList } }
     val currentSpriteMap by itemDetailDialogViewModel.currentSpriteMap.collectAsState()
 
-    val onSelectedItem: (itemId: String) -> Unit = { itemId ->
-        itemDetailDialogViewModel.sendAction(ItemDetailAction.ChangeIdAndVersion(itemId, versionName))
+    LaunchedEffect(key1 = uiState.selectedId) {
+        onChangeSelectItem.invoke(uiState.selectedId)
     }
-
 
     Dialog(onDismissRequest = {
         itemDetailDialogViewModel.sendAction(ItemDetailAction.ClearData)
@@ -98,7 +102,11 @@ fun ItemDetailDialog(
             ItemInfoBody(
                 name = baseItem.name,
                 tags = baseItem.tags,
-                bitmap = baseItem.image.getImageBitmap(currentSpriteMap)
+                bitmap = baseItem.image.getImageBitmap(currentSpriteMap),
+                onAddItemBuildData = {
+                    onAddItemBuildData.invoke(baseItem)
+                    onDismissRequest.invoke()
+                }
             )
 
             HorizontalDivider(
@@ -161,7 +169,7 @@ fun ItemDetailDialog(
                     TotalIntoItemListBody(
                         intoItemImageList = intoItemImageList,
                         spriteBitmapMap = currentSpriteMap,
-                        onSelectedItem = onSelectedItem
+                        onSelectedItem = onChangeSelectItem
                     )
                     Spacer(modifier = Modifier.height(Spacings.Spacing03))
                 }
@@ -181,7 +189,7 @@ fun ItemDetailDialog(
                         modifier = Modifier.padding(horizontal = Spacings.Spacing03),
                         itemCombination = itemCombination,
                         spriteBitmapMap = currentSpriteMap,
-                        onSelectItem = onSelectedItem
+                        onSelectItem = onChangeSelectItem
                     )
                 }
             }
@@ -331,44 +339,80 @@ fun ItemStatusBody(
 fun ItemInfoBody(
     name: String = "",
     bitmap: Bitmap? = null,
-    tags: Set<ItemTagType> = emptySet()
+    tags: Set<ItemTagType> = emptySet(),
+    onAddItemBuildData: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = Spacings.Spacing03)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BaseBitmapImage(
-            bitmap = bitmap,
-            loadingDrawableId = R.drawable.ic_main_item
-        )
-
-        Column(
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = Spacings.Spacing00,
-                    vertical = Spacings.Spacing02
-                ),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+                .padding(horizontal = Spacings.Spacing03)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = name,
-                style = TextStyles.SubTitle03,
-                color = Colors.Gold04
+            BaseBitmapImage(
+                bitmap = bitmap,
+                loadingDrawableId = R.drawable.ic_main_item
             )
 
-            if (tags.isNotEmpty()) {
-                Row(
-                    modifier = Modifier.horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
-                ) {
-                    tags.forEach {
-                        ItemTag(itemTagType = it)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = Spacings.Spacing00,
+                        vertical = Spacings.Spacing02
+                    ),
+                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+            ) {
+                Text(
+                    text = name,
+                    style = TextStyles.SubTitle03,
+                    color = Colors.Gold04
+                )
+
+                if (tags.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+                    ) {
+                        tags.forEach {
+                            ItemTag(itemTagType = it)
+                        }
                     }
                 }
             }
+        }
+
+        Spacer(modifier = Modifier.height(Spacings.Spacing00))
+
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onAddItemBuildData)
+                .border(
+                    0.5.dp,
+                    Colors.Gold04,
+                    RoundedCornerShape(Radius.Radius08)
+                )
+                .padding(
+                    horizontal = Spacings.Spacing01,
+                    vertical = 2.dp
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+        ) {
+            Text(
+                text = "아이템 빌드 추가",
+                style = TextStyles.Body04,
+                color = Colors.BaseColor
+            )
+
+            Icon(
+                modifier = Modifier.size(IconSize.SmallSize),
+                painter = painterResource(id = R.drawable.ic_add),
+                contentDescription = null,
+                tint = Colors.BaseColor
+            )
         }
     }
 }
@@ -505,7 +549,9 @@ fun ItemDetailDialogPreView() {
     LolChampionThemePreview {
         ItemDetailDialog(
             versionName = "",
-            selectedItemId = ""
+            selectedItemId = "",
+            onAddItemBuildData = {},
+            onChangeSelectItem = {}
         )
     }
 }
@@ -515,7 +561,8 @@ fun ItemDetailDialogPreView() {
 fun ItemInfoBodyPreView() {
     LolChampionThemePreview {
         ItemInfoBody(
-            "장화"
+            "장화",
+            onAddItemBuildData = {}
         )
     }
 }

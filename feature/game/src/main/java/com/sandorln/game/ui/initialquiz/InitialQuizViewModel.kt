@@ -2,7 +2,6 @@ package com.sandorln.game.ui.initialquiz
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.domain.usecase.game.UpdateLocalMaxGameScore
 import com.sandorln.domain.usecase.item.GetInitialQuizItemListByVersion
 import com.sandorln.domain.usecase.version.GetCurrentVersion
@@ -13,7 +12,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
@@ -34,6 +32,7 @@ class InitialQuizViewModel @Inject constructor(
     companion object {
         const val INIT_READY_TIME = 3f
         const val INIT_GAME_TIME = 60f
+        const val INIT_VERSION_NAME = "14.13.1"
     }
 
     val totalRoundCount: Int = 10
@@ -54,9 +53,6 @@ class InitialQuizViewModel @Inject constructor(
     private val _uiMutex = Mutex()
     private val _uiState = MutableStateFlow(InitialQuizUiState())
     val uiState = _uiState.asStateFlow()
-
-    private val _sideEffect = MutableSharedFlow<InitialQuizSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
 
     private val _action = MutableSharedFlow<InitialQuizAction>()
     fun sendAction(initialQuizAction: InitialQuizAction) {
@@ -163,7 +159,7 @@ class InitialQuizViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
-                val latestVersion = currentVersion.invoke().firstOrNull()?.name ?: "14.12.1"
+                val latestVersion = currentVersion.invoke().firstOrNull()?.name ?: INIT_VERSION_NAME
 
                 getInitialQuizItemListByVersion
                     .invoke(latestVersion)
@@ -209,11 +205,6 @@ class InitialQuizViewModel @Inject constructor(
             }
         }
     }
-}
-
-sealed interface InitialQuizSideEffect {
-    @Deprecated("게임 중 TOAST 띄우면 입력메세지 밀리는 현상 발생")
-    data class ShowToastMessage(val messageType: BaseToastType, val message: String) : InitialQuizSideEffect
 }
 
 sealed interface InitialQuizAction {

@@ -2,8 +2,6 @@ package com.sandorln.data.repository.version
 
 import com.sandorln.data.util.asData
 import com.sandorln.data.util.asEntity
-import com.sandorln.database.dao.ChampionDao
-import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.VersionEntity
 import com.sandorln.datastore.local.version.VersionDatasource
@@ -78,4 +76,7 @@ class DefaultVersionRepository @Inject constructor(
     override suspend fun updateVersionData(version: Version) {
         versionDao.insertVersion(version.asEntity())
     }
+
+    override suspend fun getLolPatchNoteUrl(major1: Int, minor1: Int): String =
+        versionService.getLolPatchNoteUrl(major1, minor1)
 }

@@ -9,6 +9,10 @@ import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
+import com.sandorln.item.R
+import com.sandorln.item.model.ItemBuildException
+import com.sandorln.item.util.getStatusList
+import com.sandorln.item.util.getUniqueStatusList
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
@@ -18,11 +22,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -41,8 +47,48 @@ class ItemHomeViewModel @Inject constructor(
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
     getCurrentVersion: GetCurrentVersion
 ) : ViewModel() {
+    companion object {
+        const val ITEM_BUILD_MAX_COUNT = 6
+        const val ITEM_LEGEND_DEPTH = 3
+        private val SUPPORT_ITEM_ID_LIST = listOf("3869", "3870", "3871", "3876", "3877", "4643", "4638") // 서폿 아이템 ID
+    }
+
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
+    private val _itemBuildList: StateFlow<List<ItemData>> = _itemUiState
+        .distinctUntilChangedBy { it.itemBuildList }
+        .map { it.itemBuildList }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val itemBuildStatus = _itemBuildList
+        .map { itemDataList ->
+            val totalStatus: MutableMap<String, Pair<Int, String>> = mutableMapOf()
+
+            itemDataList
+                .map(ItemData::getStatusList)
+                .forEach { itemStatusList ->
+                    itemStatusList.forEach { (title, value, suffix) ->
+                        val defaultStatus = totalStatus[title + suffix] ?: Pair(0, "")
+                        val sumValue = defaultStatus.first + value
+                        totalStatus[title + suffix] = sumValue to suffix
+                    }
+                }
+
+            totalStatus.toSortedMap()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    val itemBuildUniqueList = _itemBuildList
+        .map { itemDataList ->
+            itemDataList
+                .map(ItemData::getUniqueStatusList)
+                .distinctBy { it.first }
+                .filter { it.second.isNotEmpty() }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    val itemBuildGold = _itemBuildList
+        .map { itemBuildList -> itemBuildList.sumOf { itemData -> itemData.gold.total } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 
     private val _itemAction = MutableSharedFlow<ItemHomeAction>()
     fun sendAction(itemHomeAction: ItemHomeAction) = viewModelScope.launch {
@@ -52,9 +98,10 @@ class ItemHomeViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ItemHomeSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    private val _itemFilter: suspend (ItemHomeUiState, List<ItemData>, List<String>) -> List<ItemData> = { uiState, itemList, newItemIdList ->
+    private val _itemFilterTransform: suspend (ItemHomeUiState, List<ItemData>, List<String>) -> List<ItemData> = { uiState, itemList, newItemIdList ->
+        val itemListIdMap = itemList.associateBy(ItemData::id)
         val searchKeyword = uiState.searchKeyword
-        val selectMapType = uiState.isSelectMapType
+        val selectMapType = uiState.selectMapType
         val filterItemList = if (uiState.isSelectNewItem) {
             itemList.fastFilter { newItemIdList.contains(it.id) }
         } else {
@@ -62,7 +109,8 @@ class ItemHomeViewModel @Inject constructor(
         }
 
         filterItemList.filter { item ->
-            if (!item.inStore) return@filter false
+            val isMutationItem = item.gold.total == 0 && item.gold.sell == 0
+            if (isMutationItem) return@filter false
 
             /* Tag Type Filter */
             when {
@@ -78,6 +126,28 @@ class ItemHomeViewModel @Inject constructor(
                 isMatchMapType || isItemAllType -> item.name.contains(searchKeyword)
                 else -> false
             }
+        }.run {
+            if (selectMapType == MapType.ARAM || selectMapType == MapType.SUMMONER_RIFT) {
+                map { itemData ->
+                    if (itemData.depth == 0 || itemData.tags.contains(ItemTagType.Consumable)) return@map itemData
+
+                    val firstIntoItem = itemListIdMap[itemData.into.firstOrNull()]
+                    val firstFromItem = itemListIdMap[itemData.from.firstOrNull()]
+
+                    val isPreOrnnItem = itemData.into.size == 1 && (firstIntoItem?.gold?.total ?: 0) == itemData.gold.total
+                    val isNotOrrnItem = SUPPORT_ITEM_ID_LIST.none { it == itemData.id }
+                    val isOrnnItem = itemData.from.size == 1 && (firstFromItem?.gold?.total ?: 0) == itemData.gold.total && isNotOrrnItem
+                    val isLegendItem = itemData.into.isEmpty()
+
+                    when {
+                        isPreOrnnItem -> itemData.copy(depth = ITEM_LEGEND_DEPTH)
+                        isOrnnItem -> itemData.copy(depth = Int.MAX_VALUE)
+                        isLegendItem -> itemData.copy(depth = ITEM_LEGEND_DEPTH)
+                        else -> itemData
+                    }
+                }
+            } else
+                map { itemData -> itemData.copy(depth = 1) }
         }
     }
 
@@ -88,7 +158,7 @@ class ItemHomeViewModel @Inject constructor(
 
     val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Item).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemIdList, _itemFilter)
+    val displayItemList = combine(_itemUiState, _currentItemList, _currentNewItemIdList, _itemFilterTransform)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
@@ -102,7 +172,8 @@ class ItemHomeViewModel @Inject constructor(
                         _itemMutex.withLock {
                             _itemUiState.update {
                                 it.copy(
-                                    currentVersionName = version
+                                    currentVersionName = version,
+                                    itemBuildList = emptyList()
                                 )
                             }
                         }
@@ -132,7 +203,7 @@ class ItemHomeViewModel @Inject constructor(
                             }
 
                             is ItemHomeAction.ChangeMapTypeFilter -> {
-                                _itemUiState.emit(currentUiState.copy(isSelectMapType = action.mapType))
+                                _itemUiState.emit(currentUiState.copy(selectMapType = action.mapType))
                             }
 
                             is ItemHomeAction.ToggleItemTagType -> {
@@ -152,6 +223,52 @@ class ItemHomeViewModel @Inject constructor(
 
                             is ItemHomeAction.SelectItemData -> {
                                 _itemUiState.emit(currentUiState.copy(selectedItemId = action.itemDataId))
+                            }
+
+                            is ItemHomeAction.AddItemBuild -> {
+                                val itemBuildList = _itemUiState.value.itemBuildList
+                                val addItemData = action.itemData
+                                val shouldAddItemBuildList = itemBuildList.size < ITEM_BUILD_MAX_COUNT
+                                val hasSameLegendItem = addItemData.depth >= ITEM_LEGEND_DEPTH && itemBuildList.any { it.id == addItemData.id }
+
+                                when {
+                                    !shouldAddItemBuildList -> {
+                                        _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotShouldAddItemSize))
+                                    }
+
+                                    hasSameLegendItem -> {
+                                        _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotAddSameLegendItem))
+                                    }
+
+                                    else -> {
+                                        _itemUiState.update { uiState ->
+                                            val itemBuildSet = uiState
+                                                .itemBuildList
+                                                .toMutableList()
+                                                .apply {
+                                                    add(addItemData)
+                                                }
+
+                                            uiState.copy(itemBuildList = itemBuildSet)
+                                        }
+                                        _sideEffect.emit(
+                                            ItemHomeSideEffect.ShowMessage(R.string.item_build_success)
+                                        )
+                                    }
+                                }
+                            }
+
+                            is ItemHomeAction.DeleteItemBuild -> {
+                                runCatching {
+                                    _itemUiState.update { uiState ->
+                                        val itemBuildList = uiState
+                                            .itemBuildList
+                                            .toMutableList()
+                                            .apply { removeAt(action.index) }
+
+                                        uiState.copy(itemBuildList = itemBuildList)
+                                    }
+                                }
                             }
                         }
                     }
@@ -181,11 +298,12 @@ class ItemHomeViewModel @Inject constructor(
 data class ItemHomeUiState(
     val isLoading: Boolean = false,
     val searchKeyword: String = "",
-    val isSelectMapType: MapType = MapType.SUMMONER_RIFT,
+    val selectMapType: MapType = MapType.SUMMONER_RIFT,
     val selectTag: Set<ItemTagType> = emptySet(),
     val isSelectNewItem: Boolean = false,
     val selectedItemId: String? = null,
-    val currentVersionName: String = ""
+    val currentVersionName: String = "",
+    val itemBuildList: List<ItemData> = listOf()
 )
 
 sealed interface ItemHomeAction {
@@ -196,8 +314,11 @@ sealed interface ItemHomeAction {
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
+    data class AddItemBuild(val itemData: ItemData) : ItemHomeAction
+    data class DeleteItemBuild(val index: Int) : ItemHomeAction
 }
 
 sealed interface ItemHomeSideEffect {
+    data class ShowMessage(val stringId: Int) : ItemHomeSideEffect
     data class ShowErrorMessage(val exception: Exception) : ItemHomeSideEffect
 }

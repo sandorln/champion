@@ -1,21 +1,16 @@
 package com.sandorln.network.service
 
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.installations.FirebaseInstallations
 import com.sandorln.network.BuildConfig
-import com.sandorln.network.model.FireStoreDocument
 import com.sandorln.network.model.champion.NetworkChampion
 import com.sandorln.network.model.champion.NetworkChampionDetail
 import com.sandorln.network.model.champion.NetworkChampionPatchNote
 import com.sandorln.network.model.response.BaseLolResponse
-import com.sandorln.network.util.getLolDocument
-import com.sandorln.network.util.getUserId
 import com.sandorln.network.util.toNetworkChampionPatchNoteList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import javax.inject.Inject
@@ -23,8 +18,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ChampionService @Inject constructor(
-    private val ktorClient: HttpClient,
-    private val fireDB: FirebaseFirestore
+    private val ktorClient: HttpClient
 ) {
     /**
      * 해당 버전의 간략한 챔피온 정보 가져오기
@@ -51,51 +45,25 @@ class ChampionService @Inject constructor(
             .split('.')
             .map { it.toInt() }
 
-        /* Version 이 10보다 낮을 시 패치노트가 존재하지 않음 */
         if (major1 < 10) return@withContext emptyList()
 
-        val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
-        return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
-    }
-
-    /**
-     * @return Total Rating & User Writing Rating
-     */
-    @Deprecated("Firebase 사용량 때문에 금지")
-    suspend fun getChampionRating(championName: String): Pair<Float, Int> {
-        val id = FirebaseInstallations.getInstance().getUserId()
-        var writingRating = 0
-        val ratingList = fireDB
-            .getLolDocument(FireStoreDocument.RATING)
-            .collection(championName.lowercase())
-            .get()
-            .await()
-            .documents
-            .mapNotNull {
-                val rating = runCatching { it.data?.get("rating") as Number }.getOrNull()
-                if (it.id == id) writingRating = rating?.toInt() ?: 0
-                rating
+        val oldPatchUrl = async {
+            runCatching {
+                val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
+                Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
             }
+        }
+        val newPatchUrl = async {
+            runCatching {
+                val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/lol-patch-$major1-$minor1-notes/"
+                Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
+            }
+        }
 
-        val totalRating = ratingList.sumOf { it.toDouble() }.toFloat()
-        val totalCount = ratingList.size
+        val oldUrlChampionResult = oldPatchUrl.await().getOrNull()
+        val newUrlChampionResult = newPatchUrl.await().getOrNull()
+        val finalChampionPatchList = oldUrlChampionResult?.takeIf(List<NetworkChampionPatchNote>::isNotEmpty) ?: newUrlChampionResult ?: emptyList()
 
-        return if (totalCount > 0)
-            (runCatching { totalRating / totalCount }.getOrNull() ?: 0f) to writingRating
-        else
-            0f to writingRating
-    }
-
-    @Deprecated("Firebase 사용량 때문에 금지")
-    suspend fun setChampionRating(championName: String, rating: Int) {
-        val id = FirebaseInstallations.getInstance().getUserId()
-        val data = mapOf("rating" to rating)
-
-        fireDB
-            .getLolDocument(FireStoreDocument.RATING)
-            .collection(championName.lowercase())
-            .document(id)
-            .set(data)
-            .await()
+        return@withContext finalChampionPatchList
     }
 }

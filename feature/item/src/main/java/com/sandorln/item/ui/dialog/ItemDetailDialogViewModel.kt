@@ -87,12 +87,6 @@ class ItemDetailDialogViewModel @Inject constructor(
                                     it.copy(isShowPreviousItem = !it.isShowPreviousItem)
                                 }
                             }
-
-                            is ItemDetailAction.ChangeIdAndVersion -> {
-                                val id = action.selectedId
-                                val version = action.version
-                                changeData(id, version)
-                            }
                         }
                     }
                 }
@@ -104,8 +98,6 @@ class ItemDetailDialogViewModel @Inject constructor(
 sealed interface ItemDetailAction {
     data object ClearData : ItemDetailAction
     data object ToggleShowPreviousItem : ItemDetailAction
-
-    data class ChangeIdAndVersion(val selectedId: String, val version: String) : ItemDetailAction
 }
 
 data class ItemDetailUiState(

@@ -26,7 +26,9 @@ fun ItemEntity.asData(): ItemData = ItemData(
 
 fun SummaryItemEntity.asData(): ItemData = ItemData(
     id = id,
+    depth = depth,
     name = name,
+    into = into,
     tags = tags.asItemTagTypeSet(),
     image = image.asData(),
     mapType = maps.asData()

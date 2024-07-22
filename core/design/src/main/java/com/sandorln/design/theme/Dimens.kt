@@ -55,7 +55,7 @@ object Dimens {
     const val CHAMPION_SPLASH_RATIO = 1.694f
     const val CHAMPION_SKILL_VIDEO_RATIO = 1.48f
 
-    val CHAMPION_PATCH_MIN_HEIGHT = 120.dp
+    val CHAMPION_PATCH_MIN_HEIGHT = 130.dp
     val CHAMPION_RATING_BOTTOM_DIALOG_MIN_HEIGHT = 120.dp
 
     val INITIAL_ITEM_STATUS_BODY_WIDTH_MAX = 320.dp
@@ -63,6 +63,7 @@ object Dimens {
     val GAME_READY_TIME_PROGRESS = 240.dp
 
     val INITIAL_GAME_TITLE_SIZE = 40.dp
+    val ITEM_BUILD_PEEK_HEIGHT = 65.dp
 }
 
 object AnimationConfig {
