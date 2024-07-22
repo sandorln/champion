@@ -1,21 +1,16 @@
 package com.sandorln.network.service
 
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.installations.FirebaseInstallations
 import com.sandorln.network.BuildConfig
-import com.sandorln.network.model.FireStoreDocument
 import com.sandorln.network.model.champion.NetworkChampion
 import com.sandorln.network.model.champion.NetworkChampionDetail
 import com.sandorln.network.model.champion.NetworkChampionPatchNote
 import com.sandorln.network.model.response.BaseLolResponse
-import com.sandorln.network.util.getLolDocument
-import com.sandorln.network.util.getUserId
 import com.sandorln.network.util.toNetworkChampionPatchNoteList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import javax.inject.Inject
@@ -50,13 +45,25 @@ class ChampionService @Inject constructor(
             .split('.')
             .map { it.toInt() }
 
-        /* Version 이 10보다 낮을 시 패치노트가 존재하지 않음 */
         if (major1 < 10) return@withContext emptyList()
 
-        val url = if (major1 < 14 || (major1 == 14 && minor1 < 13))
-            "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
-        else
-            "https://www.leagueoflegends.com/ko-kr/news/game-updates/lol-patch-$major1-$minor1-notes/"
-        return@withContext Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
+        val oldPatchUrl = async {
+            runCatching {
+                val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
+                Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
+            }
+        }
+        val newPatchUrl = async {
+            runCatching {
+                val url = "https://www.leagueoflegends.com/ko-kr/news/game-updates/lol-patch-$major1-$minor1-notes/"
+                Jsoup.connect(url).get().toNetworkChampionPatchNoteList()
+            }
+        }
+
+        val oldUrlChampionResult = oldPatchUrl.await().getOrNull()
+        val newUrlChampionResult = newPatchUrl.await().getOrNull()
+        val finalChampionPatchList = oldUrlChampionResult?.takeIf { it.isNotEmpty() } ?: newUrlChampionResult ?: emptyList()
+
+        return@withContext finalChampionPatchList
     }
 }
