@@ -2,7 +2,6 @@ package com.sandorln.game.ui.initialquiz
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.domain.usecase.game.UpdateLocalMaxGameScore
 import com.sandorln.domain.usecase.item.GetInitialQuizItemListByVersion
 import com.sandorln.domain.usecase.version.GetCurrentVersion
@@ -13,7 +12,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
@@ -34,7 +32,7 @@ class InitialQuizViewModel @Inject constructor(
     companion object {
         const val INIT_READY_TIME = 3f
         const val INIT_GAME_TIME = 60f
-        const val INIT_VERSION_NAMe = "14.13.1"
+        const val INIT_VERSION_NAME = "14.13.1"
     }
 
     val totalRoundCount: Int = 10
@@ -161,7 +159,7 @@ class InitialQuizViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
-                val latestVersion = currentVersion.invoke().firstOrNull()?.name ?: INIT_VERSION_NAMe
+                val latestVersion = currentVersion.invoke().firstOrNull()?.name ?: INIT_VERSION_NAME
 
                 getInitialQuizItemListByVersion
                     .invoke(latestVersion)
