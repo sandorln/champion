@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,11 +22,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -51,7 +52,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.sandorln.champion.util.getResourceId
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
@@ -66,7 +66,6 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.champion.SummaryChampion
-import com.sandorln.model.type.ChampionTag
 import kotlinx.coroutines.launch
 import kotlin.math.floor
 import com.sandorln.champion.R as championR
@@ -195,8 +194,11 @@ fun ChampionHomeScreen(
                         }.getOrNull()
 
                         if (champion != null) {
+                            val isPatchNoteTarget = championPatchNoteList?.any { it.title == champion.name } == true
+
                             ChampionBody(
                                 champion = champion,
+                                isPatchNoteTarget = isPatchNoteTarget,
                                 currentSpriteMap = currentSpriteMap,
                                 moveToChampionDetailScreen = {
                                     moveToChampionDetailScreen.invoke(champion.id, currentVersion)
@@ -215,6 +217,7 @@ fun ChampionHomeScreen(
 @Composable
 private fun ChampionBody(
     modifier: Modifier = Modifier,
+    isPatchNoteTarget: Boolean = false,
     champion: SummaryChampion = SummaryChampion(),
     currentSpriteMap: Map<String, Bitmap?>,
     moveToChampionDetailScreen: () -> Unit,
@@ -233,15 +236,33 @@ private fun ChampionBody(
             imageSize = IconSize.XXLargeSize
         )
 
-        Text(
-            modifier = Modifier.padding(vertical = 1.dp),
-            text = champion.name,
-            style = TextStyles.Body03.copy(fontSize = 8.sp),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-            color = Colors.Gold02
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(
+                space = Spacings.Spacing00,
+                alignment = Alignment.CenterHorizontally
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (isPatchNoteTarget)
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(
+                            color = Colors.Green00,
+                            shape = CircleShape
+                        )
+                )
+
+            Text(
+                modifier = Modifier.padding(vertical = 1.dp),
+                text = champion.name,
+                style = TextStyles.Body03.copy(fontSize = 8.sp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                color = Colors.Gold02
+            )
+        }
     }
 }
 
@@ -352,7 +373,8 @@ fun ChampionPatchNoteBody(championPatchNote: ChampionPatchNote) {
         modifier = Modifier
             .heightIn(min = Dimens.CHAMPION_PATCH_MIN_HEIGHT)
             .fillMaxWidth()
-            .padding(horizontal = Spacings.Spacing05),
+            .padding(horizontal = Spacings.Spacing05)
+            .padding(bottom = Spacings.Spacing05),
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
     ) {
         Row(
