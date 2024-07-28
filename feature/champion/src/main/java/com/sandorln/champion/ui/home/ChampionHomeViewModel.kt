@@ -9,6 +9,7 @@ import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.champion.ChampionPatchNote
+import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.type.ChampionTag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,6 +79,17 @@ class ChampionHomeViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
+    val patchNoteChampionList = displayChampionList
+        .combine(
+            _championUiState.map { uiState ->
+                uiState.championPatchNoteList?.map(ChampionPatchNote::title)
+            }
+        ) { championList, patchTitleList ->
+            if (patchTitleList.isNullOrEmpty()) return@combine emptyList<SummaryChampion>()
+
+            championList.filter { patchTitleList.contains(it.name) }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
     init {
         viewModelScope.launch {
             launch {
@@ -139,7 +151,7 @@ class ChampionHomeViewModel @Inject constructor(
 
             launch {
                 currentVersion
-                    .collectLatest {version->
+                    .collectLatest { version ->
                         _championMutex.withLock {
                             _championUiState.update { it.copy(championPatchNoteList = null) }
                             val championPatchNoteList = getChampionPatchNoteList.invoke(version).getOrNull() ?: emptyList()
