@@ -12,14 +12,10 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.Before
 import org.junit.Test
-import kotlin.system.measureTimeMillis
-import kotlin.time.measureTime
 
 class ConnectTest {
     private lateinit var _versionService: VersionService
@@ -104,6 +100,19 @@ class ConnectTest {
                     println("서머너스펠 정보가져오기 ERROR : $it")
                 }
             )
+        }
+    }
+
+    @Test
+    fun 아이템_패치노트_가져오기() {
+        runBlocking {
+            runCatching {
+                _itemService.getItemPathNoteList("14.15.1")
+            }.onSuccess {
+                println("이번 아이템 패치 노트 : $it")
+            }.onFailure {
+                println("아이템 패치 노트 읽어오기 실패 : $it")
+            }
         }
     }
 }
