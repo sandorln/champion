@@ -55,4 +55,7 @@
     <string name="item_build_success">아이템 빌드에 추가했습니다!</string>
     <string name="item_build_should_add_error">더이상 아이템을 추가할 수 없습니다</string>
     <string name="item_build_same_legend_error">동일한 전설급 아이템은 추가할 수 없습니다</string>
+
+    <string name="item_patch_note_title">아이템 패치노트</string>
+    <string name="item_patch_note_loading_title">아이템 패치노트 불러오는 중</string>
 </resources>

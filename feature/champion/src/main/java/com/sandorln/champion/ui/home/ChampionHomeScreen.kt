@@ -7,7 +7,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,10 +18,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -80,6 +79,7 @@ fun ChampionHomeScreen(
     val context = LocalContext.current
     val currentVersion by championHomeViewModel.currentVersion.collectAsState()
     val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
+    val currentPatchChampionList by championHomeViewModel.patchNoteChampionList.collectAsState()
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by championHomeViewModel.championUiState.collectAsState()
     val championPatchNoteList = uiState.championPatchNoteList
@@ -87,6 +87,10 @@ fun ChampionHomeScreen(
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PULL_HEIGHT
     )
+
+    val onClickChampionBody: (SummaryChampion) -> Unit = {
+        moveToChampionDetailScreen.invoke(it.id, currentVersion)
+    }
 
     LaunchedEffect(true) {
         championHomeViewModel
@@ -115,6 +119,8 @@ fun ChampionHomeScreen(
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
         val chunkChampionList = currentChampionList.chunked(spanCount)
+        val chunkPatchChampionList = currentPatchChampionList.chunked(spanCount)
+
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
@@ -183,33 +189,23 @@ fun ChampionHomeScreen(
                 }
             }
 
-            items(chunkChampionList.size) { columnIndex ->
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    items(spanCount) { rowIndex ->
-                        val champion = runCatching {
-                            chunkChampionList[columnIndex][rowIndex]
-                        }.getOrNull()
+            if (chunkPatchChampionList.isNotEmpty())
+                baseChampionList(
+                    title = "패치 된 챔피온",
+                    spanCount = spanCount,
+                    chunckChampionList = chunkPatchChampionList,
+                    currentSpriteMap = currentSpriteMap,
+                    onClickChampion = onClickChampionBody
+                )
 
-                        if (champion != null) {
-                            val isPatchNoteTarget = championPatchNoteList?.any { it.title == champion.name } == true
-
-                            ChampionBody(
-                                champion = champion,
-                                isPatchNoteTarget = isPatchNoteTarget,
-                                currentSpriteMap = currentSpriteMap,
-                                moveToChampionDetailScreen = {
-                                    moveToChampionDetailScreen.invoke(champion.id, currentVersion)
-                                }
-                            )
-                        } else {
-                            Spacer(modifier = Modifier.width(IconSize.XXLargeSize))
-                        }
-                    }
-                }
-            }
+            if (chunkChampionList.isNotEmpty())
+                baseChampionList(
+                    title = "챔피온",
+                    spanCount = spanCount,
+                    chunckChampionList = chunkChampionList,
+                    currentSpriteMap = currentSpriteMap,
+                    onClickChampion = onClickChampionBody
+                )
         }
     }
 }
@@ -217,7 +213,6 @@ fun ChampionHomeScreen(
 @Composable
 private fun ChampionBody(
     modifier: Modifier = Modifier,
-    isPatchNoteTarget: Boolean = false,
     champion: SummaryChampion = SummaryChampion(),
     currentSpriteMap: Map<String, Bitmap?>,
     moveToChampionDetailScreen: () -> Unit,
@@ -236,37 +231,65 @@ private fun ChampionBody(
             imageSize = IconSize.XXLargeSize
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(
-                space = Spacings.Spacing00,
-                alignment = Alignment.CenterHorizontally
-            ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (isPatchNoteTarget)
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .background(
-                            color = Colors.Green00,
-                            shape = CircleShape
-                        )
-                )
+        Text(
+            modifier = Modifier.padding(vertical = 1.dp),
+            text = champion.name,
+            style = TextStyles.Body03.copy(fontSize = 8.sp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            color = Colors.Gold02,
+        )
+    }
+}
 
-            Text(
-                modifier = Modifier.padding(vertical = 1.dp),
-                text = champion.name,
-                style = TextStyles.Body03.copy(fontSize = 8.sp),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                color = Colors.Gold02
-            )
+private fun LazyListScope.baseChampionList(
+    title: String,
+    spanCount: Int = 5,
+    chunckChampionList: List<List<SummaryChampion>> = mutableListOf(),
+    currentSpriteMap: Map<String, Bitmap?>,
+    onClickChampion: (SummaryChampion) -> Unit
+) {
+    item {
+        Text(
+            modifier = Modifier.padding(
+                start = Spacings.Spacing01,
+                top = Spacings.Spacing03,
+                bottom = Spacings.Spacing00
+            ),
+            text = title,
+            style = TextStyles.Body02,
+            color = Colors.Gray05
+        )
+    }
+
+    items(chunckChampionList.size) { columnIndex ->
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            items(spanCount) { rowIndex ->
+                val champion = runCatching {
+                    chunckChampionList[columnIndex][rowIndex]
+                }.getOrNull()
+
+                if (champion != null) {
+                    ChampionBody(
+                        champion = champion,
+                        currentSpriteMap = currentSpriteMap,
+                        moveToChampionDetailScreen = {
+                            onClickChampion.invoke(champion)
+                        }
+                    )
+                } else {
+                    Spacer(modifier = Modifier.width(IconSize.XXLargeSize))
+                }
+            }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChampionPatchNoteListBody(
     championPatchNoteList: List<ChampionPatchNote>,
