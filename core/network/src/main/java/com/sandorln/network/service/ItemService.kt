@@ -1,8 +1,8 @@
 package com.sandorln.network.service
 
 import com.sandorln.network.BuildConfig
-import com.sandorln.network.model.NetworkItem
-import com.sandorln.network.model.champion.NetworkItemPatchNote
+import com.sandorln.network.model.item.NetworkItem
+import com.sandorln.network.model.item.NetworkItemPatchNote
 import com.sandorln.network.model.response.BaseLolResponse
 import com.sandorln.network.util.toNetworkItemPatchNoteList
 import io.ktor.client.HttpClient

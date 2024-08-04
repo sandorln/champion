@@ -1,7 +1,7 @@
 package com.sandorln.network.util
 
 import com.sandorln.network.model.champion.NetworkChampionPatchNote
-import com.sandorln.network.model.champion.NetworkItemPatchNote
+import com.sandorln.network.model.item.NetworkItemPatchNote
 import org.jsoup.nodes.Element
 
 fun Element.toNetworkChampionPatchNoteList(): List<NetworkChampionPatchNote> = getElementsByClass("patch-change-block white-stone accent-before")

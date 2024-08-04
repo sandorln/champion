@@ -509,8 +509,6 @@ fun FilterSelectBody(
         }
 
         Spacer(modifier = Modifier.height(Spacings.Spacing02))
-
-        HorizontalDivider()
     }
 }
 

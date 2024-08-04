@@ -8,7 +8,9 @@ import com.sandorln.database.model.ItemEntity
 import com.sandorln.datastore.local.version.VersionDatasource
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.data.item.ItemPatchNote
 import com.sandorln.model.data.item.SummaryItemImage
+import com.sandorln.network.model.item.NetworkItemPatchNote
 import com.sandorln.network.service.ItemService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,4 +64,7 @@ class DefaultItemRepository @Inject constructor(
 
     override suspend fun getSummaryItemImage(id: String, versionName: String): SummaryItemImage? =
         itemDao.getSummaryItemImage(id, versionName).firstOrNull()?.asData()
+
+    override suspend fun getItemPatchList(version: String): List<ItemPatchNote> =
+        itemService.getItemPathNoteList(version).map(NetworkItemPatchNote::asData)
 }

@@ -6,9 +6,3 @@ data class NetworkChampionPatchNote(
     val summary: String,
     val detailPathStory: String
 )
-
-data class NetworkItemPatchNote(
-    val itemName: String,
-    val image: String,
-    val detailPathList: List<String>
-)
