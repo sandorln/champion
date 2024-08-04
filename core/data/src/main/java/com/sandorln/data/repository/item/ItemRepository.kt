@@ -2,6 +2,7 @@ package com.sandorln.data.repository.item
 
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.data.item.ItemPatchNote
 import com.sandorln.model.data.item.SummaryItemImage
 import kotlinx.coroutines.flow.Flow
 
@@ -19,4 +20,6 @@ interface ItemRepository {
     suspend fun getItemCombination(id: String, version: String): ItemCombination
 
     suspend fun getSummaryItemImage(id: String, versionName: String): SummaryItemImage?
+
+    suspend fun getItemPatchList(version: String): List<ItemPatchNote>
 }

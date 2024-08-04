@@ -1,6 +1,7 @@
 package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
@@ -24,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SheetValue
@@ -71,7 +74,7 @@ import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
 import com.sandorln.model.type.ItemTagType
 import kotlin.math.floor
-import com.sandorln.item.R as itemR
+import com.sandorln.item.R as ItemR
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -79,6 +82,7 @@ fun ItemHomeScreen(
     itemHomeViewModel: ItemHomeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val currentVersion by itemHomeViewModel.currentVersion.collectAsState()
     val currentItemList by itemHomeViewModel.displayItemList.collectAsState()
     val currentSpriteMap by itemHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by itemHomeViewModel.itemUiState.collectAsState()
@@ -90,18 +94,18 @@ fun ItemHomeScreen(
     val (orrnItemList, legendItemList) = notEpicItemList.partition { it.depth == Int.MAX_VALUE }
 
     val selectedItemId = uiState.selectedItemId
-    val currentVersion = uiState.currentVersionName
     val itemBuildList = uiState.itemBuildList
+    val itemPatchNoteList = uiState.itemPatchList
     val totalItemBuildStatus by itemHomeViewModel.itemBuildStatus.collectAsState()
     val totalItemBuildUniqueList by itemHomeViewModel.itemBuildUniqueList.collectAsState()
     val totalItemBuildGold by itemHomeViewModel.itemBuildGold.collectAsState()
 
-    val bootsTitle = stringResource(id = itemR.string.item_boots)
-    val consumableTitle = stringResource(id = itemR.string.item_consumable)
-    val normalTitle = stringResource(id = itemR.string.item_normal)
-    val epicTitle = stringResource(id = itemR.string.item_epic)
-    val legendTitle = stringResource(id = itemR.string.item_legend)
-    val orrnTitle = stringResource(id = itemR.string.item_orrn)
+    val bootsTitle = stringResource(id = ItemR.string.item_boots)
+    val consumableTitle = stringResource(id = ItemR.string.item_consumable)
+    val normalTitle = stringResource(id = ItemR.string.item_normal)
+    val epicTitle = stringResource(id = ItemR.string.item_epic)
+    val legendTitle = stringResource(id = ItemR.string.item_legend)
+    val orrnTitle = stringResource(id = ItemR.string.item_orrn)
 
     val onClickItem: (ItemData) -> Unit = {
         itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it.id))
@@ -118,8 +122,8 @@ fun ItemHomeScreen(
                 when (it) {
                     is ItemHomeSideEffect.ShowErrorMessage -> {
                         val errorId = when (it.exception) {
-                            ItemBuildException.NotAddSameLegendItem -> itemR.string.item_build_same_legend_error
-                            ItemBuildException.NotShouldAddItemSize -> itemR.string.item_build_should_add_error
+                            ItemBuildException.NotAddSameLegendItem -> ItemR.string.item_build_same_legend_error
+                            ItemBuildException.NotShouldAddItemSize -> ItemR.string.item_build_should_add_error
                             else -> R.string.default_error_message
                         }
                         val message = context.getString(errorId)
@@ -155,6 +159,36 @@ fun ItemHomeScreen(
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = Spacings.Spacing02)
+                        .animateContentSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+                ) {
+                    when {
+                        itemPatchNoteList == null -> {
+                            CircularProgressIndicator(
+                                color = Colors.Gold03,
+                                modifier = Modifier.size(IconSize.XLargeSize),
+                                strokeWidth = 2.dp
+                            )
+
+                            Text(
+                                text = stringResource(id = ItemR.string.item_patch_note_loading_title),
+                                style = TextStyles.SubTitle02,
+                                color = Colors.Gold03
+                            )
+                        }
+
+                        itemPatchNoteList.isNotEmpty() -> {
+                            ItemPatchNoteListBody(itemPatchNoteList = itemPatchNoteList)
+                        }
+                    }
+                }
+            }
             item {
                 FilterSelectBody(
                     isSelectNewItem = uiState.isSelectNewItem,
@@ -196,7 +230,7 @@ fun ItemHomeScreen(
                                 vertical = Spacings.Spacing03
                             ),
                         text = uiState.searchKeyword,
-                        hint = stringResource(id = itemR.string.search_item),
+                        hint = stringResource(id = ItemR.string.search_item),
                         onChangeTextListener = { search ->
                             val action = ItemHomeAction.ChangeItemSearchKeyword(search)
                             itemHomeViewModel.sendAction(action)
@@ -266,7 +300,7 @@ fun ItemHomeScreen(
 
         if (selectedItemId != null) {
             ItemDetailDialog(
-                versionName = currentVersion,
+                versionName = currentVersion.name,
                 selectedItemId = selectedItemId,
                 onDismissRequest = {
                     itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(null))
@@ -450,7 +484,7 @@ fun ItemNewFilerList(
 ) {
     Column {
         Text(
-            text = stringResource(id = itemR.string.item_list_title),
+            text = stringResource(id = ItemR.string.item_list_title),
             style = TextStyles.SubTitle02,
             color = Colors.Gold02
         )
@@ -461,12 +495,12 @@ fun ItemNewFilerList(
         ) {
             BaseFilterTag(
                 isCheck = !isNewItemSelect,
-                title = stringResource(id = itemR.string.item_filter_all),
+                title = stringResource(id = ItemR.string.item_filter_all),
                 onClickTag = onToggleNewItemFilter
             )
             BaseFilterTag(
                 isCheck = isNewItemSelect,
-                title = stringResource(id = itemR.string.item_filter_new),
+                title = stringResource(id = ItemR.string.item_filter_new),
                 onClickTag = onToggleNewItemFilter
             )
         }
@@ -509,8 +543,6 @@ fun FilterSelectBody(
         }
 
         Spacer(modifier = Modifier.height(Spacings.Spacing02))
-
-        HorizontalDivider()
     }
 }
 
@@ -522,7 +554,7 @@ fun ItemMapFilerList(
 ) {
     Column {
         Text(
-            text = stringResource(id = itemR.string.item_filter_map_title),
+            text = stringResource(id = ItemR.string.item_filter_map_title),
             style = TextStyles.SubTitle02,
             color = Colors.Gold02
         )
@@ -552,7 +584,7 @@ fun ItemTagTypeFilerList(
 ) {
     Column {
         Text(
-            text = stringResource(id = itemR.string.item_filter_stats_title),
+            text = stringResource(id = ItemR.string.item_filter_stats_title),
             style = TextStyles.SubTitle02,
             color = Colors.Gold02
         )
@@ -619,7 +651,7 @@ fun ItemBuildStatusBody(
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
     ) {
         Text(
-            text = stringResource(id = itemR.string.item_build_status_title),
+            text = stringResource(id = ItemR.string.item_build_status_title),
             style = TextStyles.SubTitle03,
             color = Colors.Gold02
         )
