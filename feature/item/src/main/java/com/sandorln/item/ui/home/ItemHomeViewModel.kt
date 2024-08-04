@@ -4,6 +4,7 @@ import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.item.GetItemListByCurrentVersion
+import com.sandorln.domain.usecase.item.GetItemPatchNoteList
 import com.sandorln.domain.usecase.item.GetNewItemIdListByCurrentVersion
 import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
@@ -15,7 +16,9 @@ import com.sandorln.item.util.getStatusList
 import com.sandorln.item.util.getUniqueStatusList
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
+import com.sandorln.model.data.item.ItemPatchNote
 import com.sandorln.model.data.map.MapType
+import com.sandorln.model.data.version.Version
 import com.sandorln.model.type.ItemTagType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +48,7 @@ class ItemHomeViewModel @Inject constructor(
     refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
+    getItemPatchNoteList: GetItemPatchNoteList,
     getCurrentVersion: GetCurrentVersion
 ) : ViewModel() {
     companion object {
@@ -52,6 +56,8 @@ class ItemHomeViewModel @Inject constructor(
         const val ITEM_LEGEND_DEPTH = 3
         private val SUPPORT_ITEM_ID_LIST = listOf("3869", "3870", "3871", "3876", "3877", "4643", "4638") // 서폿 아이템 ID
     }
+
+    val currentVersion = getCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Version())
 
     private val _itemUiState = MutableStateFlow(ItemHomeUiState())
     val itemUiState = _itemUiState.asStateFlow()
@@ -164,17 +170,21 @@ class ItemHomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                getCurrentVersion
-                    .invoke()
+                currentVersion
                     .map { it.name }
                     .distinctUntilChanged()
                     .collectLatest { version ->
                         _itemMutex.withLock {
                             _itemUiState.update {
                                 it.copy(
-                                    currentVersionName = version,
+                                    itemPatchList = null,
                                     itemBuildList = emptyList()
                                 )
+                            }
+
+                            val itemPatchNoteList = getItemPatchNoteList.invoke(version).getOrNull() ?: emptyList()
+                            _itemUiState.update {
+                                it.copy(itemPatchList = itemPatchNoteList)
                             }
                         }
                     }
@@ -185,9 +195,14 @@ class ItemHomeViewModel @Inject constructor(
                         val currentUiState = _itemUiState.value
                         when (action) {
                             is ItemHomeAction.RefreshItemData -> {
-                                _itemUiState.emit(currentUiState.copy(isLoading = true))
-                                val spriteFileList = _currentItemList.value.map { item -> item.image.sprite }.distinct()
+                                _itemUiState.update {
+                                    it.copy(
+                                        isLoading = true,
+                                        itemPatchList = null
+                                    )
+                                }
 
+                                val spriteFileList = _currentItemList.value.map { item -> item.image.sprite }.distinct()
                                 refreshDownloadSpriteBitmap.invoke(
                                     spriteType = SpriteType.Item,
                                     fileNameList = spriteFileList
@@ -195,7 +210,13 @@ class ItemHomeViewModel @Inject constructor(
                                     _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
                                 }
 
-                                _itemUiState.emit(currentUiState.copy(isLoading = false))
+                                val itemPatchNoteList = getItemPatchNoteList.invoke(currentVersion.value.name).getOrNull() ?: emptyList()
+                                _itemUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        itemPatchList = itemPatchNoteList
+                                    )
+                                }
                             }
 
                             is ItemHomeAction.ChangeItemSearchKeyword -> {
@@ -302,8 +323,8 @@ data class ItemHomeUiState(
     val selectTag: Set<ItemTagType> = emptySet(),
     val isSelectNewItem: Boolean = false,
     val selectedItemId: String? = null,
-    val currentVersionName: String = "",
-    val itemBuildList: List<ItemData> = listOf()
+    val itemBuildList: List<ItemData> = listOf(),
+    val itemPatchList: List<ItemPatchNote>? = null
 )
 
 sealed interface ItemHomeAction {

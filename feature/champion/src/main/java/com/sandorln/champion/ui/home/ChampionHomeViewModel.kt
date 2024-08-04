@@ -95,7 +95,6 @@ class ChampionHomeViewModel @Inject constructor(
             launch {
                 _championAction.collect { action ->
                     _championMutex.withLock {
-                        val currentUiState = _championUiState.value
                         when (action) {
                             is ChampionHomeAction.RefreshChampionData -> {
                                 _championUiState.update {
