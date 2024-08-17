@@ -37,14 +37,14 @@ import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
-import com.sandorln.model.data.item.ItemPatchNote
+import com.sandorln.model.data.patchnote.PatchNoteData
 import kotlinx.coroutines.launch
 import com.sandorln.item.R as ItemR
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemPatchNoteListBody(
-    itemPatchNoteList: List<ItemPatchNote> = emptyList()
+    itemPatchNoteList: List<PatchNoteData> = emptyList()
 ) {
     val pagerState = rememberPagerState { itemPatchNoteList.size }
     val coroutineScope = rememberCoroutineScope()
@@ -117,7 +117,7 @@ fun ItemPatchNoteListBody(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ItemPatchNoteBody(
-    itemPatchNote: ItemPatchNote
+    itemPatchNote: PatchNoteData
 ) {
     Column(
         modifier = Modifier
@@ -133,11 +133,11 @@ fun ItemPatchNoteBody(
         ) {
             GlideImage(
                 modifier = Modifier.size(IconSize.XXLargeSize),
-                model = itemPatchNote.image,
+                model = itemPatchNote.imageUrl,
                 contentDescription = null
             )
             Text(
-                text = itemPatchNote.itemName,
+                text = itemPatchNote.title,
                 style = TextStyles.Title02
             )
         }
@@ -147,13 +147,11 @@ fun ItemPatchNoteBody(
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            itemPatchNote.detailPathList.forEach { patchNote ->
-                Text(
-                    text = patchNote,
-                    style = TextStyles.Body03,
-                    color = Colors.Gray03
-                )
-            }
+            Text(
+                text = itemPatchNote.summary,
+                style = TextStyles.Body03,
+                color = Colors.Gray03
+            )
         }
     }
 }

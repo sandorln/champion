@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.champion.GetChampionPatchNoteList
-import com.sandorln.model.data.champion.ChampionPatchNote
+import com.sandorln.model.data.patchnote.PatchNoteData
 import com.sandorln.model.keys.BundleKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +68,7 @@ class ChampionPatchNoteListViewModel @Inject constructor(
 
 data class ChampionPatchNoteListUiState(
     val isLoading: Boolean = false,
-    val championPatchNoteList: List<ChampionPatchNote>? = null
+    val championPatchNoteList: List<PatchNoteData>? = null
 )
 
 sealed interface ChampionPatchNoteListAction {
