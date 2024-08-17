@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.sandorln.champion.ui.detail.ChampionDetailScreen
-import com.sandorln.champion.ui.patchlist.ChampionPatchNoteListScreen
+import com.sandorln.champion.ui.patch.ChampionPatchNoteListScreen
 import com.sandorln.model.keys.BundleKeys
 
 private const val ChampionDetailRoute = "ChampionDetailRoute"
