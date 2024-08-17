@@ -13,5 +13,5 @@ fun NetworkPatchNoteData.asChampionData(): PatchNoteData = PatchNoteData(
 fun NetworkPatchNoteData.asItemData(): PatchNoteData = PatchNoteData(
     title = title,
     imageUrl = imageUrl,
-    summary = summary.dropLast(1).replace(". ", "\n")
+    summary = summary
 )

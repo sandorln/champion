@@ -1,4 +1,4 @@
-package com.sandorln.champion.ui.patchlist
+package com.sandorln.champion.ui.patch
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -155,6 +155,8 @@ fun ChampionPatchNoteListBody(
             val championPatchNote = runCatching { championPatchNoteList[index] }.getOrNull() ?: return@HorizontalPager
             ChampionPatchNoteBody(championPatchNote)
         }
+
+        HorizontalDivider(modifier = Modifier.padding(horizontal = Spacings.Spacing05))
 
         ChampionPatchNoteViewPagerIndicator(
             patchNoteDataList = championPatchNoteList,

@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.sandorln.champion.ui.patchlist.ChampionPatchNoteListBody
+import com.sandorln.champion.ui.patch.ChampionPatchNoteListBody
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
@@ -62,7 +62,6 @@ fun ChampionHomeScreen(
     val context = LocalContext.current
     val currentVersion by championHomeViewModel.currentVersion.collectAsState()
     val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
-    val currentPatchChampionList by championHomeViewModel.patchNoteChampionList.collectAsState()
     val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by championHomeViewModel.championUiState.collectAsState()
     val championPatchNoteList = uiState.championPatchNoteList
@@ -102,7 +101,6 @@ fun ChampionHomeScreen(
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
         val chunkChampionList = currentChampionList.chunked(spanCount)
-        val chunkPatchChampionList = currentPatchChampionList.chunked(spanCount)
 
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
@@ -172,18 +170,8 @@ fun ChampionHomeScreen(
                 }
             }
 
-            if (chunkPatchChampionList.isNotEmpty())
-                baseChampionList(
-                    title = "패치 된 챔피온",
-                    spanCount = spanCount,
-                    chunckChampionList = chunkPatchChampionList,
-                    currentSpriteMap = currentSpriteMap,
-                    onClickChampion = onClickChampionBody
-                )
-
             if (chunkChampionList.isNotEmpty())
                 baseChampionList(
-                    title = "챔피온",
                     spanCount = spanCount,
                     chunckChampionList = chunkChampionList,
                     currentSpriteMap = currentSpriteMap,
@@ -227,25 +215,11 @@ private fun ChampionBody(
 }
 
 private fun LazyListScope.baseChampionList(
-    title: String,
     spanCount: Int = 5,
     chunckChampionList: List<List<SummaryChampion>> = mutableListOf(),
     currentSpriteMap: Map<String, Bitmap?>,
     onClickChampion: (SummaryChampion) -> Unit
 ) {
-    item {
-        Text(
-            modifier = Modifier.padding(
-                start = Spacings.Spacing01,
-                top = Spacings.Spacing03,
-                bottom = Spacings.Spacing00
-            ),
-            text = title,
-            style = TextStyles.Body02,
-            color = Colors.Gray05
-        )
-    }
-
     items(chunckChampionList.size) { columnIndex ->
         LazyRow(
             modifier = Modifier.fillMaxWidth(),

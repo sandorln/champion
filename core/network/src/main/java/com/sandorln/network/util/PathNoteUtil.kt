@@ -18,7 +18,7 @@ fun Element.toNetworkPatchNoteList(
         val imageElement = pathNoteBlock.firstOrNull()?.firstElementChild()?.getElementsByTag("img")
 
         val isOldPatch = pathNoteBlock.attr("href").lowercase().contains(networkPatchNoteType.name.lowercase())
-        val isNewPatch = imageElement?.attr("src")?.lowercase()?.contains(networkPatchNoteType.name) == true
+        val isNewPatch = imageElement?.attr("src")?.lowercase()?.contains(networkPatchNoteType.name.lowercase()) == true
 
         isOldPatch || isNewPatch
     }
@@ -31,7 +31,7 @@ fun Element.toNetworkPatchNoteList(
 
             val summary = when (networkPatchNoteType) {
                 NetworkPatchNoteType.Champion -> element.getElementsByClass(PATCH_SUMMARY_CLASS_NAME).first()!!.text()
-                NetworkPatchNoteType.Item -> element.select("li").map(Element::text).joinToString(separator = "\n")
+                NetworkPatchNoteType.Item -> element.select("li").joinToString(separator = "\n", transform = Element::text)
             }
 
             NetworkPatchNoteData(

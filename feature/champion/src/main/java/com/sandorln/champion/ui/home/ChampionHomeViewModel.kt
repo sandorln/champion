@@ -79,17 +79,6 @@ class ChampionHomeViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    val patchNoteChampionList = displayChampionList
-        .combine(
-            _championUiState.map { uiState ->
-                uiState.championPatchNoteList?.map(PatchNoteData::title)
-            }
-        ) { championList, patchTitleList ->
-            if (patchTitleList.isNullOrEmpty()) return@combine emptyList<SummaryChampion>()
-
-            championList.filter { patchTitleList.contains(it.name) }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
     init {
         viewModelScope.launch {
             launch {

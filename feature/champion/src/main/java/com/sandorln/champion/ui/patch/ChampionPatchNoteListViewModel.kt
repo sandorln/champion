@@ -1,4 +1,4 @@
-package com.sandorln.champion.ui.patchlist
+package com.sandorln.champion.ui.patch
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -56,8 +56,8 @@ class ChampionPatchNoteListViewModel @Inject constructor(
 
         viewModelScope.launch {
             launch {
-                _action.collect{action->
-                    when(action){
+                _action.collect { action ->
+                    when (action) {
                         ChampionPatchNoteListAction.RefreshChampionPatchNoteList -> refreshChampionPatchNoteList()
                     }
                 }

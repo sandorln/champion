@@ -69,6 +69,7 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.item.model.ItemBuildException
 import com.sandorln.item.ui.dialog.ItemDetailDialog
+import com.sandorln.item.ui.patch.ItemPatchNoteListBody
 import com.sandorln.item.util.getTitleStringId
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
