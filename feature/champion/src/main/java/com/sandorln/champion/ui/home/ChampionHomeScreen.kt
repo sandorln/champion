@@ -152,14 +152,10 @@ fun ChampionHomeScreen(
                                 startY = Spacings.Spacing08.value
                             )
                         )
+                        .padding(all = Spacings.Spacing03),
                 ) {
                     BaseSearchTextEditor(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = Spacings.Spacing05,
-                                vertical = Spacings.Spacing03
-                            ),
+                        modifier = Modifier.fillMaxWidth(),
                         text = uiState.searchKeyword,
                         hint = stringResource(id = championR.string.search_champion),
                         onChangeTextListener = { search ->
