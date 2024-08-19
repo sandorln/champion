@@ -1,9 +1,10 @@
 package com.sandorln.data.repository.item
 
+import androidx.core.graphics.PathParser.PathDataNode
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
-import com.sandorln.model.data.item.ItemPatchNote
 import com.sandorln.model.data.item.SummaryItemImage
+import com.sandorln.model.data.patchnote.PatchNoteData
 import kotlinx.coroutines.flow.Flow
 
 interface ItemRepository {
@@ -21,5 +22,5 @@ interface ItemRepository {
 
     suspend fun getSummaryItemImage(id: String, versionName: String): SummaryItemImage?
 
-    suspend fun getItemPatchList(version: String): List<ItemPatchNote>
+    suspend fun getItemPatchList(version: String): List<PatchNoteData>
 }

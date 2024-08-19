@@ -16,8 +16,8 @@ import com.sandorln.item.util.getStatusList
 import com.sandorln.item.util.getUniqueStatusList
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
-import com.sandorln.model.data.item.ItemPatchNote
 import com.sandorln.model.data.map.MapType
+import com.sandorln.model.data.patchnote.PatchNoteData
 import com.sandorln.model.data.version.Version
 import com.sandorln.model.type.ItemTagType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -291,6 +291,10 @@ class ItemHomeViewModel @Inject constructor(
                                     }
                                 }
                             }
+
+                            is ItemHomeAction.ChangeShowFilterDialog -> {
+                                _itemUiState.update { it.copy(isShowFilterDialog = action.isVisible) }
+                            }
                         }
                     }
                 }
@@ -324,7 +328,8 @@ data class ItemHomeUiState(
     val isSelectNewItem: Boolean = false,
     val selectedItemId: String? = null,
     val itemBuildList: List<ItemData> = listOf(),
-    val itemPatchList: List<ItemPatchNote>? = null
+    val itemPatchList: List<PatchNoteData>? = null,
+    val isShowFilterDialog: Boolean = false
 )
 
 sealed interface ItemHomeAction {
@@ -337,6 +342,8 @@ sealed interface ItemHomeAction {
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
     data class AddItemBuild(val itemData: ItemData) : ItemHomeAction
     data class DeleteItemBuild(val index: Int) : ItemHomeAction
+
+    data class ChangeShowFilterDialog(val isVisible: Boolean) : ItemHomeAction
 }
 
 sealed interface ItemHomeSideEffect {

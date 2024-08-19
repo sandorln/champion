@@ -8,9 +8,9 @@ import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
-import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.image.SpriteType
+import com.sandorln.model.data.patchnote.PatchNoteData
 import com.sandorln.model.type.ChampionTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -79,17 +79,6 @@ class ChampionHomeViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    val patchNoteChampionList = displayChampionList
-        .combine(
-            _championUiState.map { uiState ->
-                uiState.championPatchNoteList?.map(ChampionPatchNote::title)
-            }
-        ) { championList, patchTitleList ->
-            if (patchTitleList.isNullOrEmpty()) return@combine emptyList<SummaryChampion>()
-
-            championList.filter { patchTitleList.contains(it.name) }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
     init {
         viewModelScope.launch {
             launch {
@@ -113,7 +102,7 @@ class ChampionHomeViewModel @Inject constructor(
                                         _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
                                     }
 
-                                val championPatchNoteList = getChampionPatchNoteList.invoke(currentVersion.value).getOrNull() ?: emptyList()
+                                val championPatchNoteList = getChampionPatchNoteList.invoke(currentVersion.value).getOrNull() ?: emptyList<PatchNoteData>()
                                 _championUiState.update {
                                     it.copy(
                                         isLoading = false,
@@ -153,7 +142,7 @@ class ChampionHomeViewModel @Inject constructor(
                     .collectLatest { version ->
                         _championMutex.withLock {
                             _championUiState.update { it.copy(championPatchNoteList = null) }
-                            val championPatchNoteList = getChampionPatchNoteList.invoke(version).getOrNull() ?: emptyList()
+                            val championPatchNoteList = getChampionPatchNoteList.invoke(version).getOrNull() ?: emptyList<PatchNoteData>()
                             _championUiState.update { it.copy(championPatchNoteList = championPatchNoteList) }
                         }
                     }
@@ -166,7 +155,7 @@ data class ChampionHomeUiState(
     val isLoading: Boolean = false,
     val searchKeyword: String = "",
     val selectChampionTagSet: Set<ChampionTag> = setOf(),
-    val championPatchNoteList: List<ChampionPatchNote>? = null
+    val championPatchNoteList: List<PatchNoteData>? = null
 )
 
 sealed interface ChampionHomeAction {

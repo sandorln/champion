@@ -5,11 +5,9 @@ import com.sandorln.database.model.SummaryItemEntity
 import com.sandorln.database.model.SummaryItemImageEntity
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
-import com.sandorln.model.data.item.ItemPatchNote
 import com.sandorln.model.data.item.SummaryItemImage
 import com.sandorln.model.type.ItemTagType
 import com.sandorln.network.model.item.NetworkItem
-import com.sandorln.network.model.item.NetworkItemPatchNote
 
 fun ItemEntity.asData(): ItemData = ItemData(
     id = id,
@@ -103,10 +101,4 @@ fun ItemEntity.asCombinationData(fromItemList: List<ItemCombination>) = ItemComb
 fun SummaryItemImageEntity.asData() = SummaryItemImage(
     id = id,
     image = image.asData()
-)
-
-fun NetworkItemPatchNote.asData() = ItemPatchNote(
-    itemName = itemName,
-    image = image,
-    detailPathList = detailPathList
 )

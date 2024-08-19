@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +27,7 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -44,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
-import com.sandorln.design.component.BaseFilterTag
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BaseSearchTextEditor
 import com.sandorln.design.component.html.LolHtmlTagTextView
@@ -69,9 +68,9 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.item.model.ItemBuildException
 import com.sandorln.item.ui.dialog.ItemDetailDialog
-import com.sandorln.item.util.getTitleStringId
+import com.sandorln.item.ui.dialog.ItemFilterDialog
+import com.sandorln.item.ui.patch.ItemPatchNoteListBody
 import com.sandorln.model.data.item.ItemData
-import com.sandorln.model.data.map.MapType
 import com.sandorln.model.type.ItemTagType
 import kotlin.math.floor
 import com.sandorln.item.R as ItemR
@@ -189,54 +188,19 @@ fun ItemHomeScreen(
                     }
                 }
             }
-            item {
-                FilterSelectBody(
-                    isSelectNewItem = uiState.isSelectNewItem,
-                    selectItemTag = uiState.selectTag,
-                    selectMapType = uiState.selectMapType,
-                    onToggleNewItemFilter = {
-                        itemHomeViewModel.sendAction(ItemHomeAction.ToggleSelectNewItem)
-                    },
-                    onToggleItemTagTypeFilter = { itemTagType ->
-                        val action = ItemHomeAction.ToggleItemTagType(itemTagType)
+
+            stickyHeader {
+                ItemStickyHeader(
+                    keyword = uiState.searchKeyword,
+                    onKeywordChange = { search ->
+                        val action = ItemHomeAction.ChangeItemSearchKeyword(search)
                         itemHomeViewModel.sendAction(action)
                     },
-                    onClickMapFilterTag = { mapType ->
-                        val action = ItemHomeAction.ChangeMapTypeFilter(mapType)
+                    onClickFilterIcon = {
+                        val action = ItemHomeAction.ChangeShowFilterDialog(true)
                         itemHomeViewModel.sendAction(action)
                     }
                 )
-            }
-
-            stickyHeader {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Colors.Blue06.copy(alpha = 1f),
-                                    Colors.Blue06.copy(alpha = 0.0f)
-                                ),
-                                startY = Spacings.Spacing08.value
-                            )
-                        )
-                ) {
-                    BaseSearchTextEditor(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = Spacings.Spacing05,
-                                vertical = Spacings.Spacing03
-                            ),
-                        text = uiState.searchKeyword,
-                        hint = stringResource(id = ItemR.string.search_item),
-                        onChangeTextListener = { search ->
-                            val action = ItemHomeAction.ChangeItemSearchKeyword(search)
-                            itemHomeViewModel.sendAction(action)
-                        }
-                    )
-                }
             }
 
             if (bootsItemListChunkList.isNotEmpty())
@@ -310,6 +274,29 @@ fun ItemHomeScreen(
                 },
                 onChangeSelectItem = {
                     itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it))
+                }
+            )
+        }
+
+        if (uiState.isShowFilterDialog) {
+            ItemFilterDialog(
+                isSelectNewItem = uiState.isSelectNewItem,
+                selectItemTag = uiState.selectTag,
+                selectMapType = uiState.selectMapType,
+                onToggleNewItemFilter = {
+                    itemHomeViewModel.sendAction(ItemHomeAction.ToggleSelectNewItem)
+                },
+                onToggleItemTagTypeFilter = { itemTagType ->
+                    val action = ItemHomeAction.ToggleItemTagType(itemTagType)
+                    itemHomeViewModel.sendAction(action)
+                },
+                onClickMapFilterTag = { mapType ->
+                    val action = ItemHomeAction.ChangeMapTypeFilter(mapType)
+                    itemHomeViewModel.sendAction(action)
+                },
+                onDismissRequest = {
+                    val action = ItemHomeAction.ChangeShowFilterDialog(false)
+                    itemHomeViewModel.sendAction(action)
                 }
             )
         }
@@ -476,137 +463,6 @@ fun ItemBody(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun ItemNewFilerList(
-    isNewItemSelect: Boolean = false,
-    onToggleNewItemFilter: () -> Unit = {}
-) {
-    Column {
-        Text(
-            text = stringResource(id = ItemR.string.item_list_title),
-            style = TextStyles.SubTitle02,
-            color = Colors.Gold02
-        )
-        Spacer(modifier = Modifier.height(Spacings.Spacing00))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
-        ) {
-            BaseFilterTag(
-                isCheck = !isNewItemSelect,
-                title = stringResource(id = ItemR.string.item_filter_all),
-                onClickTag = onToggleNewItemFilter
-            )
-            BaseFilterTag(
-                isCheck = isNewItemSelect,
-                title = stringResource(id = ItemR.string.item_filter_new),
-                onClickTag = onToggleNewItemFilter
-            )
-        }
-    }
-}
-
-@Composable
-fun FilterSelectBody(
-    isSelectNewItem: Boolean = false,
-    selectItemTag: Set<ItemTagType> = emptySet(),
-    selectMapType: MapType = MapType.ALL,
-    onToggleNewItemFilter: () -> Unit = {},
-    onToggleItemTagTypeFilter: (itemTagType: ItemTagType) -> Unit = {},
-    onClickMapFilterTag: (mapType: MapType) -> Unit = {}
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    vertical = Spacings.Spacing03,
-                    horizontal = Spacings.Spacing05
-                ),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
-        ) {
-            ItemNewFilerList(
-                isNewItemSelect = isSelectNewItem,
-                onToggleNewItemFilter = onToggleNewItemFilter
-            )
-
-            ItemTagTypeFilerList(
-                selectItemTag = selectItemTag,
-                onToggleItemTagTypeFilter = onToggleItemTagTypeFilter
-            )
-
-            ItemMapFilerList(
-                selectMapType = selectMapType,
-                onClickMapFilterTag = onClickMapFilterTag
-            )
-        }
-
-        Spacer(modifier = Modifier.height(Spacings.Spacing02))
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun ItemMapFilerList(
-    selectMapType: MapType = MapType.ALL,
-    onClickMapFilterTag: (mapType: MapType) -> Unit = {}
-) {
-    Column {
-        Text(
-            text = stringResource(id = ItemR.string.item_filter_map_title),
-            style = TextStyles.SubTitle02,
-            color = Colors.Gold02
-        )
-        Spacer(modifier = Modifier.height(Spacings.Spacing00))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
-        ) {
-            MapType.entries.filter { it != MapType.ALL }.forEach { mapType ->
-                BaseFilterTag(
-                    isCheck = selectMapType == mapType,
-                    title = stringResource(id = mapType.getTitleStringId()),
-                    onClickTag = {
-                        onClickMapFilterTag.invoke(mapType)
-                    }
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun ItemTagTypeFilerList(
-    selectItemTag: Set<ItemTagType> = emptySet(),
-    onToggleItemTagTypeFilter: (itemTagType: ItemTagType) -> Unit = {}
-) {
-    Column {
-        Text(
-            text = stringResource(id = ItemR.string.item_filter_stats_title),
-            style = TextStyles.SubTitle02,
-            color = Colors.Gold02
-        )
-        Spacer(modifier = Modifier.height(Spacings.Spacing00))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
-        ) {
-            ItemTagType.entries.forEach { itemTagType ->
-                if (itemTagType == ItemTagType.Boots || itemTagType == ItemTagType.Consumable) return@forEach
-                BaseFilterTag(
-                    isCheck = selectItemTag.contains(itemTagType),
-                    title = stringResource(id = itemTagType.getTitleStringId()),
-                    onClickTag = {
-                        onToggleItemTagTypeFilter.invoke(itemTagType)
-                    }
-                )
-            }
-        }
-    }
-}
-
 @Composable
 fun ItemBuildListBody(
     itemBuildList: List<ItemData> = emptyList(),
@@ -719,11 +575,43 @@ private fun LazyListScope.baseItemList(
     }
 }
 
-@Preview
 @Composable
-fun ItemFilerListPreview() {
-    LolChampionThemePreview {
-        ItemMapFilerList()
+fun ItemStickyHeader(
+    keyword: String,
+    onKeywordChange: (String) -> Unit,
+    onClickFilterIcon: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Colors.Blue06.copy(alpha = 1f),
+                        Colors.Blue06.copy(alpha = 0.0f)
+                    ),
+                    startY = Spacings.Spacing08.value
+                )
+            )
+            .padding(all = Spacings.Spacing03),
+        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BaseSearchTextEditor(
+            modifier = Modifier.weight(1f),
+            text = keyword,
+            hint = stringResource(id = ItemR.string.search_item),
+            onChangeTextListener = onKeywordChange
+        )
+
+        Icon(
+            modifier = Modifier
+                .size(size = IconSize.LargeSize)
+                .clickable { onClickFilterIcon.invoke() },
+            painter = painterResource(id = R.drawable.ic_filter_on),
+            contentDescription = null,
+            tint = Colors.Gray04,
+        )
     }
 }
 
@@ -732,14 +620,6 @@ fun ItemFilerListPreview() {
 fun ItemIconBodyPreview() {
     LolChampionThemePreview {
         ItemBody()
-    }
-}
-
-@Preview
-@Composable
-fun FilterSelectBodyPreview() {
-    LolChampionThemePreview {
-        FilterSelectBody()
     }
 }
 
@@ -763,5 +643,15 @@ fun ItemBuildStatusBodyPreview() {
                 "공격력" to (20 to ""),
             )
         )
+    }
+}
+
+@Preview
+@Composable
+fun ItemStickyHeaderPreview() {
+    LolChampionThemePreview {
+        ItemStickyHeader(keyword = "", onKeywordChange = {}) {
+
+        }
     }
 }

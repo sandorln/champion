@@ -1,5 +1,6 @@
 package com.sandorln.data.repository.champion
 
+import com.sandorln.data.util.asChampionData
 import com.sandorln.data.util.asData
 import com.sandorln.data.util.asDetailData
 import com.sandorln.data.util.asEntity
@@ -7,10 +8,10 @@ import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.model.ChampionEntity
 import com.sandorln.datastore.local.version.VersionDatasource
 import com.sandorln.model.data.champion.ChampionDetailData
-import com.sandorln.model.data.champion.ChampionPatchNote
 import com.sandorln.model.data.champion.SummaryChampion
+import com.sandorln.model.data.patchnote.PatchNoteData
 import com.sandorln.model.type.ChampionTag
-import com.sandorln.network.model.champion.NetworkChampionPatchNote
+import com.sandorln.network.model.patchnote.NetworkPatchNoteData
 import com.sandorln.network.service.ChampionService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -149,6 +150,6 @@ class DefaultChampionRepository @Inject constructor(
             .associateWith { true }
     }
 
-    override suspend fun getChampionPatchNoteList(version: String): List<ChampionPatchNote> =
-        championService.getChampionPathNoteList(version).map(NetworkChampionPatchNote::asData)
+    override suspend fun getChampionPatchNoteList(version: String): List<PatchNoteData> =
+        championService.getChampionPathNoteList(version).map(NetworkPatchNoteData::asChampionData)
 }
