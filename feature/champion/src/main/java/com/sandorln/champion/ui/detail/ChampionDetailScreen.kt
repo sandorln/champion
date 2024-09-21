@@ -317,9 +317,12 @@ fun ChampionDetailScreen(
 
             ChampionDetailInfoTitle(title = skinTitle)
 
-            ChampionSkins(
+            ChampionSkinsView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(Dimens.CHAMPION_SPLASH_RATIO),
                 championId = championDetailData.id,
-                skinList = championDetailData.skins
+                championSkinList = championDetailData.skins
             )
 
             ChampionDetailInfoTitle(title = storyTitle)
@@ -970,79 +973,6 @@ fun SimilarChampionListBody(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ChampionSkins(
-    championId: String,
-    skinList: List<ChampionSkin>
-) {
-    val pagerState = rememberPagerState(initialPage = 0) {
-        skinList.size
-    }
-
-    val defaultSkinName = stringResource(id = championR.string.default_skin_name)
-    val skinName = remember(pagerState.currentPage) {
-        val currentPage = pagerState.currentPage
-        if (currentPage == 0) {
-            defaultSkinName
-        } else {
-            skinList.getOrNull(currentPage)?.name ?: ""
-        }
-    }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(Dimens.CHAMPION_SPLASH_RATIO)
-        ) {
-            HorizontalPager(
-                modifier = Modifier.matchParentSize(),
-                state = pagerState,
-            ) { count ->
-                val skinNum = skinList[count].num.takeIf {
-                    !it.isNullOrEmpty()
-                } ?: count.toString()
-
-                BaseChampionSplashImage(
-                    modifier = Modifier.matchParentSize(),
-                    championId = championId,
-                    skinNum = skinNum
-                )
-            }
-        }
-
-        Text(
-            text = skinName,
-            style = TextStyles.SubTitle03,
-            color = Colors.Gold04
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(
-                space = Spacings.Spacing01,
-                alignment = Alignment.CenterHorizontally
-            ),
-        ) {
-            repeat(skinList.size) { iteration ->
-                val color = if (pagerState.currentPage == iteration)
-                    Colors.Gold04
-                else
-                    Colors.Gray07
-
-                Box(
-                    modifier = Modifier
-                        .background(color, CircleShape)
-                        .size(IconSize.TinySize)
-                )
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
 internal fun ChampionDetailInfoTitlePreview() {
@@ -1117,17 +1047,6 @@ internal fun VersionBodyPreview() {
         VersionItemBody(
             "14.5.1",
             isChangedStatsDiff = true
-        )
-    }
-}
-
-@Preview
-@Composable
-internal fun ChampionSkinsPreview() {
-    LolChampionThemePreview {
-        ChampionSkins(
-            "14.5.1",
-            List(5) { ChampionSkin(name = it.toString()) }
         )
     }
 }
