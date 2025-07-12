@@ -5,7 +5,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import javax.inject.Inject
@@ -23,15 +22,15 @@ class VersionService @Inject constructor(
     }
 
     suspend fun getLolPatchNoteUrl(major1: Int, minor1: Int): String = withContext(Dispatchers.IO) {
-        val oldUrl = "https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-$major1-$minor1-notes/"
-        val newUrl = "https://www.leagueoflegends.com/ko-kr/news/game-updates/lol-patch-$major1-$minor1-notes/"
-        val oldUrlDeferred = async { runCatching { Jsoup.connect(oldUrl).get() } }
-        val newUrlDeferred = async { runCatching { Jsoup.connect(newUrl).get() } }
-
-        return@withContext when {
-            oldUrlDeferred.await().isSuccess -> oldUrl
-            newUrlDeferred.await().isSuccess -> newUrl
-            else -> ""
+        val urlBuilder = StringBuilder("https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-")
+        when {
+            major1 == 15 && (1..2).contains(minor1) -> urlBuilder.append("${major1 + 10}-s1-$minor1-notes/")
+            major1 == 15 && 3 == minor1 -> urlBuilder.append("2025-s1-3-notes/")
+            major1 >= 15 -> urlBuilder.append("${major1 + 10}-${minor1.toString().padStart(2, '0')}-notes/")
+            else -> urlBuilder.append("$major1-$minor1-notes/")
         }
+
+        val isSuccess = runCatching { Jsoup.connect(urlBuilder.toString()).get() }.isSuccess
+        return@withContext if (isSuccess) urlBuilder.toString() else ""
     }
 }

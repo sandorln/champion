@@ -2,6 +2,8 @@ package com.sandorln.network.util
 
 import com.sandorln.network.model.patchnote.NetworkPatchNoteData
 import com.sandorln.network.model.patchnote.NetworkPatchNoteType
+import com.sandorln.network.model.patchnote.NetworkPatchNoteType.Champion
+import com.sandorln.network.model.patchnote.NetworkPatchNoteType.Item
 import org.jsoup.nodes.Element
 
 private const val PATCH_CHANGE_BLOCK_CLASS_NAME = "patch-change-block white-stone accent-before"
@@ -18,7 +20,12 @@ fun Element.toNetworkPatchNoteList(
         val imageElement = pathNoteBlock.firstOrNull()?.firstElementChild()?.getElementsByTag("img")
 
         val isOldPatch = pathNoteBlock.attr("href").lowercase().contains(networkPatchNoteType.name.lowercase())
-        val isNewPatch = imageElement?.attr("src")?.lowercase()?.contains(networkPatchNoteType.name.lowercase()) == true
+        val isNewPatch: Boolean =
+            when (networkPatchNoteType) {
+                Champion -> imageElement?.attr("src")?.lowercase()?.contains(networkPatchNoteType.name.lowercase()) == true
+                Item -> imageElement?.attr("src")?.lowercase()?.contains(networkPatchNoteType.name.lowercase()) == true ||
+                        imageElement?.attr("src")?.lowercase()?.contains("https://cmsassets.rgpub.io/sanity/images") == true
+            }
 
         isOldPatch || isNewPatch
     }
@@ -30,8 +37,8 @@ fun Element.toNetworkPatchNoteList(
             val imageUrl = imageElement.first()!!.firstElementChild()!!.getElementsByTag("img").attr("src")
 
             val summary = when (networkPatchNoteType) {
-                NetworkPatchNoteType.Champion -> element.getElementsByClass(PATCH_SUMMARY_CLASS_NAME).first()!!.text()
-                NetworkPatchNoteType.Item -> element.select("li").joinToString(separator = "\n", transform = Element::text)
+                Champion -> element.getElementsByClass(PATCH_SUMMARY_CLASS_NAME).first()!!.text()
+                Item -> element.select("li").joinToString(separator = "\n", transform = Element::text)
             }
 
             NetworkPatchNoteData(

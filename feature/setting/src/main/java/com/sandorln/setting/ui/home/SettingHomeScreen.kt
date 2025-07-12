@@ -34,7 +34,7 @@ fun SettingHomeScreen(
     val packageName = context.packageName
     val versionName = context.packageManager
         .getPackageInfo(packageName, 0)
-        .versionName
+        .versionName ?: ""
 
     Column(
         modifier = Modifier
