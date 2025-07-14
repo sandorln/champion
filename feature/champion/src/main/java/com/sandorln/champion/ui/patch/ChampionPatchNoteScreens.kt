@@ -23,6 +23,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -80,21 +81,28 @@ fun ChampionPatchNoteListScreen(
             championPatchNoteListViewModel.sendAction(ChampionPatchNoteListAction.RefreshChampionPatchNoteList)
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        BaseToolbar(
-            onClickStartIcon = onBackStack,
-            title = stringResource(id = R.string.champion_patch_note_title)
-        )
+    Scaffold { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = innerPadding.calculateTopPadding())
+        ) {
+            BaseToolbar(
+                onClickStartIcon = onBackStack,
+                title = stringResource(id = R.string.champion_patch_note_title)
+            )
 
-        BaseLazyColumnWithPull(pullToRefreshState = pullToRefreshState) {
-            item {
-                Spacer(modifier = Modifier.height(Spacings.Spacing05))
-            }
-            items(uiState.championPatchNoteList?.size ?: 0) { index ->
-                val championPatchNote = uiState.championPatchNoteList?.getOrNull(index) ?: return@items
-                ChampionPatchNoteBody(championPatchNote = championPatchNote)
+            BaseLazyColumnWithPull(pullToRefreshState = pullToRefreshState) {
+                item {
+                    Spacer(modifier = Modifier.height(Spacings.Spacing05))
+                }
+                items(uiState.championPatchNoteList?.size ?: 0) { index ->
+                    val championPatchNote = uiState.championPatchNoteList?.getOrNull(index) ?: return@items
+                    ChampionPatchNoteBody(championPatchNote = championPatchNote)
+                }
+                item {
+                    Spacer(modifier = Modifier.height(innerPadding.calculateBottomPadding()))
+                }
             }
         }
     }

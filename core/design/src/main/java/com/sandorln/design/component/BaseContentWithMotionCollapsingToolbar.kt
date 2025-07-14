@@ -4,6 +4,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
@@ -40,15 +41,18 @@ private enum class MotionRefIds {
 @Composable
 fun BaseContentWithMotionToolbar(
     headerRatio: String = "",
+    innerPadding: PaddingValues,
     headerMaxHeight: Dp = 300.dp,
     headerMinHeight: Dp = Dimens.BASE_TOOLBAR_HEIGHT,
     startConstraintSet: ConstraintSetScope.(
         headerRef: ConstrainedLayoutReference,
-        bodyRef: ConstrainedLayoutReference
+        bodyRef: ConstrainedLayoutReference,
+        innerPadding: PaddingValues
     ) -> Unit,
     endConstraintSet: ConstraintSetScope.(
         headerRef: ConstrainedLayoutReference,
-        bodyRef: ConstrainedLayoutReference
+        bodyRef: ConstrainedLayoutReference,
+        innerPadding: PaddingValues
     ) -> Unit,
     headerContent: @Composable MotionLayoutScope.(progress: Float) -> Unit = {},
     bodyContent: @Composable BoxScope.(progress: Float) -> Unit = {}
@@ -101,13 +105,13 @@ fun BaseContentWithMotionToolbar(
                         this.top.linkTo(headerAreaRef.bottom, 0.dp)
                         this.bottom.linkTo(parent.bottom, 0.dp)
                     }
-                    startConstraintSet.invoke(this, headerAreaRef, bodyRef)
+                    startConstraintSet.invoke(this, headerAreaRef, bodyRef, innerPadding)
                 },
                 end = ConstraintSet {
                     val headerAreaRef = createRefFor(MotionRefIds.HEADER_AREA)
                     val bodyRef = createRefFor(MotionRefIds.BODY)
                     constrain(headerAreaRef) {
-                        this.height = Dimension.value(headerMinHeight)
+                        this.height = Dimension.value(headerMinHeight + innerPadding.calculateTopPadding())
                     }
                     constrain(bodyRef) {
                         this.width = Dimension.matchParent
@@ -115,7 +119,7 @@ fun BaseContentWithMotionToolbar(
                         this.top.linkTo(headerAreaRef.bottom, 0.dp)
                         this.bottom.linkTo(parent.bottom, 0.dp)
                     }
-                    endConstraintSet.invoke(this, headerAreaRef, bodyRef)
+                    endConstraintSet.invoke(this, headerAreaRef, bodyRef, innerPadding)
                 }
             ) {
                 Box(modifier = Modifier.layoutId(MotionRefIds.HEADER_AREA))

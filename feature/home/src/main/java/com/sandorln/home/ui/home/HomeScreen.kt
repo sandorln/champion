@@ -9,8 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -99,6 +103,7 @@ fun HomeScreen(
     val hasNextVersion = uiState.nextVersionName.isNotEmpty()
     val hasPreVersion = uiState.preVersionName.isNotEmpty()
     val currentVersionName = uiState.currentVersionName
+    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
 
     Scaffold(
         bottomBar = {
@@ -110,6 +115,7 @@ fun HomeScreen(
                     )
                     HomeBottomNavigation(
                         selectedIndex = pagerState.currentPage,
+                        innerPadding = navigationBarPadding,
                         onSelectedIndex = { index ->
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(index)
@@ -117,7 +123,6 @@ fun HomeScreen(
                         }
                     )
                 }
-
             }
         }
     ) { innerPadding ->
@@ -335,10 +340,12 @@ private fun NewContentListBody(
 @Composable
 internal fun HomeBottomNavigation(
     selectedIndex: Int = 0,
+    innerPadding: PaddingValues = WindowInsets.navigationBars.asPaddingValues(),
     onSelectedIndex: (Int) -> Unit = {}
 ) {
     BottomNavigation(
-        backgroundColor = Colors.Blue06
+        backgroundColor = Colors.Blue06,
+        modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
     ) {
         homeItems.forEachIndexed { index, homeScreenType ->
             val isSelected = selectedIndex == index
