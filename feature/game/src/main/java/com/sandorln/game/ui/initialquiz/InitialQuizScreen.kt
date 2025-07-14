@@ -30,6 +30,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -97,54 +98,58 @@ fun InitialQuizScreen(
         mutableStateOf(color)
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
-            BaseToolbar(onClickStartIcon = onBackStack)
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp),
-                progress = { gameTime / InitialQuizViewModel.INIT_GAME_TIME },
-                color = timeProgressColor
-            )
-        }
-
-        if (readyTime <= 0)
-            InitialQuizGameBody(
-                modifier = Modifier.weight(1f),
-                item = uiState.itemData
-            )
-
-        InitialInputBody(
-            previousRound = previousRound,
-            totalRoundCount = initialQuizViewModel.totalRoundCount,
-            onDoneAnswer = {
-                initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone(it))
-            }
-        )
-
-        if (uiState.isGameEnd) {
-            Dialog(onDismissRequest = onGameDialogDismissListener) {
-                GameEndDialogBody(
-                    score = uiState.score,
-                    previousItemList = initialQuizViewModel.previousItemList,
-                    onDismissListener = onGameDialogDismissListener
+    Scaffold { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                BaseToolbar(onClickStartIcon = onBackStack)
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    progress = { gameTime / InitialQuizViewModel.INIT_GAME_TIME },
+                    color = timeProgressColor
                 )
             }
-        }
 
-        if (readyTime > 0) {
-            Dialog(
-                onDismissRequest = { },
-                properties = DialogProperties(
-                    dismissOnBackPress = false,
-                    dismissOnClickOutside = false
+            if (readyTime <= 0)
+                InitialQuizGameBody(
+                    modifier = Modifier.weight(1f),
+                    item = uiState.itemData
                 )
-            ) {
-                ReadyTimeDialogBody(readyTime)
+
+            InitialInputBody(
+                previousRound = previousRound,
+                totalRoundCount = initialQuizViewModel.totalRoundCount,
+                onDoneAnswer = {
+                    initialQuizViewModel.sendAction(InitialQuizAction.InitialQuizDone(it))
+                }
+            )
+
+            if (uiState.isGameEnd) {
+                Dialog(onDismissRequest = onGameDialogDismissListener) {
+                    GameEndDialogBody(
+                        score = uiState.score,
+                        previousItemList = initialQuizViewModel.previousItemList,
+                        onDismissListener = onGameDialogDismissListener
+                    )
+                }
+            }
+
+            if (readyTime > 0) {
+                Dialog(
+                    onDismissRequest = { },
+                    properties = DialogProperties(
+                        dismissOnBackPress = false,
+                        dismissOnClickOutside = false
+                    )
+                ) {
+                    ReadyTimeDialogBody(readyTime)
+                }
             }
         }
     }

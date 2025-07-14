@@ -8,14 +8,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,23 +51,28 @@ fun LolPatchNoteScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    Column {
-        BaseToolbar(
-            title = stringResource(id = R.string.lol_patch_note_title),
-            onClickStartIcon = onBackStack
-        )
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(lolPatchList.size) { index ->
-                LolPatchNoteBody(lolPatch = lolPatchList[index]) { major1: Int, minor1: Int ->
-                    coroutineScope.launch {
-                        val url = lolPatchNoteViewModel.getPatchNoteUrl(major1, minor1)
-                        if (url.isNotEmpty())
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        else
-                            BaseToast(context, BaseToastType.WARNING, context.getString(R.string.lol_patch_url_empty))
+    Scaffold { innerPadding ->
+        Column(modifier = Modifier.padding(top = innerPadding.calculateTopPadding())) {
+            BaseToolbar(
+                title = stringResource(id = R.string.lol_patch_note_title),
+                onClickStartIcon = onBackStack
+            )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(lolPatchList.size) { index ->
+                    LolPatchNoteBody(lolPatch = lolPatchList[index]) { major1: Int, minor1: Int ->
+                        coroutineScope.launch {
+                            val url = lolPatchNoteViewModel.getPatchNoteUrl(major1, minor1)
+                            if (url.isNotEmpty())
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            else
+                                BaseToast(context, BaseToastType.WARNING, context.getString(R.string.lol_patch_url_empty))
+                        }
                     }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(innerPadding.calculateBottomPadding()))
                 }
             }
         }
