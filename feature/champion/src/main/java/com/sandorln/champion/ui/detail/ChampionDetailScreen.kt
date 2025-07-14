@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,8 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,13 +33,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -82,7 +79,6 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.design.theme.addShadow
 import com.sandorln.model.data.champion.ChampionDetailData
-import com.sandorln.model.data.champion.ChampionSkin
 import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
@@ -106,259 +102,263 @@ fun ChampionDetailScreen(
     val skinTitle = stringResource(id = championR.string.champion_detail_title_skin)
     val storyTitle = stringResource(id = championR.string.champion_detail_title_story)
 
-    BaseContentWithMotionToolbar(
-        headerRatio = Dimens.CHAMPION_SPLASH_RATIO_STRING,
-        headerMinHeight = Dimens.BASE_TOOLBAR_HEIGHT,
-        startConstraintSet = ConstraintSetScope::championDetailStart,
-        endConstraintSet = ConstraintSetScope::championDetailEnd,
-        headerContent = { progress ->
-            val iconSize = lerp(IconSize.XXXLargeSize, IconSize.XLargeSize, progress)
-            val titleSize = lerp(TextStyles.Title01.fontSize, TextStyles.Body02.fontSize, progress)
-            val nameSize = lerp(TextStyles.Title02.fontSize, TextStyles.SubTitle01.fontSize, progress)
-            val titleColor = lerp(Colors.Gold02, Colors.BasicWhite, progress)
-            val nameColor = lerp(Colors.BasicWhite, Colors.Gold02, progress)
-            val versionBorderWidth = lerp((-0.1).dp, 1.dp, progress)
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        BaseContentWithMotionToolbar(
+            headerRatio = Dimens.CHAMPION_SPLASH_RATIO_STRING,
+            headerMinHeight = Dimens.BASE_TOOLBAR_HEIGHT,
+            innerPadding = innerPadding,
+            startConstraintSet = ConstraintSetScope::championDetailStart,
+            endConstraintSet = ConstraintSetScope::championDetailEnd,
+            headerContent = { progress ->
+                val iconSize = lerp(IconSize.XXXLargeSize, IconSize.XLargeSize, progress)
+                val titleSize = lerp(TextStyles.Title01.fontSize, TextStyles.Body02.fontSize, progress)
+                val nameSize = lerp(TextStyles.Title02.fontSize, TextStyles.SubTitle01.fontSize, progress)
+                val titleColor = lerp(Colors.Gold02, Colors.BasicWhite, progress)
+                val nameColor = lerp(Colors.BasicWhite, Colors.Gold02, progress)
+                val versionBorderWidth = lerp((-0.1).dp, 1.dp, progress)
 
-            Box(
-                modifier = Modifier.layoutId(MotionRefIdType.Splash)
-            ) {
-                BaseChampionSplashImage(
-                    modifier = Modifier.matchParentSize(),
-                    championId = championDetailData.id
-                )
-            }
-
-            Box(
-                modifier = Modifier.layoutId(MotionRefIdType.HeaderBrush)
-            ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.TopCenter)
-                        .height(Spacings.Spacing05)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Colors.Blue06.copy(alpha = 1.0f),
-                                    Colors.Blue06.copy(alpha = 0.0f)
-                                )
-                            )
-                        )
-                )
+                    modifier = Modifier.layoutId(MotionRefIdType.Splash)
+                ) {
+                    BaseChampionSplashImage(
+                        modifier = Modifier.matchParentSize(),
+                        championId = championDetailData.id
+                    )
+                }
+
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .height(Spacings.Spacing05)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Colors.Blue06.copy(alpha = 0.0f),
-                                    Colors.Blue06.copy(alpha = 1.0f)
-                                )
-                            )
-                        )
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(iconSize)
-                    .background(Colors.BaseColor, CircleShape)
-                    .layoutId(MotionRefIdType.Icon)
-            ) {
-                BaseCircleIconImage(
-                    versionName = uiState.selectedVersion,
-                    modifier = Modifier.matchParentSize(),
-                    id = championDetailData.id
-                )
-            }
-
-            Box(modifier = Modifier.layoutId(MotionRefIdType.Title)) {
-                Text(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    text = championDetailData.title,
-                    style = TextStyles.Title01.addShadow(),
-                    fontSize = titleSize,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = titleColor
-                )
-            }
-
-            Box(
-                modifier = Modifier.layoutId(MotionRefIdType.Name)
-            ) {
-                Text(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    text = championDetailData.name,
-                    style = TextStyles.Body01.addShadow(),
-                    fontSize = nameSize,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = nameColor
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .layoutId(MotionRefIdType.Back)
-                    .height(Dimens.BASE_TOOLBAR_HEIGHT)
-            ) {
-                CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-                    IconButton(
+                    modifier = Modifier.layoutId(MotionRefIdType.HeaderBrush)
+                ) {
+                    Box(
                         modifier = Modifier
-                            .padding(start = Spacings.Spacing02)
-                            .size(IconSize.XLargeSize)
-                            .align(alignment = Alignment.Center),
-                        onClick = {
-                            onBackStack.invoke()
-                        }) {
+                            .fillMaxWidth()
+                            .align(Alignment.TopCenter)
+                            .height(Spacings.Spacing05)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Colors.Blue06.copy(alpha = 1.0f),
+                                        Colors.Blue06.copy(alpha = 0.0f)
+                                    )
+                                )
+                            )
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .height(Spacings.Spacing05)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Colors.Blue06.copy(alpha = 0.0f),
+                                        Colors.Blue06.copy(alpha = 1.0f)
+                                    )
+                                )
+                            )
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(iconSize)
+                        .background(Colors.BaseColor, CircleShape)
+                        .layoutId(MotionRefIdType.Icon)
+                ) {
+                    BaseCircleIconImage(
+                        versionName = uiState.selectedVersion,
+                        modifier = Modifier.matchParentSize(),
+                        id = championDetailData.id
+                    )
+                }
+
+                Box(modifier = Modifier.layoutId(MotionRefIdType.Title)) {
+                    Text(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        text = championDetailData.title,
+                        style = TextStyles.Title01.addShadow(),
+                        fontSize = titleSize,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = titleColor
+                    )
+                }
+
+                Box(
+                    modifier = Modifier.layoutId(MotionRefIdType.Name)
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        text = championDetailData.name,
+                        style = TextStyles.Body01.addShadow(),
+                        fontSize = nameSize,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = nameColor
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .layoutId(MotionRefIdType.Back)
+                        .padding(top = innerPadding.calculateTopPadding())
+                        .height(Dimens.BASE_TOOLBAR_HEIGHT)
+                ) {
+                    CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(start = Spacings.Spacing02)
+                                .size(IconSize.XLargeSize)
+                                .align(alignment = Alignment.Center),
+                            onClick = {
+                                onBackStack.invoke()
+                            }) {
+                            Icon(
+                                modifier = Modifier.size(IconSize.XLargeSize),
+                                painter = painterResource(id = R.drawable.ic_chevron_left),
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                        }
+                    }
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.layoutId(MotionRefIdType.BottomDivider)
+                )
+
+                Box(
+                    modifier = Modifier.layoutId(MotionRefIdType.Version)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .width(80.dp)
+                            .background(
+                                color = Colors.Blue06,
+                                shape = RoundedCornerShape(Radius.Radius04)
+                            )
+                            .border(
+                                width = versionBorderWidth,
+                                color = Colors.BaseColor,
+                                shape = RoundedCornerShape(Radius.Radius04)
+                            )
+                            .padding(
+                                horizontal = Spacings.Spacing01,
+                                vertical = Spacings.Spacing00
+                            )
+                            .align(Alignment.Center)
+                            .clickable {
+                                championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersionListDialog(true))
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = uiState.selectedVersion,
+                            style = TextStyles.SubTitle03,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
+                        )
+
                         Icon(
-                            modifier = Modifier.size(IconSize.XLargeSize),
-                            painter = painterResource(id = R.drawable.ic_chevron_left),
+                            modifier = Modifier.size(IconSize.SmallSize),
+                            painter = painterResource(id = R.drawable.ic_chevron_down),
                             contentDescription = null,
                             tint = Color.Unspecified
                         )
                     }
                 }
             }
-
-            HorizontalDivider(
-                modifier = Modifier.layoutId(MotionRefIdType.BottomDivider)
-            )
-
-            Box(
-                modifier = Modifier.layoutId(MotionRefIdType.Version)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .width(80.dp)
-                        .background(
-                            color = Colors.Blue06,
-                            shape = RoundedCornerShape(Radius.Radius04)
-                        )
-                        .border(
-                            width = versionBorderWidth,
-                            color = Colors.BaseColor,
-                            shape = RoundedCornerShape(Radius.Radius04)
-                        )
-                        .padding(
-                            horizontal = Spacings.Spacing01,
-                            vertical = Spacings.Spacing00
-                        )
-                        .align(Alignment.Center)
-                        .clickable {
-                            championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersionListDialog(true))
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = uiState.selectedVersion,
-                        style = TextStyles.SubTitle03,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Icon(
-                        modifier = Modifier.size(IconSize.SmallSize),
-                        painter = painterResource(id = R.drawable.ic_chevron_down),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-                }
-            }
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
         ) {
-            Spacer(modifier = Modifier.height(Spacings.Spacing00))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+            ) {
+                Spacer(modifier = Modifier.height(Spacings.Spacing00))
 
-            ChampionDetailInfoTitle(title = statsTitle)
+                ChampionDetailInfoTitle(title = statsTitle)
 
-            ChampionStatusBody(
-                currentVersion = uiState.selectedVersion,
-                preVersion = uiState.preVersionName,
-                championStats = championDetailData.stats,
-                preChampionStats = uiState.preChampion?.stats
-            )
-
-            ChampionDetailInfoTitle(title = skillTitle)
-
-            ChampionSkillListBody(
-                isLatestVersion = uiState.isLatestVersion,
-                version = uiState.selectedVersion,
-                selectedSkill = uiState.selectedSkill,
-                selectedSkillUrl = uiState.selectedSkillUrl,
-                passiveSkill = championDetailData.passive,
-                skillList = championDetailData.spells,
-                onClickSkillIcon = { skill ->
-                    val action = ChampionDetailAction.ChangeSelectSkill(skill)
-                    championDetailViewModel.sendAction(action)
-                }
-            )
-
-            if (uiState.similarChampionList.isNotEmpty()) {
-                ChampionDetailInfoTitle(title = similarChampionTitle)
-
-                SimilarChampionListBody(
-                    version = uiState.selectedVersion,
-                    tags = championDetailData.tags,
-                    similarChampionList = uiState.similarChampionList,
-                    moveToChampionDetailScreen = moveToChampionDetailScreen
+                ChampionStatusBody(
+                    currentVersion = uiState.selectedVersion,
+                    preVersion = uiState.preVersionName,
+                    championStats = championDetailData.stats,
+                    preChampionStats = uiState.preChampion?.stats
                 )
+
+                ChampionDetailInfoTitle(title = skillTitle)
+
+                ChampionSkillListBody(
+                    isLatestVersion = uiState.isLatestVersion,
+                    version = uiState.selectedVersion,
+                    selectedSkill = uiState.selectedSkill,
+                    selectedSkillUrl = uiState.selectedSkillUrl,
+                    passiveSkill = championDetailData.passive,
+                    skillList = championDetailData.spells,
+                    onClickSkillIcon = { skill ->
+                        val action = ChampionDetailAction.ChangeSelectSkill(skill)
+                        championDetailViewModel.sendAction(action)
+                    }
+                )
+
+                if (uiState.similarChampionList.isNotEmpty()) {
+                    ChampionDetailInfoTitle(title = similarChampionTitle)
+
+                    SimilarChampionListBody(
+                        version = uiState.selectedVersion,
+                        tags = championDetailData.tags,
+                        similarChampionList = uiState.similarChampionList,
+                        moveToChampionDetailScreen = moveToChampionDetailScreen
+                    )
+                }
+
+                ChampionDetailInfoTitle(title = skinTitle)
+
+                ChampionSkinsView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(Dimens.CHAMPION_SPLASH_RATIO),
+                    championId = championDetailData.id,
+                    championSkinList = championDetailData.skins
+                )
+
+                ChampionDetailInfoTitle(title = storyTitle)
+
+                LolHtmlTagTextView(
+                    modifier = Modifier.padding(horizontal = Spacings.Spacing04),
+                    lolDescription = championDetailData.lore,
+                    textSize = TextStyles.Body01.fontSize.value,
+                    textColor = Colors.Gray03
+                )
+
+                Spacer(modifier = Modifier.height(Spacings.Spacing05))
+
+                ChampionLinkListBody(championDetailData = championDetailData)
+
+                Spacer(modifier = Modifier.height(Spacings.Spacing02))
             }
 
-            ChampionDetailInfoTitle(title = skinTitle)
+            if (uiState.isShowVersionListDialog) {
+                BaseBottomSheetDialog(
+                    onDismissRequest = {
+                        championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersionListDialog(false))
+                    }
+                ) {
+                    LazyColumn {
+                        items(count = uiState.versionNameList.size) {
+                            val versionName = uiState.versionNameList[it]
 
-            ChampionSkinsView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(Dimens.CHAMPION_SPLASH_RATIO),
-                championId = championDetailData.id,
-                championSkinList = championDetailData.skins
-            )
-
-            ChampionDetailInfoTitle(title = storyTitle)
-
-            LolHtmlTagTextView(
-                modifier = Modifier.padding(horizontal = Spacings.Spacing04),
-                lolDescription = championDetailData.lore,
-                textSize = TextStyles.Body01.fontSize.value,
-                textColor = Colors.Gray03
-            )
-
-            Spacer(modifier = Modifier.height(Spacings.Spacing05))
-
-            ChampionLinkListBody(championDetailData = championDetailData)
-
-            Spacer(modifier = Modifier.height(Spacings.Spacing02))
-        }
-
-        if (uiState.isShowVersionListDialog) {
-            BaseBottomSheetDialog(
-                onDismissRequest = {
-                    championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersionListDialog(false))
-                }
-            ) {
-                LazyColumn {
-                    items(count = uiState.versionNameList.size) {
-                        val versionName = uiState.versionNameList[it]
-
-                        VersionItemBody(
-                            versionName = versionName,
-                            isSelectedVersion = versionName == uiState.selectedVersion,
-                            isChangedStatsDiff = changedStatsVersion[versionName] == true,
-                            onClickListener = {
-                                championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersion(versionName))
-                            }
-                        )
+                            VersionItemBody(
+                                versionName = versionName,
+                                isSelectedVersion = versionName == uiState.selectedVersion,
+                                isChangedStatsDiff = changedStatsVersion[versionName] == true,
+                                onClickListener = {
+                                    championDetailViewModel.sendAction(ChampionDetailAction.ChangeVersion(versionName))
+                                }
+                            )
+                        }
                     }
                 }
             }

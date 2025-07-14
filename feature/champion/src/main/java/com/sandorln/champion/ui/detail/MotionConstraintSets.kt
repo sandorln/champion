@@ -1,5 +1,6 @@
 package com.sandorln.champion.ui.detail
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintSetScope
 import androidx.constraintlayout.compose.Dimension
@@ -11,7 +12,8 @@ internal enum class MotionRefIdType {
 
 internal fun ConstraintSetScope.championDetailStart(
     headerRef: ConstrainedLayoutReference,
-    bodyRef: ConstrainedLayoutReference
+    bodyRef: ConstrainedLayoutReference,
+    innerPadding: PaddingValues
 ) {
     val splashImgRef = createRefFor(MotionRefIdType.Splash)
     val iconRef = createRefFor(MotionRefIdType.Icon)
@@ -68,7 +70,8 @@ internal fun ConstraintSetScope.championDetailStart(
 
 internal fun ConstraintSetScope.championDetailEnd(
     headerRef: ConstrainedLayoutReference,
-    bodyRef: ConstrainedLayoutReference
+    bodyRef: ConstrainedLayoutReference,
+    innerPadding: PaddingValues
 ) {
     val splashImgRef = createRefFor(MotionRefIdType.Splash)
     val iconRef = createRefFor(MotionRefIdType.Icon)
@@ -88,14 +91,14 @@ internal fun ConstraintSetScope.championDetailEnd(
     }
     constrain(iconRef) {
         start.linkTo(backRef.end, Spacings.Spacing02)
-        top.linkTo(headerRef.top)
+        top.linkTo(headerRef.top, innerPadding.calculateTopPadding())
         bottom.linkTo(headerRef.bottom)
         alpha = 1f
     }
     constrain(titleRef) {
         height = Dimension.fillToConstraints
         start.linkTo(iconRef.end, Spacings.Spacing02)
-        top.linkTo(headerRef.top)
+        top.linkTo(headerRef.top, innerPadding.calculateTopPadding())
         bottom.linkTo(nameRef.top)
     }
     constrain(nameRef) {
@@ -112,7 +115,7 @@ internal fun ConstraintSetScope.championDetailEnd(
     constrain(versionRef) {
         width = Dimension.fillToConstraints
         end.linkTo(parent.end, Spacings.Spacing04)
-        top.linkTo(headerRef.top)
+        top.linkTo(headerRef.top, innerPadding.calculateTopPadding())
         bottom.linkTo(headerRef.bottom)
     }
 
