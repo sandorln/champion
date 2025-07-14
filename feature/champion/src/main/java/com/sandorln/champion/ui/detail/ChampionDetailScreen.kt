@@ -337,7 +337,7 @@ fun ChampionDetailScreen(
 
                 ChampionLinkListBody(championDetailData = championDetailData)
 
-                Spacer(modifier = Modifier.height(Spacings.Spacing02))
+                Spacer(modifier = Modifier.height(Spacings.Spacing02 + innerPadding.calculateBottomPadding()))
             }
 
             if (uiState.isShowVersionListDialog) {

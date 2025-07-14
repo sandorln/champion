@@ -9,8 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -100,17 +103,19 @@ fun HomeScreen(
     val hasNextVersion = uiState.nextVersionName.isNotEmpty()
     val hasPreVersion = uiState.preVersionName.isNotEmpty()
     val currentVersionName = uiState.currentVersionName
+    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues()
 
     Scaffold(
         bottomBar = {
             if (isInitComplete) {
-                Column(modifier = Modifier.padding(bottom = Spacings.Spacing03)) {
+                Column {
                     HorizontalDivider(
                         color = Colors.Gray08,
                         thickness = 1.dp
                     )
                     HomeBottomNavigation(
                         selectedIndex = pagerState.currentPage,
+                        innerPadding = navigationBarPadding,
                         onSelectedIndex = { index ->
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(index)
@@ -118,7 +123,6 @@ fun HomeScreen(
                         }
                     )
                 }
-
             }
         }
     ) { innerPadding ->
@@ -336,10 +340,12 @@ private fun NewContentListBody(
 @Composable
 internal fun HomeBottomNavigation(
     selectedIndex: Int = 0,
+    innerPadding: PaddingValues = WindowInsets.navigationBars.asPaddingValues(),
     onSelectedIndex: (Int) -> Unit = {}
 ) {
     BottomNavigation(
-        backgroundColor = Colors.Blue06
+        backgroundColor = Colors.Blue06,
+        modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
     ) {
         homeItems.forEachIndexed { index, homeScreenType ->
             val isSelected = selectedIndex == index
