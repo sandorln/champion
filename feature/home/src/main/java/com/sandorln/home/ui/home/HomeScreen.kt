@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -108,7 +110,9 @@ fun HomeScreen(
     Scaffold(
         bottomBar = {
             if (isInitComplete) {
-                Column {
+                Column(
+                    modifier = Modifier.imePadding()
+                ) {
                     HorizontalDivider(
                         color = Colors.Gray08,
                         thickness = 1.dp
@@ -126,7 +130,8 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
+        Column(modifier = Modifier
+            .padding(innerPadding)) {
             if (!isInitComplete) {
                 IntroScreen()
             } else {
