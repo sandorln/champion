@@ -7,4 +7,6 @@ data class RuneData(
     val name: String,
     val shortDesc: String,
     val longDesc: String
-)
+) {
+    val iconUrl = "https://ddragon.leagueoflegends.com/cdn/img/$icon"
+}

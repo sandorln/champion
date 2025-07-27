@@ -66,6 +66,8 @@ object Dimens {
     val ITEM_BUILD_PEEK_HEIGHT = 65.dp
 
     val RUNE_STYLE_BAR_HEIGHT = 92.dp
+    val RUNE_DATA_CORE_HEIGHT = 62.dp
+    val RUNE_DATA_DEFAULT_HEIGHT = 46.dp
 }
 
 object AnimationConfig {
