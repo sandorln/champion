@@ -201,6 +201,7 @@ fun RuneSlotListBody(
     runeSlot: RuneSlot,
     isCoreRune: Boolean,
 ) {
+    // TODO :: 갱신 로직 추가
     var selectedRuneData: RuneData? by remember(runeSlot) { mutableStateOf(null) }
     val minHeight = if (isCoreRune) Dimens.RUNE_DATA_CORE_HEIGHT else Dimens.RUNE_DATA_DEFAULT_HEIGHT
 
