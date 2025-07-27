@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.sandorln.database.AppDatabase
 import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
+import com.sandorln.database.converter.LolRuneConverters
 import com.sandorln.database.converter.MapsConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
@@ -33,12 +34,14 @@ object DatabaseModule {
         @ApplicationContext context: Context,
         lolChampionConverters: LolChampionConverters,
         lolItemConverters: LolItemConverters,
+        lolRuneConverters: LolRuneConverters,
         mapsConverters: MapsConverters
     ): AppDatabase = Room
         .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-        .createFromAsset("database/lol-champion.db")
+//        .createFromAsset("database/lol-champion.db") TODO :: 해당 버전에 맞는 DB 로 교체 필요
         .addTypeConverter(lolChampionConverters)
         .addTypeConverter(lolItemConverters)
+        .addTypeConverter(lolRuneConverters)
         .addTypeConverter(mapsConverters)
         .fallbackToDestructiveMigration()
         .build()

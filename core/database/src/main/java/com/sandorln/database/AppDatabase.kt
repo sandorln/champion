@@ -5,9 +5,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
+import com.sandorln.database.converter.LolRuneConverters
 import com.sandorln.database.converter.MapsConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
+import com.sandorln.database.dao.RuneDao
 import com.sandorln.database.dao.SummonerSpellDao
 import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.ChampionEntity
@@ -20,11 +22,12 @@ import com.sandorln.database.model.VersionEntity
         ChampionEntity::class,
         ItemEntity::class,
         SummonerSpellEntity::class,
-        VersionEntity::class
+        VersionEntity::class,
+        RuneDao::class
     ],
-    version = 10
+    version = 11
 )
-@TypeConverters(value = [LolChampionConverters::class, LolItemConverters::class, MapsConverters::class])
+@TypeConverters(value = [LolChampionConverters::class, LolItemConverters::class, LolRuneConverters::class, MapsConverters::class])
 abstract class AppDatabase : RoomDatabase() {
     abstract fun championDao(): ChampionDao
     abstract fun itemDao(): ItemDao
