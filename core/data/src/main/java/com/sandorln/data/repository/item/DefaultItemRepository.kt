@@ -41,7 +41,6 @@ class DefaultItemRepository @Inject constructor(
         val response = itemService.getAllItemMap(version)
         val itemEntityList = response.map { it.value.asEntity(id = it.key, version = version) }
         itemDao.insertItemDataList(itemEntityList)
-    }.onFailure {
     }
 
     override suspend fun getItemListByVersion(version: String): List<ItemData> =

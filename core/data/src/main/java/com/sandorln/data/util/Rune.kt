@@ -10,7 +10,7 @@ import com.sandorln.network.model.rune.NetworkRuneData
 import com.sandorln.network.model.rune.NetworkRuneSlot
 import com.sandorln.network.model.rune.NetworkRuneStyle
 
-fun RuneDataEntity.asRuneData(): RuneData = RuneData(
+fun RuneDataEntity.asData(): RuneData = RuneData(
     id = this.id,
     key = this.key,
     icon = this.icon,
@@ -19,23 +19,20 @@ fun RuneDataEntity.asRuneData(): RuneData = RuneData(
     longDesc = this.longDesc
 )
 
-fun RuneSlotEntity.asRuneSlot(): RuneSlot = RuneSlot(
-    runes = this.runes.map { it.asRuneData() }
+fun RuneSlotEntity.asData(): RuneSlot = RuneSlot(
+    runes = this.runes.map(RuneDataEntity::asData)
 )
 
-fun RuneStyleEntity.asRuneStyle(): RuneStyle =
+fun RuneStyleEntity.asData(): RuneStyle =
     RuneStyle(
         id = this.id,
         key = this.key,
         icon = this.icon,
         name = this.name,
-        slots = this.slots.map { it.asRuneSlot() }
+        slots = this.slots.map(RuneSlotEntity::asData)
     )
 
-fun List<RuneStyleEntity>.asRuneStyleList(): List<RuneStyle> =
-    this.map { it.asRuneStyle() }
-
-fun NetworkRuneData.asRuneDataEntity(): RuneDataEntity =
+fun NetworkRuneData.toEntity(): RuneDataEntity =
     RuneDataEntity(
         id = this.id,
         key = this.key,
@@ -45,18 +42,18 @@ fun NetworkRuneData.asRuneDataEntity(): RuneDataEntity =
         longDesc = this.longDesc
     )
 
-fun NetworkRuneSlot.asRuneSlotEntity(): RuneSlotEntity = RuneSlotEntity(
-    runes = this.runes.map { it.asRuneDataEntity() }
+fun NetworkRuneSlot.toEntity(): RuneSlotEntity = RuneSlotEntity(
+    runes = this.runes.map(NetworkRuneData::toEntity)
 )
 
-fun NetworkRuneStyle.asRuneStyleEntity(version: String): RuneStyleEntity = RuneStyleEntity(
+fun NetworkRuneStyle.toEntity(version: String): RuneStyleEntity = RuneStyleEntity(
     id = this.id,
     version = version,
     key = this.key,
     icon = this.icon,
     name = this.name,
-    slots = this.slots.map { it.asRuneSlotEntity() }
+    slots = this.slots.map(NetworkRuneSlot::toEntity)
 )
 
-fun List<NetworkRuneStyle>.asRuneStyleEntityList(version: String): List<RuneStyleEntity> =
-    this.map { it.asRuneStyleEntity(version) }
+fun List<NetworkRuneStyle>.toEntityList(version: String): List<RuneStyleEntity> =
+    this.map { it.toEntity(version) }
