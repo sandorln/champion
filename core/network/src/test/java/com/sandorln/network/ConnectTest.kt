@@ -1,6 +1,7 @@
 package com.sandorln.network
 
 import com.sandorln.network.service.ItemService
+import com.sandorln.network.service.RuneService
 import com.sandorln.network.service.SpriteService
 import com.sandorln.network.service.SummonerSpellService
 import com.sandorln.network.service.VersionService
@@ -22,6 +23,7 @@ class ConnectTest {
     private lateinit var _itemService: ItemService
     private lateinit var _summonerSpellService: SummonerSpellService
     private lateinit var _spriteService: SpriteService
+    private lateinit var _runeService: RuneService
 
     @Before
     fun before() {
@@ -50,6 +52,7 @@ class ConnectTest {
         _itemService = ItemService(ktorClient)
         _summonerSpellService = SummonerSpellService(ktorClient)
         _spriteService = SpriteService(ktorClient)
+        _runeService = RuneService(ktorClient)
     }
 
     @Test
@@ -112,6 +115,19 @@ class ConnectTest {
                 println("이번 아이템 패치 노트 : $it")
             }.onFailure {
                 println("아이템 패치 노트 읽어오기 실패 : $it")
+            }
+        }
+    }
+
+    @Test
+    fun 룬_정보_가져오기() {
+        runBlocking {
+            runCatching {
+                _runeService.getAllRuneDataList("14.15.1")
+            }.onSuccess {
+                println("이번 룬 정보 : $it")
+            }.onFailure {
+                println("룬 정보 읽어오기 실패 : $it")
             }
         }
     }

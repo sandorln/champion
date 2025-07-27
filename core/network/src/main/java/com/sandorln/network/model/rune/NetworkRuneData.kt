@@ -1,5 +1,8 @@
 package com.sandorln.network.model.rune
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class NetworkRuneData(
     val id: Int,
     val key: String,
