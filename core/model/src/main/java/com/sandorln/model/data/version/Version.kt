@@ -17,5 +17,5 @@ data class Version(
     val newItemIdList: List<String>? = null,
     val newChampionIdList: List<String>? = null
 ) {
-    val majorMinorPatch: List<Int> = name.split('.').map(String::toInt)
+    val majorMinorPatch: List<Int> = runCatching { name.split('.').map(String::toInt) }.getOrDefault(emptyList())
 }
