@@ -64,6 +64,8 @@ object Dimens {
 
     val INITIAL_GAME_TITLE_SIZE = 40.dp
     val ITEM_BUILD_PEEK_HEIGHT = 65.dp
+
+    val RUNE_STYLE_BAR_HEIGHT = 92.dp
 }
 
 object AnimationConfig {

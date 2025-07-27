@@ -6,4 +6,6 @@ data class RuneStyle(
     val icon: String,
     val name: String,
     val slots: List<RuneSlot>
-)
+) {
+    val iconUrl = "https://ddragon.leagueoflegends.com/cdn/img/$icon"
+}
