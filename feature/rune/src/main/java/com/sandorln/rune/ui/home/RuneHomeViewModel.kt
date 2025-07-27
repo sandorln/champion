@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,8 +46,9 @@ class RuneHomeViewModel @Inject constructor(
                     .collect { runeStyleList ->
                         _uiState.update {
                             it.copy(
-                                runeStyleList = runeStyleList.sortedBy(RuneStyle::id),
-                                selectedRuneStyle = it.selectedRuneStyle ?: runeStyleList.firstOrNull()
+                                runeStyleList = runeStyleList,
+                                selectedRuneStyle = runeStyleList.firstOrNull(),
+                                notRuneSystem = runeStyleList.isEmpty()
                             )
                         }
                     }
@@ -59,6 +61,7 @@ data class RuneHomeUiState(
     val isLoading: Boolean = false,
     val selectedRuneStyle: RuneStyle? = null,
     val runeStyleList: List<RuneStyle> = emptyList(),
+    val notRuneSystem: Boolean = false,
 )
 
 sealed interface RuneHomeAction {

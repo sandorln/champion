@@ -35,6 +35,7 @@ object IconSize {
     val XLargeSize = 32.dp
     val XXLargeSize = 48.dp
     val XXXLargeSize = 72.dp
+    val XXXXLargeSize = 162.dp
 }
 
 object Dimens {

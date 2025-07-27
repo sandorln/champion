@@ -3,6 +3,7 @@ package com.sandorln.rune.ui.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,6 +38,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +59,8 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.rune.RuneData
 import com.sandorln.model.data.rune.RuneSlot
 import com.sandorln.model.data.rune.RuneStyle
+import com.sandorln.rune.R
+import com.sandorln.design.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +68,7 @@ fun RuneHomeScreen(
     runeHomeViewModel: RuneHomeViewModel = hiltViewModel()
 ) {
     val uiState by runeHomeViewModel.uiState.collectAsState()
+    val runeSlots = uiState.selectedRuneStyle?.slots ?: emptyList()
 
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PULL_HEIGHT
@@ -79,6 +85,11 @@ fun RuneHomeScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        if (uiState.notRuneSystem) {
+            NotRuneSystemScreen()
+            return@Box
+        }
+
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
@@ -96,8 +107,8 @@ fun RuneHomeScreen(
                 }
             }
 
-            items(count = uiState.selectedRuneStyle?.slots?.size ?: 0) { index ->
-                val runeSlot = uiState.selectedRuneStyle?.slots?.get(index) ?: return@items
+            items(count = runeSlots.size) { index ->
+                val runeSlot = runeSlots.getOrNull(index) ?: return@items
                 val isCoreRune = index == 0
                 RuneSlotListBody(
                     modifier = Modifier.fillMaxWidth(),
@@ -299,6 +310,30 @@ fun SelectedRuneDataBody(runeData: RuneData?) {
     }
 }
 
+@Composable
+fun NotRuneSystemScreen() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            modifier = Modifier.size(IconSize.XXXXLargeSize),
+            contentScale = ContentScale.Fit,
+            painter = painterResource(DesignR.drawable.img_error),
+            contentDescription = null,
+        )
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(R.string.not_rune_system_message),
+            style = TextStyles.SubTitle01,
+            color = Colors.BasicWhite,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 @Preview
 @Composable
 fun RuneStyleListBodyPreview() {
@@ -376,3 +411,10 @@ fun SelectedRuneDataBodyPreview() {
     }
 }
 
+@Preview
+@Composable
+fun NotRuneSystemScreenPreview() {
+    LolChampionThemePreview {
+        NotRuneSystemScreen()
+    }
+}
