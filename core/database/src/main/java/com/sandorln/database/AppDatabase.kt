@@ -14,6 +14,7 @@ import com.sandorln.database.dao.SummonerSpellDao
 import com.sandorln.database.dao.VersionDao
 import com.sandorln.database.model.ChampionEntity
 import com.sandorln.database.model.ItemEntity
+import com.sandorln.database.model.RuneStyleEntity
 import com.sandorln.database.model.SummonerSpellEntity
 import com.sandorln.database.model.VersionEntity
 
@@ -23,7 +24,7 @@ import com.sandorln.database.model.VersionEntity
         ItemEntity::class,
         SummonerSpellEntity::class,
         VersionEntity::class,
-        RuneDao::class
+        RuneStyleEntity::class
     ],
     version = 11
 )
@@ -32,5 +33,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun championDao(): ChampionDao
     abstract fun itemDao(): ItemDao
     abstract fun summonerSpellDao(): SummonerSpellDao
+    abstract fun runeDao(): RuneDao
     abstract fun versionDao(): VersionDao
 }

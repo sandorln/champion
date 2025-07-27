@@ -10,6 +10,7 @@ import com.sandorln.database.converter.LolRuneConverters
 import com.sandorln.database.converter.MapsConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
+import com.sandorln.database.dao.RuneDao
 import com.sandorln.database.dao.SummonerSpellDao
 import com.sandorln.database.dao.VersionDao
 import dagger.Module
@@ -57,6 +58,10 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun providesSummonerSpellDao(appDatabase: AppDatabase): SummonerSpellDao = appDatabase.summonerSpellDao()
+
+    @Provides
+    @Singleton
+    fun providesRuneDao(appDatabase: AppDatabase): RuneDao = appDatabase.runeDao()
 
     @Provides
     @Singleton
