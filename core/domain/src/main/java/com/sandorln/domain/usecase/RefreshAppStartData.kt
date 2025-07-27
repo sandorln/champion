@@ -2,6 +2,7 @@ package com.sandorln.domain.usecase
 
 import com.sandorln.data.repository.champion.ChampionRepository
 import com.sandorln.data.repository.item.ItemRepository
+import com.sandorln.data.repository.rune.RuneRepository
 import com.sandorln.data.repository.spell.SummonerSpellRepository
 import com.sandorln.data.repository.version.VersionRepository
 import kotlinx.coroutines.async
@@ -16,7 +17,8 @@ class RefreshAppStartData @Inject constructor(
     private val versionRepository: VersionRepository,
     private val spellRepository: SummonerSpellRepository,
     private val championRepository: ChampionRepository,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val runeRepository: RuneRepository,
 ) {
     suspend operator fun invoke() {
         runCatching {
@@ -44,11 +46,17 @@ class RefreshAppStartData @Inject constructor(
                         else
                             spellRepository.refreshSummonerSpellList(versionName).isSuccess
 
+                        val runeResult = if (version.isCompleteRune)
+                            true
+                        else
+                            runeRepository.refreshRuneStyleList(versionName).isSuccess
+
                         versionRepository.updateVersionData(
                             version.copy(
                                 isCompleteChampions = championResult,
                                 isCompleteItems = itemResult,
-                                isCompleteSummonerSpell = spellResult
+                                isCompleteSummonerSpell = spellResult,
+                                isCompleteRune = runeResult,
                             )
                         )
                     }

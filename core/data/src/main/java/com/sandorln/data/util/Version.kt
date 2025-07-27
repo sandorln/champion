@@ -11,6 +11,7 @@ fun VersionEntity.asData(): Version = Version(
     isDownLoadItemIconSprite = isDownLoadItemIconSprite,
     isCompleteSummonerSpell = isCompleteSummonerSpell,
     isDownLoadSpellIconSprite = isDownLoadSpellIconSprite,
+    isCompleteRune = isCompleteRune,
     newItemIdList = newItemIdList,
     newChampionIdList = newChampionIdList
 )
@@ -23,6 +24,7 @@ fun Version.asEntity(): VersionEntity = VersionEntity(
     isDownLoadItemIconSprite = isDownLoadItemIconSprite,
     isCompleteSummonerSpell = isCompleteSummonerSpell,
     isDownLoadSpellIconSprite = isDownLoadSpellIconSprite,
+    isCompleteRune = isCompleteRune,
     newItemIdList = newItemIdList,
     newChampionIdList = newChampionIdList
 )

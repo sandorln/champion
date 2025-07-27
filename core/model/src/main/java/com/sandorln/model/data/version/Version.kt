@@ -11,8 +11,8 @@ data class Version(
 
     val isCompleteSummonerSpell: Boolean = false,
     val isDownLoadSpellIconSprite: Boolean = false,
-    
-    // TODO :: Rune 정보 추가 필요
+
+    val isCompleteRune : Boolean = false,
 
     val newItemIdList: List<String>? = null,
     val newChampionIdList: List<String>? = null
