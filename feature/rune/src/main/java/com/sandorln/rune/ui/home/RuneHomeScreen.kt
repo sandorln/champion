@@ -29,9 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -113,7 +110,16 @@ fun RuneHomeScreen(
                 RuneSlotListBody(
                     modifier = Modifier.fillMaxWidth(),
                     runeSlot = runeSlot,
-                    isCoreRune = isCoreRune
+                    isCoreRune = isCoreRune,
+                    selectedRuneData = uiState.selectedRuneDataList[index],
+                    onClickRuneData = { runeData ->
+                        runeHomeViewModel.sendAction(
+                            RuneHomeAction.SelectedRuneDataId(
+                                runeSlotIndex = index,
+                                runeData = runeData
+                            )
+                        )
+                    }
                 )
             }
 
@@ -200,9 +206,9 @@ fun RuneSlotListBody(
     modifier: Modifier = Modifier,
     runeSlot: RuneSlot,
     isCoreRune: Boolean,
+    selectedRuneData: RuneData?,
+    onClickRuneData: (runeData: RuneData) -> Unit
 ) {
-    // TODO :: 갱신 로직 추가
-    var selectedRuneData: RuneData? by remember(runeSlot) { mutableStateOf(null) }
     val minHeight = if (isCoreRune) Dimens.RUNE_DATA_CORE_HEIGHT else Dimens.RUNE_DATA_DEFAULT_HEIGHT
 
     Column(modifier = modifier) {
@@ -221,15 +227,13 @@ fun RuneSlotListBody(
                 count = runeSlot.runes.size,
                 key = { index -> runeSlot.runes[index].key }) { index ->
                 val runeData = runeSlot.runes.getOrNull(index) ?: return@items
-
+                val isSelected = selectedRuneData?.id == runeData.id
                 RuneDataBody(
-                    isSelect = selectedRuneData?.key == runeData.key,
+                    isSelect = isSelected,
                     selectedSize = IconSize.XXLargeSize.takeIf { isCoreRune },
                     unselectedSize = IconSize.XLargeSize.takeIf { isCoreRune },
                     runeData = runeData,
-                    onClickRuneData = { selectRuneData ->
-                        selectedRuneData = selectRuneData.takeIf { selectedRuneData != it }
-                    },
+                    onClickRuneData = onClickRuneData,
                 )
             }
         }
@@ -377,6 +381,7 @@ fun RuneSlotListBodyPreview() {
         RuneSlotListBody(
             modifier = Modifier.fillMaxWidth(),
             isCoreRune = true,
+            selectedRuneData = null,
             runeSlot = RuneSlot(
                 runes = List(4) { index ->
                     RuneData(
@@ -389,7 +394,8 @@ fun RuneSlotListBodyPreview() {
                                 "@APRatio.-1@)<br><br>재사용 대기시간: @Cooldown@ ~ @CooldownMin@초<br><br><hr></hr><i>'우리는 그들을 천둥군주라고 부른다. 그들의 번개를 입에 올리는 것은 재앙을 부르는 길이기 때문이다.'</i>"
                     )
                 }
-            )
+            ),
+            onClickRuneData = { _ -> }
         )
     }
 }
