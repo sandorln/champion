@@ -9,7 +9,6 @@ import org.jsoup.nodes.Element
 
 private const val PATCH_NOTES_CONTAINER_CLASS_NAME = "patch-notes-container"
 private const val HEADER_PRIMARY_CLASS_NAME = "header-primary"
-private const val PATCH_CHANGE_BLOCK_CLASS_NAME = "patch-change-block white-stone accent-before"
 private const val PATCH_FILTER_CHECK_CLASS_NAME = "reference-link"
 
 private const val PATCH_TITLE_CLASS_NAME = "change-title"

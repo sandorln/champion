@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
+import com.sandorln.design.component.BasePatchNoteListBodyWithLoading
 import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
@@ -90,6 +91,14 @@ fun RuneHomeScreen(
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
+            item {
+                BasePatchNoteListBodyWithLoading(
+                    title = stringResource(R.string.rune_patch_note_title),
+                    loadingTitle = stringResource(R.string.rune_patch_note_loading_title),
+                    patchNoteDataList = uiState.runePatchNoteList
+                )
+            }
+
             item {
                 Spacer(modifier = Modifier.height(Spacings.Spacing03))
             }

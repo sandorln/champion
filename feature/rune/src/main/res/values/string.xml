@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="not_rune_system_message">8.1.1 버전 이후 부터\n룬 시스템이 존재합니다.</string>
+
+    <string name="rune_patch_note_title">룬 패치노트</string>
+    <string name="rune_patch_note_loading_title">룬 패치노트 불러오는 중</string>
 </resources>
