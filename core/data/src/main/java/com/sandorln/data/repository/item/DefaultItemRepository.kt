@@ -1,10 +1,8 @@
 package com.sandorln.data.repository.item
 
 import com.sandorln.data.util.asCombinationData
-import com.sandorln.data.util.asChampionData
 import com.sandorln.data.util.asData
 import com.sandorln.data.util.asEntity
-import com.sandorln.data.util.asItemData
 import com.sandorln.database.dao.ItemDao
 import com.sandorln.database.model.ItemEntity
 import com.sandorln.datastore.local.version.VersionDatasource
@@ -67,5 +65,5 @@ class DefaultItemRepository @Inject constructor(
         itemDao.getSummaryItemImage(id, versionName).firstOrNull()?.asData()
 
     override suspend fun getItemPatchList(version: String): List<PatchNoteData> =
-        itemService.getItemPathNoteList(version).map(NetworkPatchNoteData::asItemData)
+        itemService.getItemPathNoteList(version).map(NetworkPatchNoteData::asData)
 }
