@@ -12,6 +12,10 @@ data class Version(
     val isCompleteSummonerSpell: Boolean = false,
     val isDownLoadSpellIconSprite: Boolean = false,
 
+    val isCompleteRune: Boolean = false,
+
     val newItemIdList: List<String>? = null,
     val newChampionIdList: List<String>? = null
-)
+) {
+    val majorMinorPatch: List<Int> = runCatching { name.split('.').map(String::toInt) }.getOrDefault(emptyList())
+}

@@ -5,6 +5,7 @@
     <string name="menu_spell">스펠</string>
     <string name="menu_setting">설정</string>
     <string name="menu_game">게임</string>
+    <string name="menu_rune">룬</string>
 
     <string name="version_previous_btn">Prev</string>
     <string name="version_next_btn">Next</string>

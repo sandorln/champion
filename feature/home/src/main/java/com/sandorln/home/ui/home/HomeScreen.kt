@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -66,6 +65,7 @@ import com.sandorln.home.R
 import com.sandorln.home.ui.intro.IntroScreen
 import com.sandorln.item.ui.home.ItemHomeScreen
 import com.sandorln.model.data.version.Version
+import com.sandorln.rune.ui.home.RuneHomeScreen
 import com.sandorln.setting.ui.home.SettingHomeScreen
 import com.sandorln.spell.ui.SpellHomeScreen
 import kotlinx.coroutines.launch
@@ -75,14 +75,16 @@ import com.sandorln.design.R as designR
 sealed class HomeScreenType(@DrawableRes val svgId: Int) {
     data object Champion : HomeScreenType(designR.drawable.ic_main_champion)
     data object Item : HomeScreenType(designR.drawable.ic_main_item)
+    data object Rune : HomeScreenType(designR.drawable.ic_main_special)
     data object SummonerSpell : HomeScreenType(designR.drawable.ic_main_spell)
-    data object Setting : HomeScreenType(designR.drawable.ic_main_special)
+    data object Setting : HomeScreenType(designR.drawable.ic_setting)
     data object Game : HomeScreenType(designR.drawable.ic_lol_flat_gold)
 }
 
 private val homeItems = listOf(
     HomeScreenType.Champion,
     HomeScreenType.Item,
+    HomeScreenType.Rune,
     HomeScreenType.SummonerSpell,
     HomeScreenType.Game,
     HomeScreenType.Setting
@@ -130,8 +132,10 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        Column(modifier = Modifier
-            .padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+        ) {
             if (!isInitComplete) {
                 IntroScreen()
             } else {
@@ -175,6 +179,8 @@ fun HomeScreen(
                         HomeScreenType.Game -> GameHomeScreen(
                             moveToInitialQuizScreen = moveToInitialQuizScreen
                         )
+
+                        HomeScreenType.Rune -> RuneHomeScreen()
                     }
                 }
             }
@@ -375,6 +381,7 @@ internal fun HomeBottomNavigation(
                         HomeScreenType.Setting -> R.string.menu_setting
                         HomeScreenType.SummonerSpell -> R.string.menu_spell
                         HomeScreenType.Game -> R.string.menu_game
+                        HomeScreenType.Rune -> R.string.menu_rune
                     }
                     Text(
                         text = stringResource(id = titleId),

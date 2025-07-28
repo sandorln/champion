@@ -6,9 +6,11 @@ import com.google.gson.Gson
 import com.sandorln.database.AppDatabase
 import com.sandorln.database.converter.LolChampionConverters
 import com.sandorln.database.converter.LolItemConverters
+import com.sandorln.database.converter.LolRuneConverters
 import com.sandorln.database.converter.MapsConverters
 import com.sandorln.database.dao.ChampionDao
 import com.sandorln.database.dao.ItemDao
+import com.sandorln.database.dao.RuneDao
 import com.sandorln.database.dao.SummonerSpellDao
 import com.sandorln.database.dao.VersionDao
 import dagger.Module
@@ -33,12 +35,14 @@ object DatabaseModule {
         @ApplicationContext context: Context,
         lolChampionConverters: LolChampionConverters,
         lolItemConverters: LolItemConverters,
+        lolRuneConverters: LolRuneConverters,
         mapsConverters: MapsConverters
     ): AppDatabase = Room
         .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
         .createFromAsset("database/lol-champion.db")
         .addTypeConverter(lolChampionConverters)
         .addTypeConverter(lolItemConverters)
+        .addTypeConverter(lolRuneConverters)
         .addTypeConverter(mapsConverters)
         .fallbackToDestructiveMigration()
         .build()
@@ -54,6 +58,10 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun providesSummonerSpellDao(appDatabase: AppDatabase): SummonerSpellDao = appDatabase.summonerSpellDao()
+
+    @Provides
+    @Singleton
+    fun providesRuneDao(appDatabase: AppDatabase): RuneDao = appDatabase.runeDao()
 
     @Provides
     @Singleton
