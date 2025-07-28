@@ -153,7 +153,8 @@ fun HomeScreen(
                 )
                 HorizontalPager(
                     state = pagerState,
-                    beyondBoundsPageCount = homeItems.size
+                    beyondBoundsPageCount = homeItems.size,
+                    userScrollEnabled = false,
                 ) { page: Int ->
                     when (homeItems[page]) {
                         HomeScreenType.Champion -> ChampionHomeScreen(
