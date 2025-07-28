@@ -272,7 +272,7 @@ fun RuneDataBody(
         model = runeData.iconUrl,
         colorFilter = colorFilter,
         contentDescription = null,
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
     )
 }
 
