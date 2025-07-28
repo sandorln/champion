@@ -1,5 +1,6 @@
 package com.sandorln.network
 
+import com.sandorln.network.service.ChampionService
 import com.sandorln.network.service.ItemService
 import com.sandorln.network.service.RuneService
 import com.sandorln.network.service.SpriteService
@@ -20,6 +21,7 @@ import org.junit.Test
 
 class ConnectTest {
     private lateinit var _versionService: VersionService
+    private lateinit var _championService: ChampionService
     private lateinit var _itemService: ItemService
     private lateinit var _summonerSpellService: SummonerSpellService
     private lateinit var _spriteService: SpriteService
@@ -49,10 +51,11 @@ class ConnectTest {
         }
 
         _versionService = VersionService(ktorClient)
+        _championService = ChampionService(ktorClient)
         _itemService = ItemService(ktorClient)
+        _runeService = RuneService(ktorClient)
         _summonerSpellService = SummonerSpellService(ktorClient)
         _spriteService = SpriteService(ktorClient)
-        _runeService = RuneService(ktorClient)
     }
 
     @Test
@@ -107,14 +110,20 @@ class ConnectTest {
     }
 
     @Test
-    fun 아이템_패치노트_가져오기() {
+    fun 각_패치노트_가져오기() {
         runBlocking {
             runCatching {
-                _itemService.getItemPathNoteList("14.15.1")
-            }.onSuccess {
-                println("이번 아이템 패치 노트 : $it")
+                val versionName = "15.12.1"
+                val itemPatchResult = _itemService.getItemPathNoteList(versionName)
+                println(itemPatchResult)
+
+                val championPatchResult = _championService.getChampionPathNoteList(versionName)
+                println(championPatchResult)
+
+                val runePatchResult = _runeService.getRunePathNoteList(versionName)
+                println(runePatchResult)
             }.onFailure {
-                println("아이템 패치 노트 읽어오기 실패 : $it")
+                println("패치 노트 읽어오기 실패 : $it")
             }
         }
     }
