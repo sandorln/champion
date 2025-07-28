@@ -100,7 +100,7 @@ fun RuneHomeScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(Spacings.Spacing03))
+                Spacer(modifier = Modifier.height(Spacings.Spacing05))
             }
 
             item {

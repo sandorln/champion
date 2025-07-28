@@ -39,7 +39,7 @@ object DatabaseModule {
         mapsConverters: MapsConverters
     ): AppDatabase = Room
         .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-//        .createFromAsset("database/lol-champion.db") TODO :: 해당 버전에 맞는 DB 로 교체 필요
+        .createFromAsset("database/lol-champion.db")
         .addTypeConverter(lolChampionConverters)
         .addTypeConverter(lolItemConverters)
         .addTypeConverter(lolRuneConverters)
