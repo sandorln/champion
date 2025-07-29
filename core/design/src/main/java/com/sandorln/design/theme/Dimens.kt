@@ -35,6 +35,7 @@ object IconSize {
     val XLargeSize = 32.dp
     val XXLargeSize = 48.dp
     val XXXLargeSize = 72.dp
+    val XXXXLargeSize = 162.dp
 }
 
 object Dimens {
@@ -55,7 +56,7 @@ object Dimens {
     const val CHAMPION_SPLASH_RATIO = 1.694f
     const val CHAMPION_SKILL_VIDEO_RATIO = 1.48f
 
-    val CHAMPION_PATCH_MIN_HEIGHT = 130.dp
+    val BASE_PATCH_MIN_HEIGHT = 130.dp
     val CHAMPION_RATING_BOTTOM_DIALOG_MIN_HEIGHT = 120.dp
 
     val INITIAL_ITEM_STATUS_BODY_WIDTH_MAX = 320.dp
@@ -64,6 +65,10 @@ object Dimens {
 
     val INITIAL_GAME_TITLE_SIZE = 40.dp
     val ITEM_BUILD_PEEK_HEIGHT = 65.dp
+
+    val RUNE_STYLE_BAR_HEIGHT = 92.dp
+    val RUNE_DATA_CORE_HEIGHT = 62.dp
+    val RUNE_DATA_DEFAULT_HEIGHT = 46.dp
 }
 
 object AnimationConfig {

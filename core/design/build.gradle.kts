@@ -51,4 +51,5 @@ dependencies {
     api(libs.glide)
     api(libs.androidx.media.exoplayer)
     api(libs.androidx.media.ui)
+    api(project(":core:model"))
 }

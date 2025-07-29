@@ -1,7 +1,6 @@
 package com.sandorln.champion.ui.home
 
 import android.graphics.Bitmap
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,11 +12,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -36,10 +33,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.sandorln.champion.ui.patch.ChampionPatchNoteListBody
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
+import com.sandorln.design.component.BasePatchNoteListBodyWithLoading
 import com.sandorln.design.component.BaseSearchTextEditor
 import com.sandorln.design.component.toast.BaseToast
 import com.sandorln.design.theme.Colors
@@ -106,37 +103,12 @@ fun ChampionHomeScreen(
             pullToRefreshState = pullToRefreshState
         ) {
             item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = Spacings.Spacing02)
-                        .animateContentSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
-                ) {
-                    when {
-                        championPatchNoteList == null -> {
-                            CircularProgressIndicator(
-                                color = Colors.Gold03,
-                                modifier = Modifier.size(IconSize.XLargeSize),
-                                strokeWidth = 2.dp
-                            )
-
-                            Text(
-                                text = stringResource(id = championR.string.champion_patch_note_loading_title),
-                                style = TextStyles.SubTitle02,
-                                color = Colors.Gold03
-                            )
-                        }
-
-                        championPatchNoteList.isNotEmpty() -> {
-                            ChampionPatchNoteListBody(
-                                moveToChampionPatchNoteListScreen = { moveToChampionPatchNoteListScreen.invoke(currentVersion) },
-                                championPatchNoteList = championPatchNoteList
-                            )
-                        }
-                    }
-                }
+                BasePatchNoteListBodyWithLoading(
+                    title = stringResource(id = championR.string.champion_patch_note_title),
+                    loadingTitle = stringResource(id = championR.string.champion_patch_note_loading_title),
+                    patchNoteDataList = championPatchNoteList,
+                    moveToPatchNoteDetailScreen = { moveToChampionPatchNoteListScreen.invoke(currentVersion) }
+                )
             }
 
             stickyHeader {

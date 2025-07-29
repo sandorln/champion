@@ -16,7 +16,7 @@ interface VersionDao {
     @Query("SELECT * FROM VersionEntity WHERE name == :versionName")
     fun getVersionEntity(versionName: String): Flow<List<VersionEntity>>
 
-    @Query("SELECT * FROM VersionEntity WHERE isCompleteChampions == 0 OR isCompleteItems == 0 OR isCompleteSummonerSpell == 0")
+    @Query("SELECT * FROM VersionEntity WHERE isCompleteChampions == 0 OR isCompleteItems == 0 OR isCompleteSummonerSpell == 0 OR isCompleteRune == 0")
     suspend fun getNotInitVersionEntityList(): List<VersionEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -10,7 +10,7 @@ fun NetworkPatchNoteData.asChampionData(): PatchNoteData = PatchNoteData(
     summary = summary.dropLast(1).replace(". ", "\n")
 )
 
-fun NetworkPatchNoteData.asItemData(): PatchNoteData = PatchNoteData(
+fun NetworkPatchNoteData.asData(): PatchNoteData = PatchNoteData(
     title = title,
     imageUrl = imageUrl,
     summary = summary

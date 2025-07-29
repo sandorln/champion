@@ -1,7 +1,6 @@
 package com.sandorln.item.ui.home
 
 import android.graphics.Bitmap
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +23,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,6 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R
 import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
+import com.sandorln.design.component.BasePatchNoteListBodyWithLoading
 import com.sandorln.design.component.BaseSearchTextEditor
 import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.component.toast.BaseToast
@@ -69,7 +68,6 @@ import com.sandorln.design.theme.TextStyles
 import com.sandorln.item.model.ItemBuildException
 import com.sandorln.item.ui.dialog.ItemDetailDialog
 import com.sandorln.item.ui.dialog.ItemFilterDialog
-import com.sandorln.item.ui.patch.ItemPatchNoteListBody
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.type.ItemTagType
 import kotlin.math.floor
@@ -159,34 +157,11 @@ fun ItemHomeScreen(
             pullToRefreshState = pullToRefreshState
         ) {
             item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = Spacings.Spacing02)
-                        .animateContentSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
-                ) {
-                    when {
-                        itemPatchNoteList == null -> {
-                            CircularProgressIndicator(
-                                color = Colors.Gold03,
-                                modifier = Modifier.size(IconSize.XLargeSize),
-                                strokeWidth = 2.dp
-                            )
-
-                            Text(
-                                text = stringResource(id = ItemR.string.item_patch_note_loading_title),
-                                style = TextStyles.SubTitle02,
-                                color = Colors.Gold03
-                            )
-                        }
-
-                        itemPatchNoteList.isNotEmpty() -> {
-                            ItemPatchNoteListBody(itemPatchNoteList = itemPatchNoteList)
-                        }
-                    }
-                }
+                BasePatchNoteListBodyWithLoading(
+                    title = stringResource(id = ItemR.string.item_patch_note_title),
+                    loadingTitle = stringResource(id = ItemR.string.item_patch_note_loading_title),
+                    patchNoteDataList = itemPatchNoteList
+                )
             }
 
             stickyHeader {

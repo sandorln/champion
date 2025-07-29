@@ -6,6 +6,8 @@ import com.sandorln.data.repository.game.DefaultGameRepository
 import com.sandorln.data.repository.game.GameRepository
 import com.sandorln.data.repository.item.DefaultItemRepository
 import com.sandorln.data.repository.item.ItemRepository
+import com.sandorln.data.repository.rune.DefaultRuneRepository
+import com.sandorln.data.repository.rune.RuneRepository
 import com.sandorln.data.repository.spell.DefaultSummonerSpellRepository
 import com.sandorln.data.repository.spell.SummonerSpellRepository
 import com.sandorln.data.repository.sprite.DefaultSpriteRepository
@@ -40,6 +42,10 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindsSummonerSpellRepository(defaultSummonerSpellRepository: DefaultSummonerSpellRepository): SummonerSpellRepository
+
+    @Binds
+    @Singleton
+    fun bindsRuneRepository(defaultRuneRepository: DefaultRuneRepository): RuneRepository
 
     @Binds
     @Singleton

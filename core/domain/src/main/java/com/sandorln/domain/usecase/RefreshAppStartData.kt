@@ -2,6 +2,7 @@ package com.sandorln.domain.usecase
 
 import com.sandorln.data.repository.champion.ChampionRepository
 import com.sandorln.data.repository.item.ItemRepository
+import com.sandorln.data.repository.rune.RuneRepository
 import com.sandorln.data.repository.spell.SummonerSpellRepository
 import com.sandorln.data.repository.version.VersionRepository
 import kotlinx.coroutines.async
@@ -16,8 +17,13 @@ class RefreshAppStartData @Inject constructor(
     private val versionRepository: VersionRepository,
     private val spellRepository: SummonerSpellRepository,
     private val championRepository: ChampionRepository,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val runeRepository: RuneRepository,
 ) {
+    /**
+     * 앱을 새롭게 시작할 때 버전 및 초기화가 이뤄지지 않은 버전들 새롭게 초기화 처리
+     * [info] 룬 시스템은 Version [8.1.1] 이상부터 존재
+     */
     suspend operator fun invoke() {
         runCatching {
             coroutineScope {
@@ -44,11 +50,26 @@ class RefreshAppStartData @Inject constructor(
                         else
                             spellRepository.refreshSummonerSpellList(versionName).isSuccess
 
+                        val (major, minor, patch) = version.majorMinorPatch
+                        val isGreaterThanOrEqualTo811 =
+                            when {
+                                major > 8 -> true
+                                major == 8 && minor > 1 -> true
+                                major == 8 && minor == 1 && patch >= 1 -> true
+                                else -> false
+                            }
+
+                        val runeResult = if (!isGreaterThanOrEqualTo811 || version.isCompleteRune)
+                            true
+                        else
+                            runeRepository.refreshRuneStyleList(versionName).isSuccess
+
                         versionRepository.updateVersionData(
                             version.copy(
                                 isCompleteChampions = championResult,
                                 isCompleteItems = itemResult,
-                                isCompleteSummonerSpell = spellResult
+                                isCompleteSummonerSpell = spellResult,
+                                isCompleteRune = runeResult,
                             )
                         )
                     }

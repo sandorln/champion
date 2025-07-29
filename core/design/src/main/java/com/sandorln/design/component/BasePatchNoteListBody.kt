@@ -1,0 +1,279 @@
+package com.sandorln.design.component
+
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.sandorln.design.theme.Colors
+import com.sandorln.design.theme.Dimens
+import com.sandorln.design.theme.IconSize
+import com.sandorln.design.theme.LolChampionThemePreview
+import com.sandorln.design.theme.Spacings
+import com.sandorln.design.theme.TextStyles
+import com.sandorln.model.data.patchnote.PatchNoteData
+import kotlinx.coroutines.launch
+
+@Composable
+fun BasePatchNoteListBodyWithLoading(
+    title: String,
+    loadingTitle: String,
+    patchNoteDataList: List<PatchNoteData>?,
+    moveToPatchNoteDetailScreen: (() -> Unit)? = null,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = Spacings.Spacing02)
+            .animateContentSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+    ) {
+        when {
+            patchNoteDataList == null -> {
+                CircularProgressIndicator(
+                    color = Colors.Gold03,
+                    modifier = Modifier.size(IconSize.XLargeSize),
+                    strokeWidth = 2.dp
+                )
+
+                Text(
+                    text = loadingTitle,
+                    style = TextStyles.SubTitle02,
+                    color = Colors.Gold03
+                )
+            }
+
+            patchNoteDataList.isNotEmpty() -> {
+                BasePatchNoteListBody(
+                    title = title,
+                    patchNoteList = patchNoteDataList,
+                    moveToPatchNoteDetailScreen = moveToPatchNoteDetailScreen
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun BasePatchNoteListBody(
+    title: String,
+    patchNoteList: List<PatchNoteData>,
+    moveToPatchNoteDetailScreen: (() -> Unit)?
+) {
+    val pagerState = rememberPagerState { patchNoteList.size }
+    val coroutineScope = rememberCoroutineScope()
+    val currentPosition by remember { derivedStateOf { pagerState.currentPage } }
+
+    val moveToPage: (page: Int) -> Unit = { page ->
+        coroutineScope.launch { pagerState.scrollToPage(page) }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        ConstraintLayout(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val (titleRef, listBtnRef) = createRefs()
+            Text(
+                modifier = Modifier.constrainAs(titleRef) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+                text = title,
+                style = TextStyles.SubTitle02,
+                color = Colors.Gold02
+            )
+
+            if (moveToPatchNoteDetailScreen != null)
+                Text(
+                    modifier = Modifier
+                        .constrainAs(listBtnRef) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(parent.end, Spacings.Spacing05)
+                        }
+                        .clickable {
+                            moveToPatchNoteDetailScreen.invoke()
+                        },
+                    text = title,
+                    style = TextStyles.Body04,
+                    color = Colors.Gray03
+                )
+        }
+
+        HorizontalPager(state = pagerState) { index ->
+            val patchNote = runCatching { patchNoteList[index] }.getOrNull() ?: return@HorizontalPager
+            PatchNoteBody(patchNote)
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(horizontal = Spacings.Spacing05))
+
+        PatchNoteViewPagerIndicator(
+            patchNoteDataList = patchNoteList,
+            selectedPosition = currentPosition,
+            onClickPatchNoteItem = moveToPage
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalGlideComposeApi::class)
+fun PatchNoteBody(championPatchNote: PatchNoteData) {
+    Column(
+        modifier = Modifier
+            .heightIn(min = Dimens.BASE_PATCH_MIN_HEIGHT)
+            .fillMaxWidth()
+            .padding(horizontal = Spacings.Spacing05)
+            .padding(bottom = Spacings.Spacing05),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+        ) {
+            GlideImage(
+                modifier = Modifier.size(IconSize.XXLargeSize),
+                model = championPatchNote.imageUrl,
+                contentDescription = null
+            )
+            Text(
+                text = championPatchNote.title,
+                style = TextStyles.Title02
+            )
+        }
+
+        HorizontalDivider()
+
+        Text(
+            text = championPatchNote.summary,
+            style = TextStyles.Body03,
+            color = Colors.Gray03
+        )
+    }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+internal fun PatchNoteViewPagerIndicator(
+    modifier: Modifier = Modifier,
+    selectedPosition: Int = 0,
+    patchNoteDataList: List<PatchNoteData>,
+    onClickPatchNoteItem: (position: Int) -> Unit
+) {
+    LazyRow(
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = Spacings.Spacing05),
+        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+    ) {
+        items(count = patchNoteDataList.size) { index ->
+            val patchNoteData = patchNoteDataList.getOrNull(index) ?: return@items
+            val isSelected = selectedPosition == index
+            val color by animateColorAsState(
+                targetValue = if (isSelected) Colors.Gold03 else Colors.Gray05,
+                label = ""
+            )
+            val colorFilter = if (isSelected) null else ColorFilter.tint(Colors.Gray05, BlendMode.Color)
+
+            Column(
+                modifier = Modifier.clickable {
+                    onClickPatchNoteItem.invoke(index)
+                },
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                GlideImage(
+                    modifier = modifier
+                        .size(IconSize.XLargeSize)
+                        .background(Colors.Blue06, CircleShape)
+                        .clip(CircleShape)
+                        .border(1.dp, color, CircleShape),
+                    model = patchNoteData.imageUrl,
+                    colorFilter = colorFilter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+
+                Text(
+                    modifier = modifier.width(IconSize.XLargeSize),
+                    text = patchNoteData.title,
+                    style = TextStyles.Body04,
+                    color = color,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+internal fun BasePatchNoteListPreview() {
+    LolChampionThemePreview {
+        BasePatchNoteListBody(
+            moveToPatchNoteDetailScreen = {},
+            title = "",
+            patchNoteList = List<PatchNoteData>(10) {
+                PatchNoteData(
+                    title = "title_$it",
+                    summary = "summary_$it",
+                    imageUrl = "image_$it"
+                )
+            }
+        )
+    }
+}
+
+@Preview
+@Composable
+internal fun PatchNoteViewPagerIndicatorPreview() {
+    LolChampionThemePreview {
+        PatchNoteViewPagerIndicator(
+            patchNoteDataList = List(10) { PatchNoteData("챔피언 이름 $it", "", "이것은 패치 노트 내용") }
+        ) {
+
+        }
+    }
+}
