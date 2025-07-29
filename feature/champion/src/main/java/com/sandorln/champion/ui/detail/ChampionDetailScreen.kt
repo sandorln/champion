@@ -1,7 +1,6 @@
 package com.sandorln.champion.ui.detail
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -60,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.fastJoinToString
 import androidx.constraintlayout.compose.ConstraintSetScope
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.champion.R
 import com.sandorln.champion.util.getResourceId
@@ -425,13 +425,13 @@ private fun ChampionLinkListBody(
             ChampionLinkBody(
                 title = stringResource(id = R.string.site_name_op_gg),
                 onClickListener = {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(opggUrl)))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, opggUrl.toUri()))
                 }
             )
             ChampionLinkBody(
                 title = stringResource(id = R.string.site_name_lol_ps),
                 onClickListener = {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(lolpsUrl)))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, lolpsUrl.toUri()))
                 }
             )
         }
