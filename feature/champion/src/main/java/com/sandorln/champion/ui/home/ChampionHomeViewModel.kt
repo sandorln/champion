@@ -8,7 +8,6 @@ import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
-import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.patchnote.PatchNoteData
 import com.sandorln.model.type.ChampionTag
