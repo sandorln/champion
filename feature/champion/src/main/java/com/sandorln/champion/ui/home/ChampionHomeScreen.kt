@@ -193,10 +193,7 @@ private fun LazyListScope.baseChampionList(
             horizontalArrangement = Arrangement.Center
         ) {
             items(spanCount) { rowIndex ->
-                val champion = runCatching {
-                    chunckChampionList[columnIndex][rowIndex]
-                }.getOrNull()
-
+                val champion = chunckChampionList[columnIndex].getOrNull(rowIndex)
                 if (champion != null) {
                     ChampionBody(
                         champion = champion,

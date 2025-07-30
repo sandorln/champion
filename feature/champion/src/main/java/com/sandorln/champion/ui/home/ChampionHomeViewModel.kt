@@ -12,6 +12,7 @@ import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.patchnote.PatchNoteData
+import com.sandorln.model.data.version.Version
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,7 +22,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,7 +57,6 @@ class ChampionHomeViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ChampionHomeSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    // TODO :: 버전 변경 시 패치 노트가 여러번 호출 됨
     private var _refreshJob: Job? = null
     private fun refreshChampionData() {
         _refreshJob?.cancel()
@@ -144,16 +147,18 @@ class ChampionHomeViewModel @Inject constructor(
             launch {
                 getCurrentVersion
                     .invoke()
+                    .map { it.name }
+                    .distinctUntilChanged()
                     .collectLatest { version ->
                         _championUiState.update {
                             it.copy(
-                                currentVersionName = version.name,
+                                currentVersionName = version,
                                 championPatchNoteList = null
                             )
                         }
 
                         val championPatchNoteList = getChampionPatchNoteList
-                            .invoke(version.name)
+                            .invoke(version)
                             .getOrNull() ?: emptyList()
 
                         _championUiState.update {
