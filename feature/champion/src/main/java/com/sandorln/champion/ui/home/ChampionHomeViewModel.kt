@@ -150,6 +150,8 @@ class ChampionHomeViewModel @Inject constructor(
                     .map { it.name }
                     .distinctUntilChanged()
                     .collectLatest { version ->
+                        _refreshJob?.cancel()
+
                         _championUiState.update {
                             it.copy(
                                 currentVersionName = version,
