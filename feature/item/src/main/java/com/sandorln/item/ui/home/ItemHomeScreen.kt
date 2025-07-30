@@ -25,10 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -55,7 +51,6 @@ import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
-import com.sandorln.item.model.ItemBuildException
 import com.sandorln.item.ui.dialog.ItemDetailDialog
 import com.sandorln.item.ui.dialog.ItemFilterDialog
 import com.sandorln.model.data.item.ItemData
@@ -88,20 +83,15 @@ fun ItemHomeScreen(
     LaunchedEffect(true) {
         itemHomeViewModel
             .sideEffect
-            .collect {
-                when (it) {
+            .collect { sideEffect ->
+                when (sideEffect) {
                     is ItemHomeSideEffect.ShowErrorMessage -> {
-                        val errorId = when (it.exception) {
-                            ItemBuildException.NotAddSameLegendItem -> ItemR.string.item_build_same_legend_error
-                            ItemBuildException.NotShouldAddItemSize -> ItemR.string.item_build_should_add_error
-                            else -> R.string.default_error_message
-                        }
-                        val message = context.getString(errorId)
+                        val message = context.getString(R.string.default_error_message)
                         BaseToast(context, BaseToastType.WARNING, message).show()
                     }
 
                     is ItemHomeSideEffect.ShowMessage -> {
-                        BaseToast(context, BaseToastType.OKAY, context.getString(it.stringId)).show()
+                        BaseToast(context, BaseToastType.OKAY, sideEffect.message).show()
                     }
                 }
             }

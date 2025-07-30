@@ -304,6 +304,6 @@ sealed interface ItemHomeAction {
 }
 
 sealed interface ItemHomeSideEffect {
-    data class ShowMessage(val stringId: Int) : ItemHomeSideEffect
+    data class ShowMessage(val message: String) : ItemHomeSideEffect
     data class ShowErrorMessage(val exception: Exception) : ItemHomeSideEffect
 }
