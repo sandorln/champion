@@ -21,7 +21,6 @@ import com.sandorln.model.data.patchnote.PatchNoteData
 import com.sandorln.model.data.version.Version
 import com.sandorln.model.type.ItemTagType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,8 +36,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 @HiltViewModel
@@ -157,8 +154,6 @@ class ItemHomeViewModel @Inject constructor(
         }
     }
 
-    private val _itemMutex = Mutex()
-
     private val _currentItemList = getItemListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     private val _currentNewItemIdList = getNewItemIdListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -174,134 +169,133 @@ class ItemHomeViewModel @Inject constructor(
                     .map { it.name }
                     .distinctUntilChanged()
                     .collectLatest { version ->
-                        _itemMutex.withLock {
-                            _itemUiState.update {
-                                it.copy(
-                                    itemPatchList = null,
-                                    itemBuildList = emptyList()
-                                )
-                            }
+                        _itemUiState.update {
+                            it.copy(
+                                itemPatchList = null,
+                                itemBuildList = emptyList()
+                            )
+                        }
 
-                            val itemPatchNoteList = getItemPatchNoteList.invoke(version).getOrNull() ?: emptyList()
-                            _itemUiState.update {
-                                it.copy(itemPatchList = itemPatchNoteList)
-                            }
+                        val itemPatchNoteList = getItemPatchNoteList.invoke(version).getOrNull() ?: emptyList()
+                        _itemUiState.update {
+                            it.copy(itemPatchList = itemPatchNoteList)
                         }
                     }
             }
             launch {
                 _itemAction.collect { action ->
-                    _itemMutex.withLock {
-                        val currentUiState = _itemUiState.value
-                        when (action) {
-                            is ItemHomeAction.RefreshItemData -> {
-                                _itemUiState.update {
-                                    it.copy(
-                                        isLoading = true,
-                                        itemPatchList = null
-                                    )
+                    val currentUiState = _itemUiState.value
+                    when (action) {
+                        is ItemHomeAction.RefreshItemData -> {
+                            _itemUiState.update {
+                                it.copy(
+                                    isLoading = true,
+                                    itemPatchList = null
+                                )
+                            }
+
+                            val spriteFileList = _currentItemList.value.map { item -> item.image.sprite }.distinct()
+                            refreshDownloadSpriteBitmap.invoke(
+                                spriteType = SpriteType.Item,
+                                fileNameList = spriteFileList
+                            ).onFailure {
+                                _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
+                            }
+
+                            val itemPatchNoteList = getItemPatchNoteList.invoke(currentVersion.value.name).getOrNull() ?: emptyList()
+                            _itemUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    itemPatchList = itemPatchNoteList
+                                )
+                            }
+                        }
+
+                        is ItemHomeAction.ChangeItemSearchKeyword -> {
+                            _itemUiState.emit(currentUiState.copy(searchKeyword = action.searchKeyword))
+                        }
+
+                        is ItemHomeAction.ChangeMapTypeFilter -> {
+                            _itemUiState.emit(currentUiState.copy(selectMapType = action.mapType))
+                        }
+
+                        is ItemHomeAction.ToggleItemTagType -> {
+                            val isSelected = currentUiState.selectTag.contains(action.itemTagType)
+                            val selectTag = currentUiState.selectTag.toMutableSet()
+                            if (isSelected) {
+                                selectTag.remove(action.itemTagType)
+                            } else {
+                                selectTag.add(action.itemTagType)
+                            }
+                            _itemUiState.emit(currentUiState.copy(selectTag = selectTag.toSet()))
+                        }
+
+                        is ItemHomeAction.ToggleSelectNewItem -> {
+                            _itemUiState.emit(currentUiState.copy(isSelectNewItem = !currentUiState.isSelectNewItem))
+                        }
+
+                        is ItemHomeAction.SelectItemData -> {
+                            _itemUiState.emit(currentUiState.copy(selectedItemId = action.itemDataId))
+                        }
+
+                        is ItemHomeAction.AddItemBuild -> {
+                            val itemBuildList = _itemUiState.value.itemBuildList
+                            val addItemData = action.itemData
+                            val shouldAddItemBuildList = itemBuildList.size < ITEM_BUILD_MAX_COUNT
+                            val hasSameLegendItem = addItemData.depth >= ITEM_LEGEND_DEPTH && itemBuildList.any { it.id == addItemData.id }
+
+                            when {
+                                !shouldAddItemBuildList -> {
+                                    _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotShouldAddItemSize))
                                 }
 
-                                val spriteFileList = _currentItemList.value.map { item -> item.image.sprite }.distinct()
-                                refreshDownloadSpriteBitmap.invoke(
-                                    spriteType = SpriteType.Item,
-                                    fileNameList = spriteFileList
-                                ).onFailure {
-                                    _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
+                                hasSameLegendItem -> {
+                                    _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotAddSameLegendItem))
                                 }
 
-                                val itemPatchNoteList = getItemPatchNoteList.invoke(currentVersion.value.name).getOrNull() ?: emptyList()
-                                _itemUiState.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        itemPatchList = itemPatchNoteList
-                                    )
-                                }
-                            }
-
-                            is ItemHomeAction.ChangeItemSearchKeyword -> {
-                                _itemUiState.emit(currentUiState.copy(searchKeyword = action.searchKeyword))
-                            }
-
-                            is ItemHomeAction.ChangeMapTypeFilter -> {
-                                _itemUiState.emit(currentUiState.copy(selectMapType = action.mapType))
-                            }
-
-                            is ItemHomeAction.ToggleItemTagType -> {
-                                val isSelected = currentUiState.selectTag.contains(action.itemTagType)
-                                val selectTag = currentUiState.selectTag.toMutableSet()
-                                if (isSelected) {
-                                    selectTag.remove(action.itemTagType)
-                                } else {
-                                    selectTag.add(action.itemTagType)
-                                }
-                                _itemUiState.emit(currentUiState.copy(selectTag = selectTag.toSet()))
-                            }
-
-                            is ItemHomeAction.ToggleSelectNewItem -> {
-                                _itemUiState.emit(currentUiState.copy(isSelectNewItem = !currentUiState.isSelectNewItem))
-                            }
-
-                            is ItemHomeAction.SelectItemData -> {
-                                _itemUiState.emit(currentUiState.copy(selectedItemId = action.itemDataId))
-                            }
-
-                            is ItemHomeAction.AddItemBuild -> {
-                                val itemBuildList = _itemUiState.value.itemBuildList
-                                val addItemData = action.itemData
-                                val shouldAddItemBuildList = itemBuildList.size < ITEM_BUILD_MAX_COUNT
-                                val hasSameLegendItem = addItemData.depth >= ITEM_LEGEND_DEPTH && itemBuildList.any { it.id == addItemData.id }
-
-                                when {
-                                    !shouldAddItemBuildList -> {
-                                        _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotShouldAddItemSize))
-                                    }
-
-                                    hasSameLegendItem -> {
-                                        _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.NotAddSameLegendItem))
-                                    }
-
-                                    else -> {
-                                        _itemUiState.update { uiState ->
-                                            val itemBuildSet = uiState
-                                                .itemBuildList
-                                                .toMutableList()
-                                                .apply {
-                                                    add(addItemData)
-                                                }
-
-                                            uiState.copy(itemBuildList = itemBuildSet)
-                                        }
-                                        _sideEffect.emit(
-                                            ItemHomeSideEffect.ShowMessage(R.string.item_build_success)
-                                        )
-                                    }
-                                }
-                            }
-
-                            is ItemHomeAction.DeleteItemBuild -> {
-                                runCatching {
+                                else -> {
                                     _itemUiState.update { uiState ->
-                                        val itemBuildList = uiState
+                                        val itemBuildSet = uiState
                                             .itemBuildList
                                             .toMutableList()
-                                            .apply { removeAt(action.index) }
+                                            .apply {
+                                                add(addItemData)
+                                            }
 
-                                        uiState.copy(itemBuildList = itemBuildList)
+                                        uiState.copy(itemBuildList = itemBuildSet)
                                     }
+                                    _sideEffect.emit(
+                                        ItemHomeSideEffect.ShowMessage(R.string.item_build_success)
+                                    )
                                 }
                             }
+                        }
 
-                            is ItemHomeAction.ChangeShowFilterDialog -> {
-                                _itemUiState.update { it.copy(isShowFilterDialog = action.isVisible) }
+                        is ItemHomeAction.DeleteItemBuild -> {
+                            runCatching {
+                                _itemUiState.update { uiState ->
+                                    val itemBuildList = uiState
+                                        .itemBuildList
+                                        .toMutableList()
+                                        .apply { removeAt(action.index) }
+
+                                    uiState.copy(itemBuildList = itemBuildList)
+                                }
                             }
+                        }
+
+                        is ItemHomeAction.ChangeShowFilterDialog -> {
+                            _itemUiState.update { it.copy(isShowFilterDialog = action.isVisible) }
                         }
                     }
                 }
             }
 
-            launch(Dispatchers.IO) {
-                combine(getCurrentVersionDistinctBySpriteType.invoke(SpriteType.Item), _currentItemList) { version, itemList ->
+            launch {
+                combine(
+                    getCurrentVersionDistinctBySpriteType.invoke(SpriteType.Item),
+                    _currentItemList
+                ) { version, itemList ->
                     if (version.isDownLoadItemIconSprite || itemList.isEmpty())
                         return@combine null
 
