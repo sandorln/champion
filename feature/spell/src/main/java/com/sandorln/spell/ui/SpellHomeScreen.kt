@@ -46,8 +46,6 @@ fun SpellHomeScreen(
 ) {
     val context = LocalContext.current
     val uiState by spellHomeViewModel.uiState.collectAsState()
-    val spellList by spellHomeViewModel.currentSpellList.collectAsState()
-    val spellSpriteBitmap by spellHomeViewModel.currentSpriteMap.collectAsState()
     val selectedSpell = uiState.selectedSpell
 
     val pullToRefreshState = rememberPullToRefreshState(
@@ -80,7 +78,8 @@ fun SpellHomeScreen(
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
-        val chunkSpellList = spellList.chunked(spanCount)
+        spellHomeViewModel.sendAction(SpellHomeAction.ChangeSpan(span = spanCount))
+
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
@@ -99,9 +98,8 @@ fun SpellHomeScreen(
                 ) {
                     Spacer(modifier = Modifier.height(Spacings.Spacing02))
                     if (selectedSpell != null) {
-                        BaseBitmapImage(
-                            bitmap = selectedSpell.image.getImageBitmap(spellSpriteBitmap)
-                        )
+                        val selectedSpellBitmap = selectedSpell.image.getImageBitmap(uiState.currentSpriteMap)
+                        BaseBitmapImage(bitmap = selectedSpellBitmap)
 
                         Text(
                             text = selectedSpell.name,
@@ -137,16 +135,13 @@ fun SpellHomeScreen(
                 }
             }
 
-            items(chunkSpellList.size) { columnIndex ->
+            items(uiState.displaySpellList.size) { columnIndex ->
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     items(spanCount) { rowIndex ->
-                        val spell = runCatching {
-                            chunkSpellList[columnIndex][rowIndex]
-                        }.getOrNull()
-
+                        val spell = uiState.displaySpellList[columnIndex].getOrNull(rowIndex)
                         if (spell != null) {
                             val isSelectedSpell = selectedSpell == null || selectedSpell.id == spell.id
 
@@ -159,7 +154,7 @@ fun SpellHomeScreen(
                                         .clickable {
                                             spellHomeViewModel.sendAction(SpellHomeAction.SelectSpell(spell))
                                         },
-                                    bitmap = spell.image.getImageBitmap(spellSpriteBitmap)
+                                    bitmap = spell.image.getImageBitmap(uiState.currentSpriteMap)
                                 )
 
                                 if (!isSelectedSpell) {
