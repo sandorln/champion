@@ -22,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -57,18 +59,17 @@ fun ChampionHomeScreen(
     moveToChampionPatchNoteListScreen: (version: String) -> Unit
 ) {
     val context = LocalContext.current
-    val currentVersion by championHomeViewModel.currentVersion.collectAsState()
-    val currentChampionList by championHomeViewModel.displayChampionList.collectAsState()
-    val currentSpriteMap by championHomeViewModel.currentSpriteMap.collectAsState()
     val uiState by championHomeViewModel.championUiState.collectAsState()
-    val championPatchNoteList = uiState.championPatchNoteList
 
     val pullToRefreshState = rememberPullToRefreshState(
         positionalThreshold = Dimens.PULL_HEIGHT
     )
 
-    val onClickChampionBody: (SummaryChampion) -> Unit = {
-        moveToChampionDetailScreen.invoke(it.id, currentVersion)
+    val onClickChampionBody: (SummaryChampion) -> Unit by remember(uiState.currentVersionName) {
+        mutableStateOf(value = { moveToChampionDetailScreen.invoke(it.id, uiState.currentVersionName) })
+    }
+    val onClickPatchNoteList: () -> Unit by remember(uiState.currentVersionName) {
+        mutableStateOf(value = { moveToChampionPatchNoteListScreen.invoke(uiState.currentVersionName) })
     }
 
     LaunchedEffect(true) {
@@ -97,8 +98,7 @@ fun ChampionHomeScreen(
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
-        val chunkChampionList = currentChampionList.chunked(spanCount)
-
+        championHomeViewModel.sendAction(ChampionHomeAction.ChangeSpan(span = spanCount))
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
@@ -106,8 +106,8 @@ fun ChampionHomeScreen(
                 BasePatchNoteListBodyWithLoading(
                     title = stringResource(id = championR.string.champion_patch_note_title),
                     loadingTitle = stringResource(id = championR.string.champion_patch_note_loading_title),
-                    patchNoteDataList = championPatchNoteList,
-                    moveToPatchNoteDetailScreen = { moveToChampionPatchNoteListScreen.invoke(currentVersion) }
+                    patchNoteDataList = uiState.championPatchNoteList,
+                    moveToPatchNoteDetailScreen = onClickPatchNoteList
                 )
             }
 
@@ -128,7 +128,6 @@ fun ChampionHomeScreen(
                 ) {
                     BaseSearchTextEditor(
                         modifier = Modifier.fillMaxWidth(),
-                        text = uiState.searchKeyword,
                         hint = stringResource(id = championR.string.search_champion),
                         onChangeTextListener = { search ->
                             val action = ChampionHomeAction.ChangeChampionSearchKeyword(search)
@@ -138,11 +137,11 @@ fun ChampionHomeScreen(
                 }
             }
 
-            if (chunkChampionList.isNotEmpty())
+            if (uiState.displayChampionList.isNotEmpty())
                 baseChampionList(
                     spanCount = spanCount,
-                    chunckChampionList = chunkChampionList,
-                    currentSpriteMap = currentSpriteMap,
+                    chunckChampionList = uiState.displayChampionList,
+                    currentSpriteMap = uiState.currentSpriteMap,
                     onClickChampion = onClickChampionBody
                 )
         }
@@ -194,10 +193,7 @@ private fun LazyListScope.baseChampionList(
             horizontalArrangement = Arrangement.Center
         ) {
             items(spanCount) { rowIndex ->
-                val champion = runCatching {
-                    chunckChampionList[columnIndex][rowIndex]
-                }.getOrNull()
-
+                val champion = chunckChampionList[columnIndex].getOrNull(rowIndex)
                 if (champion != null) {
                     ChampionBody(
                         champion = champion,

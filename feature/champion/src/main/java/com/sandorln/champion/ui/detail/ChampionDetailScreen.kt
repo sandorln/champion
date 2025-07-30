@@ -1,7 +1,6 @@
 package com.sandorln.champion.ui.detail
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -38,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -59,10 +59,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.fastJoinToString
 import androidx.constraintlayout.compose.ConstraintSetScope
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sandorln.champion.R
 import com.sandorln.champion.util.getResourceId
 import com.sandorln.champion.util.statusCompareColor
-import com.sandorln.design.R
 import com.sandorln.design.component.BaseChampionSplashImage
 import com.sandorln.design.component.BaseCircleIconImage
 import com.sandorln.design.component.BaseContentWithMotionToolbar
@@ -70,6 +71,8 @@ import com.sandorln.design.component.BaseSkillImage
 import com.sandorln.design.component.ExoPlayerView
 import com.sandorln.design.component.dialog.BaseBottomSheetDialog
 import com.sandorln.design.component.html.LolHtmlTagTextView
+import com.sandorln.design.component.toast.BaseToast
+import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
@@ -83,7 +86,7 @@ import com.sandorln.model.data.champion.ChampionSpell
 import com.sandorln.model.data.champion.ChampionStats
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.type.ChampionTag
-import com.sandorln.champion.R as championR
+import com.sandorln.design.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,14 +96,35 @@ fun ChampionDetailScreen(
     moveToChampionDetailScreen: (championId: String, version: String) -> Unit
 ) {
     val uiState by championDetailViewModel.uiState.collectAsState()
+    val currentContext = LocalContext.current
     val championDetailData = uiState.championDetailData
     val changedStatsVersion = uiState.changedStatsVersion
 
-    val statsTitle = stringResource(id = championR.string.champion_detail_title_stats)
-    val skillTitle = stringResource(id = championR.string.champion_detail_title_skill)
-    val similarChampionTitle = stringResource(id = championR.string.champion_detail_title_similar_champion)
-    val skinTitle = stringResource(id = championR.string.champion_detail_title_skin)
-    val storyTitle = stringResource(id = championR.string.champion_detail_title_story)
+    LaunchedEffect(championDetailViewModel.sideEffect) {
+        championDetailViewModel
+            .sideEffect
+            .collect { sideEffect ->
+                when (sideEffect) {
+                    ChampionDetailSideEffect.NotFoundChampionInVersion -> BaseToast(
+                        currentContext,
+                        BaseToastType.WARNING,
+                        currentContext.getString(R.string.not_found_champion_in_version)
+                    ).show()
+
+                    is ChampionDetailSideEffect.ShowErrorMessage -> BaseToast(
+                        currentContext,
+                        BaseToastType.WARNING,
+                        currentContext.getString(DesignR.string.default_error_message)
+                    ).show()
+                }
+            }
+    }
+
+    val statsTitle = stringResource(id = R.string.champion_detail_title_stats)
+    val skillTitle = stringResource(id = R.string.champion_detail_title_skill)
+    val similarChampionTitle = stringResource(id = R.string.champion_detail_title_similar_champion)
+    val skinTitle = stringResource(id = R.string.champion_detail_title_skin)
+    val storyTitle = stringResource(id = R.string.champion_detail_title_story)
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         BaseContentWithMotionToolbar(
@@ -215,7 +239,7 @@ fun ChampionDetailScreen(
                             }) {
                             Icon(
                                 modifier = Modifier.size(IconSize.XLargeSize),
-                                painter = painterResource(id = R.drawable.ic_chevron_left),
+                                painter = painterResource(id = DesignR.drawable.ic_chevron_left),
                                 contentDescription = null,
                                 tint = Color.Unspecified
                             )
@@ -263,7 +287,7 @@ fun ChampionDetailScreen(
 
                         Icon(
                             modifier = Modifier.size(IconSize.SmallSize),
-                            painter = painterResource(id = R.drawable.ic_chevron_down),
+                            painter = painterResource(id = DesignR.drawable.ic_chevron_down),
                             contentDescription = null,
                             tint = Color.Unspecified
                         )
@@ -372,11 +396,11 @@ private fun ChampionLinkListBody(
 ) {
     val context = LocalContext.current
     val opggUrl = stringResource(
-        id = championR.string.op_gg_site_url,
+        id = R.string.op_gg_site_url,
         championDetailData.id
     )
     val lolpsUrl = stringResource(
-        id = championR.string.lol_ps_site_url,
+        id = R.string.lol_ps_site_url,
         championDetailData.key
     )
 
@@ -386,7 +410,7 @@ private fun ChampionLinkListBody(
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
     ) {
         Text(
-            text = stringResource(id = championR.string.move_to_guide_site),
+            text = stringResource(id = R.string.move_to_guide_site),
             style = TextStyles.Body03,
             color = Colors.Gray05,
             textDecoration = TextDecoration.Underline
@@ -399,15 +423,15 @@ private fun ChampionLinkListBody(
             )
         ) {
             ChampionLinkBody(
-                title = stringResource(id = championR.string.site_name_op_gg),
+                title = stringResource(id = R.string.site_name_op_gg),
                 onClickListener = {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(opggUrl)))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, opggUrl.toUri()))
                 }
             )
             ChampionLinkBody(
-                title = stringResource(id = championR.string.site_name_lol_ps),
+                title = stringResource(id = R.string.site_name_lol_ps),
                 onClickListener = {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(lolpsUrl)))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, lolpsUrl.toUri()))
                 }
             )
         }
@@ -455,7 +479,7 @@ fun VersionItemBody(
                         horizontal = Spacings.Spacing01,
                         vertical = Spacings.Spacing00
                     ),
-                text = stringResource(id = championR.string.changed_stats),
+                text = stringResource(id = R.string.changed_stats),
                 style = TextStyles.Body04,
                 color = Colors.Gold02
             )
@@ -519,7 +543,7 @@ fun ChampionSkillListBody(
 
         if (!isLatestVersion)
             Text(
-                text = stringResource(id = championR.string.skill_video_play_when_latest_version),
+                text = stringResource(id = R.string.skill_video_play_when_latest_version),
                 modifier = Modifier.padding(vertical = Spacings.Spacing00),
                 style = TextStyles.Body04.addShadow(),
                 color = Colors.Gray03
@@ -574,7 +598,7 @@ fun ChampionSkillListBody(
 
             if (selectedSkill.cooldownBurn.isNotEmpty()) {
                 val coolTimeText = stringResource(
-                    id = championR.string.skill_cool_time,
+                    id = R.string.skill_cool_time,
                     selectedSkill.cooldownBurn
                 )
 
@@ -588,7 +612,7 @@ fun ChampionSkillListBody(
 
             if (selectedSkill.costBurn.isNotEmpty() && selectedSkill.costBurn != "0") {
                 val costText = stringResource(
-                    id = championR.string.skill_cost,
+                    id = R.string.skill_cost,
                     selectedSkill.costBurn
                 )
 
@@ -602,7 +626,7 @@ fun ChampionSkillListBody(
 
             if (selectedSkill.levelTip.isNotEmpty()) {
                 val lvTipText = stringResource(
-                    id = championR.string.skill_lv_tip,
+                    id = R.string.skill_lv_tip,
                     selectedSkill.levelTip.fastJoinToString(" / ")
                 )
 
@@ -702,7 +726,7 @@ fun ChampionLinkBody(
 
         Icon(
             modifier = Modifier.size(IconSize.SmallSize),
-            painter = painterResource(id = R.drawable.ic_open_in_new),
+            painter = painterResource(id = DesignR.drawable.ic_open_in_new),
             contentDescription = null,
             tint = Colors.Blue03
         )
@@ -743,7 +767,7 @@ fun ChampionStatusBody(
         }
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_attack),
+            title = stringResource(id = R.string.stats_attack),
             originalValue = championStats.attackdamage,
             originalLvValue = championStats.attackdamageperlevel,
             compareValue = preChampionStats?.attackdamage,
@@ -751,7 +775,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_attack_speed),
+            title = stringResource(id = R.string.stats_attack_speed),
             originalValue = championStats.attackspeed,
             originalLvValue = championStats.attackspeedperlevel,
             compareValue = preChampionStats?.attackspeed,
@@ -759,13 +783,13 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_attack_range),
+            title = stringResource(id = R.string.stats_attack_range),
             originalValue = championStats.attackrange,
             compareValue = preChampionStats?.attackrange,
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_hp),
+            title = stringResource(id = R.string.stats_hp),
             originalValue = championStats.hp,
             originalLvValue = championStats.hpperlevel,
             compareValue = preChampionStats?.hp,
@@ -773,7 +797,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_hp_regen),
+            title = stringResource(id = R.string.stats_hp_regen),
             originalValue = championStats.hpregen,
             originalLvValue = championStats.hpregenperlevel,
             compareValue = preChampionStats?.hpregen,
@@ -781,7 +805,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_mp),
+            title = stringResource(id = R.string.stats_mp),
             originalValue = championStats.mp,
             originalLvValue = championStats.mpperlevel,
             compareValue = preChampionStats?.mp,
@@ -789,7 +813,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_mp_regen),
+            title = stringResource(id = R.string.stats_mp_regen),
             originalValue = championStats.mpregen,
             originalLvValue = championStats.mpregenperlevel,
             compareValue = preChampionStats?.mpregen,
@@ -797,7 +821,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_armor),
+            title = stringResource(id = R.string.stats_armor),
             originalValue = championStats.armor,
             originalLvValue = championStats.armorperlevel,
             compareValue = preChampionStats?.armor,
@@ -805,7 +829,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_spell_armor),
+            title = stringResource(id = R.string.stats_spell_armor),
             originalValue = championStats.spellblock,
             originalLvValue = championStats.spellblockperlevel,
             compareValue = preChampionStats?.spellblock,
@@ -813,7 +837,7 @@ fun ChampionStatusBody(
         )
 
         StatusCompareBody(
-            title = stringResource(id = championR.string.stats_move),
+            title = stringResource(id = R.string.stats_move),
             originalValue = championStats.movespeed,
             compareValue = preChampionStats?.movespeed,
         )
@@ -829,7 +853,7 @@ fun StatusCompareBody(
     compareLvValue: Double? = null,
 ) {
     val titleWithSuffix = if (originalLvValue != null) {
-        stringResource(id = championR.string.stats_add_lv, title)
+        stringResource(id = R.string.stats_add_lv, title)
     } else {
         title
     }
@@ -898,7 +922,7 @@ fun StatusBody(
         )
         if (lvValue != null) {
             val statsText = stringResource(
-                id = championR.string.stats_lv_stats,
+                id = R.string.stats_lv_stats,
                 lvValue.toString()
             )
             Text(

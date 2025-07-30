@@ -49,9 +49,8 @@ fun BaseSearchTextEditor(
     onChangeTextListener: (String) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
-    var textFocus by remember {
-        mutableStateOf(false)
-    }
+    var inputText by remember { mutableStateOf("") }
+    var textFocus by remember { mutableStateOf(false) }
     val focusColor = if (textFocus) {
         Colors.BaseColor
     } else {
@@ -86,15 +85,18 @@ fun BaseSearchTextEditor(
             modifier = Modifier
                 .onFocusChanged { textFocus = it.isFocused }
                 .weight(1f),
-            value = text,
+            value = inputText,
             cursorBrush = SolidColor(Colors.BaseColor),
-            onValueChange = onChangeTextListener,
+            onValueChange = { value ->
+                inputText = value
+                onChangeTextListener.invoke(value)
+            },
             maxLines = 1,
             keyboardActions = KeyboardActions { focusManager.clearFocus() },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             textStyle = textStyle,
             decorationBox = { innerTextField ->
-                if (text.isEmpty())
+                if (inputText.isEmpty())
                     Text(
                         text = hint,
                         color = Colors.Gray05,
