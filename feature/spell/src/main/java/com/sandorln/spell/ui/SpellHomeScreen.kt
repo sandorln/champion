@@ -141,7 +141,7 @@ fun SpellHomeScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     items(spanCount) { rowIndex ->
-                        val spell = uiState.displaySpellList[columnIndex].getOrNull(rowIndex)
+                        val spell = uiState.displaySpellList.getOrNull(columnIndex)?.getOrNull(rowIndex)
                         if (spell != null) {
                             val isSelectedSpell = selectedSpell == null || selectedSpell.id == spell.id
 

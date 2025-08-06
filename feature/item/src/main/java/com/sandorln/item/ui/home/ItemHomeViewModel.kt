@@ -192,16 +192,19 @@ class ItemHomeViewModel @Inject constructor(
                     val (epicItemList, notEpicItemList) = notNormalItemList.partition { it.depth < ItemHomeViewModel.ITEM_LEGEND_DEPTH }
                     val (orrnItemList, legendItemList) = notEpicItemList.partition { it.depth == Int.MAX_VALUE }
 
-                    itemDataList.chunked(span)
-                    _itemUiState.update {
-                        it.copy(
-                            bootItemList = bootItemList.chunked(span),
-                            consumableItemList = consumableItemList.chunked(span),
-                            normalItemList = normalItemList.chunked(span),
-                            epicItemList = epicItemList.chunked(span),
-                            orrnItemList = orrnItemList.chunked(span),
-                            legendItemList = legendItemList.chunked(span)
-                        )
+                    runCatching {
+                        _itemUiState.update {
+                            it.copy(
+                                bootItemList = bootItemList.chunked(span),
+                                consumableItemList = consumableItemList.chunked(span),
+                                normalItemList = normalItemList.chunked(span),
+                                epicItemList = epicItemList.chunked(span),
+                                orrnItemList = orrnItemList.chunked(span),
+                                legendItemList = legendItemList.chunked(span)
+                            )
+                        }
+                    }.onFailure {
+                        _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
                     }
                 }.flowOn(Dispatchers.Default).collect()
             }
