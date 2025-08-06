@@ -12,7 +12,6 @@ import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.patchnote.PatchNoteData
-import com.sandorln.model.data.version.Version
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,7 +24,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -136,7 +134,11 @@ class ChampionHomeViewModel @Inject constructor(
                     else
                         allChampionList.filter { champion -> champion.name.startsWith(searchKeyword) }
 
-                    filterPassChampionList.chunked(span)
+                    runCatching {
+                        filterPassChampionList.chunked(span)
+                    }.onFailure {
+                        _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
+                    }.getOrDefault(emptyList())
                 }.collectLatest { displayChampionList ->
                     _championUiState.update {
                         it.copy(displayChampionList = displayChampionList)
