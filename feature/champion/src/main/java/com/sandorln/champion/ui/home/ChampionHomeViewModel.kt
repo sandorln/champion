@@ -1,5 +1,6 @@
 package com.sandorln.champion.ui.home
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sandorln.domain.usecase.champion.GetChampionPatchNoteList
@@ -11,116 +12,89 @@ import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.data.champion.SummaryChampion
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.patchnote.PatchNoteData
-import com.sandorln.model.type.ChampionTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 @HiltViewModel
 class ChampionHomeViewModel @Inject constructor(
+    getCurrentVersion: GetCurrentVersion,
     getSummaryChampionListByCurrentVersion: GetSummaryChampionListByCurrentVersion,
-    refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
     getCurrentVersionDistinctBySpriteType: GetCurrentVersionDistinctBySpriteType,
     getSpriteBitmapByCurrentVersion: GetSpriteBitmapByCurrentVersion,
-    getCurrentVersion: GetCurrentVersion,
-    getChampionPatchNoteList: GetChampionPatchNoteList
+    private val refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap,
+    private val getChampionPatchNoteList: GetChampionPatchNoteList
 ) : ViewModel() {
-    val currentVersion = getCurrentVersion
-        .invoke()
-        .map { it.name }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
-
     private val _championUiState = MutableStateFlow(ChampionHomeUiState())
     val championUiState = _championUiState.asStateFlow()
 
-    private val _championAction = MutableSharedFlow<ChampionHomeAction>()
-    fun sendAction(championHomeAction: ChampionHomeAction) = viewModelScope.launch {
-        _championAction.emit(championHomeAction)
+    private var _latestAllSummaryChampionList: List<SummaryChampion> = listOf()
+    private val _searchKeyword = MutableStateFlow("")
+    private val _span = MutableStateFlow(1)
+
+    fun sendAction(action: ChampionHomeAction) {
+        when (action) {
+            is ChampionHomeAction.RefreshChampionData -> refreshChampionData()
+            is ChampionHomeAction.ChangeChampionSearchKeyword -> _searchKeyword.update { action.searchKeyword }
+            is ChampionHomeAction.ChangeSpan -> _span.update { action.span }
+        }
     }
 
     private val _sideEffect = MutableSharedFlow<ChampionHomeSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    private val _championMutex = Mutex()
-    private val _currentChampionList = getSummaryChampionListByCurrentVersion.invoke().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    val currentSpriteMap = getSpriteBitmapByCurrentVersion.invoke(SpriteType.Champion).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+    private var _refreshJob: Job? = null
+    private fun refreshChampionData() {
+        _refreshJob?.cancel()
 
-    val displayChampionList = combine(_championUiState, _currentChampionList) { uiState, championList ->
-        val searchKeyword = uiState.searchKeyword
-        val tagFilterSet = uiState.selectChampionTagSet
-
-        if (searchKeyword.trim().isEmpty() && tagFilterSet.isEmpty())
-            return@combine championList
-
-        championList.filter { champion ->
-            val isMatchKeyword = if (searchKeyword.isNotEmpty()) {
-                champion.name.startsWith(searchKeyword)
-            } else {
-                true
+        _refreshJob = viewModelScope.launch {
+            val currentVersion = _championUiState.value.currentVersionName
+            _championUiState.update {
+                it.copy(
+                    isLoading = true,
+                    championPatchNoteList = null
+                )
             }
 
-            val isMatchTagFilter = champion.tags.containsAll(tagFilterSet)
+            val spriteFileList = _latestAllSummaryChampionList.map { item -> item.image.sprite }
+            refreshDownloadSpriteBitmap
+                .invoke(
+                    SpriteType.Champion,
+                    spriteFileList
+                ).onFailure {
+                    _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
+                }
 
-            isMatchKeyword && isMatchTagFilter
+            val championPatchNoteList = getChampionPatchNoteList.invoke(currentVersion).getOrNull() ?: emptyList<PatchNoteData>()
+            _championUiState.update {
+                it.copy(
+                    isLoading = false,
+                    championPatchNoteList = championPatchNoteList
+                )
+            }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    }
 
     init {
         viewModelScope.launch {
-            launch {
-                _championAction.collect { action ->
-                    _championMutex.withLock {
-                        when (action) {
-                            is ChampionHomeAction.RefreshChampionData -> {
-                                _championUiState.update {
-                                    it.copy(
-                                        isLoading = true,
-                                        championPatchNoteList = null
-                                    )
-                                }
-
-                                val spriteFileList = _currentChampionList.value.map { item -> item.image.sprite }.distinct()
-                                refreshDownloadSpriteBitmap
-                                    .invoke(
-                                        SpriteType.Champion,
-                                        spriteFileList
-                                    ).onFailure {
-                                        _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
-                                    }
-
-                                val championPatchNoteList = getChampionPatchNoteList.invoke(currentVersion.value).getOrNull() ?: emptyList<PatchNoteData>()
-                                _championUiState.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        championPatchNoteList = championPatchNoteList
-                                    )
-                                }
-                            }
-
-                            is ChampionHomeAction.ChangeChampionSearchKeyword -> {
-                                _championUiState.update { it.copy(searchKeyword = action.searchKeyword) }
-                            }
-                        }
-                    }
-                }
-            }
-
+            /**  다운로드가 되지 않은 Sprite 가 있을 시 다시 다운로드 시작 */
             launch(Dispatchers.IO) {
-                combine(getCurrentVersionDistinctBySpriteType.invoke(SpriteType.Champion), _currentChampionList) { version, championList ->
+                combine(
+                    getCurrentVersionDistinctBySpriteType.invoke(SpriteType.Champion),
+                    getSummaryChampionListByCurrentVersion.invoke()
+                ) { version, championList ->
                     if (version.isDownLoadChampionIconSprite || championList.isEmpty())
                         return@combine null
 
@@ -138,12 +112,61 @@ class ChampionHomeViewModel @Inject constructor(
             }
 
             launch {
-                currentVersion
+                getSpriteBitmapByCurrentVersion
+                    .invoke(SpriteType.Champion)
+                    .collectLatest { currentSpriteMap ->
+                        _championUiState.update {
+                            it.copy(currentSpriteMap = currentSpriteMap)
+                        }
+                    }
+            }
+
+            launch {
+                combine(
+                    getSummaryChampionListByCurrentVersion.invoke(),
+                    _span,
+                    _searchKeyword
+                ) { allChampionList, span, searchKeyword ->
+                    _latestAllSummaryChampionList = allChampionList
+
+                    val filterPassChampionList = if (searchKeyword.trim().isEmpty())
+                        allChampionList
+                    else
+                        allChampionList.filter { champion -> champion.name.startsWith(searchKeyword) }
+
+                    runCatching {
+                        filterPassChampionList.chunked(span)
+                    }.onFailure {
+                        _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
+                    }.getOrDefault(emptyList())
+                }.collectLatest { displayChampionList ->
+                    _championUiState.update {
+                        it.copy(displayChampionList = displayChampionList)
+                    }
+                }
+            }
+
+            launch {
+                getCurrentVersion
+                    .invoke()
+                    .map { it.name }
+                    .distinctUntilChanged()
                     .collectLatest { version ->
-                        _championMutex.withLock {
-                            _championUiState.update { it.copy(championPatchNoteList = null) }
-                            val championPatchNoteList = getChampionPatchNoteList.invoke(version).getOrNull() ?: emptyList<PatchNoteData>()
-                            _championUiState.update { it.copy(championPatchNoteList = championPatchNoteList) }
+                        _refreshJob?.cancel()
+
+                        _championUiState.update {
+                            it.copy(
+                                currentVersionName = version,
+                                championPatchNoteList = null
+                            )
+                        }
+
+                        val championPatchNoteList = getChampionPatchNoteList
+                            .invoke(version)
+                            .getOrNull() ?: emptyList()
+
+                        _championUiState.update {
+                            it.copy(championPatchNoteList = championPatchNoteList)
                         }
                     }
             }
@@ -153,15 +176,17 @@ class ChampionHomeViewModel @Inject constructor(
 
 data class ChampionHomeUiState(
     val isLoading: Boolean = false,
-    val searchKeyword: String = "",
-    val selectChampionTagSet: Set<ChampionTag> = setOf(),
-    val championPatchNoteList: List<PatchNoteData>? = null
+    val championPatchNoteList: List<PatchNoteData>? = null,
+    val currentVersionName: String = "",
+    val displayChampionList: List<List<SummaryChampion>> = listOf(),
+    val currentSpriteMap: Map<String, Bitmap> = emptyMap()
 )
 
 sealed interface ChampionHomeAction {
     data object RefreshChampionData : ChampionHomeAction
 
     data class ChangeChampionSearchKeyword(val searchKeyword: String) : ChampionHomeAction
+    data class ChangeSpan(val span: Int) : ChampionHomeAction
 }
 
 sealed interface ChampionHomeSideEffect {

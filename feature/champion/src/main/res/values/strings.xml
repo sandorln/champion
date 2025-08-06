@@ -11,6 +11,7 @@
     <string name="site_name_lol_ps" translatable="false">LOL.PS</string>
     <string name="op_gg_site_url" translatable="false">https://www.op.gg/champions/%1$s/build</string>
     <string name="lol_ps_site_url" translatable="false">https://lol.ps/champ/%1$s</string>
+    <string name="link_error_message" translatable="false">해당 링크로 이동할 수 없었습니다</string>
 
     <string name="changed_stats">능력치 변경</string>
 
@@ -38,4 +39,6 @@
     <string name="champion_patch_note_title">챔피언 패치노트</string>
     <string name="champion_patch_note_list">패치노트 목록 ></string>
     <string name="champion_patch_note_loading_title">챔피언 패치노트 불러오는 중</string>
+
+    <string name="not_found_champion_in_version">해당 버전에서 챔피언을 찾을 수 없습니다</string>
 </resources>

@@ -144,7 +144,7 @@ fun BasePatchNoteListBody(
         }
 
         HorizontalPager(state = pagerState) { index ->
-            val patchNote = runCatching { patchNoteList[index] }.getOrNull() ?: return@HorizontalPager
+            val patchNote = patchNoteList.getOrNull(index) ?: return@HorizontalPager
             PatchNoteBody(patchNote)
         }
 

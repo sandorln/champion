@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,9 +50,8 @@ fun BaseSearchTextEditor(
     onChangeTextListener: (String) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
-    var textFocus by remember {
-        mutableStateOf(false)
-    }
+    var inputText by rememberSaveable { mutableStateOf("") }
+    var textFocus by remember { mutableStateOf(false) }
     val focusColor = if (textFocus) {
         Colors.BaseColor
     } else {
@@ -86,15 +86,18 @@ fun BaseSearchTextEditor(
             modifier = Modifier
                 .onFocusChanged { textFocus = it.isFocused }
                 .weight(1f),
-            value = text,
+            value = inputText,
             cursorBrush = SolidColor(Colors.BaseColor),
-            onValueChange = onChangeTextListener,
+            onValueChange = { value ->
+                inputText = value
+                onChangeTextListener.invoke(value)
+            },
             maxLines = 1,
             keyboardActions = KeyboardActions { focusManager.clearFocus() },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             textStyle = textStyle,
             decorationBox = { innerTextField ->
-                if (text.isEmpty())
+                if (inputText.isEmpty())
                     Text(
                         text = hint,
                         color = Colors.Gray05,
