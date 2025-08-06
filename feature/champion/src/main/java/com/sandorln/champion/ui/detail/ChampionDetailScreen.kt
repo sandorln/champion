@@ -709,9 +709,21 @@ fun ChampionLinkBody(
     title: String = "OP.GG",
     onClickListener: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
     Row(
         modifier = Modifier
-            .clickable { onClickListener.invoke() }
+            .clickable {
+                runCatching {
+                    onClickListener.invoke()
+                }.onFailure {
+                    BaseToast(
+                        context,
+                        BaseToastType.WARNING,
+                        context.getString(R.string.link_error_message)
+                    ).show()
+                }
+            }
             .border(1.dp, Colors.Blue03, RoundedCornerShape(Radius.Radius04))
             .padding(vertical = Spacings.Spacing00, horizontal = Spacings.Spacing02),
         verticalAlignment = Alignment.CenterVertically,
