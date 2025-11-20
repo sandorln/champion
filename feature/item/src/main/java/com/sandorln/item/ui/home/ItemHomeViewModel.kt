@@ -12,6 +12,8 @@ import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.item.model.ItemBuildException
+import com.sandorln.item.util.getStatusList
+import com.sandorln.item.util.getUniqueStatusList
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
@@ -93,32 +95,60 @@ class ItemHomeViewModel @Inject constructor(
             hasSameLegendItem -> sendSideEffect(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.DuplicateLegendaryItem()))
 
             else -> {
-                _itemUiState.update { uiState ->
-                    val itemBuildSet = uiState
-                        .itemBuildList
-                        .toMutableList()
-                        .apply {
-                            add(addItemData)
-                        }
+                val tempUiState = _itemUiState.value.copy()
+                val itemBuildList = tempUiState
+                    .itemBuildList
+                    .toMutableList()
+                    .apply { add(addItemData) }
 
-                    uiState.copy(itemBuildList = itemBuildSet)
-                }
+                refreshItemBuild(itemBuildList)
                 sendSideEffect(ItemHomeSideEffect.SuccessItemBuild())
             }
         }
     }
 
     private fun deletedItemBuildByIndex(index: Int) {
-        _itemUiState.update { uiState ->
-            val itemBuildList = runCatching {
-                uiState
-                    .itemBuildList
-                    .toMutableList()
-                    .apply { removeAt(index) }
-            }.onFailure {
-                viewModelScope.launch { _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception)) }
-            }.getOrDefault(uiState.itemBuildList)
-            uiState.copy(itemBuildList = itemBuildList)
+        val tempUiState = _itemUiState.value.copy()
+        val itemBuildList = runCatching {
+            tempUiState
+                .itemBuildList
+                .toMutableList()
+                .apply { removeAt(index) }
+        }.onFailure {
+            sendSideEffect(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
+        }.getOrNull()
+
+        if (itemBuildList == null) return
+        refreshItemBuild(itemBuildList)
+    }
+
+    private fun refreshItemBuild(itemBuildList: List<ItemData> = emptyList()) {
+        val itemBuildStatus: MutableMap<String, Pair<Int, String>> = mutableMapOf()
+        itemBuildList
+            .map(ItemData::getStatusList)
+            .forEach { itemStatusList ->
+                itemStatusList.forEach { (title, value, suffix) ->
+                    val defaultStatus = itemBuildStatus[title + suffix] ?: Pair(0, "")
+                    val sumValue = defaultStatus.first + value
+                    itemBuildStatus[title + suffix] = sumValue to suffix
+                }
+            }
+        itemBuildStatus.toSortedMap()
+
+        val itemBuildUniqueList: List<Pair<String, String>> = itemBuildList
+            .map(ItemData::getUniqueStatusList)
+            .distinctBy { it.first }
+            .filter { it.second.isNotEmpty() }
+
+        val itemBuildTotalGold: Int = itemBuildList.sumOf { itemData -> itemData.gold.total }
+
+        _itemUiState.update {
+            it.copy(
+                itemBuildList = itemBuildList,
+                itemBuildStatus = itemBuildStatus,
+                itemBuildUniqueList = itemBuildUniqueList,
+                itemBuildTotalGold = itemBuildTotalGold
+            )
         }
     }
 
@@ -139,6 +169,9 @@ class ItemHomeViewModel @Inject constructor(
                     isLoading = true,
                     itemPatchList = null,
                     itemBuildList = emptyList(),
+                    itemBuildStatus = emptyMap(),
+                    itemBuildUniqueList = emptyList(),
+                    itemBuildTotalGold = 0
                 )
             }
 
@@ -266,6 +299,9 @@ class ItemHomeViewModel @Inject constructor(
                         _itemUiState.update {
                             it.copy(
                                 itemBuildList = emptyList(),
+                                itemBuildStatus = emptyMap(),
+                                itemBuildUniqueList = emptyList(),
+                                itemBuildTotalGold = 0,
                                 currentVersionName = version,
                                 isLoading = true,
                                 itemPatchList = null,
@@ -319,7 +355,11 @@ class ItemHomeViewModel @Inject constructor(
 data class ItemHomeUiState(
     val isLoading: Boolean = false,
     val itemPatchList: List<PatchNoteData>? = null,
+
     val itemBuildList: List<ItemData> = listOf(),
+    val itemBuildStatus: Map<String, Pair<Int, String>> = emptyMap(),
+    val itemBuildUniqueList: List<Pair<String, String>> = emptyList(),
+    val itemBuildTotalGold: Int = 0,
 
     val currentVersionName: String = "",
 
