@@ -11,6 +11,7 @@ import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
+import com.sandorln.item.model.ItemBuildException
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
@@ -45,6 +46,7 @@ class ItemHomeViewModel @Inject constructor(
     private val refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap
 ) : ViewModel() {
     companion object {
+        const val ITEM_BUILD_MAX_COUNT = 6
         const val ITEM_LEGEND_DEPTH = 3
         private val SUPPORT_ITEM_ID_LIST = listOf("3869", "3870", "3871", "3876", "3877", "4643", "4638") // 서폿 아이템 ID
     }
@@ -76,11 +78,55 @@ class ItemHomeViewModel @Inject constructor(
             ItemHomeAction.RefreshItemData -> refreshItemData()
             ItemHomeAction.ToggleSelectNewItem -> _itemUiState.update { it.copy(isSelectNewItem = !it.isSelectNewItem) }
             is ItemHomeAction.ChangeShowFilterDialog -> _itemUiState.update { it.copy(isShowFilterDialog = action.isVisible) }
+            is ItemHomeAction.AddItemBuild -> addItemBuild(action.itemData)
+            is ItemHomeAction.DeleteItemBuild -> deletedItemBuildByIndex(action.index)
+        }
+    }
+
+    private fun addItemBuild(addItemData: ItemData) {
+        val itemBuildList = _itemUiState.value.itemBuildList
+        val shouldAddItemBuildList = itemBuildList.size < ITEM_BUILD_MAX_COUNT
+        val hasSameLegendItem = addItemData.depth >= ITEM_LEGEND_DEPTH && itemBuildList.any { it.id == addItemData.id }
+
+        when {
+            !shouldAddItemBuildList -> sendSideEffect(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.MaxItemSizeReached()))
+            hasSameLegendItem -> sendSideEffect(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.DuplicateLegendaryItem()))
+
+            else -> {
+                _itemUiState.update { uiState ->
+                    val itemBuildSet = uiState
+                        .itemBuildList
+                        .toMutableList()
+                        .apply {
+                            add(addItemData)
+                        }
+
+                    uiState.copy(itemBuildList = itemBuildSet)
+                }
+                sendSideEffect(ItemHomeSideEffect.SuccessItemBuild())
+            }
+        }
+    }
+
+    private fun deletedItemBuildByIndex(index: Int) {
+        _itemUiState.update { uiState ->
+            val itemBuildList = runCatching {
+                uiState
+                    .itemBuildList
+                    .toMutableList()
+                    .apply { removeAt(index) }
+            }.onFailure {
+                viewModelScope.launch { _sideEffect.emit(ItemHomeSideEffect.ShowErrorMessage(it as Exception)) }
+            }.getOrDefault(uiState.itemBuildList)
+            uiState.copy(itemBuildList = itemBuildList)
         }
     }
 
     private val _sideEffect = MutableSharedFlow<ItemHomeSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
+    private fun sendSideEffect(sideEffect: ItemHomeSideEffect) {
+        viewModelScope.launch { _sideEffect.emit(sideEffect) }
+    }
 
     private var _refreshJob: Job? = null
     private fun refreshItemData() {
@@ -91,7 +137,8 @@ class ItemHomeViewModel @Inject constructor(
             _itemUiState.update {
                 it.copy(
                     isLoading = true,
-                    itemPatchList = null
+                    itemPatchList = null,
+                    itemBuildList = emptyList(),
                 )
             }
 
@@ -111,7 +158,6 @@ class ItemHomeViewModel @Inject constructor(
                 )
             }
         }
-
     }
 
     init {
@@ -219,6 +265,7 @@ class ItemHomeViewModel @Inject constructor(
 
                         _itemUiState.update {
                             it.copy(
+                                itemBuildList = emptyList(),
                                 currentVersionName = version,
                                 isLoading = true,
                                 itemPatchList = null,
@@ -272,6 +319,7 @@ class ItemHomeViewModel @Inject constructor(
 data class ItemHomeUiState(
     val isLoading: Boolean = false,
     val itemPatchList: List<PatchNoteData>? = null,
+    val itemBuildList: List<ItemData> = listOf(),
 
     val currentVersionName: String = "",
 
@@ -295,18 +343,18 @@ data class ItemHomeUiState(
 sealed interface ItemHomeAction {
     data object RefreshItemData : ItemHomeAction
     data object ToggleSelectNewItem : ItemHomeAction
-
     data class ToggleItemTagType(val itemTagType: ItemTagType) : ItemHomeAction
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
-
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
     data class ChangeSpan(val span: Int) : ItemHomeAction
-
     data class ChangeShowFilterDialog(val isVisible: Boolean) : ItemHomeAction
+    data class AddItemBuild(val itemData: ItemData) : ItemHomeAction
+    data class DeleteItemBuild(val index: Int) : ItemHomeAction
 }
 
 sealed interface ItemHomeSideEffect {
+    class SuccessItemBuild : ItemHomeSideEffect
     data class ShowMessage(val message: String) : ItemHomeSideEffect
     data class ShowErrorMessage(val exception: Exception) : ItemHomeSideEffect
 }
