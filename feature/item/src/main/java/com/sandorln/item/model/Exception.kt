@@ -1,6 +1,6 @@
 package com.sandorln.item.model
 
-sealed interface ItemBuildException {
-    data object DuplicateLegendaryItem : ItemBuildException
-    data object MaxItemSizeReached : ItemBuildException
+sealed class ItemBuildException : Exception() {
+    class DuplicateLegendaryItem : ItemBuildException()
+    class MaxItemSizeReached : ItemBuildException()
 }
