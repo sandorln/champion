@@ -4,7 +4,9 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,14 +19,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -43,12 +55,14 @@ import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseLazyColumnWithPull
 import com.sandorln.design.component.BasePatchNoteListBodyWithLoading
 import com.sandorln.design.component.BaseSearchTextEditor
+import com.sandorln.design.component.html.LolHtmlTagTextView
 import com.sandorln.design.component.toast.BaseToast
 import com.sandorln.design.component.toast.BaseToastType
 import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.Dimens
 import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
+import com.sandorln.design.theme.Radius
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.item.model.ItemBuildException
@@ -201,7 +215,7 @@ fun ItemHomeScreen(
                 )
 
             item {
-                Spacer(modifier = Modifier.height(Spacings.Spacing02))
+                Spacer(modifier = Modifier.height(Dimens.ITEM_BUILD_PEEK_HEIGHT))
             }
         }
 
@@ -214,6 +228,9 @@ fun ItemHomeScreen(
                 },
                 onChangeSelectItem = {
                     itemHomeViewModel.sendAction(ItemHomeAction.SelectItemData(it))
+                },
+                onAddItemBuildData = {
+                    itemHomeViewModel.sendAction(ItemHomeAction.AddItemBuild(it))
                 }
             )
         }
@@ -239,6 +256,201 @@ fun ItemHomeScreen(
                     itemHomeViewModel.sendAction(action)
                 }
             )
+        }
+
+        ItemBuildBottomSheet(
+            itemBuildList = uiState.itemBuildList,
+            currentSpriteMap = uiState.currentSpriteMap,
+            totalItemBuildGold = uiState.itemBuildTotalGold,
+            totalItemBuildStatus = uiState.itemBuildStatus,
+            totalItemBuildUniqueList = uiState.itemBuildUniqueList,
+            onDeleteItemBuildIndex = { index ->
+                itemHomeViewModel.sendAction(ItemHomeAction.DeleteItemBuild(index))
+            }
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun ItemBuildBottomSheet(
+    itemBuildList: List<ItemData>,
+    currentSpriteMap: Map<String, Bitmap>,
+    totalItemBuildGold: Int,
+    totalItemBuildStatus: Map<String, Pair<Int, String>>,
+    totalItemBuildUniqueList: List<Pair<String, String>>,
+    onDeleteItemBuildIndex: (Int) -> Unit
+) {
+    val hasUniqueList by remember(totalItemBuildUniqueList) {
+        derivedStateOf { totalItemBuildUniqueList.any { it.second.isNotEmpty() } }
+    }
+
+    val bottomSheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.PartiallyExpanded,
+        skipHiddenState = false
+    )
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = bottomSheetState
+    )
+
+    LaunchedEffect(bottomSheetState.currentValue) {
+        if (bottomSheetState.currentValue == SheetValue.Hidden) {
+            bottomSheetState.partialExpand()
+        }
+    }
+
+    BottomSheetScaffold(
+        content = {},
+        scaffoldState = bottomSheetScaffoldState,
+        sheetPeekHeight = Dimens.ITEM_BUILD_PEEK_HEIGHT,
+        sheetDragHandle = null,
+        sheetContainerColor = Colors.Blue06,
+        sheetShape = RoundedCornerShape(topStart = Radius.Radius05, topEnd = Radius.Radius05),
+        sheetContent = {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+            ) {
+                Spacer(modifier = Modifier)
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            Colors.Gray06,
+                            RoundedCornerShape(Radius.Radius05)
+                        )
+                        .height(3.dp)
+                        .width(25.dp)
+                )
+
+                ItemBuildListBody(
+                    itemBuildList = itemBuildList,
+                    currentSpriteMap = currentSpriteMap,
+                    onDeleteItemBuildIndex = onDeleteItemBuildIndex
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "$totalItemBuildGold G",
+                        style = TextStyles.SubTitle03,
+                        color = Colors.Gold02
+                    )
+
+                    HorizontalDivider()
+
+                    ItemBuildStatusBody(totalItemBuildStatus)
+
+                    if (hasUniqueList) {
+                        HorizontalDivider()
+
+                        ItemBuildUniqueBody(totalItemBuildUniqueList)
+                    }
+
+                    Spacer(modifier = Modifier.height(Spacings.Spacing02))
+                }
+            }
+        })
+}
+
+@Composable
+fun ItemBuildUniqueBody(
+    totalItemUniqueList: List<Pair<String, String>> = emptyList()
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+    ) {
+        totalItemUniqueList.forEachIndexed { index, unique ->
+            Text(
+                modifier = Modifier.padding(horizontal = Spacings.Spacing05),
+                text = unique.first,
+                style = TextStyles.SubTitle03,
+                color = Colors.Gold02
+            )
+
+            LolHtmlTagTextView(
+                modifier = Modifier.padding(horizontal = Spacings.Spacing05),
+                textSize = TextStyles.Body03.fontSize.value,
+                lolDescription = unique.second
+            )
+
+            if (index < totalItemUniqueList.lastIndex)
+                HorizontalDivider()
+        }
+    }
+}
+
+@Composable
+fun ItemBuildListBody(
+    itemBuildList: List<ItemData> = emptyList(),
+    currentSpriteMap: Map<String, Bitmap?> = emptyMap(),
+    onDeleteItemBuildIndex: (Int) -> Unit = {}
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(state = rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(
+                space = Spacings.Spacing01,
+                alignment = Alignment.CenterHorizontally
+            )
+        ) {
+            repeat(ItemHomeViewModel.ITEM_BUILD_MAX_COUNT) { index ->
+                val itemData = itemBuildList.getOrNull(index) ?: ItemData()
+                ItemBody(
+                    itemIconSize = IconSize.XLargeSize,
+                    item = itemData,
+                    currentSpriteMap = currentSpriteMap,
+                    onClickItem = {
+                        onDeleteItemBuildIndex.invoke(index)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemBuildStatusBody(
+    totalItemStatus: Map<String, Pair<Int, String>> = emptyMap(),
+) {
+    val chunkItemStatusList = totalItemStatus.toList().chunked(2)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacings.Spacing05),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+    ) {
+        Text(
+            text = stringResource(id = ItemR.string.item_build_status_title),
+            style = TextStyles.SubTitle03,
+            color = Colors.Gold02
+        )
+
+        chunkItemStatusList.forEach { list ->
+            Row {
+                list.forEach { itemStatus ->
+                    val title = itemStatus.first
+                    val status = itemStatus.second.first
+                    val suffix = itemStatus.second.second
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = "$title : ${status}${suffix}",
+                        style = TextStyles.Body03,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+            }
         }
     }
 }
