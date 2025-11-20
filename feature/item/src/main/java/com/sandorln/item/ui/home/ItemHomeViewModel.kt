@@ -224,6 +224,9 @@ class ItemHomeViewModel @Inject constructor(
                         }
 
                         filterItemList.filter { item ->
+                            val itemVersions = item.version.split('.').map { it.toIntOrNull() ?: 0 }
+                            val isArenaVersion = itemVersions[0] >= 15 && itemVersions[1] >= 16
+
                             val isMutationItem = item.gold.total == 0 && item.gold.sell == 0
                             if (isMutationItem) return@filter false
 
@@ -234,9 +237,16 @@ class ItemHomeViewModel @Inject constructor(
                             }
 
                             /* Map Type Filter */
+                            /* 15.16.1 Version 부터 아레나 아이템 때문에 Maps 가 꼬이는 현상 발생, ALL 에 해당하는 아이템을 뿌려야함 */
+                            if (isArenaVersion && selectMapType == MapType.SUMMONER_RIFT) {
+                                if (item.mapType == MapType.ALL)
+                                    item.name.contains(searchKeyword)
+                                else
+                                    return@filter false
+                            }
+
                             val isMatchMapType = item.mapType == selectMapType
                             val isItemAllType = item.mapType == MapType.ALL && (selectMapType == MapType.SUMMONER_RIFT || selectMapType == MapType.ARAM)
-
                             return@filter when {
                                 isMatchMapType || isItemAllType -> item.name.contains(searchKeyword)
                                 else -> false
