@@ -51,6 +51,7 @@ import com.sandorln.design.theme.IconSize
 import com.sandorln.design.theme.LolChampionThemePreview
 import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
+import com.sandorln.item.model.ItemBuildException
 import com.sandorln.item.ui.dialog.ItemDetailDialog
 import com.sandorln.item.ui.dialog.ItemFilterDialog
 import com.sandorln.model.data.item.ItemData
@@ -86,12 +87,22 @@ fun ItemHomeScreen(
             .collect { sideEffect ->
                 when (sideEffect) {
                     is ItemHomeSideEffect.ShowErrorMessage -> {
-                        val message = context.getString(R.string.default_error_message)
+                        val messageId = when (sideEffect.exception) {
+                            is ItemBuildException.MaxItemSizeReached -> ItemR.string.item_build_should_add_error
+                            is ItemBuildException.DuplicateLegendaryItem -> ItemR.string.item_build_same_legend_error
+                            else -> R.string.default_error_message
+                        }
+                        val message = context.getString(messageId)
                         BaseToast(context, BaseToastType.WARNING, message).show()
                     }
 
                     is ItemHomeSideEffect.ShowMessage -> {
                         BaseToast(context, BaseToastType.OKAY, sideEffect.message).show()
+                    }
+
+                    is ItemHomeSideEffect.SuccessItemBuild -> {
+                        val message = context.getString(ItemR.string.item_build_success)
+                        BaseToast(context, BaseToastType.OKAY, message).show()
                     }
                 }
             }
