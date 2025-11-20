@@ -109,6 +109,8 @@ class ItemHomeViewModel @Inject constructor(
 
     private fun deletedItemBuildByIndex(index: Int) {
         val tempUiState = _itemUiState.value.copy()
+        if (index >= tempUiState.itemBuildList.size) return
+
         val itemBuildList = runCatching {
             tempUiState
                 .itemBuildList
