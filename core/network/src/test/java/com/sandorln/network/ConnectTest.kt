@@ -113,7 +113,7 @@ class ConnectTest {
     fun 각_패치노트_가져오기() {
         runBlocking {
             runCatching {
-                val versionName = "15.12.1"
+                val versionName = "15.16.1"
                 val itemPatchResult = _itemService.getItemPathNoteList(versionName)
                 println(itemPatchResult)
 
@@ -141,3 +141,4 @@ class ConnectTest {
         }
     }
 }
+

@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -62,6 +63,7 @@ fun ItemDetailDialog(
     versionName: String,
     selectedItemId: String,
     itemDetailDialogViewModel: ItemDetailDialogViewModel = hiltViewModel(),
+    onAddItemBuildData: (ItemData) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onChangeSelectItem: (String) -> Unit = {}
 ) {
@@ -99,7 +101,11 @@ fun ItemDetailDialog(
             ItemInfoBody(
                 name = baseItem.name,
                 tags = baseItem.tags,
-                bitmap = baseItem.image.getImageBitmap(currentSpriteMap)
+                bitmap = baseItem.image.getImageBitmap(currentSpriteMap),
+                onAddItemBuildData = {
+                    onAddItemBuildData.invoke(baseItem)
+                    onDismissRequest.invoke()
+                }
             )
 
             HorizontalDivider(
@@ -333,6 +339,7 @@ fun ItemInfoBody(
     name: String = "",
     bitmap: Bitmap? = null,
     tags: Set<ItemTagType> = emptySet(),
+    onAddItemBuildData: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -377,6 +384,35 @@ fun ItemInfoBody(
         }
 
         Spacer(modifier = Modifier.height(Spacings.Spacing00))
+
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onAddItemBuildData)
+                .border(
+                    0.5.dp,
+                    Colors.Gold04,
+                    RoundedCornerShape(Radius.Radius08)
+                )
+                .padding(
+                    horizontal = Spacings.Spacing01,
+                    vertical = 2.dp
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
+        ) {
+            Text(
+                text = "아이템 빌드 추가",
+                style = TextStyles.Body04,
+                color = Colors.BaseColor
+            )
+
+            Icon(
+                modifier = Modifier.size(IconSize.SmallSize),
+                painter = painterResource(id = R.drawable.ic_add),
+                contentDescription = null,
+                tint = Colors.BaseColor
+            )
+        }
     }
 }
 
@@ -522,7 +558,7 @@ fun ItemDetailDialogPreView() {
 @Composable
 fun ItemInfoBodyPreView() {
     LolChampionThemePreview {
-        ItemInfoBody("장화")
+        ItemInfoBody("장화", onAddItemBuildData = {})
     }
 }
 

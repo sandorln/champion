@@ -11,6 +11,9 @@ import com.sandorln.domain.usecase.sprite.GetCurrentVersionDistinctBySpriteType
 import com.sandorln.domain.usecase.sprite.GetSpriteBitmapByCurrentVersion
 import com.sandorln.domain.usecase.sprite.RefreshDownloadSpriteBitmap
 import com.sandorln.domain.usecase.version.GetCurrentVersion
+import com.sandorln.item.model.ItemBuildException
+import com.sandorln.item.util.getStatusList
+import com.sandorln.item.util.getUniqueStatusList
 import com.sandorln.model.data.image.SpriteType
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.map.MapType
@@ -45,6 +48,7 @@ class ItemHomeViewModel @Inject constructor(
     private val refreshDownloadSpriteBitmap: RefreshDownloadSpriteBitmap
 ) : ViewModel() {
     companion object {
+        const val ITEM_BUILD_MAX_COUNT = 6
         const val ITEM_LEGEND_DEPTH = 3
         private val SUPPORT_ITEM_ID_LIST = listOf("3869", "3870", "3871", "3876", "3877", "4643", "4638") // 서폿 아이템 ID
     }
@@ -76,11 +80,85 @@ class ItemHomeViewModel @Inject constructor(
             ItemHomeAction.RefreshItemData -> refreshItemData()
             ItemHomeAction.ToggleSelectNewItem -> _itemUiState.update { it.copy(isSelectNewItem = !it.isSelectNewItem) }
             is ItemHomeAction.ChangeShowFilterDialog -> _itemUiState.update { it.copy(isShowFilterDialog = action.isVisible) }
+            is ItemHomeAction.AddItemBuild -> addItemBuild(action.itemData)
+            is ItemHomeAction.DeleteItemBuild -> deletedItemBuildByIndex(action.index)
+        }
+    }
+
+    private fun addItemBuild(addItemData: ItemData) {
+        val itemBuildList = _itemUiState.value.itemBuildList
+        val shouldAddItemBuildList = itemBuildList.size < ITEM_BUILD_MAX_COUNT
+        val hasSameLegendItem = addItemData.depth >= ITEM_LEGEND_DEPTH && itemBuildList.any { it.id == addItemData.id }
+
+        when {
+            !shouldAddItemBuildList -> sendSideEffect(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.MaxItemSizeReached()))
+            hasSameLegendItem -> sendSideEffect(ItemHomeSideEffect.ShowErrorMessage(ItemBuildException.DuplicateLegendaryItem()))
+
+            else -> {
+                val tempUiState = _itemUiState.value.copy()
+                val itemBuildList = tempUiState
+                    .itemBuildList
+                    .toMutableList()
+                    .apply { add(addItemData) }
+
+                refreshItemBuild(itemBuildList)
+                sendSideEffect(ItemHomeSideEffect.SuccessItemBuild())
+            }
+        }
+    }
+
+    private fun deletedItemBuildByIndex(index: Int) {
+        val tempUiState = _itemUiState.value.copy()
+        if (index >= tempUiState.itemBuildList.size) return
+
+        val itemBuildList = runCatching {
+            tempUiState
+                .itemBuildList
+                .toMutableList()
+                .apply { removeAt(index) }
+        }.onFailure {
+            sendSideEffect(ItemHomeSideEffect.ShowErrorMessage(it as Exception))
+        }.getOrNull()
+
+        if (itemBuildList == null) return
+        refreshItemBuild(itemBuildList)
+    }
+
+    private fun refreshItemBuild(itemBuildList: List<ItemData> = emptyList()) {
+        val itemBuildStatus: MutableMap<String, Pair<Int, String>> = mutableMapOf()
+        itemBuildList
+            .map(ItemData::getStatusList)
+            .forEach { itemStatusList ->
+                itemStatusList.forEach { (title, value, suffix) ->
+                    val defaultStatus = itemBuildStatus[title + suffix] ?: Pair(0, "")
+                    val sumValue = defaultStatus.first + value
+                    itemBuildStatus[title + suffix] = sumValue to suffix
+                }
+            }
+        itemBuildStatus.toSortedMap()
+
+        val itemBuildUniqueList: List<Pair<String, String>> = itemBuildList
+            .map(ItemData::getUniqueStatusList)
+            .distinctBy { it.first }
+            .filter { it.second.isNotEmpty() }
+
+        val itemBuildTotalGold: Int = itemBuildList.sumOf { itemData -> itemData.gold.total }
+
+        _itemUiState.update {
+            it.copy(
+                itemBuildList = itemBuildList,
+                itemBuildStatus = itemBuildStatus,
+                itemBuildUniqueList = itemBuildUniqueList,
+                itemBuildTotalGold = itemBuildTotalGold
+            )
         }
     }
 
     private val _sideEffect = MutableSharedFlow<ItemHomeSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
+    private fun sendSideEffect(sideEffect: ItemHomeSideEffect) {
+        viewModelScope.launch { _sideEffect.emit(sideEffect) }
+    }
 
     private var _refreshJob: Job? = null
     private fun refreshItemData() {
@@ -91,7 +169,11 @@ class ItemHomeViewModel @Inject constructor(
             _itemUiState.update {
                 it.copy(
                     isLoading = true,
-                    itemPatchList = null
+                    itemPatchList = null,
+                    itemBuildList = emptyList(),
+                    itemBuildStatus = emptyMap(),
+                    itemBuildUniqueList = emptyList(),
+                    itemBuildTotalGold = 0
                 )
             }
 
@@ -111,7 +193,6 @@ class ItemHomeViewModel @Inject constructor(
                 )
             }
         }
-
     }
 
     init {
@@ -143,6 +224,9 @@ class ItemHomeViewModel @Inject constructor(
                         }
 
                         filterItemList.filter { item ->
+                            val itemVersions = item.version.split('.').map { it.toIntOrNull() ?: 0 }
+                            val isArenaVersion = itemVersions[0] >= 15 && itemVersions[1] >= 16
+
                             val isMutationItem = item.gold.total == 0 && item.gold.sell == 0
                             if (isMutationItem) return@filter false
 
@@ -153,9 +237,16 @@ class ItemHomeViewModel @Inject constructor(
                             }
 
                             /* Map Type Filter */
+                            /* 15.16.1 Version 부터 아레나 아이템 때문에 Maps 가 꼬이는 현상 발생, ALL 에 해당하는 아이템을 뿌려야함 */
+                            if (isArenaVersion && selectMapType == MapType.SUMMONER_RIFT) {
+                                if (item.mapType == MapType.ALL)
+                                    item.name.contains(searchKeyword)
+                                else
+                                    return@filter false
+                            }
+
                             val isMatchMapType = item.mapType == selectMapType
                             val isItemAllType = item.mapType == MapType.ALL && (selectMapType == MapType.SUMMONER_RIFT || selectMapType == MapType.ARAM)
-
                             return@filter when {
                                 isMatchMapType || isItemAllType -> item.name.contains(searchKeyword)
                                 else -> false
@@ -219,6 +310,10 @@ class ItemHomeViewModel @Inject constructor(
 
                         _itemUiState.update {
                             it.copy(
+                                itemBuildList = emptyList(),
+                                itemBuildStatus = emptyMap(),
+                                itemBuildUniqueList = emptyList(),
+                                itemBuildTotalGold = 0,
                                 currentVersionName = version,
                                 isLoading = true,
                                 itemPatchList = null,
@@ -273,6 +368,11 @@ data class ItemHomeUiState(
     val isLoading: Boolean = false,
     val itemPatchList: List<PatchNoteData>? = null,
 
+    val itemBuildList: List<ItemData> = listOf(),
+    val itemBuildStatus: Map<String, Pair<Int, String>> = emptyMap(),
+    val itemBuildUniqueList: List<Pair<String, String>> = emptyList(),
+    val itemBuildTotalGold: Int = 0,
+
     val currentVersionName: String = "",
 
     val bootItemList: List<List<ItemData>> = listOf(),
@@ -295,18 +395,18 @@ data class ItemHomeUiState(
 sealed interface ItemHomeAction {
     data object RefreshItemData : ItemHomeAction
     data object ToggleSelectNewItem : ItemHomeAction
-
     data class ToggleItemTagType(val itemTagType: ItemTagType) : ItemHomeAction
     data class ChangeMapTypeFilter(val mapType: MapType) : ItemHomeAction
     data class SelectItemData(val itemDataId: String?) : ItemHomeAction
-
     data class ChangeItemSearchKeyword(val searchKeyword: String) : ItemHomeAction
     data class ChangeSpan(val span: Int) : ItemHomeAction
-
     data class ChangeShowFilterDialog(val isVisible: Boolean) : ItemHomeAction
+    data class AddItemBuild(val itemData: ItemData) : ItemHomeAction
+    data class DeleteItemBuild(val index: Int) : ItemHomeAction
 }
 
 sealed interface ItemHomeSideEffect {
+    class SuccessItemBuild : ItemHomeSideEffect
     data class ShowMessage(val message: String) : ItemHomeSideEffect
     data class ShowErrorMessage(val exception: Exception) : ItemHomeSideEffect
 }
