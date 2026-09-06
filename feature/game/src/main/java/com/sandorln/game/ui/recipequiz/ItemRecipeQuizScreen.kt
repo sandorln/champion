@@ -241,261 +241,268 @@ private fun ItemRecipeQuizBody(
     val currentSelectedCount = uiState.userCart.values.sum()
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacings.Spacing03, vertical = Spacings.Spacing01),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Round header & Score
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "ROUND ${uiState.currentRoundIndex} / ${uiState.totalRoundCount}",
-                style = TextStyles.SubTitle02,
-                color = Colors.Gold02
-            )
-            Text(
-                text = "${thousandDotDecimalFormat.format(uiState.score)}점",
-                style = TextStyles.Title02,
-                color = Colors.Gray01
-            )
-        }
-
-        // Target Item Card
-        Box(
+        // Scrollable Top-Aligned Content (Round Header, Target Item, Candidate Header & Grid)
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Colors.Blue05, RoundedCornerShape(Radius.Radius03))
-                .border(1.dp, Colors.Gold04, RoundedCornerShape(Radius.Radius03))
-                .padding(Spacings.Spacing03)
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Spacings.Spacing03, vertical = Spacings.Spacing01),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
         ) {
+            // Round header & Score
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                BaseRectangleIconImage(
-                    modifier = Modifier.size(54.dp),
-                    serverIconType = ServerIconType.ITEM,
-                    versionName = targetItem.version,
-                    id = targetItem.id
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = targetItem.name,
-                        style = TextStyles.SubTitle01,
-                        color = Colors.BasicWhite,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = "가격: ${targetItem.gold.total}G",
-                        style = TextStyles.Body03,
-                        color = Colors.Gold03
-                    )
-                    Text(
-                        text = "필요 최소 재료: ${totalRequiredCount}개",
-                        style = TextStyles.Body04,
-                        color = Colors.Gray03
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .background(Colors.Blue06, RoundedCornerShape(Radius.Radius02))
-                        .padding(horizontal = Spacings.Spacing02, vertical = Spacings.Spacing01)
-                ) {
-                    Text(
-                        text = "$currentSelectedCount / $totalRequiredCount",
-                        style = TextStyles.SubTitle02,
-                        color = if (currentSelectedCount == totalRequiredCount) Colors.Gold02 else Colors.Gray03
-                    )
-                }
-            }
-        }
-
-        // Candidate Leaf Items Header (Larger text + [전체 초기화] button on far right)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = Spacings.Spacing02, bottom = Spacings.Spacing01),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "최소 기초 재료 후보",
-                style = TextStyles.SubTitle01,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Colors.BasicWhite
-            )
-            Row(
-                modifier = Modifier
-                    .background(Colors.Blue06, RoundedCornerShape(Radius.Radius01))
-                    .border(1.dp, Colors.Gray06, RoundedCornerShape(Radius.Radius01))
-                    .clickable(onClick = onClearCart)
-                    .padding(horizontal = Spacings.Spacing02, vertical = Spacings.Spacing01),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    modifier = Modifier.size(14.dp),
-                    painter = painterResource(id = DesignR.drawable.ic_refresh),
-                    contentDescription = null,
-                    tint = Colors.Gold03
+                Text(
+                    text = "ROUND ${uiState.currentRoundIndex} / ${uiState.totalRoundCount}",
+                    style = TextStyles.SubTitle02,
+                    color = Colors.Gold02
                 )
                 Text(
-                    text = "전체 초기화",
-                    style = TextStyles.Body04,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Colors.Gold03
+                    text = "${thousandDotDecimalFormat.format(uiState.score)}점",
+                    style = TextStyles.Title02,
+                    color = Colors.Gray01
                 )
             }
-        }
 
-        // Candidate Leaf Items (4 rows x 4 items = 16 slots, padded with blank slots if < 16)
-        val candidates = round.candidateLeafItems
-        val paddedSlots: List<ItemData?> = (0 until 16).map { candidates.getOrNull(it) }
-        val chunked = paddedSlots.chunked(4)
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
-        ) {
-            chunked.forEach { rowSlots ->
+            // Target Item Card
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Colors.Blue05, RoundedCornerShape(Radius.Radius03))
+                    .border(1.dp, Colors.Gold04, RoundedCornerShape(Radius.Radius03))
+                    .padding(Spacings.Spacing03)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
                 ) {
-                    rowSlots.forEach { item ->
-                        if (item != null) {
-                            val count = uiState.userCart[item] ?: 0
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .background(
-                                        if (count > 0) Colors.Blue05 else Colors.Blue06,
-                                        RoundedCornerShape(Radius.Radius02)
-                                    )
-                                    .border(
-                                        1.dp,
-                                        if (count > 0) Colors.Gold03 else Colors.Gray07,
-                                        RoundedCornerShape(Radius.Radius02)
-                                    )
-                                    .padding(vertical = 4.dp, horizontal = 2.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.clickable { onAddLeaf(item) }
-                                    ) {
-                                        BaseRectangleIconImage(
-                                            modifier = Modifier.size(34.dp),
-                                            serverIconType = ServerIconType.ITEM,
-                                            versionName = item.version,
-                                            id = item.id
-                                        )
-                                    }
-                                    Text(
-                                        text = item.name,
-                                        style = TextStyles.Body04,
-                                        fontSize = 11.sp,
-                                        color = Colors.BasicWhite,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Text(
-                                        text = "${item.gold.total}G",
-                                        style = TextStyles.Body04,
-                                        fontSize = 9.sp,
-                                        color = Colors.Gold04
-                                    )
+                    BaseRectangleIconImage(
+                        modifier = Modifier.size(54.dp),
+                        serverIconType = ServerIconType.ITEM,
+                        versionName = targetItem.version,
+                        id = targetItem.id
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = targetItem.name,
+                            style = TextStyles.SubTitle01,
+                            color = Colors.BasicWhite,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "가격: ${targetItem.gold.total}G",
+                            style = TextStyles.Body03,
+                            color = Colors.Gold03
+                        )
+                        Text(
+                            text = "필요 최소 재료: ${totalRequiredCount}개",
+                            style = TextStyles.Body04,
+                            color = Colors.Gray03
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .background(Colors.Blue06, RoundedCornerShape(Radius.Radius02))
+                            .padding(horizontal = Spacings.Spacing02, vertical = Spacings.Spacing01)
+                    ) {
+                        Text(
+                            text = "$currentSelectedCount / $totalRequiredCount",
+                            style = TextStyles.SubTitle02,
+                            color = if (currentSelectedCount == totalRequiredCount) Colors.Gold02 else Colors.Gray03
+                        )
+                    }
+                }
+            }
 
-                                    // [-] count [+] direct controls
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 2.dp),
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
+            // Candidate Leaf Items Header (Larger text + [전체 초기화] button on far right)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "최소 기초 재료 후보",
+                    style = TextStyles.SubTitle01,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Colors.BasicWhite
+                )
+                Row(
+                    modifier = Modifier
+                        .background(Colors.Blue06, RoundedCornerShape(Radius.Radius01))
+                        .border(1.dp, Colors.Gray06, RoundedCornerShape(Radius.Radius01))
+                        .clickable(onClick = onClearCart)
+                        .padding(horizontal = Spacings.Spacing02, vertical = Spacings.Spacing01),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier.size(14.dp),
+                        painter = painterResource(id = DesignR.drawable.ic_refresh),
+                        contentDescription = null,
+                        tint = Colors.Gold03
+                    )
+                    Text(
+                        text = "전체 초기화",
+                        style = TextStyles.Body04,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Colors.Gold03
+                    )
+                }
+            }
+
+            // Candidate Leaf Items (4 rows x 4 items = 16 slots, padded with blank slots if < 16)
+            val candidates = round.candidateLeafItems
+            val paddedSlots: List<ItemData?> = (0 until 16).map { candidates.getOrNull(it) }
+            val chunked = paddedSlots.chunked(4)
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+            ) {
+                chunked.forEach { rowSlots ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+                    ) {
+                        rowSlots.forEach { item ->
+                            if (item != null) {
+                                val count = uiState.userCart[item] ?: 0
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .background(
+                                            if (count > 0) Colors.Blue05 else Colors.Blue06,
+                                            RoundedCornerShape(Radius.Radius02)
+                                        )
+                                        .border(
+                                            1.dp,
+                                            if (count > 0) Colors.Gold03 else Colors.Gray07,
+                                            RoundedCornerShape(Radius.Radius02)
+                                        )
+                                        .padding(vertical = 4.dp, horizontal = 2.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(2.dp)
                                     ) {
                                         Box(
-                                            modifier = Modifier
-                                                .size(18.dp)
-                                                .background(
-                                                    if (count > 0) Colors.Blue07 else Colors.Blue07.copy(alpha = 0.4f),
-                                                    RoundedCornerShape(4.dp)
-                                                )
-                                                .border(
-                                                    0.5.dp,
-                                                    if (count > 0) Colors.Gray05 else Colors.Gray07,
-                                                    RoundedCornerShape(4.dp)
-                                                )
-                                                .clickable(enabled = count > 0) { onRemoveLeaf(item) },
-                                            contentAlignment = Alignment.Center
+                                            modifier = Modifier.clickable { onAddLeaf(item) }
                                         ) {
-                                            Text(
-                                                text = "-",
-                                                style = TextStyles.SubTitle03,
-                                                fontSize = 13.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = if (count > 0) Colors.Gold02 else Colors.Gray06
+                                            BaseRectangleIconImage(
+                                                modifier = Modifier.size(34.dp),
+                                                serverIconType = ServerIconType.ITEM,
+                                                versionName = item.version,
+                                                id = item.id
                                             )
                                         }
-
                                         Text(
-                                            modifier = Modifier.padding(horizontal = 4.dp),
-                                            text = "$count",
+                                            text = item.name,
                                             style = TextStyles.Body04,
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (count > 0) Colors.Gold02 else Colors.Gray04
+                                            fontSize = 11.sp,
+                                            color = Colors.BasicWhite,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = "${item.gold.total}G",
+                                            style = TextStyles.Body04,
+                                            fontSize = 9.sp,
+                                            color = Colors.Gold04
                                         )
 
-                                        Box(
+                                        // [-] count [+] direct controls with wide spacing
+                                        Row(
                                             modifier = Modifier
-                                                .size(18.dp)
-                                                .background(Colors.Blue07, RoundedCornerShape(4.dp))
-                                                .border(0.5.dp, Colors.Gray05, RoundedCornerShape(4.dp))
-                                                .clickable { onAddLeaf(item) },
-                                            contentAlignment = Alignment.Center
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 4.dp, vertical = 2.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(20.dp)
+                                                    .background(
+                                                        if (count > 0) Colors.Blue07 else Colors.Blue07.copy(alpha = 0.4f),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .border(
+                                                        0.5.dp,
+                                                        if (count > 0) Colors.Gray05 else Colors.Gray07,
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .clickable(enabled = count > 0) { onRemoveLeaf(item) },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "-",
+                                                    style = TextStyles.SubTitle03,
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (count > 0) Colors.Gold02 else Colors.Gray06
+                                                )
+                                            }
+
                                             Text(
-                                                text = "+",
-                                                style = TextStyles.SubTitle03,
-                                                fontSize = 13.sp,
+                                                text = "$count",
+                                                style = TextStyles.Body04,
+                                                fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = Colors.Gold02
+                                                color = if (count > 0) Colors.Gold02 else Colors.Gray04
                                             )
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(20.dp)
+                                                    .background(Colors.Blue07, RoundedCornerShape(4.dp))
+                                                    .border(0.5.dp, Colors.Gray05, RoundedCornerShape(4.dp))
+                                                    .clickable { onAddLeaf(item) },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "+",
+                                                    style = TextStyles.SubTitle03,
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Colors.Gold02
+                                                )
+                                            }
                                         }
                                     }
                                 }
+                            } else {
+                                // 빈칸 슬롯 (Placeholder when fewer than 16 items)
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(84.dp)
+                                        .background(Colors.Blue07.copy(alpha = 0.2f), RoundedCornerShape(Radius.Radius02))
+                                        .border(1.dp, Colors.Gray07.copy(alpha = 0.2f), RoundedCornerShape(Radius.Radius02))
+                                )
                             }
-                        } else {
-                            // 빈칸 슬롯 (Placeholder when fewer than 16 items)
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(84.dp)
-                                    .background(Colors.Blue07.copy(alpha = 0.2f), RoundedCornerShape(Radius.Radius02))
-                                    .border(1.dp, Colors.Gray07.copy(alpha = 0.2f), RoundedCornerShape(Radius.Radius02))
-                            )
                         }
                     }
                 }
             }
         }
 
-        // Action Button: "조합 완성" (No emoji, clean full-width button)
+        // Action Button: "조합 완성" (Fixed at bottom)
         val canCraft = currentSelectedCount > 0
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = Spacings.Spacing03, vertical = Spacings.Spacing02)
                 .background(
                     if (canCraft) Colors.Gold02 else Colors.Gray07,
                     RoundedCornerShape(Radius.Radius03)
