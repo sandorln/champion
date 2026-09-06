@@ -5,7 +5,9 @@ import com.sandorln.data.util.asEntity
 import com.sandorln.database.dao.SummonerSpellDao
 import com.sandorln.database.model.SummonerSpellEntity
 import com.sandorln.datastore.local.version.VersionDatasource
+import com.sandorln.model.data.patchnote.PatchNoteData
 import com.sandorln.model.data.spell.SummonerSpell
+import com.sandorln.network.model.patchnote.NetworkPatchNoteData
 import com.sandorln.network.service.SummonerSpellService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -37,4 +39,7 @@ class DefaultSummonerSpellRepository @Inject constructor(
 
     override suspend fun getSummonerSpellListByVersion(version: String): List<SummonerSpell> =
         summonerSpellDao.getAllSummonerSpell(version).firstOrNull()?.map(SummonerSpellEntity::asData) ?: emptyList()
+
+    override suspend fun getSpellPatchList(version: String): List<PatchNoteData> =
+        summonerSpellService.getSpellPathNoteList(version).map(NetworkPatchNoteData::asData)
 }

@@ -3,6 +3,9 @@ package com.sandorln.network.service
 import com.sandorln.network.BuildConfig
 import com.sandorln.network.model.NetworkSummonerSpell
 import com.sandorln.network.model.response.BaseLolResponse
+import com.sandorln.network.model.patchnote.NetworkPatchNoteData
+import com.sandorln.network.model.patchnote.NetworkPatchNoteType
+import com.sandorln.network.util.fetchPatchNoteList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -21,5 +24,13 @@ class SummonerSpellService @Inject constructor(
             .body<BaseLolResponse<Map<String, NetworkSummonerSpell>>>()
 
         response.data ?: throw Exception("")
+    }
+
+    suspend fun getSpellPathNoteList(version: String): List<NetworkPatchNoteData> = withContext(Dispatchers.IO) {
+        val spellResult = runCatching {
+            fetchPatchNoteList(version, NetworkPatchNoteType.Spell)
+        }.getOrNull()
+
+        return@withContext spellResult?.takeIf(List<NetworkPatchNoteData>::isNotEmpty) ?: emptyList()
     }
 }
