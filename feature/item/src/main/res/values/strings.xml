@@ -26,6 +26,7 @@
     <string name="map_type_all">모두</string>
     <string name="map_type_summoner_rift">소환사의 협곡</string>
     <string name="map_type_aram">칼바람 협곡</string>
+    <string name="map_type_classic_summoner_rift">소환사의 협곡(클래식)</string>
     <string name="map_type_none">그 외</string>
 
     <string name="item_filter_stats_title">아이템 능력</string>

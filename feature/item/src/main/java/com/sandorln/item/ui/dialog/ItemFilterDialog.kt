@@ -172,7 +172,7 @@ fun ItemMapFilerList(
             horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
         ) {
-            MapType.entries.filter { it != MapType.ALL }.forEach { mapType ->
+            MapType.entries.forEach { mapType ->
                 BaseFilterTag(
                     isCheck = selectMapType == mapType,
                     title = stringResource(id = mapType.getTitleStringId()),
