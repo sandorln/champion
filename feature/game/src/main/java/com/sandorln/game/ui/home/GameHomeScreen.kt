@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,8 +33,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,9 +52,9 @@ import com.sandorln.design.util.thousandDotDecimalFormat
 @Composable
 fun GameHomeScreen(
     moveToInitialQuizScreen: () -> Unit,
+    moveToItemRecipeQuizScreen: () -> Unit = {},
     gameHomeViewModel: GameHomeViewModel = hiltViewModel()
 ) {
-
     val score by gameHomeViewModel.initialGameScore.collectAsState()
     val rank by gameHomeViewModel.initialGameRank.collectAsState()
     val refreshRemainingTime by gameHomeViewModel.remainingRankRefreshTime.collectAsState()
@@ -61,7 +63,10 @@ fun GameHomeScreen(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(state = rememberScrollState())
+            .padding(vertical = Spacings.Spacing04),
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing05)
     ) {
+        // Game 1: Initial Quiz
         InitialGameRankingBody(
             score = score,
             rank = rank,
@@ -69,10 +74,22 @@ fun GameHomeScreen(
             onClickInitialRankRefreshBtn = gameHomeViewModel::refreshGameRank,
             onClickInitialGameStart = moveToInitialQuizScreen
         )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = Spacings.Spacing04),
+            color = Colors.Gray08,
+            thickness = 1.dp
+        )
+
+        // Game 2: Item Recipe Quiz (신규)
+        RecipeGameHubBody(
+            onClickRecipeGameStart = moveToItemRecipeQuizScreen
+        )
     }
 }
 
 private val INITIAL_GAME_TITLE = listOf("ㅊ", "ㅅ", "ㄱ", "ㅇ")
+private val RECIPE_GAME_TITLE = listOf("ㅈ", "ㅎ", "ㄱ", "ㅇ")
 
 @Composable
 fun InitialGameRankingBody(
@@ -102,15 +119,21 @@ fun InitialGameRankingBody(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = Spacings.Spacing07),
+            .padding(vertical = Spacings.Spacing03),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
         ) {
-            InitialGameTitleBody()
+            InitialGameTitleBody(INITIAL_GAME_TITLE)
         }
+
+        Text(
+            text = "초성으로 아이템 이름을 빠르게 맞추세요!",
+            style = TextStyles.Body03,
+            color = Colors.Gray04
+        )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -161,7 +184,6 @@ fun InitialGameRankingBody(
             )
         }
 
-
         TextButton(
             modifier = Modifier.offset(y = btnOffset.dp),
             shape = RoundedCornerShape(Radius.Radius09),
@@ -169,7 +191,7 @@ fun InitialGameRankingBody(
             onClick = onClickInitialGameStart,
         ) {
             Text(
-                text = "GAME START",
+                text = "초성 게임 시작",
                 style = TextStyles.SubTitle01,
                 color = Colors.Gold02
             )
@@ -178,11 +200,85 @@ fun InitialGameRankingBody(
 }
 
 @Composable
-fun InitialGameTitleBody() {
+fun RecipeGameHubBody(
+    onClickRecipeGameStart: () -> Unit
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val btnOffset by infiniteTransition.animateFloat(
+        initialValue = 0.dp.value,
+        targetValue = -Spacings.Spacing00.value,
+        animationSpec = infiniteRepeatable(
+            animation = tween(AnimationConfig.FAST, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = ""
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = Spacings.Spacing03),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacings.Spacing03)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+        ) {
+            InitialGameTitleBody(RECIPE_GAME_TITLE)
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(Colors.Gold02, RoundedCornerShape(Radius.Radius01))
+                    .padding(horizontal = Spacings.Spacing01, vertical = 2.dp)
+            ) {
+                Text(
+                    text = "NEW ✨",
+                    style = TextStyles.Body04,
+                    color = Colors.Blue06,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Text(
+                text = "아이템 조합식 퀴즈",
+                style = TextStyles.SubTitle01,
+                color = Colors.BasicWhite
+            )
+        }
+
+        Text(
+            text = "완성 아이템에 필요한 최소 기초 재료와 수량을 맞추세요!",
+            style = TextStyles.Body03,
+            color = Colors.Gray04
+        )
+
+        Spacer(modifier = Modifier.height(Spacings.Spacing01))
+
+        TextButton(
+            modifier = Modifier.offset(y = btnOffset.dp),
+            shape = RoundedCornerShape(Radius.Radius09),
+            border = BorderStroke(1.dp, Colors.Gold04),
+            onClick = onClickRecipeGameStart,
+        ) {
+            Text(
+                text = "조합 게임 시작",
+                style = TextStyles.SubTitle01,
+                color = Colors.Gold02
+            )
+        }
+    }
+}
+
+@Composable
+fun InitialGameTitleBody(titles: List<String> = INITIAL_GAME_TITLE) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
     ) {
-        INITIAL_GAME_TITLE.forEach {
+        titles.forEach {
             Box(
                 modifier = Modifier
                     .background(

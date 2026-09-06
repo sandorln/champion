@@ -11,7 +11,8 @@ fun NavGraphBuilder.homeScreens(
     moveToChampionPatchNoteListScreen: (version: String) -> Unit,
     moveToLicensesScreen: () -> Unit,
     moveToLolPatchNoteScreen: () -> Unit,
-    moveToInitialQuizScreen: () -> Unit
+    moveToInitialQuizScreen: () -> Unit,
+    moveToItemRecipeQuizScreen: () -> Unit = {}
 ) {
     composable(
         route = HomeScreenRoute
@@ -21,7 +22,8 @@ fun NavGraphBuilder.homeScreens(
             moveToLicensesScreen = moveToLicensesScreen,
             moveToLolPatchNoteScreen = moveToLolPatchNoteScreen,
             moveToChampionPatchNoteListScreen = moveToChampionPatchNoteListScreen,
-            moveToInitialQuizScreen = moveToInitialQuizScreen
+            moveToInitialQuizScreen = moveToInitialQuizScreen,
+            moveToItemRecipeQuizScreen = moveToItemRecipeQuizScreen
         )
     }
 }

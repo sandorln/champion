@@ -97,7 +97,8 @@ fun HomeScreen(
     moveToLicensesScreen: () -> Unit,
     moveToLolPatchNoteScreen: () -> Unit,
     moveToChampionPatchNoteListScreen: (version: String) -> Unit,
-    moveToInitialQuizScreen: () -> Unit
+    moveToInitialQuizScreen: () -> Unit,
+    moveToItemRecipeQuizScreen: () -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0) { homeItems.size }
@@ -172,7 +173,8 @@ fun HomeScreen(
                         )
 
                         HomeScreenType.Game -> GameHomeScreen(
-                            moveToInitialQuizScreen = moveToInitialQuizScreen
+                            moveToInitialQuizScreen = moveToInitialQuizScreen,
+                            moveToItemRecipeQuizScreen = moveToItemRecipeQuizScreen
                         )
 
                         HomeScreenType.Rune -> RuneHomeScreen()

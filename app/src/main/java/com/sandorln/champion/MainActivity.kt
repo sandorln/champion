@@ -21,6 +21,7 @@ import com.sandorln.design.theme.Colors
 import com.sandorln.design.theme.LolChampionTheme
 import com.sandorln.game.navigation.gameScreens
 import com.sandorln.game.navigation.moveToInitialQuiz
+import com.sandorln.game.navigation.moveToItemRecipeQuiz
 import com.sandorln.home.navigation.HomeScreenRoute
 import com.sandorln.home.navigation.homeScreens
 import com.sandorln.setting.navigation.moveToLolPatchNoteScreen
@@ -51,7 +52,8 @@ class MainActivity : ComponentActivity() {
                             moveToLicensesScreen = moveToLicensesScreen,
                             moveToLolPatchNoteScreen = navController::moveToLolPatchNoteScreen,
                             moveToChampionPatchNoteListScreen = navController::moveToChampionPatchNoteList,
-                            moveToInitialQuizScreen = navController::moveToInitialQuiz
+                            moveToInitialQuizScreen = navController::moveToInitialQuiz,
+                            moveToItemRecipeQuizScreen = navController::moveToItemRecipeQuiz
                         )
                         championScreens(
                             onBackStack = navController::navigateUp,
