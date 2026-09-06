@@ -8,6 +8,7 @@
 - [[MVI_Architecture]]: 안드로이드 단방향 데이터 흐름(UDF), Action-UiState-SideEffect 패턴
 - [[Riot_DataDragon_API]]: 라이엇 게임즈 공식 정적 CDN API 및 버전 관리 구조
 - [[Sprite_Sheet_Optimization]]: 대량 아이콘 렌더링 및 네트워크 병목 해소를 위한 비트맵 슬라이싱 최적화
+- [[Game_Mode_Architecture]]: 미니게임 허브 구조 및 재귀적 아이템 조합식 퀴즈 아키텍처
 
 ---
 
