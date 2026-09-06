@@ -7,7 +7,7 @@ import com.sandorln.network.model.patchnote.NetworkPatchNoteData
 fun NetworkPatchNoteData.asChampionData(): PatchNoteData = PatchNoteData(
     title = title,
     imageUrl = imageUrl,
-    summary = summary.dropLast(1).replace(". ", "\n")
+    summary = summary.trim().removeSuffix(".")
 )
 
 fun NetworkPatchNoteData.asData(): PatchNoteData = PatchNoteData(
