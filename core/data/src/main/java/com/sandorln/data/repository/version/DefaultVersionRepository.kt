@@ -38,20 +38,22 @@ class DefaultVersionRepository @Inject constructor(
                 }
         }.flowOn(Dispatchers.IO)
 
+    companion object {
+        val versionComparator = Comparator<VersionEntity> { version1, version2 ->
+            val (major1, minor1, patch1) = runCatching { version1.name.split('.').map { it.toInt() } }.getOrDefault(listOf(0, 0, 0))
+            val (major2, minor2, patch2) = runCatching { version2.name.split('.').map { it.toInt() } }.getOrDefault(listOf(0, 0, 0))
+
+            when {
+                major1 != major2 -> major2 - major1
+                minor1 != minor2 -> minor2 - minor1
+                else -> patch2 - patch1
+            }
+        }
+    }
+
     override val allVersionList: StateFlow<List<Version>> = versionDao
         .getAllVersion()
         .map { versionEntityList ->
-            val versionComparator = Comparator<VersionEntity> { version1, version2 ->
-                val (major1, minor1, patch1) = version1.name.split('.').map { it.toInt() }
-                val (major2, minor2, patch2) = version2.name.split('.').map { it.toInt() }
-
-                when {
-                    major1 != major2 -> major2 - major1
-                    minor1 != minor2 -> minor2 - minor1
-                    else -> patch2 - patch1
-                }
-            }
-
             versionEntityList.sortedWith(versionComparator).map(VersionEntity::asData)
         }.stateIn(CoroutineScope(Dispatchers.IO), SharingStarted.WhileSubscribed(), emptyList())
 
@@ -73,8 +75,25 @@ class DefaultVersionRepository @Inject constructor(
     }
 
     override suspend fun getNotInitCompleteVersionList(): List<Version> = versionDao.getNotInitVersionEntityList().map(VersionEntity::asData)
+
+    override suspend fun getAllVersionList(): List<Version> = withContext(Dispatchers.IO) {
+        versionDao.getAllVersionEntityList()
+            .sortedWith(versionComparator)
+            .map(VersionEntity::asData)
+    }
+
     override suspend fun updateVersionData(version: Version) {
         versionDao.insertVersion(version.asEntity())
+    }
+
+    override suspend fun updateNewIdList(
+        versionName: String,
+        newChampionIdList: List<String>?,
+        newItemIdList: List<String>?
+    ) {
+        withContext(Dispatchers.IO) {
+            versionDao.updateNewIdList(versionName, newChampionIdList, newItemIdList)
+        }
     }
 
     override suspend fun getLolPatchNoteUrl(major1: Int, minor1: Int): String =
