@@ -28,6 +28,8 @@ android {
 }
 
 dependencies {
+    testImplementation(libs.test.junit)
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
