@@ -8,7 +8,6 @@ import com.sandorln.data.repository.version.VersionRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -76,7 +75,7 @@ class RefreshAppStartData @Inject constructor(
                 }.awaitAll()
 
                 /* 이전 버전과 비교 하여 비교 값 저장 */
-                val allVersionList = versionRepository.allVersionList.firstOrNull() ?: return@coroutineScope
+                val allVersionList = versionRepository.getAllVersionList()
                 allVersionList.mapIndexed { index, version ->
                     async {
                         if (!version.isCompleteChampions || !version.isCompleteItems)
@@ -84,7 +83,7 @@ class RefreshAppStartData @Inject constructor(
 
                         val preVersion = allVersionList.getOrNull(index + 1)
                         val preVersionName = preVersion?.name ?: ""
-                        if (preVersion?.isCompleteChampions == false)
+                        if (preVersion != null && !preVersion.isCompleteChampions)
                             return@async
 
                         var newItemIdList: List<String>? = version.newItemIdList
@@ -107,11 +106,10 @@ class RefreshAppStartData @Inject constructor(
                             )
                         }
 
-                        versionRepository.updateVersionData(
-                            version.copy(
-                                newChampionIdList = newChampionIdList,
-                                newItemIdList = newItemIdList
-                            )
+                        versionRepository.updateNewIdList(
+                            versionName = version.name,
+                            newChampionIdList = newChampionIdList,
+                            newItemIdList = newItemIdList
                         )
                     }
                 }.awaitAll()
