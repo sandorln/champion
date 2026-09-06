@@ -2,7 +2,7 @@
 
 - **유형**: 안드로이드 애플리케이션 프로젝트 (Application Project)
 - **개발자/저자**: sandorln
-- **관련 개념**: [[MVI_Architecture]], [[Riot_DataDragon_API]], [[Sprite_Sheet_Optimization]]
+- **관련 개념**: [[MVI_Architecture]], [[Riot_DataDragon_API]], [[Sprite_Sheet_Optimization]], [[App_Startup_Sync_Architecture]]
 - **기술 스택/의존성**: [[Jetpack_Compose]], [[Ktor]], [[Room]], [[Riot_Games]]
 
 ---
@@ -29,6 +29,7 @@
 ## 3. 핵심 아키텍처 원칙
 - [EXTRACTED] 화면 레벨의 상태 관리는 [[MVI_Architecture]]를 전면 적용하여 단방향 데이터 흐름을 유지한다.
 - [EXTRACTED] 데이터 통신은 [[Riot_Games]]의 [[Riot_DataDragon_API]]를 사용하며, 대량 에셋은 [[Sprite_Sheet_Optimization]]을 통해 처리한다.
+- [EXTRACTED] 앱 구동 시 초기 데이터 동기화는 [[App_Startup_Sync_Architecture]]를 준수하여 Room DB와 Data Dragon 간의 2단계 정합성 파이프라인으로 처리된다.
 
 ---
 
