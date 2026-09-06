@@ -97,7 +97,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
     }
 
     private var roundStartTime: Long = 0
-    private fun nextRound(isAnswer: Boolean) {
+    private fun nextRound(isAnswer: Boolean, requiredMap: Map<ItemData, Int>, userCart: Map<ItemData, Int>) {
         val nowDate = System.currentTimeMillis()
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -114,6 +114,16 @@ class ItemRecipeQuizViewModel @Inject constructor(
                         ChainType.FAIL -> 0
                     }
                     _uiState.update { it.copy(score = it.score + plusScore) }
+                } else {
+                    // 부분 점수: 조합식과 비교하여 맞춘 최소 기초 재료 1개당 10점씩 부여
+                    val matchedCount = requiredMap.entries.sumOf { (item, reqCount) ->
+                        val selectedCount = userCart[item] ?: 0
+                        minOf(selectedCount, reqCount)
+                    }
+                    val partialScore = matchedCount * 10L
+                    if (partialScore > 0) {
+                        _uiState.update { it.copy(score = it.score + partialScore) }
+                    }
                 }
 
                 val currentRound = _uiState.value.currentRound
@@ -122,7 +132,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
                         chainType = chainType,
                         targetItem = currentRound.targetItem,
                         isCorrect = isAnswer,
-                        userCart = _uiState.value.userCart,
+                        userCart = userCart,
                         answerLeaves = currentRound.requiredLeafItems
                     )
                 )
@@ -233,7 +243,14 @@ class ItemRecipeQuizViewModel @Inject constructor(
                                         userCart[item] == count
                                     }
 
-                            nextRound(isAnswer)
+                            val animationType = if (isAnswer) CraftAnimationType.SUCCESS else CraftAnimationType.FAIL
+                            _uiState.update { it.copy(craftAnimation = animationType) }
+
+                            nextRound(isAnswer, requiredMap, userCart)
+                        }
+
+                        ItemRecipeQuizAction.DismissCraftAnimation -> {
+                            _uiState.update { it.copy(craftAnimation = null) }
                         }
 
                         ItemRecipeQuizAction.CloseGameDialog -> {
@@ -246,11 +263,17 @@ class ItemRecipeQuizViewModel @Inject constructor(
     }
 }
 
+enum class CraftAnimationType {
+    SUCCESS,
+    FAIL
+}
+
 sealed interface ItemRecipeQuizAction {
     data class AddLeafItem(val item: ItemData) : ItemRecipeQuizAction
     data class RemoveLeafItem(val item: ItemData) : ItemRecipeQuizAction
     data object ClearCart : ItemRecipeQuizAction
     data object SubmitCraft : ItemRecipeQuizAction
+    data object DismissCraftAnimation : ItemRecipeQuizAction
     data object CloseGameDialog : ItemRecipeQuizAction
 }
 
@@ -262,7 +285,8 @@ data class ItemRecipeQuizUiState(
     val userCart: Map<ItemData, Int> = emptyMap(),
     val isGameEnd: Boolean = false,
     val lastFeedbackMessage: String = "",
-    val isLastAnswerCorrect: Boolean? = null
+    val isLastAnswerCorrect: Boolean? = null,
+    val craftAnimation: CraftAnimationType? = null
 )
 
 data class RecipeRoundResult(

@@ -15,7 +15,7 @@ class GetItemRecipeQuizRoundList @Inject constructor(
 ) {
     companion object {
         const val DEFAULT_ROUND_COUNT = 10
-        const val CANDIDATE_POOL_SIZE = 8
+        const val CANDIDATE_POOL_SIZE = 16
     }
 
     suspend operator fun invoke(

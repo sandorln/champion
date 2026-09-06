@@ -68,4 +68,39 @@ class ItemRecipeQuizStateTest {
                 requiredMap.all { (item, count) -> missingCart[item] == count }
         assertFalse(isMatch3)
     }
+
+    @Test
+    fun testPartialScoringLogic() {
+        // 톱날단검: 롱소드 2개 필요
+        val longSword = ItemData(id = "1036", name = "롱소드")
+        val ruby = ItemData(id = "1028", name = "루비수정")
+        val requiredMap = mapOf(longSword to 2)
+
+        // Case 1: 롱소드 1개만 넣었을 때 -> 1개 일치 -> 10점
+        val cart1 = mapOf(longSword to 1)
+        val matched1 = requiredMap.entries.sumOf { (item, reqCount) ->
+            minOf(cart1[item] ?: 0, reqCount)
+        }
+        assertEquals(1, matched1)
+        val score1 = matched1 * 10L
+        assertEquals(10L, score1)
+
+        // Case 2: 롱소드 1개 + 오답 루비수정 1개 넣었을 때 -> 1개 일치 -> 10점
+        val cart2 = mapOf(longSword to 1, ruby to 1)
+        val matched2 = requiredMap.entries.sumOf { (item, reqCount) ->
+            minOf(cart2[item] ?: 0, reqCount)
+        }
+        assertEquals(1, matched2)
+        val score2 = matched2 * 10L
+        assertEquals(10L, score2)
+
+        // Case 3: 롱소드 3개(초과) 넣었을 때 -> 최대 요구치 2개까지만 일치 인정 -> 20점
+        val cart3 = mapOf(longSword to 3)
+        val matched3 = requiredMap.entries.sumOf { (item, reqCount) ->
+            minOf(cart3[item] ?: 0, reqCount)
+        }
+        assertEquals(2, matched3)
+        val score3 = matched3 * 10L
+        assertEquals(20L, score3)
+    }
 }

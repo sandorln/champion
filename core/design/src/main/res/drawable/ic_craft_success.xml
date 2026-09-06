@@ -1,0 +1,53 @@
+﻿<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Anvil Base & Body -->
+    <path
+        android:fillColor="#785A28"
+        android:pathData="M22,86 L78,86 L72,74 L28,74 Z" />
+    <path
+        android:fillColor="#C89B3C"
+        android:pathData="M25,84 L75,84 L70,75 L30,75 Z" />
+    <!-- Anvil Waist -->
+    <path
+        android:fillColor="#5A6470"
+        android:pathData="M34,75 L66,75 L60,56 L40,56 Z" />
+    <!-- Anvil Top Face and Horn -->
+    <path
+        android:fillColor="#A09B8C"
+        android:pathData="M12,44 C20,46 28,50 36,56 L86,56 L88,44 L12,44 Z" />
+    <!-- Anvil Top Highlight -->
+    <path
+        android:fillColor="#F0E6D2"
+        android:pathData="M16,44 L87,44 L85,47 L22,47 Z" />
+
+    <!-- Hammer Striking on Anvil -->
+    <!-- Handle -->
+    <path
+        android:fillColor="#937341"
+        android:pathData="M52,28 L84,6 L88,10 L56,32 Z" />
+    <!-- Hammer Head -->
+    <path
+        android:fillColor="#0AC8B9"
+        android:pathData="M40,24 L60,38 L48,50 L28,36 Z" />
+    <path
+        android:fillColor="#F0E6D2"
+        android:pathData="M42,26 L58,38 L54,42 L38,30 Z" />
+
+    <!-- Golden Sparks & Bursts -->
+    <!-- Spark 1 -->
+    <path
+        android:fillColor="#F0C050"
+        android:pathData="M28,26 L30,18 L32,26 L40,28 L32,30 L30,38 L28,30 L20,28 Z" />
+    <!-- Spark 2 -->
+    <path
+        android:fillColor="#F0C050"
+        android:pathData="M66,42 L68,36 L70,42 L76,44 L70,46 L68,52 L66,46 L60,44 Z" />
+    <!-- Spark 3 (Top) -->
+    <path
+        android:fillColor="#FFE680"
+        android:pathData="M50,14 L51,8 L52,14 L58,15 L52,16 L51,22 L50,16 L44,15 Z" />
+</vector>

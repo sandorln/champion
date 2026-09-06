@@ -1,0 +1,44 @@
+﻿<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Anvil Base & Body (Grayed out & cracked) -->
+    <path
+        android:fillColor="#3C4048"
+        android:pathData="M18,86 L68,86 L62,74 L24,74 Z" />
+    <path
+        android:fillColor="#4F5661"
+        android:pathData="M20,84 L65,84 L60,75 L26,75 Z" />
+    <!-- Anvil Waist -->
+    <path
+        android:fillColor="#33383F"
+        android:pathData="M28,75 L56,75 L50,56 L34,56 Z" />
+    <!-- Anvil Top Face and Horn -->
+    <path
+        android:fillColor="#5A6470"
+        android:pathData="M8,44 C16,46 24,50 30,56 L72,56 L74,44 L8,44 Z" />
+
+    <!-- Crack on Anvil -->
+    <path
+        android:fillColor="#E84057"
+        android:pathData="M42,44 L40,50 L44,53 L38,62 L40,62 L46,52 L42,49 L45,44 Z" />
+
+    <!-- Hammer Separated & Fallen on Ground to the Right -->
+    <!-- Fallen Handle -->
+    <path
+        android:fillColor="#5E4E36"
+        android:pathData="M78,64 L96,82 L93,85 L75,67 Z" />
+    <!-- Fallen Head -->
+    <path
+        android:fillColor="#707882"
+        android:pathData="M68,58 L82,54 L86,68 L72,72 Z" />
+    <!-- Impact dust / smoke -->
+    <path
+        android:fillColor="#E84057"
+        android:pathData="M74,78 L76,72 L78,78 L84,80 L78,82 L76,88 L74,82 L68,80 Z" />
+    <path
+        android:fillColor="#8A939E"
+        android:pathData="M84,52 L86,48 L88,52 L92,53 L88,54 L86,58 L84,54 L80,53 Z" />
+</vector>
