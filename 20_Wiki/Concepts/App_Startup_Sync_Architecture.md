@@ -1,4 +1,4 @@
-﻿# App Startup Sync Architecture (초기 데이터 동기화 아키텍처)
+# App Startup Sync Architecture (초기 데이터 동기화 아키텍처)
 
 - **유형**: 동기화 전략 및 데이터 파이프라인 (Synchronization Pattern)
 - **상위 카테고리**: 안드로이드 데이터 아키텍처
@@ -18,12 +18,12 @@
 
 ### 2.1 1단계: 신규 버전 데이터 수집 및 DB 적재
 - [EXTRACTED] 원격 API로부터 최신 버전 목록을 가져와 로컬에 없는 신규 버전을 식별한다.
-- [EXTRACTED] 초기화가 완료되지 않은 버전(`getNotInitCompleteVersionList`)들에 대해 챔피언, 아이템, 소환사 주문, 룬 데이터를 코루틴 비동기 병렬(`async`/`awaitAll`)로 다운로드하여 Room DB에 저장한다.
+- [EXTRACTED] 초기화가 완료되지 않은 버전(`getNotInitCompleteVersionList`)들에 대해 OOM 방지를 위해 3개 단위 청크(`chunked(3)`)로 분할하여 챔피언, 아이템, 소환사 주문, 룬 데이터를 코루틴 비동기 병렬(`async`/`awaitAll`)로 다운로드하여 Room DB에 저장한다.
 - [EXTRACTED] 데이터 적재 완료 후 해당 버전의 완료 플래그(`isCompleteChampions`, `isCompleteItems` 등)를 `true`로 갱신한다.
 
 ### 2.2 2단계: 버전 간 Diff 연산 및 신규 ID 원자적 부분 갱신
 - [EXTRACTED] 비동기 UI `StateFlow` 대신 로컬 DB 단발성 직접 조회(`versionRepository.getAllVersionList()`)를 호출하여 최신 DB 스냅샷을 획득한다.
-- [EXTRACTED] 이전 버전(`preVersion`)과의 SQLite 서브쿼리 비교를 통해 신규 챔피언 ID 목록(`newChampionIdList`)과 아이템 ID 목록(`newItemIdList`)을 계산한다.
+- [EXTRACTED] 전체 버전을 5개 단위 청크(`chunked(5)`)로 분할하여 이전 버전(`preVersion`)과의 SQLite 서브쿼리 비교를 통해 신규 챔피언 ID 목록(`newChampionIdList`)과 아이템 ID 목록(`newItemIdList`)을 계산한다.
 - [EXTRACTED] 전체 Entity를 덮어쓰지 않고 대상 컬럼만 안전하게 부분 갱신(`updateNewIdList`)하여 데이터 무결성을 보장한다.
 
 ---
@@ -33,7 +33,9 @@
    - [INFERRED] UI 관찰용 Flow나 StateFlow는 비동기 스케줄링으로 인해 직전 쓰기 작업 직후 과거 캐시(Stale Data)를 반환할 수 있다. 비즈니스 로직 내부에서는 반드시 Room suspend 직접 조회를 사용하여 Race Condition을 방지한다.
 2. **원자적 부분 업데이트(Partial Atomic Update)**:
    - [INFERRED] Room `@Insert(onConflict = REPLACE)`로 엔티티를 통째로 덮어쓰면 구버전 객체의 플래그로 인해 롤백이 일어날 수 있으므로, 변경된 컬럼만 `@Query("UPDATE ...")`로 갱신한다.
-3. **UI 방출 동기화 후 스플래시 해제**:
+3. **청크 분할 및 메모리 상한 제어(Chunked Memory Protection)**:
+   - [INFERRED] 수십~수백 개의 버전을 한 번에 비동기 병렬 처리할 경우 대량의 JSON 역직렬화로 인해 JVM 힙 한도를 초과하여 `OutOfMemoryError`가 발생한다. `chunked(3)` 단위로 분할하여 동시 활성 코루틴 수를 제한함으로써 힙 메모리를 15MB~20MB 수준으로 엄격히 유지하며, `AndroidManifest.xml`에 `android:largeHeap="true"`를 부여하여 안정성을 극대화한다.
+4. **UI 방출 동기화 후 스플래시 해제**:
    - [INFERRED] DB 작업 완료 후 `_allVersionList` Flow가 최신 데이터를 1회 이상 정상 방출한 것을 확인한 뒤 스플래시 플래그(`isInitComplete`)를 해제하여 홈 진입 직후의 UI 깜빡임을 방지한다.
 
 ---
