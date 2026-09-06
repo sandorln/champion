@@ -5,14 +5,12 @@ import com.sandorln.network.model.item.NetworkItem
 import com.sandorln.network.model.patchnote.NetworkPatchNoteData
 import com.sandorln.network.model.patchnote.NetworkPatchNoteType
 import com.sandorln.network.model.response.BaseLolResponse
-import com.sandorln.network.util.getPatchNoteUrl
-import com.sandorln.network.util.toNetworkPatchNoteList
+import com.sandorln.network.util.fetchPatchNoteList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,7 +28,7 @@ class ItemService @Inject constructor(
 
     suspend fun getItemPathNoteList(version: String): List<NetworkPatchNoteData> = withContext(Dispatchers.IO) {
         val itemResult = runCatching {
-            Jsoup.connect(version.getPatchNoteUrl()).get().toNetworkPatchNoteList(NetworkPatchNoteType.Item)
+            fetchPatchNoteList(version, NetworkPatchNoteType.Item)
         }.getOrNull()
 
         return@withContext itemResult?.takeIf(List<NetworkPatchNoteData>::isNotEmpty) ?: emptyList()

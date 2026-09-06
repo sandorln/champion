@@ -6,14 +6,12 @@ import com.sandorln.network.model.champion.NetworkChampionDetail
 import com.sandorln.network.model.patchnote.NetworkPatchNoteData
 import com.sandorln.network.model.patchnote.NetworkPatchNoteType
 import com.sandorln.network.model.response.BaseLolResponse
-import com.sandorln.network.util.getPatchNoteUrl
-import com.sandorln.network.util.toNetworkPatchNoteList
+import com.sandorln.network.util.fetchPatchNoteList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,7 +41,7 @@ class ChampionService @Inject constructor(
 
     suspend fun getChampionPathNoteList(version: String): List<NetworkPatchNoteData> = withContext(Dispatchers.IO) {
         val championResult = runCatching {
-            Jsoup.connect(version.getPatchNoteUrl()).get().toNetworkPatchNoteList(NetworkPatchNoteType.Champion)
+            fetchPatchNoteList(version, NetworkPatchNoteType.Champion)
         }.getOrNull()
 
         return@withContext championResult?.takeIf(List<NetworkPatchNoteData>::isNotEmpty) ?: emptyList()
