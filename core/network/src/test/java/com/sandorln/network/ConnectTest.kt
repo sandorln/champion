@@ -112,19 +112,34 @@ class ConnectTest {
     @Test
     fun 각_패치노트_가져오기() {
         runBlocking {
-            runCatching {
-                val versionName = "15.16.1"
-                val itemPatchResult = _itemService.getItemPathNoteList(versionName)
-                println(itemPatchResult)
+            // 최신 버전 (16.17.1 등) 테스트
+            val latestVersion = "16.17.1"
+            val champNotes16 = _championService.getChampionPathNoteList(latestVersion)
+            println("16.17.1 챔피언 패치노트 개수 : ${champNotes16.size}")
+            champNotes16.take(3).forEach { println(" - [${it.title}] ${it.summary.take(50)}...") }
 
-                val championPatchResult = _championService.getChampionPathNoteList(versionName)
-                println(championPatchResult)
+            val itemNotes16 = _itemService.getItemPathNoteList(latestVersion)
+            println("16.17.1 아이템 패치노트 개수 : ${itemNotes16.size}")
 
-                val runePatchResult = _runeService.getRunePathNoteList(versionName)
-                println(runePatchResult)
-            }.onFailure {
-                println("패치 노트 읽어오기 실패 : $it")
-            }
+            val spellNotes16 = _summonerSpellService.getSpellPathNoteList(latestVersion)
+            println("16.17.1 소환사 주문 패치노트 개수 : ${spellNotes16.size}")
+
+            // 15.16.1 버전 테스트
+            val version15 = "15.16.1"
+            val champNotes15 = _championService.getChampionPathNoteList(version15)
+            println("15.16.1 챔피언 패치노트 개수 : ${champNotes15.size}")
+            val itemNotes15 = _itemService.getItemPathNoteList(version15)
+            println("15.16.1 아이템 패치노트 개수 : ${itemNotes15.size}")
+
+            // 14.10.1 버전 테스트 (소환사 주문 대규모 변경 포함 패치)
+            val version14 = "14.10.1"
+            val spellNotes14 = _summonerSpellService.getSpellPathNoteList(version14)
+            println("14.10.1 소환사 주문 패치노트 개수 : ${spellNotes14.size}")
+            spellNotes14.forEach { println(" - 소환사 주문 [${it.title}] : ${it.summary.take(40)}...") }
+
+            org.junit.Assert.assertTrue("16.17.1 챔피언 패치노트가 비어있지 않아야 합니다", champNotes16.isNotEmpty())
+            org.junit.Assert.assertTrue("15.16.1 챔피언 패치노트가 비어있지 않아야 합니다", champNotes15.isNotEmpty())
+            org.junit.Assert.assertTrue("14.10.1 소환사 주문 패치노트가 비어있지 않아야 합니다", spellNotes14.isNotEmpty())
         }
     }
 
