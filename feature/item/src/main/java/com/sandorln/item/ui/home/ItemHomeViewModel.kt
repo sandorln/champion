@@ -234,12 +234,13 @@ class ItemHomeViewModel @Inject constructor(
                             }
 
                             /* Map Type Filter */
+                            val isStandardItem = item.id.length <= 4
                             val isMatchMapType = when (selectMapType) {
                                 MapType.ALL -> true
-                                MapType.SUMMONER_RIFT -> item.mapType == MapType.SUMMONER_RIFT || item.mapType == MapType.ALL
-                                MapType.ARAM -> item.mapType == MapType.ARAM || item.mapType == MapType.ALL
-                                MapType.CLASSIC_SUMMONER_RIFT -> item.mapType == MapType.CLASSIC_SUMMONER_RIFT
-                                MapType.NONE -> item.mapType == MapType.NONE
+                                MapType.SUMMONER_RIFT -> isStandardItem && (item.mapType == MapType.SUMMONER_RIFT || item.mapType == MapType.ALL)
+                                MapType.ARAM -> isStandardItem && (item.mapType == MapType.ARAM || item.mapType == MapType.ALL)
+                                MapType.CLASSIC_SUMMONER_RIFT -> isStandardItem && item.mapType == MapType.CLASSIC_SUMMONER_RIFT
+                                MapType.NONE -> !isStandardItem || item.mapType == MapType.NONE
                             }
                             return@filter if (isMatchMapType) item.name.contains(searchKeyword) else false
                         }.run {

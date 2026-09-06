@@ -45,7 +45,7 @@ fun NetworkItem.asEntity(id: String, version: String): ItemEntity = ItemEntity(
     from = from.filterNotNull(),
     into = into.filterNotNull(),
     image = image.asEntity(),
-    maps = maps.asMapTypeEntity(),
+    maps = maps.asMapTypeEntity(id),
     gold = gold.asEntity()
 )
 
