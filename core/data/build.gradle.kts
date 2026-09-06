@@ -37,4 +37,6 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:datastore"))
     implementation(project(":core:model"))
+
+    testImplementation(libs.test.junit)
 }

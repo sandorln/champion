@@ -34,7 +34,8 @@ data class ItemEntity(
         ALL,
         SUMMONER_RIFT,
         ARAM,
-        NONE
+        NONE,
+        CLASSIC_SUMMONER_RIFT
     }
 }
 
