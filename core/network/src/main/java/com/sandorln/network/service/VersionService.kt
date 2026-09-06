@@ -10,6 +10,8 @@ import org.jsoup.Jsoup
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import com.sandorln.network.util.getPatchNoteUrlCandidates
+
 @Singleton
 class VersionService @Inject constructor(
     private val ktorClient: HttpClient
@@ -22,15 +24,17 @@ class VersionService @Inject constructor(
     }
 
     suspend fun getLolPatchNoteUrl(major1: Int, minor1: Int): String = withContext(Dispatchers.IO) {
-        val urlBuilder = StringBuilder("https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-")
-        when {
-            major1 == 15 && (1..2).contains(minor1) -> urlBuilder.append("${major1 + 10}-s1-$minor1-notes/")
-            major1 == 15 && 3 == minor1 -> urlBuilder.append("2025-s1-3-notes/")
-            major1 >= 15 -> urlBuilder.append("${major1 + 10}-${minor1.toString().padStart(2, '0')}-notes/")
-            else -> urlBuilder.append("$major1-$minor1-notes/")
+        val candidates = "$major1.$minor1.0".getPatchNoteUrlCandidates()
+        for (url in candidates) {
+            val isSuccess = runCatching {
+                Jsoup.connect(url)
+                    .timeout(5_000)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    .execute()
+                    .statusCode() == 200
+            }.getOrDefault(false)
+            if (isSuccess) return@withContext url
         }
-
-        val isSuccess = runCatching { Jsoup.connect(urlBuilder.toString()).get() }.isSuccess
-        return@withContext if (isSuccess) urlBuilder.toString() else ""
+        return@withContext ""
     }
 }
