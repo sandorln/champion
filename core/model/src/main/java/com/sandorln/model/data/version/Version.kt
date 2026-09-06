@@ -18,4 +18,6 @@ data class Version(
     val newChampionIdList: List<String>? = null
 ) {
     val majorMinorPatch: List<Int> = runCatching { name.split('.').map(String::toInt) }.getOrDefault(emptyList())
+    val isInitCompleteVersion: Boolean
+        get() = isCompleteChampions && isCompleteItems && isCompleteSummonerSpell && isCompleteRune
 }
