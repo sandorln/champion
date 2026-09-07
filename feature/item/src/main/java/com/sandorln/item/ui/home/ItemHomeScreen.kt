@@ -70,6 +70,7 @@ import com.sandorln.item.ui.dialog.ItemDetailDialog
 import com.sandorln.item.ui.dialog.ItemFilterDialog
 import com.sandorln.model.data.item.ItemData
 import kotlin.math.floor
+import kotlin.math.max
 import com.sandorln.item.R as ItemR
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -133,8 +134,10 @@ fun ItemHomeScreen(
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
-        itemHomeViewModel.sendAction(ItemHomeAction.ChangeSpan(span = spanCount))
+        val spanCount = max(1, floor(this.maxWidth / IconSize.XXLargeSize).toInt())
+        LaunchedEffect(spanCount) {
+            itemHomeViewModel.sendAction(ItemHomeAction.ChangeSpan(span = spanCount))
+        }
 
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
@@ -514,9 +517,7 @@ private fun LazyListScope.baseItemList(
             horizontalArrangement = Arrangement.Center
         ) {
             items(spanCount) { rowIndex ->
-                val item = runCatching {
-                    itemChunkList[columnIndex][rowIndex]
-                }.getOrNull()
+                val item = itemChunkList.getOrNull(columnIndex)?.getOrNull(rowIndex)
 
                 if (item != null) {
                     ItemBody(

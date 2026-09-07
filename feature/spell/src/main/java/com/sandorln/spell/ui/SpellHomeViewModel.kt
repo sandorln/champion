@@ -82,12 +82,9 @@ class SpellHomeViewModel @Inject constructor(
                     getSpellListByCurrentVersion.invoke(),
                     _span
                 ) { currentSpellList, span ->
-                    runCatching {
-                        _latestSpellList = currentSpellList
-                        currentSpellList.chunked(span)
-                    }.onFailure {
-                        _sideEffect.emit(SpellHomeSideEffect.ShowErrorMessage(it as Exception))
-                    }.getOrDefault(emptyList())
+                    _latestSpellList = currentSpellList
+                    val safeSpan = span.coerceAtLeast(1)
+                    currentSpellList.chunked(safeSpan)
                 }.collectLatest { spellList ->
                     _uiState.update { it.copy(displaySpellList = spellList) }
                 }
