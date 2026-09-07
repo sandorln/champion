@@ -264,6 +264,12 @@ class ItemHomeViewModel @Inject constructor(
                                 ) ?: items.first()
                             }
                         }.run {
+                            val version = itemList.firstOrNull()?.version ?: ""
+                            val isAfterOrnnRemovedVersion = runCatching {
+                                val v = version.split('.').map { it.toIntOrNull() ?: 0 }
+                                v[0] > 14 || (v[0] == 14 && v.getOrElse(1) { 0 } >= 13)
+                            }.getOrDefault(false)
+
                             if (selectMapType == MapType.ARAM || selectMapType == MapType.SUMMONER_RIFT) {
                                 map { itemData ->
                                     if (itemData.depth == 0 || itemData.tags.contains(ItemTagType.Consumable)) return@map itemData
@@ -271,9 +277,9 @@ class ItemHomeViewModel @Inject constructor(
                                     val firstIntoItem = itemListIdMap[itemData.into.firstOrNull()]
                                     val firstFromItem = itemListIdMap[itemData.from.firstOrNull()]
 
-                                    val isPreOrnnItem = itemData.into.size == 1 && (firstIntoItem?.gold?.total ?: 0) == itemData.gold.total
+                                    val isPreOrnnItem = !isAfterOrnnRemovedVersion && itemData.into.size == 1 && (firstIntoItem?.gold?.total ?: 0) == itemData.gold.total
                                     val isNotOrrnItem = SUPPORT_ITEM_ID_LIST.none { it == itemData.id }
-                                    val isOrnnItem = itemData.from.size == 1 && (firstFromItem?.gold?.total ?: 0) == itemData.gold.total && isNotOrrnItem
+                                    val isOrnnItem = !isAfterOrnnRemovedVersion && itemData.from.size == 1 && (firstFromItem?.gold?.total ?: 0) == itemData.gold.total && isNotOrrnItem
                                     val isLegendItem = itemData.into.isEmpty()
 
                                     when {

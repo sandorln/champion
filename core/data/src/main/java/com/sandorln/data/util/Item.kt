@@ -9,6 +9,11 @@ import com.sandorln.model.data.item.SummaryItemImage
 import com.sandorln.model.type.ItemTagType
 import com.sandorln.network.model.item.NetworkItem
 
+private fun isVersionAtLeast(version: String, major: Int, minor: Int): Boolean = runCatching {
+    val v = version.split('.').map { it.toIntOrNull() ?: 0 }
+    v[0] > major || (v[0] == major && v.getOrElse(1) { 0 } >= minor)
+}.getOrDefault(false)
+
 fun ItemEntity.asData(): ItemData = ItemData(
     id = id,
     version = version,
@@ -18,7 +23,9 @@ fun ItemEntity.asData(): ItemData = ItemData(
     inStore = inStore,
     from = from,
     into = into,
-    tags = tags.asItemTagTypeSet(),
+    tags = tags.asItemTagTypeSet().let {
+        if (id == "3172" && isVersionAtLeast(version, 14, 10)) it + ItemTagType.Boots else it
+    },
     image = image.asData(),
     mapType = maps.asData(),
     gold = gold.asData()
@@ -41,7 +48,7 @@ fun NetworkItem.asEntity(id: String, version: String): ItemEntity = ItemEntity(
     description = description,
     depth = depth,
     inStore = inStore,
-    tags = tags,
+    tags = if (id == "3172" && isVersionAtLeast(version, 14, 10) && !tags.contains("Boots")) tags + "Boots" else tags,
     from = from.filterNotNull(),
     into = into.filterNotNull(),
     image = image.asEntity(),
