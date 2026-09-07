@@ -113,17 +113,32 @@ class ConnectTest {
     fun 각_패치노트_가져오기() {
         runBlocking {
             runCatching {
-                val versionName = "15.16.1"
+                val versionName = "16.17.1"
                 val itemPatchResult = _itemService.getItemPathNoteList(versionName)
-                println(itemPatchResult)
+                println("itemPatchResult size: ${itemPatchResult.size}")
+                assert(itemPatchResult.isNotEmpty())
 
                 val championPatchResult = _championService.getChampionPathNoteList(versionName)
-                println(championPatchResult)
+                println("championPatchResult size: ${championPatchResult.size}")
+                assert(championPatchResult.isNotEmpty())
 
                 val runePatchResult = _runeService.getRunePathNoteList(versionName)
-                println(runePatchResult)
+                println("runePatchResult size: ${runePatchResult.size}")
+
+                val url16_17 = _versionService.getLolPatchNoteUrl(16, 17)
+                println("16.17 url: $url16_17")
+                assert(url16_17.isNotEmpty())
+
+                val url16_1 = _versionService.getLolPatchNoteUrl(16, 1)
+                println("16.1 url: $url16_1")
+                assert(url16_1.isNotEmpty())
+
+                val url15_16 = _versionService.getLolPatchNoteUrl(15, 16)
+                println("15.16 url: $url15_16")
+                assert(url15_16.isNotEmpty())
             }.onFailure {
                 println("패치 노트 읽어오기 실패 : $it")
+                throw it
             }
         }
     }

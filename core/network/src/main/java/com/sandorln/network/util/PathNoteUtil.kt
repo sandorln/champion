@@ -89,12 +89,13 @@ fun String.getPatchNoteUrl(): String {
     val (major1, minor1, _) = this.split('.').map { it.toInt() }
     if (major1 < 10) return ""
 
-    val urlBuilder = StringBuilder("https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-")
+    val urlBuilder = StringBuilder("https://www.leagueoflegends.com/ko-kr/news/game-updates/")
     return when {
-        major1 >= 16 -> urlBuilder.append("${major1 + 10}-$minor1-notes/")
-        major1 == 15 && (1..2).contains(minor1) -> urlBuilder.append("${major1 + 10}-s1-$minor1-notes/")
-        major1 == 15 && 3 == minor1 -> urlBuilder.append("2025-s1-3-notes/")
-        major1 >= 15 -> urlBuilder.append("${major1 + 10}-${minor1.toString().padStart(2, '0')}-notes/")
-        else -> urlBuilder.append("$major1-$minor1-notes/")
+        major1 >= 16 && minor1 >= 4 -> urlBuilder.append("league-of-legends-patch-${major1 + 10}-$minor1-notes/")
+        major1 >= 16 -> urlBuilder.append("patch-${major1 + 10}-$minor1-notes/")
+        major1 == 15 && (1..2).contains(minor1) -> urlBuilder.append("patch-${major1 + 10}-s1-$minor1-notes/")
+        major1 == 15 && 3 == minor1 -> urlBuilder.append("patch-2025-s1-3-notes/")
+        major1 >= 15 -> urlBuilder.append("patch-${major1 + 10}-${minor1.toString().padStart(2, '0')}-notes/")
+        else -> urlBuilder.append("patch-$major1-$minor1-notes/")
     }.toString()
 }
