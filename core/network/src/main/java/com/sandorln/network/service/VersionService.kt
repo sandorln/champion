@@ -24,6 +24,7 @@ class VersionService @Inject constructor(
     suspend fun getLolPatchNoteUrl(major1: Int, minor1: Int): String = withContext(Dispatchers.IO) {
         val urlBuilder = StringBuilder("https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-")
         when {
+            major1 >= 16 -> urlBuilder.append("${major1 + 10}-$minor1-notes/")
             major1 == 15 && (1..2).contains(minor1) -> urlBuilder.append("${major1 + 10}-s1-$minor1-notes/")
             major1 == 15 && 3 == minor1 -> urlBuilder.append("2025-s1-3-notes/")
             major1 >= 15 -> urlBuilder.append("${major1 + 10}-${minor1.toString().padStart(2, '0')}-notes/")
