@@ -5,7 +5,9 @@
 ---
 
 ## 1. 아키텍처 및 핵심 이론 (Concepts)
+- [[Item_Data_Classification]]: 아이템 데이터 정제, 맵(협곡/나락/아레나/클래식) 분류 체계 및 버전별 예외 보정 규약
 - [[MVI_Architecture]]: 안드로이드 단방향 데이터 흐름(UDF), Action-UiState-SideEffect 패턴
+- [[Plan_Mode]]: docs/plans 계획서 작성, 엄격한 리뷰 게이트, 기능별 분할 커밋 및 위키 갱신 규약
 - [[Riot_DataDragon_API]]: 라이엇 게임즈 공식 정적 CDN API 및 버전 관리 구조
 - [[Sprite_Sheet_Optimization]]: 대량 아이콘 렌더링 및 네트워크 병목 해소를 위한 비트맵 슬라이싱 최적화
 - [[Game_Mode_Architecture]]: 미니게임 허브 구조 및 재귀적 아이템 조합식 퀴즈 아키텍처

@@ -38,6 +38,7 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.spell.R
 import kotlin.math.floor
+import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,8 +78,10 @@ fun SpellHomeScreen(
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
-        spellHomeViewModel.sendAction(SpellHomeAction.ChangeSpan(span = spanCount))
+        val spanCount = max(1, floor(this.maxWidth / IconSize.XXLargeSize).toInt())
+        LaunchedEffect(spanCount) {
+            spellHomeViewModel.sendAction(SpellHomeAction.ChangeSpan(span = spanCount))
+        }
 
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
