@@ -8,6 +8,8 @@ fun MapType.getTitleStringId(): Int = when (this) {
     MapType.ALL -> R.string.map_type_all
     MapType.SUMMONER_RIFT -> R.string.map_type_summoner_rift
     MapType.ARAM -> R.string.map_type_aram
+    MapType.CLASSIC -> R.string.map_type_classic
+    MapType.ARENA -> R.string.map_type_arena
     MapType.NONE -> R.string.map_type_none
 }
 

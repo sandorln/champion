@@ -224,11 +224,9 @@ class ItemHomeViewModel @Inject constructor(
                         }
 
                         filterItemList.filter { item ->
-                            val itemVersions = item.version.split('.').map { it.toIntOrNull() ?: 0 }
-                            val isArenaVersion = itemVersions[0] >= 15 && itemVersions[1] >= 16
-
                             val isMutationItem = item.gold.total == 0 && item.gold.sell == 0
                             if (isMutationItem) return@filter false
+                            if (!item.inStore) return@filter false
 
                             /* Tag Type Filter */
                             when {
@@ -237,31 +235,40 @@ class ItemHomeViewModel @Inject constructor(
                             }
 
                             /* Map Type Filter */
-                            /* 15.16.1 Version 부터 아레나 아이템 때문에 Maps 가 꼬이는 현상 발생, ALL 에 해당하는 아이템을 뿌려야함 */
-                            if (isArenaVersion && selectMapType == MapType.SUMMONER_RIFT) {
-                                if (item.mapType == MapType.ALL)
-                                    item.name.contains(searchKeyword)
-                                else
-                                    return@filter false
-                            }
-
                             val isMatchMapType = item.mapType == selectMapType
                             val isItemAllType = item.mapType == MapType.ALL && (selectMapType == MapType.SUMMONER_RIFT || selectMapType == MapType.ARAM)
                             return@filter when {
                                 isMatchMapType || isItemAllType -> item.name.contains(searchKeyword)
                                 else -> false
                             }
+                        }.groupBy { it.name }
+                        .map { (_, items) ->
+                            if (items.size == 1) {
+                                items.first()
+                            } else {
+                                items.minWithOrNull(
+                                    compareBy<ItemData> { it.id.length > 4 }
+                                        .thenBy { it.mapType != MapType.ALL }
+                                        .thenBy { it.id }
+                                ) ?: items.first()
+                            }
                         }.run {
-                            if (selectMapType == MapType.ARAM || selectMapType == MapType.SUMMONER_RIFT) {
+                            val version = itemList.firstOrNull()?.version ?: ""
+                            val isAfterOrnnRemovedVersion = runCatching {
+                                val v = version.split('.').map { it.toIntOrNull() ?: 0 }
+                                v[0] > 14 || (v[0] == 14 && v.getOrElse(1) { 0 } >= 13)
+                            }.getOrDefault(false)
+
+                            if (selectMapType == MapType.ARAM || selectMapType == MapType.SUMMONER_RIFT || selectMapType == MapType.CLASSIC || selectMapType == MapType.ARENA) {
                                 map { itemData ->
                                     if (itemData.depth == 0 || itemData.tags.contains(ItemTagType.Consumable)) return@map itemData
 
                                     val firstIntoItem = itemListIdMap[itemData.into.firstOrNull()]
                                     val firstFromItem = itemListIdMap[itemData.from.firstOrNull()]
 
-                                    val isPreOrnnItem = itemData.into.size == 1 && (firstIntoItem?.gold?.total ?: 0) == itemData.gold.total
+                                    val isPreOrnnItem = !isAfterOrnnRemovedVersion && itemData.into.size == 1 && (firstIntoItem?.gold?.total ?: 0) == itemData.gold.total
                                     val isNotOrrnItem = SUPPORT_ITEM_ID_LIST.none { it == itemData.id }
-                                    val isOrnnItem = itemData.from.size == 1 && (firstFromItem?.gold?.total ?: 0) == itemData.gold.total && isNotOrrnItem
+                                    val isOrnnItem = !isAfterOrnnRemovedVersion && itemData.from.size == 1 && (firstFromItem?.gold?.total ?: 0) == itemData.gold.total && isNotOrrnItem
                                     val isLegendItem = itemData.into.isEmpty()
 
                                     when {
