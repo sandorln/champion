@@ -49,10 +49,29 @@ class ItemRecipeQuizViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ItemRecipeQuizUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var initialAllRounds: List<ItemRecipeQuizRound> = emptyList()
     private val _roundStack: Stack<ItemRecipeQuizRound> = Stack()
     private val _previousRoundList: MutableList<RecipeRoundResult> = mutableListOf()
     val previousRoundList: List<RecipeRoundResult> get() = _previousRoundList.toList()
     val previousAnswerList: List<Boolean> get() = _previousRoundList.map { it.chainType != ChainType.FAIL }
+
+    private fun fillRemainingRoundsAsFailed() {
+        val completedCount = _previousRoundList.size
+        for (i in completedCount until initialAllRounds.size) {
+            val uncompletedRound = initialAllRounds[i]
+            val cart = if (i == completedCount) _uiState.value.userCart else emptyMap()
+            _previousRoundList.add(
+                RecipeRoundResult(
+                    chainType = ChainType.FAIL,
+                    targetItem = uncompletedRound.targetItem,
+                    isCorrect = false,
+                    userCart = cart,
+                    answerLeaves = uncompletedRound.requiredLeafItems
+                )
+            )
+        }
+        _roundStack.clear()
+    }
 
     private val _action = MutableSharedFlow<ItemRecipeQuizAction>()
     fun sendAction(action: ItemRecipeQuizAction) {
@@ -84,6 +103,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
 
                 if (_gameTime.value <= 0) {
                     _uiMutex.withLock {
+                        fillRemainingRoundsAsFailed()
                         _uiState.update {
                             it.copy(
                                 isGameEnd = true
@@ -143,6 +163,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
                             it.copy(
                                 currentRound = nextRoundData,
                                 currentRoundIndex = it.currentRoundIndex + 1,
+                                userCartList = emptyList(),
                                 userCart = emptyMap(),
                                 lastFeedbackMessage = if (isAnswer) "조합 성공!" else "조합 실패!",
                                 isLastAnswerCorrect = isAnswer
@@ -150,6 +171,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
                         }
                     }.onFailure {
                         gameJob?.cancel()
+                        fillRemainingRoundsAsFailed()
                         val answerPer = previousAnswerList.count { it }.toFloat() / totalRoundCount.toFloat()
                         val remainingTime = _gameTime.value
                         val score = _uiState.value.score
@@ -159,6 +181,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
                             it.copy(
                                 score = finalScore,
                                 isGameEnd = true,
+                                userCartList = emptyList(),
                                 userCart = emptyMap()
                             )
                         }
@@ -180,6 +203,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
                         if (rounds.isEmpty()) return@onSuccess
 
                         _roundStack.clear()
+                        initialAllRounds = rounds
                         // Stack은 pop() 시 역순으로 나오므로 반대로 push
                         rounds.reversed().forEach { _roundStack.push(it) }
 
@@ -190,6 +214,7 @@ class ItemRecipeQuizViewModel @Inject constructor(
                                     currentRound = firstRound,
                                     currentRoundIndex = 1,
                                     totalRoundCount = rounds.size,
+                                    userCartList = emptyList(),
                                     userCart = emptyMap()
                                 )
                             }
@@ -205,9 +230,10 @@ class ItemRecipeQuizViewModel @Inject constructor(
                     when (action) {
                         is ItemRecipeQuizAction.AddLeafItem -> {
                             _uiState.update { state ->
-                                val currentCount = state.userCart[action.item] ?: 0
+                                val updatedList = state.userCartList + action.item
                                 state.copy(
-                                    userCart = state.userCart + (action.item to currentCount + 1),
+                                    userCartList = updatedList,
+                                    userCart = updatedList.groupingBy { it }.eachCount(),
                                     lastFeedbackMessage = ""
                                 )
                             }
@@ -215,25 +241,43 @@ class ItemRecipeQuizViewModel @Inject constructor(
 
                         is ItemRecipeQuizAction.RemoveLeafItem -> {
                             _uiState.update { state ->
-                                val currentCount = state.userCart[action.item] ?: 0
-                                val updatedMap = if (currentCount <= 1) {
-                                    state.userCart - action.item
+                                val lastIdx = state.userCartList.lastIndexOf(action.item)
+                                val updatedList = if (lastIdx != -1) {
+                                    state.userCartList.filterIndexed { index, _ -> index != lastIdx }
                                 } else {
-                                    state.userCart + (action.item to currentCount - 1)
+                                    state.userCartList
                                 }
                                 state.copy(
-                                    userCart = updatedMap,
+                                    userCartList = updatedList,
+                                    userCart = updatedList.groupingBy { it }.eachCount(),
+                                    lastFeedbackMessage = ""
+                                )
+                            }
+                        }
+
+                        is ItemRecipeQuizAction.RemoveLeafItemAtIndex -> {
+                            _uiState.update { state ->
+                                val updatedList = state.userCartList.filterIndexed { i, _ -> i != action.index }
+                                state.copy(
+                                    userCartList = updatedList,
+                                    userCart = updatedList.groupingBy { it }.eachCount(),
                                     lastFeedbackMessage = ""
                                 )
                             }
                         }
 
                         ItemRecipeQuizAction.ClearCart -> {
-                            _uiState.update { it.copy(userCart = emptyMap(), lastFeedbackMessage = "") }
+                            _uiState.update {
+                                it.copy(
+                                    userCartList = emptyList(),
+                                    userCart = emptyMap(),
+                                    lastFeedbackMessage = ""
+                                )
+                            }
                         }
 
                         ItemRecipeQuizAction.SubmitCraft -> {
-                            if (gameJob?.isCompleted == true) return@collect
+                            if (gameJob?.isCompleted == true || _uiState.value.isGameEnd) return@collect
                             val state = _uiState.value
                             val requiredMap = state.currentRound.requiredLeafItems
                             val userCart = state.userCart
@@ -271,6 +315,7 @@ enum class CraftAnimationType {
 sealed interface ItemRecipeQuizAction {
     data class AddLeafItem(val item: ItemData) : ItemRecipeQuizAction
     data class RemoveLeafItem(val item: ItemData) : ItemRecipeQuizAction
+    data class RemoveLeafItemAtIndex(val index: Int) : ItemRecipeQuizAction
     data object ClearCart : ItemRecipeQuizAction
     data object SubmitCraft : ItemRecipeQuizAction
     data object DismissCraftAnimation : ItemRecipeQuizAction
@@ -282,6 +327,7 @@ data class ItemRecipeQuizUiState(
     val currentRound: ItemRecipeQuizRound = ItemRecipeQuizRound(),
     val currentRoundIndex: Int = 1,
     val totalRoundCount: Int = 10,
+    val userCartList: List<ItemData> = emptyList(),
     val userCart: Map<ItemData, Int> = emptyMap(),
     val isGameEnd: Boolean = false,
     val lastFeedbackMessage: String = "",

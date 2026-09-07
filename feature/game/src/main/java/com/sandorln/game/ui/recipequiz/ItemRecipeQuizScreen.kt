@@ -13,16 +13,32 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -60,6 +76,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sandorln.design.R as DesignR
+import com.sandorln.design.component.BaseBitmapImage
 import com.sandorln.design.component.BaseRectangleIconImage
 import com.sandorln.design.component.BaseToolbar
 import com.sandorln.design.component.ServerIconType
@@ -84,6 +101,9 @@ fun ItemRecipeQuizScreen(
     val uiState by recipeQuizViewModel.uiState.collectAsState()
     val gameTime by recipeQuizViewModel.gameTime.collectAsState()
     val readyTime by recipeQuizViewModel.readyTime.collectAsState()
+    val previousRound = remember(recipeQuizViewModel.previousAnswerList.size) {
+        recipeQuizViewModel.previousAnswerList
+    }
 
     val onGameDialogDismissListener: () -> Unit = {
         recipeQuizViewModel.sendAction(ItemRecipeQuizAction.CloseGameDialog)
@@ -129,8 +149,10 @@ fun ItemRecipeQuizScreen(
                     ItemRecipeQuizBody(
                         modifier = Modifier.weight(1f),
                         uiState = uiState,
+                        previousRound = previousRound,
                         onAddLeaf = { recipeQuizViewModel.sendAction(ItemRecipeQuizAction.AddLeafItem(it)) },
                         onRemoveLeaf = { recipeQuizViewModel.sendAction(ItemRecipeQuizAction.RemoveLeafItem(it)) },
+                        onRemoveLeafAtIndex = { recipeQuizViewModel.sendAction(ItemRecipeQuizAction.RemoveLeafItemAtIndex(it)) },
                         onClearCart = { recipeQuizViewModel.sendAction(ItemRecipeQuizAction.ClearCart) },
                         onSubmitCraft = { recipeQuizViewModel.sendAction(ItemRecipeQuizAction.SubmitCraft) }
                     )
@@ -230,50 +252,35 @@ private fun CraftResultOverlay(craftAnimation: CraftAnimationType?) {
 private fun ItemRecipeQuizBody(
     modifier: Modifier = Modifier,
     uiState: ItemRecipeQuizUiState,
+    previousRound: List<Boolean>,
     onAddLeaf: (ItemData) -> Unit,
     onRemoveLeaf: (ItemData) -> Unit,
+    onRemoveLeafAtIndex: (Int) -> Unit,
     onClearCart: () -> Unit,
     onSubmitCraft: () -> Unit
 ) {
     val round = uiState.currentRound
     val targetItem = round.targetItem
     val totalRequiredCount = round.totalRequiredCount
-    val currentSelectedCount = uiState.userCart.values.sum()
+    val currentSelectedCount = uiState.userCartList.size
 
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Scrollable Top-Aligned Content (Round Header, Target Item, Candidate Header & Grid)
+        // 1. Top Section (Fixed): Target Item Card & Full-Width Selected Leaf Items Bar
         Column(
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacings.Spacing03, vertical = Spacings.Spacing01),
+                .fillMaxWidth()
+                .padding(top = 14.dp, bottom = Spacings.Spacing01),
             verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
         ) {
-            // Round header & Score
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "ROUND ${uiState.currentRoundIndex} / ${uiState.totalRoundCount}",
-                    style = TextStyles.SubTitle02,
-                    color = Colors.Gold02
-                )
-                Text(
-                    text = "${thousandDotDecimalFormat.format(uiState.score)}점",
-                    style = TextStyles.Title02,
-                    color = Colors.Gray01
-                )
-            }
 
-            // Target Item Card
+            // Target Item Card (with standard horizontal padding)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = Spacings.Spacing03)
                     .background(Colors.Blue05, RoundedCornerShape(Radius.Radius03))
                     .border(1.dp, Colors.Gold04, RoundedCornerShape(Radius.Radius03))
                     .padding(Spacings.Spacing03)
@@ -302,193 +309,270 @@ private fun ItemRecipeQuizBody(
                             style = TextStyles.Body03,
                             color = Colors.Gold03
                         )
-                        Text(
-                            text = "필요 최소 재료: ${totalRequiredCount}개",
-                            style = TextStyles.Body04,
-                            color = Colors.Gray03
-                        )
                     }
+                    val isExceeded = currentSelectedCount > totalRequiredCount
+                    val isComplete = currentSelectedCount == totalRequiredCount
+                    val warningRed = Color(0xFFE84057)
+
                     Box(
                         modifier = Modifier
-                            .background(Colors.Blue06, RoundedCornerShape(Radius.Radius02))
+                            .background(
+                                if (isExceeded) warningRed.copy(alpha = 0.2f) else Colors.Blue06,
+                                RoundedCornerShape(Radius.Radius02)
+                            )
+                            .then(
+                                if (isExceeded) {
+                                    Modifier.border(1.dp, warningRed, RoundedCornerShape(Radius.Radius02))
+                                } else Modifier
+                            )
                             .padding(horizontal = Spacings.Spacing02, vertical = Spacings.Spacing01)
                     ) {
                         Text(
                             text = "$currentSelectedCount / $totalRequiredCount",
                             style = TextStyles.SubTitle02,
-                            color = if (currentSelectedCount == totalRequiredCount) Colors.Gold02 else Colors.Gray03
+                            color = when {
+                                isExceeded -> warningRed
+                                isComplete -> Colors.Gold02
+                                else -> Colors.Gray03
+                            }
                         )
                     }
                 }
             }
 
-            // Candidate Leaf Items Header (Larger text + [전체 초기화] button on far right)
+            // Selected Leaf Items Row (No border, full width scrollable, preserving addition order)
+            val selectedLeafList = uiState.userCartList
+            val emptySlotCount = maxOf(0, totalRequiredCount - selectedLeafList.size)
+            val selectedListState = rememberLazyListState()
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = Spacings.Spacing03),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                    .height(54.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "최소 기초 재료 후보",
-                    style = TextStyles.SubTitle01,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Colors.BasicWhite
-                )
-                Row(
+                // Full-width horizontal scroll with edge fading (alpha gradient for scrollable indication)
+                LazyRow(
+                    state = selectedListState,
                     modifier = Modifier
-                        .background(Colors.Blue06, RoundedCornerShape(Radius.Radius01))
-                        .border(1.dp, Colors.Gray06, RoundedCornerShape(Radius.Radius01))
-                        .clickable(onClick = onClearCart)
-                        .padding(horizontal = Spacings.Spacing02, vertical = Spacings.Spacing01),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        .weight(1f)
+                        .horizontalFadingEdge(
+                            startFade = selectedListState.canScrollBackward,
+                            endFade = selectedListState.canScrollForward,
+                            fadeWidth = 24.dp
+                        ),
+                    contentPadding = PaddingValues(start = Spacings.Spacing03, end = Spacings.Spacing02, top = 6.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Filled slots (selected items in chronological addition order)
+                    itemsIndexed(selectedLeafList) { index, item ->
+                        Box(
+                            modifier = Modifier
+                                .size(width = 42.dp, height = 42.dp)
+                                .clickable { onRemoveLeafAtIndex(index) }
+                        ) {
+                            BaseRectangleIconImage(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .align(Alignment.BottomStart),
+                                serverIconType = ServerIconType.ITEM,
+                                versionName = item.version,
+                                id = item.id
+                            )
+                            // Clear 'x' badge at top-right within safe bounds (never clipped)
+                            Box(
+                                modifier = Modifier
+                                    .size(15.dp)
+                                    .align(Alignment.TopEnd)
+                                    .background(Colors.Gray09, CircleShape)
+                                    .border(1.dp, Colors.Gold03, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(8.dp),
+                                    painter = painterResource(id = DesignR.drawable.ic_clear),
+                                    contentDescription = "제거",
+                                    tint = Colors.Gold02
+                                )
+                            }
+                        }
+                    }
+
+                    // Empty skeleton slots
+                    items(emptySlotCount) {
+                        Box(
+                            modifier = Modifier.size(width = 42.dp, height = 42.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .align(Alignment.BottomStart)
+                                    .background(Colors.Blue07.copy(alpha = 0.5f), RoundedCornerShape(Radius.Radius01))
+                                    .border(1.dp, Colors.Gray06.copy(alpha = 0.35f), RoundedCornerShape(Radius.Radius01)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                BaseBitmapImage(
+                                    bitmap = null,
+                                    loadingDrawableId = DesignR.drawable.ic_main_item,
+                                    imageSize = 28.dp,
+                                    innerPadding = Spacings.Spacing01
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Circle Icon Button for Reset (Fixed on the right with Spacings.Spacing03 margin)
+                Box(
+                    modifier = Modifier
+                        .padding(end = Spacings.Spacing03, start = Spacings.Spacing01)
+                        .size(32.dp)
+                        .background(
+                            if (currentSelectedCount > 0) Colors.Blue07 else Colors.Blue07.copy(alpha = 0.4f),
+                            CircleShape
+                        )
+                        .border(
+                            1.dp,
+                            if (currentSelectedCount > 0) Colors.Gold03 else Colors.Gray06,
+                            CircleShape
+                        )
+                        .clickable(enabled = currentSelectedCount > 0, onClick = onClearCart),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         modifier = Modifier.size(14.dp),
                         painter = painterResource(id = DesignR.drawable.ic_refresh),
-                        contentDescription = null,
-                        tint = Colors.Gold03
-                    )
-                    Text(
-                        text = "전체 초기화",
-                        style = TextStyles.Body04,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Colors.Gold03
+                        contentDescription = "전체 초기화",
+                        tint = if (currentSelectedCount > 0) Colors.Gold02 else Colors.Gray05
                     )
                 }
             }
+        }
 
-            // Candidate Leaf Items (4 rows x 4 items = 16 slots, padded with blank slots if < 16)
-            val candidates = round.candidateLeafItems
-            val paddedSlots: List<ItemData?> = (0 until 16).map { candidates.getOrNull(it) }
-            val chunked = paddedSlots.chunked(4)
+        // 2. Middle Section (Scrollable): 3-Column LazyVerticalGrid with Fading Edge
+        val candidates = round.candidateLeafItems
+        val gridState = rememberLazyGridState()
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
-            ) {
-                chunked.forEach { rowSlots ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            state = gridState,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = Spacings.Spacing03)
+                .verticalFadingEdge(
+                    topFade = gridState.canScrollBackward,
+                    bottomFade = gridState.canScrollForward
+                ),
+            contentPadding = PaddingValues(
+                top = Spacings.Spacing03,
+                bottom = Spacings.Spacing04
+            ),
+            verticalArrangement = Arrangement.spacedBy(Spacings.Spacing02),
+            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
+        ) {
+            items(candidates, key = { it.id }) { item ->
+                val count = uiState.userCart[item] ?: 0
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            if (count > 0) Colors.Blue05 else Colors.Blue06,
+                            RoundedCornerShape(Radius.Radius02)
+                        )
+                        .border(
+                            1.dp,
+                            if (count > 0) Colors.Gold03 else Colors.Gray07,
+                            RoundedCornerShape(Radius.Radius02)
+                        )
+                        .padding(vertical = Spacings.Spacing02, horizontal = Spacings.Spacing01),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        rowSlots.forEach { item ->
-                            if (item != null) {
-                                val count = uiState.userCart[item] ?: 0
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .background(
-                                            if (count > 0) Colors.Blue05 else Colors.Blue06,
-                                            RoundedCornerShape(Radius.Radius02)
-                                        )
-                                        .border(
-                                            1.dp,
-                                            if (count > 0) Colors.Gold03 else Colors.Gray07,
-                                            RoundedCornerShape(Radius.Radius02)
-                                        )
-                                        .padding(vertical = 4.dp, horizontal = 2.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                                    ) {
-                                        Box(
-                                            modifier = Modifier.clickable { onAddLeaf(item) }
-                                        ) {
-                                            BaseRectangleIconImage(
-                                                modifier = Modifier.size(34.dp),
-                                                serverIconType = ServerIconType.ITEM,
-                                                versionName = item.version,
-                                                id = item.id
-                                            )
-                                        }
-                                        Text(
-                                            text = item.name,
-                                            style = TextStyles.Body04,
-                                            fontSize = 11.sp,
-                                            color = Colors.BasicWhite,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        Text(
-                                            text = "${item.gold.total}G",
-                                            style = TextStyles.Body04,
-                                            fontSize = 9.sp,
-                                            color = Colors.Gold04
-                                        )
+                        Box(
+                            modifier = Modifier.clickable { onAddLeaf(item) }
+                        ) {
+                            BaseRectangleIconImage(
+                                modifier = Modifier.size(40.dp),
+                                serverIconType = ServerIconType.ITEM,
+                                versionName = item.version,
+                                id = item.id
+                            )
+                        }
+                        Text(
+                            text = item.name,
+                            style = TextStyles.Body04,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Colors.BasicWhite,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "${item.gold.total}G",
+                            style = TextStyles.Body04,
+                            fontSize = 10.sp,
+                            color = Colors.Gold04
+                        )
 
-                                        // [-] count [+] direct controls with wide spacing
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 4.dp, vertical = 2.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(20.dp)
-                                                    .background(
-                                                        if (count > 0) Colors.Blue07 else Colors.Blue07.copy(alpha = 0.4f),
-                                                        RoundedCornerShape(4.dp)
-                                                    )
-                                                    .border(
-                                                        0.5.dp,
-                                                        if (count > 0) Colors.Gray05 else Colors.Gray07,
-                                                        RoundedCornerShape(4.dp)
-                                                    )
-                                                    .clickable(enabled = count > 0) { onRemoveLeaf(item) },
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "-",
-                                                    style = TextStyles.SubTitle03,
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = if (count > 0) Colors.Gold02 else Colors.Gray06
-                                                )
-                                            }
+                        // [-] count [+] enlarged buttons for easy clicking
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp, vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .background(
+                                        if (count > 0) Colors.Blue07 else Colors.Blue07.copy(alpha = 0.4f),
+                                        RoundedCornerShape(6.dp)
+                                    )
+                                    .border(
+                                        0.5.dp,
+                                        if (count > 0) Colors.Gray05 else Colors.Gray07,
+                                        RoundedCornerShape(6.dp)
+                                    )
+                                    .clickable(enabled = count > 0) { onRemoveLeaf(item) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "-",
+                                    style = TextStyles.SubTitle02,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (count > 0) Colors.Gold02 else Colors.Gray06
+                                )
+                            }
 
-                                            Text(
-                                                text = "$count",
-                                                style = TextStyles.Body04,
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = if (count > 0) Colors.Gold02 else Colors.Gray04
-                                            )
+                            Text(
+                                text = "$count",
+                                style = TextStyles.SubTitle02,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (count > 0) Colors.Gold02 else Colors.Gray04
+                            )
 
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(20.dp)
-                                                    .background(Colors.Blue07, RoundedCornerShape(4.dp))
-                                                    .border(0.5.dp, Colors.Gray05, RoundedCornerShape(4.dp))
-                                                    .clickable { onAddLeaf(item) },
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "+",
-                                                    style = TextStyles.SubTitle03,
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = Colors.Gold02
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                // 빈칸 슬롯 (Placeholder when fewer than 16 items)
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(84.dp)
-                                        .background(Colors.Blue07.copy(alpha = 0.2f), RoundedCornerShape(Radius.Radius02))
-                                        .border(1.dp, Colors.Gray07.copy(alpha = 0.2f), RoundedCornerShape(Radius.Radius02))
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .background(Colors.Blue07, RoundedCornerShape(6.dp))
+                                    .border(0.5.dp, Colors.Gray05, RoundedCornerShape(6.dp))
+                                    .clickable { onAddLeaf(item) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "+",
+                                    style = TextStyles.SubTitle02,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Colors.Gold02
                                 )
                             }
                         }
@@ -497,27 +581,84 @@ private fun ItemRecipeQuizBody(
             }
         }
 
-        // Action Button: "조합 완성" (Fixed at bottom)
-        val canCraft = currentSelectedCount > 0
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacings.Spacing03, vertical = Spacings.Spacing02)
-                .background(
-                    if (canCraft) Colors.Gold02 else Colors.Gray07,
-                    RoundedCornerShape(Radius.Radius03)
-                )
-                .clickable(enabled = canCraft, onClick = onSubmitCraft)
-                .padding(vertical = Spacings.Spacing03),
-            contentAlignment = Alignment.Center
+        // 3. Bottom Section (Fixed): Round status (InitialQuiz style) + "조합 완성" Action Button
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = "조합 완성",
-                style = TextStyles.SubTitle01,
-                color = if (canCraft) Colors.Blue06 else Colors.Gray05,
-                fontWeight = FontWeight.Bold
+            HorizontalDivider()
+
+            RecipeRoundBody(
+                previousRound = previousRound,
+                totalRoundCount = uiState.totalRoundCount
+            )
+
+            val canCraft = currentSelectedCount > 0 && currentSelectedCount <= totalRequiredCount
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacings.Spacing03, vertical = Spacings.Spacing02)
+                    .background(
+                        if (canCraft) Colors.Gold02 else Colors.Gray07,
+                        RoundedCornerShape(Radius.Radius03)
+                    )
+                    .clickable(enabled = canCraft, onClick = onSubmitCraft)
+                    .padding(vertical = Spacings.Spacing03),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "조합 완성",
+                    style = TextStyles.SubTitle01,
+                    color = if (canCraft) Colors.Blue06 else Colors.Gray05,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RecipeRoundBody(
+    previousRound: List<Boolean>,
+    totalRoundCount: Int
+) {
+    val horizontalState = rememberScrollState()
+    Row(
+        modifier = Modifier
+            .padding(vertical = Spacings.Spacing01)
+            .fillMaxWidth()
+            .horizontalScroll(state = horizontalState),
+        horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02, Alignment.CenterHorizontally)
+    ) {
+        Spacer(modifier = Modifier.width(Spacings.Spacing02))
+        repeat(totalRoundCount) { index ->
+            val isSubmit = previousRound.getOrNull(index)
+            val iconId: Int
+            val tintColor: Color
+
+            when (isSubmit) {
+                true -> {
+                    iconId = DesignR.drawable.ic_done
+                    tintColor = Colors.Green00
+                }
+
+                false -> {
+                    iconId = DesignR.drawable.ic_clear
+                    tintColor = Colors.Orange00
+                }
+
+                else -> {
+                    iconId = DesignR.drawable.ic_question
+                    tintColor = Colors.Gray06
+                }
+            }
+            Icon(
+                modifier = Modifier.size(IconSize.MediumSize),
+                painter = painterResource(id = iconId),
+                tint = tintColor,
+                contentDescription = null
             )
         }
+        Spacer(modifier = Modifier.width(Spacings.Spacing02))
     }
 }
 
@@ -578,7 +719,7 @@ private fun RecipeGameEndDialogBody(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .heightIn(max = 260.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(Spacings.Spacing01)
             ) {
@@ -592,9 +733,16 @@ private fun RecipeGameEndDialogBody(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(
+                            modifier = Modifier.weight(1f),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing02)
                         ) {
+                            Text(
+                                text = "${index + 1}.",
+                                style = TextStyles.SubTitle03,
+                                color = Colors.Gold04,
+                                fontWeight = FontWeight.Bold
+                            )
                             BaseRectangleIconImage(
                                 modifier = Modifier.size(28.dp),
                                 serverIconType = ServerIconType.ITEM,
@@ -604,13 +752,16 @@ private fun RecipeGameEndDialogBody(
                             Text(
                                 text = round.targetItem.name,
                                 style = TextStyles.SubTitle03,
-                                color = Colors.BasicWhite
+                                color = Colors.BasicWhite,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
+                        Spacer(modifier = Modifier.width(Spacings.Spacing02))
                         Text(
                             text = if (round.isCorrect) "정답 (${round.chainType.name})" else "실패",
                             style = TextStyles.Body03,
-                            color = if (round.isCorrect) Colors.Gold02 else Colors.Gray04,
+                            color = if (round.isCorrect) Colors.Gold02 else Color(0xFFE84057).copy(alpha = 0.9f),
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -637,3 +788,65 @@ private fun RecipeGameEndDialogBody(
         }
     }
 }
+
+fun Modifier.verticalFadingEdge(
+    topFade: Boolean,
+    bottomFade: Boolean,
+    fadeHeight: Dp = 20.dp
+): Modifier = this
+    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    .drawWithContent {
+        drawContent()
+        val fadeHeightPx = fadeHeight.toPx()
+        if (topFade && size.height > fadeHeightPx) {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.Transparent, Color.Black),
+                    startY = 0f,
+                    endY = fadeHeightPx
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+        if (bottomFade && size.height > fadeHeightPx) {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.Black, Color.Transparent),
+                    startY = size.height - fadeHeightPx,
+                    endY = size.height
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+    }
+
+fun Modifier.horizontalFadingEdge(
+    startFade: Boolean,
+    endFade: Boolean,
+    fadeWidth: Dp = 24.dp
+): Modifier = this
+    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    .drawWithContent {
+        drawContent()
+        val fadeWidthPx = fadeWidth.toPx()
+        if (startFade && size.width > fadeWidthPx) {
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(Color.Transparent, Color.Black),
+                    startX = 0f,
+                    endX = fadeWidthPx
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+        if (endFade && size.width > fadeWidthPx) {
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(Color.Black, Color.Transparent),
+                    startX = size.width - fadeWidthPx,
+                    endX = size.width
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+    }

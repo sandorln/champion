@@ -103,4 +103,81 @@ class ItemRecipeQuizStateTest {
         val score3 = matched3 * 10L
         assertEquals(20L, score3)
     }
+
+    @Test
+    fun testUnansweredRoundsMarkedAsFailed() {
+        val rounds = (1..10).map { i ->
+            val item = ItemData(id = "$i", name = "아이템$i")
+            com.sandorln.model.data.game.ItemRecipeQuizRound(
+                targetItem = item,
+                requiredLeafItems = mapOf(item to 1)
+            )
+        }
+
+        // Simulate user answering 3 rounds
+        val previousRoundList = mutableListOf<RecipeRoundResult>()
+        for (i in 0 until 3) {
+            previousRoundList.add(
+                RecipeRoundResult(
+                    chainType = com.sandorln.game.ui.initialquiz.ChainType.GOOD,
+                    targetItem = rounds[i].targetItem,
+                    isCorrect = true,
+                    userCart = rounds[i].requiredLeafItems,
+                    answerLeaves = rounds[i].requiredLeafItems
+                )
+            )
+        }
+        assertEquals(3, previousRoundList.size)
+
+        // Simulate filling remaining rounds on timeout
+        val completedCount = previousRoundList.size
+        for (i in completedCount until rounds.size) {
+            val uncompleted = rounds[i]
+            previousRoundList.add(
+                RecipeRoundResult(
+                    chainType = com.sandorln.game.ui.initialquiz.ChainType.FAIL,
+                    targetItem = uncompleted.targetItem,
+                    isCorrect = false,
+                    userCart = emptyMap(),
+                    answerLeaves = uncompleted.requiredLeafItems
+                )
+            )
+        }
+
+        // Must have all 10 rounds
+        assertEquals(10, previousRoundList.size)
+        // First 3 are correct, remaining 7 are failed
+        assertEquals(3, previousRoundList.count { it.isCorrect })
+        assertEquals(7, previousRoundList.count { !it.isCorrect })
+        assertTrue(previousRoundList.drop(3).all { it.chainType == com.sandorln.game.ui.initialquiz.ChainType.FAIL })
+    }
+
+    @Test
+    fun testChronologicalCartOrderAndIndexRemoval() {
+        val dagger = ItemData(id = "1042", name = "단검")
+        val longSword = ItemData(id = "1036", name = "롱소드")
+
+        var cartList = listOf<ItemData>()
+
+        // 1. Add 단검, 롱소드, 단검 in order
+        cartList = cartList + dagger
+        cartList = cartList + longSword
+        cartList = cartList + dagger
+
+        assertEquals(listOf(dagger, longSword, dagger), cartList)
+
+        // 2. Derive userCart map
+        val cartMap = cartList.groupingBy { it }.eachCount()
+        assertEquals(2, cartMap[dagger])
+        assertEquals(1, cartMap[longSword])
+
+        // 3. Remove index 1 (롱소드)
+        cartList = cartList.filterIndexed { i, _ -> i != 1 }
+        assertEquals(listOf(dagger, dagger), cartList)
+
+        // 4. Remove item by candidate card [-] (removes last dagger at index 1)
+        val lastIdx = cartList.lastIndexOf(dagger)
+        cartList = cartList.filterIndexed { i, _ -> i != lastIdx }
+        assertEquals(listOf(dagger), cartList)
+    }
 }
