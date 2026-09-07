@@ -8,7 +8,6 @@ import com.sandorln.data.repository.version.VersionRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,91 +29,95 @@ class RefreshAppStartData @Inject constructor(
                 /* Server 데이터로 갱신 */
                 versionRepository.refreshVersionList()
 
-                /* 초기 값이 완료 되지 않은 버전 다시 갱신 (최신 미완료 버전 1개만 우선 갱신하여 OOM 방지) */
-                versionRepository.getNotInitCompleteVersionList().take(1).map { version ->
-                    async {
-                        val versionName = version.name
+                /* 초기 값이 완료 되지 않은 버전 다시 갱신 (메모리 OOM 방지를 위해 3개씩 청크 분할 처리) */
+                versionRepository.getNotInitCompleteVersionList().chunked(3).forEach { chunk ->
+                    chunk.map { version ->
+                        async {
+                            val versionName = version.name
 
-                        val championResult = if (version.isCompleteChampions)
-                            true
-                        else
-                            championRepository.refreshChampionList(versionName).isSuccess
+                            val championResult = if (version.isCompleteChampions)
+                                true
+                            else
+                                championRepository.refreshChampionList(versionName).isSuccess
 
-                        val itemResult = if (version.isCompleteItems)
-                            true
-                        else
-                            itemRepository.refreshItemList(versionName).isSuccess
+                            val itemResult = if (version.isCompleteItems)
+                                true
+                            else
+                                itemRepository.refreshItemList(versionName).isSuccess
 
-                        val spellResult = if (version.isCompleteSummonerSpell)
-                            true
-                        else
-                            spellRepository.refreshSummonerSpellList(versionName).isSuccess
+                            val spellResult = if (version.isCompleteSummonerSpell)
+                                true
+                            else
+                                spellRepository.refreshSummonerSpellList(versionName).isSuccess
 
-                        val (major, minor, patch) = version.majorMinorPatch
-                        val isGreaterThanOrEqualTo811 =
-                            when {
-                                major > 8 -> true
-                                major == 8 && minor > 1 -> true
-                                major == 8 && minor == 1 && patch >= 1 -> true
-                                else -> false
-                            }
+                            val (major, minor, patch) = version.majorMinorPatch
+                            val isGreaterThanOrEqualTo811 =
+                                when {
+                                    major > 8 -> true
+                                    major == 8 && minor > 1 -> true
+                                    major == 8 && minor == 1 && patch >= 1 -> true
+                                    else -> false
+                                }
 
-                        val runeResult = if (!isGreaterThanOrEqualTo811 || version.isCompleteRune)
-                            true
-                        else
-                            runeRepository.refreshRuneStyleList(versionName).isSuccess
+                            val runeResult = if (!isGreaterThanOrEqualTo811 || version.isCompleteRune)
+                                true
+                            else
+                                runeRepository.refreshRuneStyleList(versionName).isSuccess
 
-                        versionRepository.updateVersionData(
-                            version.copy(
-                                isCompleteChampions = championResult,
-                                isCompleteItems = itemResult,
-                                isCompleteSummonerSpell = spellResult,
-                                isCompleteRune = runeResult,
+                            versionRepository.updateVersionData(
+                                version.copy(
+                                    isCompleteChampions = championResult,
+                                    isCompleteItems = itemResult,
+                                    isCompleteSummonerSpell = spellResult,
+                                    isCompleteRune = runeResult,
+                                )
                             )
-                        )
-                    }
-                }.awaitAll()
+                        }
+                    }.awaitAll()
+                }
 
                 /* 이전 버전과 비교 하여 비교 값 저장 */
-                val allVersionList = versionRepository.allVersionList.firstOrNull() ?: return@coroutineScope
-                allVersionList.mapIndexed { index, version ->
-                    async {
-                        if (!version.isCompleteChampions || !version.isCompleteItems)
-                            return@async
+                val allVersionList = versionRepository.getAllVersionList()
+                allVersionList.chunked(5).forEach { chunk ->
+                    chunk.map { version ->
+                        async {
+                            if (!version.isCompleteChampions || !version.isCompleteItems)
+                                return@async
 
-                        val preVersion = allVersionList.getOrNull(index + 1)
-                        val preVersionName = preVersion?.name ?: ""
-                        if (preVersion?.isCompleteChampions == false)
-                            return@async
+                            val index = allVersionList.indexOf(version)
+                            val preVersion = allVersionList.getOrNull(index + 1)
+                            val preVersionName = preVersion?.name ?: ""
+                            if (preVersion != null && !preVersion.isCompleteChampions)
+                                return@async
 
-                        var newItemIdList: List<String>? = version.newItemIdList
-                        var newChampionIdList: List<String>? = version.newChampionIdList
+                            var newItemIdList: List<String>? = version.newItemIdList
+                            var newChampionIdList: List<String>? = version.newChampionIdList
 
-                        if (newItemIdList != null && newChampionIdList != null)
-                            return@async
+                            if (newItemIdList != null && newChampionIdList != null)
+                                return@async
 
-                        if (newItemIdList == null) {
-                            newItemIdList = itemRepository.getNewItemIdList(
+                            if (newItemIdList == null) {
+                                newItemIdList = itemRepository.getNewItemIdList(
+                                    versionName = version.name,
+                                    preVersionName = preVersionName
+                                )
+                            }
+
+                            if (newChampionIdList == null) {
+                                newChampionIdList = championRepository.getNewChampionIdList(
+                                    versionName = version.name,
+                                    preVersionName = preVersionName
+                                )
+                            }
+
+                            versionRepository.updateNewIdList(
                                 versionName = version.name,
-                                preVersionName = preVersionName
-                            )
-                        }
-
-                        if (newChampionIdList == null) {
-                            newChampionIdList = championRepository.getNewChampionIdList(
-                                versionName = version.name,
-                                preVersionName = preVersionName
-                            )
-                        }
-
-                        versionRepository.updateVersionData(
-                            version.copy(
                                 newChampionIdList = newChampionIdList,
                                 newItemIdList = newItemIdList
                             )
-                        )
-                    }
-                }.awaitAll()
+                        }
+                    }.awaitAll()
+                }
             }
         }
     }

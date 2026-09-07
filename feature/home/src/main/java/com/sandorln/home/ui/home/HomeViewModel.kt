@@ -119,6 +119,11 @@ class HomeViewModel @Inject constructor(
 
             launch(Dispatchers.IO) {
                 refreshAppStartData.invoke()
+                runCatching {
+                    kotlinx.coroutines.withTimeoutOrNull(3000) {
+                        _allVersionList.first { it.isNotEmpty() }
+                    }
+                }
                 _isInitComplete.emit(true)
             }
 

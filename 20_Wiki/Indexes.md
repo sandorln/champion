@@ -10,6 +10,7 @@
 - [[Plan_Mode]]: docs/plans 계획서 작성, 엄격한 리뷰 게이트, 기능별 분할 커밋 및 위키 갱신 규약
 - [[Riot_DataDragon_API]]: 라이엇 게임즈 공식 정적 CDN API 및 버전 관리 구조
 - [[Sprite_Sheet_Optimization]]: 대량 아이콘 렌더링 및 네트워크 병목 해소를 위한 비트맵 슬라이싱 최적화
+- [[App_Startup_Sync_Architecture]]: 초기 앱 구동 시 스플래시 화면 2단계 데이터 동기화 및 캐시 정합성 설계
 - [[Game_Mode_Architecture]]: 미니게임 허브 구조 및 재귀적 아이템 조합식 퀴즈 아키텍처
 
 ---
