@@ -64,10 +64,15 @@ fun LolPatchNoteScreen(
                     LolPatchNoteBody(lolPatch = lolPatchList[index]) { major1: Int, minor1: Int ->
                         coroutineScope.launch {
                             val url = lolPatchNoteViewModel.getPatchNoteUrl(major1, minor1)
-                            if (url.isNotEmpty())
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                            else
-                                BaseToast(context, BaseToastType.WARNING, context.getString(R.string.lol_patch_url_empty))
+                            if (url.isNotEmpty()) {
+                                runCatching {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                }.onFailure {
+                                    BaseToast(context, BaseToastType.WARNING, context.getString(R.string.lol_patch_url_empty)).show()
+                                }
+                            } else {
+                                BaseToast(context, BaseToastType.WARNING, context.getString(R.string.lol_patch_url_empty)).show()
+                            }
                         }
                     }
                 }

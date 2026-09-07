@@ -49,6 +49,7 @@ import com.sandorln.design.theme.Spacings
 import com.sandorln.design.theme.TextStyles
 import com.sandorln.model.data.champion.SummaryChampion
 import kotlin.math.floor
+import kotlin.math.max
 import com.sandorln.champion.R as championR
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -97,8 +98,10 @@ fun ChampionHomeScreen(
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val spanCount = floor(this.maxWidth / IconSize.XXLargeSize).toInt()
-        championHomeViewModel.sendAction(ChampionHomeAction.ChangeSpan(span = spanCount))
+        val spanCount = max(1, floor(this.maxWidth / IconSize.XXLargeSize).toInt())
+        LaunchedEffect(spanCount) {
+            championHomeViewModel.sendAction(ChampionHomeAction.ChangeSpan(span = spanCount))
+        }
         BaseLazyColumnWithPull(
             pullToRefreshState = pullToRefreshState
         ) {
@@ -193,7 +196,7 @@ private fun LazyListScope.baseChampionList(
             horizontalArrangement = Arrangement.Center
         ) {
             items(spanCount) { rowIndex ->
-                val champion = chunckChampionList[columnIndex].getOrNull(rowIndex)
+                val champion = chunckChampionList.getOrNull(columnIndex)?.getOrNull(rowIndex)
                 if (champion != null) {
                     ChampionBody(
                         champion = champion,
