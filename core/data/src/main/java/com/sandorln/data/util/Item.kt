@@ -6,6 +6,7 @@ import com.sandorln.database.model.SummaryItemImageEntity
 import com.sandorln.model.data.item.ItemCombination
 import com.sandorln.model.data.item.ItemData
 import com.sandorln.model.data.item.SummaryItemImage
+import com.sandorln.model.data.map.MapType
 import com.sandorln.model.type.ItemTagType
 import com.sandorln.network.model.item.NetworkItem
 
@@ -13,6 +14,15 @@ private fun isVersionAtLeast(version: String, major: Int, minor: Int): Boolean =
     val v = version.split('.').map { it.toIntOrNull() ?: 0 }
     v[0] > major || (v[0] == major && v.getOrElse(1) { 0 } >= minor)
 }.getOrDefault(false)
+
+private val ARENA_FOUR_DIGIT_ID_SET = setOf(
+    "2142", "2143", "2144", "2145", "2146",
+    "3348", "3430", "4010", "4011", "4015", "4016", "4017"
+)
+
+private fun isArenaItem(id: String): Boolean =
+    (id.length > 4 && (id.startsWith("22") || id.startsWith("44"))) ||
+    ARENA_FOUR_DIGIT_ID_SET.contains(id)
 
 fun ItemEntity.asData(): ItemData = ItemData(
     id = id,
@@ -27,7 +37,12 @@ fun ItemEntity.asData(): ItemData = ItemData(
         if (id == "3172" && isVersionAtLeast(version, 14, 10)) it + ItemTagType.Boots else it
     },
     image = image.asData(),
-    mapType = maps.asData(),
+    mapType = when {
+        id.startsWith("77") -> MapType.CLASSIC
+        id.length > 4 && id.startsWith("66") -> MapType.NONE
+        isArenaItem(id) -> MapType.ARENA
+        else -> maps.asData()
+    },
     gold = gold.asData()
 )
 
@@ -38,7 +53,12 @@ fun SummaryItemEntity.asData(): ItemData = ItemData(
     into = into,
     tags = tags.asItemTagTypeSet(),
     image = image.asData(),
-    mapType = maps.asData()
+    mapType = when {
+        id.startsWith("77") -> MapType.CLASSIC
+        id.length > 4 && id.startsWith("66") -> MapType.NONE
+        isArenaItem(id) -> MapType.ARENA
+        else -> maps.asData()
+    }
 )
 
 fun NetworkItem.asEntity(id: String, version: String): ItemEntity = ItemEntity(
@@ -52,7 +72,12 @@ fun NetworkItem.asEntity(id: String, version: String): ItemEntity = ItemEntity(
     from = from.filterNotNull(),
     into = into.filterNotNull(),
     image = image.asEntity(),
-    maps = maps.asMapTypeEntity(),
+    maps = when {
+        id.startsWith("77") -> ItemEntity.MapTypeEntity.CLASSIC
+        id.length > 4 && id.startsWith("66") -> ItemEntity.MapTypeEntity.NONE
+        isArenaItem(id) -> ItemEntity.MapTypeEntity.ARENA
+        else -> maps.asMapTypeEntity()
+    },
     gold = gold.asEntity()
 )
 

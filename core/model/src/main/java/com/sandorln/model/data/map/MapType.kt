@@ -4,5 +4,7 @@ enum class MapType {
     ALL,
     SUMMONER_RIFT,
     ARAM,
-    NONE
+    NONE,
+    CLASSIC,
+    ARENA
 }
