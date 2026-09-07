@@ -20,6 +20,13 @@ private val ARENA_FOUR_DIGIT_ID_SET = setOf(
     "3348", "3430", "4010", "4011", "4015", "4016", "4017"
 )
 
+private val ARAM_ONLY_ITEM_ID_SET = setOf(
+    "2051", // 수호자의 뿔피리
+    "3112", // 수호자의 보주
+    "3177", // 수호자의 검
+    "3184"  // 수호자의 망치
+)
+
 private fun isArenaItem(id: String): Boolean =
     (id.length > 4 && (id.startsWith("22") || id.startsWith("44"))) ||
     ARENA_FOUR_DIGIT_ID_SET.contains(id)
@@ -41,6 +48,7 @@ fun ItemEntity.asData(): ItemData = ItemData(
         id.startsWith("77") -> MapType.CLASSIC
         id.length > 4 && id.startsWith("66") -> MapType.NONE
         isArenaItem(id) -> MapType.ARENA
+        ARAM_ONLY_ITEM_ID_SET.contains(id) -> MapType.ARAM
         else -> maps.asData()
     },
     gold = gold.asData()
@@ -57,6 +65,7 @@ fun SummaryItemEntity.asData(): ItemData = ItemData(
         id.startsWith("77") -> MapType.CLASSIC
         id.length > 4 && id.startsWith("66") -> MapType.NONE
         isArenaItem(id) -> MapType.ARENA
+        ARAM_ONLY_ITEM_ID_SET.contains(id) -> MapType.ARAM
         else -> maps.asData()
     }
 )
@@ -76,6 +85,7 @@ fun NetworkItem.asEntity(id: String, version: String): ItemEntity = ItemEntity(
         id.startsWith("77") -> ItemEntity.MapTypeEntity.CLASSIC
         id.length > 4 && id.startsWith("66") -> ItemEntity.MapTypeEntity.NONE
         isArenaItem(id) -> ItemEntity.MapTypeEntity.ARENA
+        ARAM_ONLY_ITEM_ID_SET.contains(id) -> ItemEntity.MapTypeEntity.ARAM
         else -> maps.asMapTypeEntity()
     },
     gold = gold.asEntity()
