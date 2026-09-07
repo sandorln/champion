@@ -33,6 +33,21 @@
 
 ---
 
-## 4. 출처 및 참고 문헌
+## 4. 공식 웹사이트 패치 노트 URL 규격
+라이엇 공식 홈페이지의 패치 노트 URL은 시즌별 / 마이너 버전별로 규칙이 상이하므로 클라이언트에서 웹 스크래핑 및 링크 연결 시 다음 규칙을 적용한다:
+- **Major >= 16 (시즌 26 이후)**:
+  - Minor >= 4: `https://www.leagueoflegends.com/ko-kr/news/game-updates/league-of-legends-patch-{major + 10}-{minor}-notes/`
+  - Minor 1..3: `https://www.leagueoflegends.com/ko-kr/news/game-updates/patch-{major + 10}-{minor}-notes/`
+- **Major 15 (시즌 25)**:
+  - Minor 1..2: `patch-25-s1-{minor}-notes/`
+  - Minor 3: `patch-2025-s1-3-notes/`
+  - Minor >= 4: `patch-25-{minor:02d}-notes/`
+- **Major <= 14**:
+  - `patch-{major}-{minor}-notes/`
+
+---
+
+## 5. 출처 및 참고 문헌
 - [EXTRACTED] `10_Raw_Sources/Project_Docs/LOL_Champion_Architecture_Spec.md`
 - [EXTRACTED] Riot Games Developer Portal Data Dragon Documentation
+- [EXTRACTED] 라이엇 게임즈 공식 웹사이트 패치 뉴스 URL 구조 실측 분석 (2026-09)
