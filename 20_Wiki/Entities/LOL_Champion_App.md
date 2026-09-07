@@ -2,7 +2,7 @@
 
 - **유형**: 안드로이드 애플리케이션 프로젝트 (Application Project)
 - **개발자/저자**: sandorln
-- **관련 개념**: [[MVI_Architecture]], [[Riot_DataDragon_API]], [[Sprite_Sheet_Optimization]], [[Item_Data_Classification]], [[Plan_Mode]]
+- **관련 개념**: [[MVI_Architecture]], [[Riot_DataDragon_API]], [[Sprite_Sheet_Optimization]], [[Game_Mode_Architecture]], [[Item_Data_Classification]], [[Plan_Mode]]
 - **기술 스택/의존성**: [[Jetpack_Compose]], [[Ktor]], [[Room]], [[Riot_Games]]
 
 ---

@@ -1,4 +1,4 @@
-﻿# LLM Wiki Lint Report
+# LLM Wiki Lint Report
 
 - Audit Timestamp: 2026-09-07 21:46:17
 - Total Wiki Files: 11

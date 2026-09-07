@@ -30,8 +30,8 @@ class RefreshAppStartData @Inject constructor(
                 /* Server 데이터로 갱신 */
                 versionRepository.refreshVersionList()
 
-                /* 초기 값이 완료 되지 않은 버전 다시 갱신 */
-                versionRepository.getNotInitCompleteVersionList().map { version ->
+                /* 초기 값이 완료 되지 않은 버전 다시 갱신 (최신 미완료 버전 1개만 우선 갱신하여 OOM 방지) */
+                versionRepository.getNotInitCompleteVersionList().take(1).map { version ->
                     async {
                         val versionName = version.name
 
