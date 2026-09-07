@@ -229,6 +229,7 @@ class ItemHomeViewModel @Inject constructor(
 
                             val isMutationItem = item.gold.total == 0 && item.gold.sell == 0
                             if (isMutationItem) return@filter false
+                            if (!item.inStore) return@filter false
 
                             /* Tag Type Filter */
                             when {
@@ -250,6 +251,17 @@ class ItemHomeViewModel @Inject constructor(
                             return@filter when {
                                 isMatchMapType || isItemAllType -> item.name.contains(searchKeyword)
                                 else -> false
+                            }
+                        }.groupBy { it.name }
+                        .map { (_, items) ->
+                            if (items.size == 1) {
+                                items.first()
+                            } else {
+                                items.minWithOrNull(
+                                    compareBy<ItemData> { it.id.length > 4 }
+                                        .thenBy { it.mapType != MapType.ALL }
+                                        .thenBy { it.id }
+                                ) ?: items.first()
                             }
                         }.run {
                             if (selectMapType == MapType.ARAM || selectMapType == MapType.SUMMONER_RIFT) {
