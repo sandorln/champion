@@ -1,0 +1,19 @@
+[
+  {
+    "filename": "LOL_Champion_Architecture_Spec.md",
+    "target_dir": "10_Raw_Sources/Project_Docs",
+    "sha256": "20edbe41fde1b25c5f822171c7520fa23382a8f080d253495851dcf31189af80",
+    "timestamp": "2026-09-06 15:35:00",
+    "generated_pages": [
+      "20_Wiki/Concepts/MVI_Architecture.md",
+      "20_Wiki/Concepts/Riot_DataDragon_API.md",
+      "20_Wiki/Concepts/Sprite_Sheet_Optimization.md",
+      "20_Wiki/Entities/LOL_Champion_App.md",
+      "20_Wiki/Entities/Riot_Games.md",
+      "20_Wiki/Entities/Jetpack_Compose.md",
+      "20_Wiki/Entities/Ktor.md",
+      "20_Wiki/Entities/Room.md",
+      "20_Wiki/Indexes.md"
+    ]
+  }
+]

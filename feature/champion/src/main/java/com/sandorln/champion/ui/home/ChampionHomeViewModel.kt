@@ -134,11 +134,8 @@ class ChampionHomeViewModel @Inject constructor(
                     else
                         allChampionList.filter { champion -> champion.name.startsWith(searchKeyword) }
 
-                    runCatching {
-                        filterPassChampionList.chunked(span)
-                    }.onFailure {
-                        _sideEffect.emit(ChampionHomeSideEffect.ShowErrorMessage(it as Exception))
-                    }.getOrDefault(emptyList())
+                    val safeSpan = span.coerceAtLeast(1)
+                    filterPassChampionList.chunked(safeSpan)
                 }.collectLatest { displayChampionList ->
                     _championUiState.update {
                         it.copy(displayChampionList = displayChampionList)

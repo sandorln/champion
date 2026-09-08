@@ -6,6 +6,7 @@ import com.sandorln.domain.usecase.game.GetGameRank
 import com.sandorln.domain.usecase.game.GetInitialGameScore
 import com.sandorln.domain.usecase.game.GetRefreshRankGameNextTime
 import com.sandorln.domain.usecase.game.RefreshGameRank
+import com.sandorln.domain.usecase.version.GetCurrentVersion
 import com.sandorln.model.type.GameType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -27,8 +28,13 @@ class GameHomeViewModel @Inject constructor(
     getInitialGameScore: GetInitialGameScore,
     getRefreshRankGameNextTime: GetRefreshRankGameNextTime,
     getGameRank: GetGameRank,
-    private val refreshGameRank: RefreshGameRank
+    private val refreshGameRank: RefreshGameRank,
+    getCurrentVersion: GetCurrentVersion
 ) : ViewModel() {
+    val currentVersionName: StateFlow<String> = getCurrentVersion.invoke()
+        .map { it.name }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "14.13.1")
+
     val initialGameRank : StateFlow<Int?> = getGameRank.invoke()
         .map { it[GameType.Initial] }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)

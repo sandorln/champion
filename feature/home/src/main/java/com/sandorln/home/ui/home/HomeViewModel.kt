@@ -119,6 +119,11 @@ class HomeViewModel @Inject constructor(
 
             launch(Dispatchers.IO) {
                 refreshAppStartData.invoke()
+                runCatching {
+                    kotlinx.coroutines.withTimeoutOrNull(3000) {
+                        _allVersionList.first { it.isNotEmpty() }
+                    }
+                }
                 _isInitComplete.emit(true)
             }
 
@@ -128,7 +133,7 @@ class HomeViewModel @Inject constructor(
                     .first { versionList ->
                         val currentVersion = getCurrentVersion.invoke().firstOrNull() ?: Version()
                         if (currentVersion.name.isEmpty()) {
-                            val latestVersion = versionList.firstOrNull() ?: return@first false
+                            val latestVersion = versionList.firstOrNull { it.isInitCompleteVersion } ?: versionList.firstOrNull() ?: return@first false
                             changeCurrentVersion.invoke(latestVersion.name)
                         }
 
