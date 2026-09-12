@@ -60,4 +60,25 @@
 
     <string name="item_patch_note_title">아이템 패치노트</string>
     <string name="item_patch_note_loading_title">아이템 패치노트 불러오는 중</string>
+
+    <string name="item_builder_title">아이템 빌드</string>
+    <string name="item_builder_empty">작성된 아이템 빌드가 없습니다.\n새로운 빌드를 추가해보세요.</string>
+    <string name="item_builder_new">새 빌드 추가</string>
+    <string name="item_builder_edit">수정</string>
+    <string name="item_builder_delete">삭제</string>
+    <string name="item_builder_save">저장</string>
+    <string name="item_builder_name_hint">빌드 이름 입력</string>
+    <string name="item_builder_position_title">추천 포지션</string>
+    <string name="item_builder_add_item">추가하기</string>
+    <string name="item_builder_max_count_reached">버전당 최대 10개의 빌드만 생성할 수 있습니다</string>
+    <string name="item_builder_delete_confirm">해당 아이템 빌드를 삭제하시겠습니까?</string>
+    <string name="item_builder_saved">아이템 빌드가 저장되었습니다.</string>
+    <string name="item_builder_deleted">아이템 빌드가 삭제되었습니다.</string>
+
+    <string name="tag_fighter">전사</string>
+    <string name="tag_tank">탱커</string>
+    <string name="tag_mage">마법사</string>
+    <string name="tag_assassin">암살자</string>
+    <string name="tag_marksman">원거리 딜러</string>
+    <string name="tag_support">서포터</string>
 </resources>

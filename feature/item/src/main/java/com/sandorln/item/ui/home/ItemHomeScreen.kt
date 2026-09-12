@@ -491,7 +491,7 @@ fun ItemBody(
     }
 }
 
-private fun LazyListScope.baseItemList(
+internal fun LazyListScope.baseItemList(
     title: String = "제목",
     spanCount: Int = 5,
     spriteMap: Map<String, Bitmap?> = emptyMap(),
