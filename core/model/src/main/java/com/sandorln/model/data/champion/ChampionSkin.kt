@@ -4,5 +4,6 @@ data class ChampionSkin(
     var id: String? = null,
     var num: String? = null,
     var name: String = "",
-    var chromas: Boolean = false
+    var chromas: Boolean = false,
+    var parentSkin: Int? = null
 )
