@@ -62,6 +62,7 @@ import com.sandorln.item.R as itemR
 fun ItemDetailDialog(
     versionName: String,
     selectedItemId: String,
+    isBuilderMode: Boolean = false,
     itemDetailDialogViewModel: ItemDetailDialogViewModel = hiltViewModel(),
     onAddItemBuildData: (ItemData) -> Unit = {},
     onDismissRequest: () -> Unit = {},
@@ -101,11 +102,7 @@ fun ItemDetailDialog(
             ItemInfoBody(
                 name = baseItem.name,
                 tags = baseItem.tags,
-                bitmap = baseItem.image.getImageBitmap(currentSpriteMap),
-                onAddItemBuildData = {
-                    onAddItemBuildData.invoke(baseItem)
-                    onDismissRequest.invoke()
-                }
+                bitmap = baseItem.image.getImageBitmap(currentSpriteMap)
             )
 
             HorizontalDivider(
@@ -189,6 +186,36 @@ fun ItemDetailDialog(
                         itemCombination = itemCombination,
                         spriteBitmapMap = currentSpriteMap,
                         onSelectItem = onChangeSelectItem
+                    )
+                }
+            }
+
+            if (isBuilderMode) {
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = Colors.Gold07
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = Colors.Blue05,
+                            shape = RoundedCornerShape(
+                                bottomStart = Radius.Radius04,
+                                bottomEnd = Radius.Radius04
+                            )
+                        )
+                        .clickable {
+                            onAddItemBuildData.invoke(baseItem)
+                            onDismissRequest.invoke()
+                        }
+                        .padding(vertical = Spacings.Spacing03),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "추가하기",
+                        style = TextStyles.SubTitle01,
+                        color = Colors.Gold02
                     )
                 }
             }
@@ -338,8 +365,7 @@ fun ItemStatusBody(
 fun ItemInfoBody(
     name: String = "",
     bitmap: Bitmap? = null,
-    tags: Set<ItemTagType> = emptySet(),
-    onAddItemBuildData: () -> Unit
+    tags: Set<ItemTagType> = emptySet()
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -381,37 +407,6 @@ fun ItemInfoBody(
                     }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(Spacings.Spacing00))
-
-        Row(
-            modifier = Modifier
-                .clickable(onClick = onAddItemBuildData)
-                .border(
-                    0.5.dp,
-                    Colors.Gold04,
-                    RoundedCornerShape(Radius.Radius08)
-                )
-                .padding(
-                    horizontal = Spacings.Spacing01,
-                    vertical = 2.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacings.Spacing00)
-        ) {
-            Text(
-                text = "아이템 빌드 추가",
-                style = TextStyles.Body04,
-                color = Colors.BaseColor
-            )
-
-            Icon(
-                modifier = Modifier.size(IconSize.SmallSize),
-                painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = null,
-                tint = Colors.BaseColor
-            )
         }
     }
 }
@@ -558,7 +553,7 @@ fun ItemDetailDialogPreView() {
 @Composable
 fun ItemInfoBodyPreView() {
     LolChampionThemePreview {
-        ItemInfoBody("장화", onAddItemBuildData = {})
+        ItemInfoBody("장화")
     }
 }
 
