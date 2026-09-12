@@ -50,4 +50,8 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindsGameRepository(defaultGameRepository: DefaultGameRepository): GameRepository
+
+    @Binds
+    @Singleton
+    fun bindsItemBuildRepository(defaultItemBuildRepository: com.sandorln.data.repository.item.DefaultItemBuildRepository): com.sandorln.data.repository.item.ItemBuildRepository
 }

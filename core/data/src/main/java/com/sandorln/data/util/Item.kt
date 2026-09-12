@@ -144,3 +144,21 @@ fun SummaryItemImageEntity.asData() = SummaryItemImage(
     id = id,
     image = image.asData()
 )
+
+fun com.sandorln.database.model.ItemBuildEntity.asData(): com.sandorln.model.data.item.ItemBuild = com.sandorln.model.data.item.ItemBuild(
+    id = id,
+    version = version,
+    title = title,
+    positionList = positions.asData(),
+    itemIdList = itemIds,
+    createdAt = createdAt
+)
+
+fun com.sandorln.model.data.item.ItemBuild.asEntity(): com.sandorln.database.model.ItemBuildEntity = com.sandorln.database.model.ItemBuildEntity(
+    id = id,
+    version = version,
+    title = title,
+    positions = positionList.asEntity(),
+    itemIds = itemIdList,
+    createdAt = createdAt
+)
