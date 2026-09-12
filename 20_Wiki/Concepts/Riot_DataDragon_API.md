@@ -58,6 +58,10 @@
   - 크로마 항목은 고유 속성으로 `"parentSkin": {부모스킨번호}`를 포함한다.
   - **주의**: 라이엇 CDN은 개별 크로마에 대한 스플래시 이미지 에셋을 제공하지 않으며, 요청 시 **403 Forbidden**을 반환한다.
   - 따라서 챔피언 상세 화면의 스킨 갤러리 구성 시에는 `parentSkin == null`인 고유 스킨만 필터링하여 노출해야 정상적인 이미지를 렌더링할 수 있다.
+- **CDN 비동기 이미지 로딩 및 플레이스홀더 전략**:
+  - [EXTRACTED] 고해상도 스플래시 이미지 다운로드 시 발생하는 네트워크 지연 동안 빈 화면(투명 또는 단색 박스)이 노출되는 것을 방지하기 위해 Glide Compose의 `GlideSubcomposition`을 활용한 상태별 렌더링 파이프라인을 구축한다.
+  - [EXTRACTED] `RequestState.Loading`: 전체 뷰 리컴포지션을 유발하지 않으면서 테마 골드 컬러(`Colors.Gold03`)의 원형 프로그레스 인디케이터(`CircularProgressIndicator`) 및 다크 배경(`Colors.Gray09`)을 즉각 노출한다.
+  - [EXTRACTED] `RequestState.Failure`: 네트워크 단절이나 에셋 누락 시 기본 챔피언 아이콘(`ic_main_champion`)으로 안전하게 Fallback 처리한다.
 
 ---
 
