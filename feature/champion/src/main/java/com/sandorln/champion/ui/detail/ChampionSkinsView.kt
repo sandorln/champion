@@ -49,13 +49,14 @@ fun ChampionSkinsView(
     var isShowSkinInfo by remember { mutableStateOf(true) }
     var selectedPosition by remember { mutableIntStateOf(0) }
     val lazyListState = rememberLazyListState()
-    val selectedChampionSkin = championSkinList.getOrElse(selectedPosition) { championSkinList.firstOrNull() }
-    val selectedChampionSkinNum = selectedChampionSkin?.num?.takeIf(String::isNotEmpty) ?: selectedPosition.toString()
-    val selectedChampionSkinName = selectedChampionSkin?.name?.takeIf { selectedPosition > 0 } ?: "기본 스킨"
+    val displaySkinList = championSkinList.ifEmpty { listOf(ChampionSkin(name = "기본 스킨", num = "0")) }
+    val selectedChampionSkin = displaySkinList.getOrElse(selectedPosition) { displaySkinList.first() }
+    val selectedChampionSkinNum = selectedChampionSkin.num?.takeIf(String::isNotEmpty) ?: "0"
+    val selectedChampionSkinName = selectedChampionSkin.name.takeIf { selectedPosition > 0 && it != "default" } ?: "기본 스킨"
     val disableColorFilter = ColorFilter.tint(Colors.Gray07, BlendMode.Color)
 
-    LaunchedEffect(key1 = championSkinList.size) {
-        selectedPosition = if (championSkinList.lastIndex < selectedPosition) 0 else selectedPosition
+    LaunchedEffect(key1 = displaySkinList.size) {
+        selectedPosition = if (displaySkinList.lastIndex < selectedPosition) 0 else selectedPosition
     }
 
     Box(modifier = modifier) {
@@ -101,9 +102,9 @@ fun ChampionSkinsView(
                     contentPadding = PaddingValues(vertical = Spacings.Spacing05),
                     state = lazyListState
                 ) {
-                    items(championSkinList.size) { count ->
+                    items(displaySkinList.size) { count ->
                         val isSelected = count == selectedPosition
-                        val skinNum = championSkinList[count].num?.takeIf(String::isNotEmpty) ?: count.toString()
+                        val skinNum = displaySkinList[count].num?.takeIf(String::isNotEmpty) ?: count.toString()
                         BaseChampionSplashImage(
                             modifier = Modifier
                                 .clickable {

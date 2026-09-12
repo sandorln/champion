@@ -151,7 +151,7 @@ fun ChampionEntity.asDetailData(): ChampionDetailData = ChampionDetailData(
 fun NetworkChampionDetail.asData(otherChampionDetail: ChampionDetailData = ChampionDetailData()): ChampionDetailData =
     otherChampionDetail.copy(
         lore = lore,
-        skins = skins.map(NetworkChampionSkin::asData),
+        skins = skins.map(NetworkChampionSkin::asData).filter { it.parentSkin == null },
         allytips = allyTips,
         enemytips = enemyTips,
         spells = spells.mapIndexed { index, networkChampionSpell ->
@@ -163,8 +163,9 @@ fun NetworkChampionDetail.asData(otherChampionDetail: ChampionDetailData = Champ
 fun NetworkChampionSkin.asData(): ChampionSkin = ChampionSkin(
     id = id,
     name = name,
-    num = num,
-    chromas = chromas
+    num = num.toString(),
+    chromas = chromas,
+    parentSkin = parentSkin
 )
 
 fun NetworkChampionSpell.asData(index: Int): ChampionSpell {

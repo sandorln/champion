@@ -47,7 +47,26 @@
 
 ---
 
-## 5. 출처 및 참고 문헌
+## 5. 챔피언 스킨 및 스플래시 이미지 규격
+라이엇 Data Dragon의 챔피언 상세 API(`champion/{championId}.json`) 및 스플래시 이미지 CDN 연동 규칙:
+- **스플래시 이미지 엔드포인트**: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{championId}_{num}.jpg`
+- **스킨 데이터 모델 규격**:
+  - `num`: 고유 스킨 식별 번호 (JSON 상에서 **정수형(`Int`)**으로 제공됨, 예: `0`, `1`, `2`).
+  - `name`: 스킨 명칭 (스킨 번호 `0`의 명칭은 `"default"`로 제공되므로 클라이언트에서 "기본 스킨"으로 로컬라이징 처리).
+- **최신 버전 크로마(Chroma) 포함 및 필터링 정책**:
+  - 최신 버전(16.x 이상)부터는 `skins` 배열 내에 색상 변형인 크로마 항목들이 함께 포함되어 제공된다.
+  - 크로마 항목은 고유 속성으로 `"parentSkin": {부모스킨번호}`를 포함한다.
+  - **주의**: 라이엇 CDN은 개별 크로마에 대한 스플래시 이미지 에셋을 제공하지 않으며, 요청 시 **403 Forbidden**을 반환한다.
+  - 따라서 챔피언 상세 화면의 스킨 갤러리 구성 시에는 `parentSkin == null`인 고유 스킨만 필터링하여 노출해야 정상적인 이미지를 렌더링할 수 있다.
+- **CDN 비동기 이미지 로딩 및 플레이스홀더 전략**:
+  - [EXTRACTED] 고해상도 스플래시 이미지 다운로드 시 발생하는 네트워크 지연 동안 빈 화면(투명 또는 단색 박스)이 노출되는 것을 방지하기 위해 Glide Compose의 `GlideSubcomposition`을 활용한 상태별 렌더링 파이프라인을 구축한다.
+  - [EXTRACTED] `RequestState.Loading`: 전체 뷰 리컴포지션을 유발하지 않으면서 테마 골드 컬러(`Colors.Gold03`)의 원형 프로그레스 인디케이터(`CircularProgressIndicator`) 및 다크 배경(`Colors.Gray09`)을 즉각 노출한다.
+  - [EXTRACTED] `RequestState.Failure`: 네트워크 단절이나 에셋 누락 시 기본 챔피언 아이콘(`ic_main_champion`)으로 안전하게 Fallback 처리한다.
+
+---
+
+## 6. 출처 및 참고 문헌
 - [EXTRACTED] `10_Raw_Sources/Project_Docs/LOL_Champion_Architecture_Spec.md`
 - [EXTRACTED] Riot Games Developer Portal Data Dragon Documentation
 - [EXTRACTED] 라이엇 게임즈 공식 웹사이트 패치 뉴스 URL 구조 실측 분석 (2026-09)
+- [EXTRACTED] Data Dragon 16.17.1 챔피언 상세 스킨 스키마 및 CDN 스플래시 응답 실측 검증 (2026-09)

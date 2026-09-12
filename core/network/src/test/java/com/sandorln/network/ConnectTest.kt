@@ -155,5 +155,21 @@ class ConnectTest {
             }
         }
     }
+
+    @Test
+    fun 최신_버전_챔피언_상세_스킨_정보_가져오기() {
+        runBlocking {
+            val latestVersion = "16.17.1"
+            val aatroxDetail = _championService.getChampionDetail(latestVersion, "Aatrox")
+            println("아트록스 스킨 개수: ${aatroxDetail.skins.size}")
+            assert(aatroxDetail.skins.isNotEmpty())
+            assert(aatroxDetail.skins.any { it.num == 0 })
+            assert(aatroxDetail.skins.any { it.parentSkin != null })
+
+            val ahriDetail = _championService.getChampionDetail(latestVersion, "Ahri")
+            println("아리 스킨 개수: ${ahriDetail.skins.size}")
+            assert(ahriDetail.skins.isNotEmpty())
+        }
+    }
 }
 
