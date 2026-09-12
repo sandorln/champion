@@ -76,7 +76,8 @@ import com.sandorln.item.R as ItemR
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ItemHomeScreen(
-    itemHomeViewModel: ItemHomeViewModel = hiltViewModel()
+    itemHomeViewModel: ItemHomeViewModel = hiltViewModel(),
+    moveToItemBuilderListScreen: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val uiState by itemHomeViewModel.itemUiState.collectAsState()
@@ -159,7 +160,8 @@ fun ItemHomeScreen(
                     onClickFilterIcon = {
                         val action = ItemHomeAction.ChangeShowFilterDialog(true)
                         itemHomeViewModel.sendAction(action)
-                    }
+                    },
+                    onClickBuilderIcon = moveToItemBuilderListScreen
                 )
             }
 
@@ -536,7 +538,8 @@ internal fun LazyListScope.baseItemList(
 @Composable
 fun ItemStickyHeader(
     onKeywordChange: (String) -> Unit,
-    onClickFilterIcon: () -> Unit
+    onClickFilterIcon: () -> Unit,
+    onClickBuilderIcon: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -568,6 +571,15 @@ fun ItemStickyHeader(
             contentDescription = null,
             tint = Colors.Gray04,
         )
+
+        Icon(
+            modifier = Modifier
+                .size(size = IconSize.LargeSize)
+                .clickable { onClickBuilderIcon.invoke() },
+            painter = painterResource(id = R.drawable.ic_pencil),
+            contentDescription = null,
+            tint = Colors.Gray04,
+        )
     }
 }
 
@@ -584,8 +596,9 @@ fun ItemIconBodyPreview() {
 @Composable
 fun ItemStickyHeaderPreview() {
     LolChampionThemePreview {
-        ItemStickyHeader(onKeywordChange = {}) {
-
-        }
+        ItemStickyHeader(
+            onKeywordChange = {},
+            onClickFilterIcon = {}
+        )
     }
 }

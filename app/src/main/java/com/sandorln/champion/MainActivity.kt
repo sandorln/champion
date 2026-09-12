@@ -24,6 +24,9 @@ import com.sandorln.game.navigation.moveToInitialQuiz
 import com.sandorln.game.navigation.moveToItemRecipeQuiz
 import com.sandorln.home.navigation.HomeScreenRoute
 import com.sandorln.home.navigation.homeScreens
+import com.sandorln.item.navigation.itemScreens
+import com.sandorln.item.navigation.moveToItemBuilderEdit
+import com.sandorln.item.navigation.moveToItemBuilderList
 import com.sandorln.setting.navigation.moveToLolPatchNoteScreen
 import com.sandorln.setting.navigation.settingScreens
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,11 +56,16 @@ class MainActivity : ComponentActivity() {
                             moveToLolPatchNoteScreen = navController::moveToLolPatchNoteScreen,
                             moveToChampionPatchNoteListScreen = navController::moveToChampionPatchNoteList,
                             moveToInitialQuizScreen = navController::moveToInitialQuiz,
-                            moveToItemRecipeQuizScreen = navController::moveToItemRecipeQuiz
+                            moveToItemRecipeQuizScreen = navController::moveToItemRecipeQuiz,
+                            moveToItemBuilderListScreen = navController::moveToItemBuilderList
                         )
                         championScreens(
                             onBackStack = navController::navigateUp,
                             moveToChampionDetailScreen = navController::moveToChampionDetail
+                        )
+                        itemScreens(
+                            onBackStack = navController::navigateUp,
+                            moveToItemBuilderEdit = navController::moveToItemBuilderEdit
                         )
                         settingScreens(
                             onBackStack = navController::navigateUp
