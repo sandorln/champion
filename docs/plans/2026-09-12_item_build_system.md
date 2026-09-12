@@ -15,8 +15,13 @@
 
 ### 1.2 핵심 사용자 요구사항
 1. **시작 기준**: `develop` 최신 커밋에서 신규 브랜치(`feat/item_build_system`) 생성 후 진행.
-2. **홈 아이템 탭 진입점**: 상단 `StickyHeader` 검색창 옆 필터 아이콘 좌/우에 독립적인 **Builder Icon** 배치.
-3. **아이템 빌더 목록 화면**:
+2. **버전별 종속 및 수량 제한 (Version-specific & Max 10 Builds)**:
+   - 각 아이템 빌드는 작성 시점의 롤 버전(예: `16.17.1`)에 종속되어 저장됩니다.
+   - 각 버전당 최대 10개까지만 아이템 빌드를 생성할 수 있습니다 (`count <= 10`).
+   - 목록 화면에서 현재 선택된 버전의 빌드 목록 및 카운트(예: `아이템 빌드 (3/10)`)를 표시하고, 10개 초과 생성을 방지합니다.
+3. **디자인 일관성 준수**: 기존 앱 디자인 시스템(`LolChampionTheme`, `Colors.Gold*`, `Colors.Blue*`, `Radius`, `TextStyles`)에 완벽히 부합하도록 구현.
+4. **홈 아이템 탭 진입점**: 상단 `StickyHeader` 검색창 옆 필터 아이콘 좌/우에 독립적인 **Builder Icon** 배치.
+5. **아이템 빌더 목록 화면**:
    - 뒤로가기 네비게이션.
    - 사용자가 작성한 아이템 빌드를 보여주는 가로형 카드(`ItemBuilderCard`) 리스트.
    - 카드 구성: 가로가 긴 라운드 카드, 넉넉한 가로 내부 패딩, 좌측 정렬 텍스트(제목, 포지션 태그 표기), 선택된 아이템 가로 나열, 우측 상단 더보기(More) 아이콘.
@@ -77,6 +82,7 @@ flowchart TD
   ```kotlin
   data class ItemBuild(
       val id: Long = 0L,
+      val version: String = "",                          // 해당 빌드가 작성된 롤 버전
       val title: String = "",
       val positionList: List<ChampionTag> = emptyList(), // Fighter, Tank, Mage, Assassin, Marksman, Support
       val itemIdList: List<String> = emptyList(),        // 최대 6개 아이템 ID
@@ -91,6 +97,7 @@ flowchart TD
   data class ItemBuildEntity(
       @PrimaryKey(autoGenerate = true)
       val id: Long = 0L,
+      val version: String,
       val title: String,
       val positions: List<ChampionTag>,
       val itemIds: List<String>,

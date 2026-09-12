@@ -66,4 +66,21 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun providesVersionDao(appDatabase: AppDatabase): VersionDao = appDatabase.versionDao()
+
+    private const val ITEM_BUILD_DB_NAME = "item-build"
+
+    @Provides
+    @Singleton
+    fun providesItemBuildDatabase(
+        @ApplicationContext context: Context,
+        lolChampionConverters: LolChampionConverters
+    ): com.sandorln.database.ItemBuildDatabase = Room
+        .databaseBuilder(context, com.sandorln.database.ItemBuildDatabase::class.java, ITEM_BUILD_DB_NAME)
+        .addTypeConverter(lolChampionConverters)
+        .build()
+
+    @Provides
+    @Singleton
+    fun providesItemBuildDao(itemBuildDatabase: com.sandorln.database.ItemBuildDatabase): com.sandorln.database.dao.ItemBuildDao =
+        itemBuildDatabase.itemBuildDao()
 }
